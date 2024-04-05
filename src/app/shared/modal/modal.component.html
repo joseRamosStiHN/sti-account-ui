@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Crear Nueva cuenta</h2>
+<div mat-dialog-content>
+    <form #form="ngForm">
+
+        <div class="form-modal">
+            <mat-form-field>
+                <input matInput placeholder="Código" name="codigo" ngModel required>
+            </mat-form-field>
+        </div>
+        <div class="form-modal">
+            <mat-form-field>
+                <input matInput placeholder="Nombre de la Cuenta" name="nombre" ngModel required>
+            </mat-form-field>
+        </div>
+        <div class="form-modal">
+            <mat-form-field>
+                <input matInput placeholder="Naturaleza" name="nombre" ngModel required>
+            </mat-form-field>
+        </div>
+        <div class="form-modal">
+            <mat-form-field>
+                <input matInput placeholder="Saldo de la Cuenta" name="nombre" ngModel required>
+            </mat-form-field>
+        </div>
+
+    </form>
+</div>
+<div mat-dialog-actions class="align-end">
+    <button mat-button (click)="cerrarModal()">Cancelar</button>
+    <button mat-button color="primary" [disabled]="!form.valid" (click)="guardar()">Guardar</button>
+</div>

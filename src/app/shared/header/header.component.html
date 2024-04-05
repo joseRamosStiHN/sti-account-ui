@@ -1,0 +1,25 @@
+<!-- header.component.html -->
+<header>
+  <div class="container-modulos">
+    <div class="logo">
+      <img src="../../../../assets/logoSti.jpeg" alt="Logo">
+    </div>
+    <div class="modulos">
+      <a [routerLink]="['/accounting/customer-invoicing']">Factura de clientes</a>
+      <a [routerLink]="['/accounting/suplier-invoice']">Factura de proveedores</a>
+      <a [routerLink]="['/accounting/account-settings']">Configuracion</a>
+      <a [routerLink]="['/customer-invoicing']">Otros</a>
+    </div>
+  </div>
+
+  <div class="usuario" [ngClass]="{'sin-foto': !tieneFotoPerfil}">
+    <span class="name-user">Josue Rodriguez</span>
+
+    @if (!tieneFotoPerfil) {
+      <span class="iniciales">{{iniciales}}</span>
+    } @else {
+      <img src="usuario.png" alt="perfil">
+    } 
+
+  </div>
+</header>

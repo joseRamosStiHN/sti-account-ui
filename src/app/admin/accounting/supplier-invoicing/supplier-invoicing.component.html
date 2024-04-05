@@ -1,0 +1,134 @@
+<div class="container-customer-invoicing">
+
+  <div class="container-customers">
+
+    <div class="contianer-invoice">
+      <div class="contianer-customer">
+        <div class="my-form-group">
+          <label for="">Factura del Proveedor</label>
+          <input type="text">
+        </div>
+
+        <div class="my-form-group">
+          <label for="cliente">Proveedor</label>
+          <ng-select dropdownPosition="bottom" class="custom" id="c_tipo_planilla" name="c_tipo_planilla"
+            formControlName='c_tipo_planilla'>
+            <ng-option *ngFor="let item of clientes" [value]="item.id">
+              {{item.cliente}}</ng-option>
+          </ng-select>
+        </div>
+
+
+
+
+      </div>
+      <div class="contianer-customer-detail">
+        <div class="form-group">
+          <label for="cliente">Fecha de Factura</label>
+          <mat-form-field class="example-full-width custom-form-field ">
+
+            <input matInput [matDatepicker]="pickerFactura">
+
+            <mat-datepicker-toggle matIconSuffix [for]="pickerFactura">
+
+            </mat-datepicker-toggle>
+            <mat-datepicker #pickerFactura></mat-datepicker>
+          </mat-form-field>
+
+        </div>
+        <div class="form-group">
+          <label for="">Referencia de pago</label>
+          <input type="text" class="input-payment-reference">
+        </div>
+        <div class="form-group">
+          <label for="cliente">Fecha de Vencimiento</label>
+          <mat-form-field class="example-full">
+            <input matInput [matDatepicker]="pickerVencimiento">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerVencimiento">
+            </mat-datepicker-toggle>
+            <mat-datepicker #pickerVencimiento></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <label for="diario">Condiciones de pago</label>
+          <ng-select dropdownPosition="bottom" class="custom" id="c_tipo_planilla" class="custom-select"
+            name="c_tipo_planilla" formControlName='c_tipo_planilla'>
+            <ng-option *ngFor="let item of clientes" [value]="item.id">
+              {{item.cliente}}</ng-option>
+          </ng-select>
+        </div>
+        <div class="form-group">
+          <label for="diario">Diario</label>
+          <ng-select dropdownPosition="bottom" class="custom" id="c_tipo_planilla" class="custom-select"
+            name="c_tipo_planilla" formControlName='c_tipo_planilla'>
+            <ng-option *ngFor="let item of clientes" [value]="item.id">
+              {{item.cliente}}</ng-option>
+          </ng-select>
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <div class="container-table" *ngIf="lista.length > 0">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Etiqueta</th>
+                <th>Cuenta</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Impuestos</th>
+                <th>Total</th>
+                <th>Eliminar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of lista; let i = index">
+                <td>{{i + 1}}</td>
+                <td contenteditable (blur)="editarCampo($event, i, 'producto')" [textContent]="item.producto"></td>
+                <td contenteditable (blur)="editarCampo($event, i, 'etiqueta')" [textContent]="item.etiqueta"></td>
+                <td contenteditable="true" (blur)="editarCampos($event, i, 'cuenta', seleccionado)">
+                  <ng-select dropdownPosition="bottom" class="custom" id="c_tipo_planilla" class="custom-select"
+                    name="c_tipo_planilla" formControlName='c_tipo_planilla' (change)="capturarSeleccion($event, i)">
+                    <ng-option *ngFor="let nuevo of clientes" [value]="nuevo.id">{{nuevo.cliente}}</ng-option>
+                  </ng-select>
+                </td>
+                <td contenteditable (blur)="editarCampo($event, i, 'cantidad')" [textContent]="item.cantidad"></td>
+                <td contenteditable (blur)="editarCampo($event, i, 'cantidad')" [textContent]="item.cantidad"></td>
+                <td contenteditable (blur)="editarCampo($event, i, 'precio')" [textContent]="item.precio"></td>
+                <td>{{item.cantidad * item.precio}}</td>
+                <td>
+                  <button class="btn btn-danger" (click)="eliminar(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="btn-group">
+            <button class="btn btn-default" (click)="agregar()">
+              <mat-icon>add</mat-icon>
+              <p>Agregar Nueva linea</p>
+            </button>
+            <!-- <button class="btn btn-default" (click)="recuperarValores()">Recuperar Valores</button> -->
+          </div>
+          <br>
+          <br>
+          <div id="JSON"></div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+
+</div>

@@ -1,0 +1,71 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #333;
+}
+
+.logo img {
+  width: 100px; 
+}
+
+.usuario img {
+  width: 40px; 
+  border-radius: 50%; 
+  margin-right: 10px;
+}
+
+.usuario span {
+  font-size: 16px;
+}
+
+.logo img{
+  border-radius: 5px;
+}
+
+.modulos{
+  margin-left: 10px;
+}
+
+.modulos a {
+  margin-right: 20px;
+  color: #000;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.modulos a:hover {
+  color: #2062c5;
+  cursor: pointer;
+}
+
+.container-modulos{
+
+  display: flex;
+  justify-content: start;
+  flex-direction: row;
+  align-items: center;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+}
+
+.usuario .name-user {
+  font-size: 16px;
+  padding: 20px;
+}
+.sin-foto .iniciales {
+  background-color: #555;
+  padding: 5px;
+  border-radius: 50%;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}

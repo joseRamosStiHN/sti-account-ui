@@ -1,0 +1,14 @@
+.align-end {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .form-modal {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  mat-form-field{
+    width: 100%;
+  }

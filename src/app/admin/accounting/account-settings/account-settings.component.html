@@ -1,0 +1,55 @@
+<div class="container-settings">
+  <div class="btn-group">
+    <button class="btn btn-default" (click)="abrirModal()">
+      <mat-icon>add</mat-icon>
+      <p>Agregar cuenta</p>
+    </button>
+  </div>
+  <div class="container-table" *ngIf="lista.length > 0">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Codigo</th>
+              <th>Nombre cuenta</th>
+              <th>Naturaleza</th>
+              <th>Saldo</th>
+              <th>Estado</th>
+              <th>Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of lista; let i = index">
+              <td>{{i + 1}}</td>
+              <td contenteditable (blur)="editarCampo($event, i, 'producto')" [textContent]="item.producto"></td>
+              <td contenteditable (blur)="editarCampo($event, i, 'etiqueta')" [textContent]="item.etiqueta"></td>
+              <td contenteditable="true" (blur)="editarCampos($event, i, 'cuenta', seleccionado)">
+                <ng-select dropdownPosition="bottom" class="custom" id="c_tipo_planilla" class="custom-select"
+                  name="c_tipo_planilla" formControlName='c_tipo_planilla' (change)="capturarSeleccion($event, i)">
+                  <ng-option *ngFor="let nuevo of clientes" [value]="nuevo.id">{{nuevo.cliente}}</ng-option>
+                </ng-select>
+              </td>
+              <td contenteditable (blur)="editarCampo($event, i, 'cantidad')" [textContent]="item.cantidad"></td>
+              <td>
+                <mat-slide-toggle (change)="toggleChanged($event)"></mat-slide-toggle>
+              </td>
+  
+              <td>
+                <button class="btn btn-danger" (click)="eliminar(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <br>
+        <br>
+        <div id="JSON"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
