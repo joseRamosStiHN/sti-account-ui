@@ -5,7 +5,7 @@
 }
 
 .contianer-invoice {
-  width: 98%;
+  width: 100%;
   display: flex;
   justify-content: space-evenly;
   margin-top: 20px;
@@ -17,34 +17,32 @@
 }
 
 .container-customers {
-  width: 98%;
+  width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   margin-top: 20px;
   flex-wrap: wrap;
   background-color: #fff;
-  margin: 10px;
-  border: thin solid #000;
 
 }
 
 .container-table {
-  width: 90%;
+  width: 100%;
+  padding: 20px 120px 0px 120px;
 }
 
 
 .contianer-customer {
-  width: 600px;
+  width: 50%;
   display: flex;
- 
   flex-direction: column;
-  padding: 5px;
 
+  padding: 20px 40px 0px 120px;
 
 }
 
 .contianer-customer-detail {
-  width: 600px;
+  width: 50%;
   padding-top: 10px;
   display: flex;
   flex-direction: column;
@@ -52,7 +50,7 @@
 }
 
 .my-form-group {
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   /* Espaciado vertical entre los grupos */
 }
 
@@ -68,33 +66,25 @@
 .my-form-group input[type="password"],
 .my-form-group textarea,
 .my-form-group select {
-  width: 100%;
-  /* Ajusta el ancho del control de formulario al 100% */
-  padding: 8px;
-  /* Ajusta el relleno del control de formulario */
+  width: 70%;
+  padding: 5px;
   border: none;
   border-bottom: 1px solid #ccc;
-  /* Agrega un borde alrededor del control */
 
   box-sizing: border-box;
-  /* Incluye el relleno y el borde en el tamaño total */
 }
 
 .my-form-group small {
-  font-size: 0.8em;
-  /* Tamaño de fuente más pequeño para textos adicionales */
+  font-size: 10px;
   color: #999;
-  /* Color de texto más suave para textos adicionales */
 }
 
 .my-form-group.form-check input[type="checkbox"] {
   margin-right: 5px;
-  /* Ajusta el margen derecho para los checkboxes en la clase form-check */
 }
 
 .my-form-group.form-check label {
   display: inline-block;
-  /* Alinea los labels de los checkboxes en línea */
 }
 
 .form-group {
@@ -127,7 +117,7 @@ input:focus {
 }
 
 .custom-select {
-  width: 60%;
+  width: 70%;
   /* height: 10px; */
 }
 
@@ -150,7 +140,9 @@ input:focus {
 }
 
 .panel-body {
-  padding: 15px;
+  /* padding: 15px; */
+  max-height: 300px; 
+  overflow-y: auto;
 }
 
 .table {
@@ -179,7 +171,7 @@ input:focus {
   border: 1px solid transparent;
   white-space: nowrap;
   padding: 6px 12px;
-  font-size: 14px;
+  font-size: 12px;
   border-radius: 4px;
 }
 
@@ -207,4 +199,53 @@ input:focus {
 
 tr th {
   text-align: start;
+}
+
+
+.select-table{
+  width: 100%;
+  height:auto;
+  /* height: 10px; */
+}
+
+.container-select-table{
+  width: 300px;
+}
+
+thead  {
+  height: 30px;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f2f2f2; /* Asegura que los encabezados sean visibles */
+}
+
+.contianer-controls{
+  display: flex;
+  padding: 0 20px 20px 20px;
+  justify-content: space-between;
+}
+
+
+.container-total {
+
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.container-total label {
+  font-weight: bold;
+}
+
+.container-total label:last-child {
+  color: #ff0000;
 }
