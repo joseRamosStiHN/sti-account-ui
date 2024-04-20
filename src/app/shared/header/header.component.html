@@ -1,25 +1,47 @@
 <!-- header.component.html -->
-<header>
-  <div class="container-modulos">
-    <div class="logo">
-      <img src="../../../../assets/logoSti.jpeg" alt="Logo">
+<header class="w-[100%]">
+  <nav class="border-b-2 h-14">
+    <div class="flex justify-between gap-1 items-center p-2">
+      <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+        <img [src]="'assets/logoSti.jpeg'" class="h-8" alt="Logo" />
+        <span
+          class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
+        ></span>
+      </a>
+
+      <div class="min-h-14" id="navbar-sticky">
+        <ul
+          class="flex p-1 border-gray-700 xl:gap-5 md:gap-2 rounded-md text-sm"
+        >
+          @for (n of nav; track $index) {
+          <li>
+            <a
+              [routerLink]="n.path"
+              class="block py-2 px-3 font-bold p-1.5 rounded hover:bg-blue-900 hover:text-slate-50"
+              aria-current="page"
+              >{{ n.label }}</a
+            >
+          </li>
+          }
+        </ul>
+      </div>
+
+      <div class="mb-2">
+        <button
+          type="button"
+          class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+          id="user-menu-button"
+          aria-expanded="false"
+          data-dropdown-toggle="user-dropdown"
+          data-dropdown-placement="bottom"
+        >
+          <span class="sr-only">Open user menu</span>
+          <small
+            class="w-8 h-8 rounded-full text-gray-400"
+            alt="user photo"
+          ></small>
+        </button>
+      </div>
     </div>
-    <div class="modulos">
-      <a [routerLink]="['/accounting/customer-invoicing']">Factura de clientes</a>
-      <a [routerLink]="['/accounting/suplier-invoice']">Factura de proveedores</a>
-      <a [routerLink]="['/accounting/account-settings']">Configuracion</a>
-      <a [routerLink]="['/customer-invoicing']">Otros</a>
-    </div>
-  </div>
-
-  <div class="usuario" [ngClass]="{'sin-foto': !tieneFotoPerfil}">
-    <span class="name-user">Josue Rodriguez</span>
-
-    @if (!tieneFotoPerfil) {
-      <span class="iniciales">{{iniciales}}</span>
-    } @else {
-      <img src="usuario.png" alt="perfil">
-    } 
-
-  </div>
+  </nav>
 </header>
