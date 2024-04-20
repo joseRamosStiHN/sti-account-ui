@@ -1,0 +1,62 @@
+<div class="w-full flex flex-col mt-5 gap-2">
+  <h2
+    class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl"
+  >
+    Facturas de clientes
+  </h2>
+  <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
+    <dx-date-range-box class="p-1"> </dx-date-range-box>
+    <button
+      type="button"
+      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 rounded-md text-sm px-5 py-2 me-1 mt-1 focus:outline-none"
+    >
+      Buscar
+    </button>
+  </div>
+  <div class="w-full">
+    <dx-data-grid
+      id="gridContainer"
+      [dataSource]="dataSource"
+      [allowColumnReordering]="true"
+      [rowAlternationEnabled]="true"
+      [showBorders]="true"
+      [width]="'100%'"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 25, 50, 100]"
+      ></dxo-pager>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="true"
+      ></dxo-search-panel>
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+      <dxi-column caption="Documento" dataField="document"></dxi-column>
+      <dxi-column caption="Cuenta" dataField="account"></dxi-column>
+      <dxi-column
+        caption="Fecha"
+        dataField="dateAt"
+        dataType="date"
+      ></dxi-column>
+      <dxi-column caption="Valor" dataField="amount"></dxi-column>
+      <dxi-column caption="Estado" dataField="status"></dxi-column>
+      <dxi-column caption="No Partida" dataField="entryNumber"></dxi-column>
+
+      <dxo-toolbar>
+        <dxi-item name="groupPanel"></dxi-item>
+        <dxi-item name="searchPanel"></dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            icon="add"
+            hint="Agregar factura"
+            aria-placeholder="Agregar factura"
+            (onClick)="goToClient()"
+          >
+          </dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+    </dx-data-grid>
+  </div>
+</div>

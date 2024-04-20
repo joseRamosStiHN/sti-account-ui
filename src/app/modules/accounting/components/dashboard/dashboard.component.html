@@ -1,0 +1,101 @@
+<div class="content-account-dash mt-5">
+  <div
+    class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+  >
+    <div class="flex flex-col rounded border-2 shadow-sm mx-auto">
+      <div
+        class="px-1 py-1 bg-gray-50 border-b border-gray-600 font-bold text-center uppercase"
+      >
+        Factura de Proveedores
+      </div>
+      <div class="flex flex-row">
+        <div class="basis-1/3 flex text-center items-center">
+          <button
+            class="font-semibold ml-2 p-2 border border-transparent rounded hover:border-gray-200 hover:shadow-sm hover:bg-slate-100 active:bg-slate-300 active:shadow-none"
+          >
+            Agregar Factura
+          </button>
+        </div>
+
+        <div class="basis-2/3 justify-items-end">
+          <p class="text-center capitalize text-xs p-1">Ultimas facturas</p>
+          <ul class="mt-2 border-l-0">
+            <li class="text-center">
+              <a
+                class="block text-sm text-blue-600 hover:text-balance hover:underline hover:cursor-pointer"
+                >F00001 - 01/01/2024</a
+              >
+            </li>
+            <li class="text-center">
+              <a
+                class="block text-sm text-blue-600 hover:text-balance hover:underline hover:cursor-pointer"
+                >F00002 - 01/01/2024</a
+              >
+            </li>
+            <li class="text-center">
+              <a
+                class="block text-sm text-blue-600 hover:text-balance hover:underline hover:cursor-pointer"
+                >F00003 - 01/01/2024</a
+              >
+            </li>
+          </ul>
+          <div class="text-end mt-2">
+            <small
+              class="text-gray-900 font-medium mr-2 cursor-pointer hover:text-blue-700 hover:underline"
+              >ver mas</small
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col rounded border-2 shadow-sm mx-auto">
+      <div
+        class="px-1 py-1 bg-gray-50 border-b border-gray-600 font-bold text-center uppercase"
+      >
+        Factura de Clientes
+      </div>
+      <div class="flex flex-row">
+        <div class="basis-1/3 flex text-center items-center">
+          <a
+            [routerLink]="'./client-invoicing'"
+            class="font-semibold ml-2 p-2 border border-transparent rounded hover:border-gray-200 hover:shadow-sm hover:bg-slate-100 active:bg-slate-300 active:shadow-none"
+          >
+            Agregar Factura
+          </a>
+        </div>
+
+        <div class="basis-2/3 justify-items-end">
+          <p class="text-center capitalize text-xs p-1">Ultimas facturas</p>
+          <ul class="mt-2 border-l-0">
+            <li class="text-center">
+              <a
+                class="block text-sm text-blue-600 hover:text-balance hover:underline hover:cursor-pointer"
+                >F00001 - 01/01/2024</a
+              >
+            </li>
+            <li class="text-center">
+              <a
+                class="block text-sm text-blue-600 hover:text-balance hover:underline hover:cursor-pointer"
+                >F00002 - 01/01/2024</a
+              >
+            </li>
+            <li class="text-center">
+              <a
+                class="block text-sm text-blue-600 hover:text-balance hover:underline hover:cursor-pointer"
+                >F00003 - 01/01/2024</a
+              >
+            </li>
+          </ul>
+          <div class="text-end mt-2">
+            <a
+              [routerLink]="'./client-list'"
+              class="text-gray-900 font-medium mr-2 cursor-pointer hover:text-blue-700 hover:underline"
+              >ver mas</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
