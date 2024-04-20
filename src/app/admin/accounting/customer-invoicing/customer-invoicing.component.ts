@@ -1,108 +1,150 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgSelectModule } from '@ng-select/ng-select';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import { MatNativeDateModule } from '@angular/material/core';
-import {MatInputModule} from '@angular/material/input';
-import { MatDialog } from '@angular/material/dialog'; // Importa MatDialog
-import { MatIconModule } from '@angular/material/icon';
+import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
+import { DxDataGridModule } from 'devextreme-angular';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import config from 'devextreme/core/config';
+interface Transaction {
+  accountId: number;
+  amount: number;
+  movement: string;
+}
 
-export interface ItemLista {
-  producto: string,
-      etiqueta: string,
-      cuenta: string,
-      cantidad: number,
-      precio: number,
-      impuestos:number,
-      
+interface IAccount {
+  code: string;
+  name: string;
+}
+
+interface IMovement {
+  name: string;
+  code: string;
+}
+
+interface ClientBilling {
+  id?: number;
+  billingNumber: string;
+  date: Date;
+  currency: string;
+  exchangeRate: number;
+  description: string;
 }
 
 @Component({
   selector: 'app-customer-invoicing',
   standalone: true,
-  imports: [ CommonModule, NgSelectModule,MatDatepickerModule
-    ,MatNativeDateModule,MatInputModule,MatIconModule],
+  imports: [CommonModule, DxDataGridModule, FormsModule, ReactiveFormsModule],
   templateUrl: './customer-invoicing.component.html',
-  styleUrl: './customer-invoicing.component.css'
+  styleUrl: './customer-invoicing.component.css',
 })
 export class CustomerInvoicingComponent {
- 
- seleccionado: any;
-  displayedColumns: string[] = ['nombre', 'apellido', 'edad', 'acciones'];
-
- 
-
-  data = [{ nombre: '', apellido: '', edad: null }];
-
-
-  clientes = [{id:1,cliente:'Josue Rodriguez'},{id:2,cliente:'Valeria Rodriguez'}]
-
-  public editing = false;
-
-  lista: ItemLista[] = [
+  totalCredit: number = 0;
+  totalDebit: number = 0;
+  invalidBalance: string = '';
+  invalidNumberOfTx: string = '';
+  clientBilling: ClientBilling = {
+    billingNumber: '',
+    date: new Date(),
+    currency: '',
+    exchangeRate: 0,
+    description: '',
+  };
+  dataSource: Transaction[] = [];
+  listAccount: IAccount[] = [
     {
-      producto: '',
-      etiqueta: '',
-      cuenta: '',
-      cantidad: 0,
-      precio: 0,
-      impuestos:0,
-      
+      code: '1',
+      name: 'Cuentas por Cobrar',
     },
-    
+    {
+      code: '2',
+      name: 'Cuentas por pagar',
+    },
   ];
+  listMovement: IMovement[] = [
+    {
+      code: 'DEBE',
+      name: 'Debe',
+    },
+    {
+      code: 'HABER',
+      name: 'Haber',
+    },
+  ];
+  //
+  constructor() {
+    config({
+      defaultCurrency: 'HNL',
+      defaultUseCurrencyAccountingStyle: true,
+      serverDecimalSeparator: '.',
+    });
+  }
 
-  eliminar(row: number): void {
-    if (confirm("¿Seguro que desea eliminar?")) {
-      this.lista.splice(row, 1);
+  //submit request
+  onSubmit(e: NgForm) {
+    console.log('valid? ', e.valid);
+    if (e.valid && this.validate()) {
+      console.log('data:', this.clientBilling);
+      console.log('dataSource', this.dataSource);
     }
   }
 
-  agregar(): void {
-    this.lista.push({producto: '',
-    etiqueta: '',
-    cuenta: '',
-    cantidad: 0,
-    precio: 0,
-    impuestos:0,
-  });
-  }
-
-  recuperarValores(): void {
-    console.log(this.lista);
-    document.getElementById('JSON')!.textContent = JSON.stringify(this.lista);
-  }
-
-  editarCampo(event: Event, index: number, field: keyof ItemLista): void {
- 
-    
-    const target = event.target as HTMLElement;
-    if (target.textContent !== null && target.textContent !== undefined) {
-
-      
-      const newValue = target.textContent.trim();
-      (this.lista[index] as any)[field] = field === 'cantidad' || field === 'precio' ? +newValue : newValue;
+  // calcula el total en el componente del summary
+  calculateSummary(options: any) {
+    if (options.name === 'totalDebit' || options.name === 'totalCredit') {
+      switch (options.summaryProcess) {
+        case 'start':
+          options.totalValue = 0;
+          break;
+        case 'calculate':
+          if (
+            options.name === 'totalDebit' &&
+            options.value.movimiento === 'DEBE'
+          ) {
+            // si es el item de debito y el movimiento el `DEBE`
+            options.totalValue += options.value.monto;
+          } else if (
+            // si es el item de credito y movimiento es el `HABER`
+            options.name === 'totalCredit' &&
+            options.value.movimiento === 'HABER'
+          ) {
+            options.totalValue += options.value.monto;
+          }
+          break;
+      }
     }
   }
 
-  editarCampos(event: Event, index: number, field: keyof ItemLista, selecc:string): void {
-    
- 
-    
-    const target = event.target as HTMLElement;
-    if (target.textContent !== null && target.textContent !== undefined) {
-      const newValue = target.textContent.trim();
-      (this.lista[index] as any)[field] = field === 'cantidad' || field === 'precio' ? +newValue : newValue;
+  customCurrencyText(cellInfo: any): string {
+    return cellInfo.valueText.replace('USD', '$').replace('HNL', 'L');
+  }
+
+  onContentReady(e: DxDataGridTypes.ContentReadyEvent) {
+    const gridComponent = e.component;
+
+    // Obtén los totales del summary. por medio de los nombres del calculateSummary.
+    const totalDebit = gridComponent.getTotalSummaryValue('totalDebit');
+    const totalCredit = gridComponent.getTotalSummaryValue('totalCredit');
+
+    // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
+    // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
+    this.totalDebit = totalDebit; // actualiza en la vista
+    this.totalCredit = totalCredit;
+  }
+
+  private validate(): boolean {
+    this.invalidBalance = ''; // limpia el balance
+    if (this.dataSource.length < 2) {
+      // si el array contiene menos de 2 registros
+      this.invalidNumberOfTx = 'Debe agregar al menos 2 transacciones';
+      return false;
     }
+    // operar sobre el total y verificar que lleve a cero la operación
+    const total = this.totalCredit - this.totalDebit;
+    if (total !== 0) {
+      this.invalidBalance =
+        'El balance no es correcto, por favor ingrese los valores correctos';
+      return false;
+    }
+    // si todo `OK` retorna true
+    return true;
   }
-
-  capturarSeleccion(event: any, i: number) {
-    
-    this.lista[i].cuenta = event;
-  }
-
-
-  
 }
