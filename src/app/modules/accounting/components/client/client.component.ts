@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import config from 'devextreme/core/config';
+import { confirm } from 'devextreme/ui/dialog';
 
 interface Transaction {
   accountId: number;
@@ -26,6 +28,13 @@ interface ClientBilling {
   currency: string;
   exchangeRate: number;
   description: string;
+  status?: string;
+}
+enum typeToast {
+  Info = 'info',
+  Error = 'error',
+  Success = 'success',
+  Warning = 'warning',
 }
 @Component({
   selector: 'app-client',
@@ -35,8 +44,11 @@ interface ClientBilling {
 export class ClientComponent {
   totalCredit: number = 0;
   totalDebit: number = 0;
-  errorMessage: string = '';
-  showErrorMessage: boolean = false;
+  messageToast: string = '';
+  showToast: boolean = false;
+  toastType: string = typeToast.Info;
+  buttonTextPosting: string = 'Confirmar';
+  disablePosting: boolean = false;
   clientBilling: ClientBilling = {
     billingNumber: '',
     date: new Date(),
@@ -66,7 +78,7 @@ export class ClientComponent {
     },
   ];
   //
-  constructor() {
+  constructor(private router: Router) {
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
@@ -74,13 +86,59 @@ export class ClientComponent {
     });
   }
 
-  //TODO: aqui debe trabajar
   onSubmit(e: NgForm) {
     console.log('valid? ', e.valid);
     if (e.valid && this.validate()) {
       console.log('data:', this.clientBilling);
       console.log('dataSource', this.dataSource);
+      //TODO: Laurent aqui hace la integración
+      //el servicio deberia retornar el id de la transaccion y su estado
+      //set id
+      this.clientBilling.id = 1;
+      this.clientBilling.status = 'Draft';
+      //cuando todo este OK use
+      this.toastType = typeToast.Success;
+      this.messageToast = 'Registros insertados exitosamente';
+      this.showToast = true;
+      // en caso de error usar
+      /*  this.toastType = typeToast.Error;
+          this.messageToast = '<Aqui va el mensaje de error>'; 
+          this.showToast = true;
+      */
     }
+  }
+
+  posting() {
+    let dialogo = confirm(
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Advertencia'
+    );
+
+    dialogo.then(async (d) => {
+      if (d) {
+        // si el usuario dio OK
+        this.buttonTextPosting = 'confirmando...';
+        this.disablePosting = true;
+
+        //TODO: Laurent
+        /*
+          aqui cuando el usuario le dio confirma debe de llamar al api
+          debe de enviar el estado al que va a cambiar que seria POST(o el que ponga Edwin)
+          y el id de la transacción
+          si todo va bien lo vamos a enviar a otra sección
+          en caso de error usar:
+               this.toastType = typeToast.Error;
+               this.messageToast = '<Aqui va el mensaje de error>'; 
+               this.showToast = true;
+
+                this.buttonTextPosting = 'Confirmar';
+                this.disablePosting = false;
+    
+        */
+        //si todo fue OK redirigir al usuario
+        this.router.navigate(['/accounting/client-list']);
+      }
+    });
   }
 
   // calcula el total en el componente del summary
@@ -128,22 +186,24 @@ export class ClientComponent {
   }
 
   private validate(): boolean {
-    this.errorMessage = ''; // limpia el balance
-    this.showErrorMessage = false;
+    this.messageToast = ''; // limpia el balance
+    this.showToast = false;
     if (this.dataSource.length < 2) {
       // si el array contiene menos de 2 registros
-      this.errorMessage = 'Debe agregar al menos 2 transacciones';
-      this.showErrorMessage = true;
-      console.log('invalida number of tnx');
+      this.messageToast = 'Debe agregar al menos 2 transacciones';
+      this.showToast = true;
+      this.toastType = typeToast.Error;
+      //console.log('invalida number of tnx');
       return false;
     }
     // operar sobre el total y verificar que lleve a cero la operación
     const total = this.totalCredit - this.totalDebit;
     if (total !== 0) {
-      this.errorMessage =
+      this.messageToast =
         'El balance no es correcto, por favor ingrese los valores correctos';
-      this.showErrorMessage = true;
-      console.log('invalida balance');
+      this.showToast = true;
+      this.toastType = typeToast.Error;
+      //console.log('invalida balance');
       return false;
     }
     // si todo `OK` retorna true

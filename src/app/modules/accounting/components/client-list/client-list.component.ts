@@ -93,7 +93,7 @@ export class ClientListComponent {
   ];
 
   constructor(private router: Router) {}
-  //TODO:
+
   goToClient = () => {
     this.router.navigate(['/accounting/client-invoicing']);
   };
