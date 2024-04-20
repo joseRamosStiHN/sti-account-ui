@@ -19,135 +19,144 @@
           </button>
         </div>
       </div>
-
-      <div class="grid gap-4 mb-6 md:grid-cols-2">
+      <div class="contianer-customer-detail">
         <div class="form-group">
-          <label
-            for="billingNumber"
-            class="block mb-2 text-sm font-medium text-gray-900"
-            >Número de Factura</label
-          >
-          <input
-            [(ngModel)]="clientBilling.billingNumber"
-            id="billingNumber"
-            name="billingNumber"
-            type="text"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            placeholder="FACT00001"
-            required
-          />
-          <div
-            *ngIf="
-              itemForm.submitted &&
-              itemForm.form.controls['billingNumber'].getError('required')
-            "
-          >
-            <small class="text-xs text-red-900"
-              >Número de Factura es requerido.</small
-            >
-          </div>
-        </div>
-        <div>
-          <label for="date" class="block mb-2 text-sm font-medium text-gray-900"
-            >Fecha</label
-          >
-          <input
-            type="date"
-            [(ngModel)]="clientBilling.date"
-            id="date"
-            name="date"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            placeholder=""
-            required
-          />
-          <div
-            *ngIf="
-              itemForm.submitted &&
-              itemForm.form.controls['date'].getError('required')
-            "
-          >
-            <small class="text-xs text-red-900">La fecha es requerida.</small>
-          </div>
-        </div>
+          <label for="cliente">Fecha de Factura</label>
+          <mat-form-field class="example-full-width custom-form-field">
+            <input matInput [matDatepicker]="pickerFactura" />
 
-        <div>
-          <label
-            for="txt_moneda"
-            class="block mb-2 text-sm font-medium text-gray-900"
-            >Moneda</label
-          >
-          <select
-            [(ngModel)]="clientBilling.currency"
-            required
-            name="currency"
-            id="txt_moneda"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
-            <option selected>Lempiras</option>
-            <option>Dolares</option>
-          </select>
-          <div
-            *ngIf="
-              itemForm.submitted &&
-              itemForm.form.controls['currency'].getError('required')
-            "
-          >
-            <small class="text-xs text-red-900">La moneda es requerida.</small>
-          </div>
+            <mat-datepicker-toggle matIconSuffix [for]="pickerFactura">
+            </mat-datepicker-toggle>
+            <mat-datepicker #pickerFactura></mat-datepicker>
+          </mat-form-field>
         </div>
-        <div>
-          <label
-            for="exchangeRate"
-            class="block mb-2 text-sm font-medium text-gray-900"
-            >Tasa de Cambio</label
+        <div class="form-group">
+          <label for="">Referencia de pago</label>
+          <input type="text" class="input-payment-reference" />
+        </div>
+        <div class="form-group">
+          <label for="cliente">Fecha de Vencimiento</label>
+          <mat-form-field class="example-full">
+            <input matInput [matDatepicker]="pickerVencimiento" />
+            <mat-datepicker-toggle matIconSuffix [for]="pickerVencimiento">
+            </mat-datepicker-toggle>
+            <mat-datepicker #pickerVencimiento></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <label for="diario">Condiciones de pago</label>
+          <ng-select
+            dropdownPosition="bottom"
+            class="custom"
+            id="c_tipo_planilla"
+            class="custom-select"
+            name="c_tipo_planilla"
+            formControlName="c_tipo_planilla"
           >
-          <select
-            [(ngModel)]="clientBilling.exchangeRate"
-            required="true"
-            name="exchangeRate"
-            id="exchangeRate"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
-            <option selected>24.7012</option>
-            <option>24.7821</option>
-          </select>
-          <div
-            *ngIf="
-              itemForm.submitted &&
-              itemForm.form.controls['exchangeRate'].errors &&
-              itemForm.form.controls['exchangeRate'].errors['required']
-            "
-          >
-            <small class="text-xs text-red-900"
-              >La tasa de cambio es requerida.</small
+            <ng-option *ngFor="let item of clientes" [value]="item.id">
+              {{ item.cliente }}</ng-option
             >
-          </div>
+          </ng-select>
+        </div>
+        <div class="form-group">
+          <label for="diario">Diario</label>
+          <ng-select
+            dropdownPosition="bottom"
+            class="custom"
+            id="c_tipo_planilla"
+            class="custom-select"
+            name="c_tipo_planilla"
+            formControlName="c_tipo_planilla"
+          >
+            <ng-option *ngFor="let item of clientes" [value]="item.id">
+              {{ item.cliente }}</ng-option
+            >
+          </ng-select>
         </div>
       </div>
-      <div class="mb-6">
-        <label
-          for="txt_description"
-          class="block mb-2 text-sm font-medium text-gray-900"
-          >Descripción de la partida</label
-        >
-        <input
-          [(ngModel)]="clientBilling.description"
-          type="text"
-          name="description"
-          id="txt_description"
-          maxlength="150"
-          class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Ingresa una Descripción corta acerca de la partida contable"
-          required
-        />
+    </div>
 
-        <div
-          *ngIf="
-            itemForm.submitted &&
-            itemForm.form.controls['description'].getError('required')
-          "
-        >
-          <small class="text-xs text-red-900">La descripción requerida.</small>
+    <div class="container-table" *ngIf="lista.length > 0">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Etiqueta</th>
+                <th>Cuenta</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Impuestos</th>
+                <th>Total</th>
+                <th>Eliminar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of lista; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td
+                  contenteditable
+                  (blur)="editarCampo($event, i, 'producto')"
+                  [textContent]="item.producto"
+                ></td>
+                <td
+                  contenteditable
+                  (blur)="editarCampo($event, i, 'etiqueta')"
+                  [textContent]="item.etiqueta"
+                ></td>
+                <td>
+                  <ng-select
+                    dropdownPosition="bottom"
+                    class="custom"
+                    id="c_tipo_planilla"
+                    class="custom-select"
+                    name="c_tipo_planilla"
+                    formControlName="c_tipo_planilla"
+                    (change)="capturarSeleccion($event, i)"
+                  >
+                    <ng-option
+                      *ngFor="let nuevo of clientes"
+                      [value]="nuevo.id"
+                      >{{ nuevo.cliente }}</ng-option
+                    >
+                  </ng-select>
+                </td>
+                <td
+                  contenteditable
+                  (blur)="editarCampo($event, i, 'cantidad')"
+                  [textContent]="item.cantidad"
+                ></td>
+                <td
+                  contenteditable
+                  (blur)="editarCampo($event, i, 'cantidad')"
+                  [textContent]="item.cantidad"
+                ></td>
+                <td
+                  contenteditable
+                  (blur)="editarCampo($event, i, 'precio')"
+                  [textContent]="item.precio"
+                ></td>
+                <td>{{ item.cantidad * item.precio }}</td>
+                <td>
+                  <button class="btn btn-danger" (click)="eliminar(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="btn-group">
+            <button class="btn btn-default" (click)="agregar()">
+              <mat-icon>add</mat-icon>
+              <p>Agregar Nueva linea</p>
+            </button>
+            <!-- <button class="btn btn-default" (click)="recuperarValores()">Recuperar Valores</button> -->
+          </div>
+          <br />
+          <br />
+          <div id="JSON"></div>
         </div>
       </div>
     </div>
