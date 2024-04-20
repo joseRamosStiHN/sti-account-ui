@@ -3,41 +3,44 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+/* * {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 html,
 body {
-    height: 100%;
+  height: 100%;
 }
 
 body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    background-color: #f0f0f0;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f0f0f0;
 }
 
-
-
 .mat-form-field-label {
-    color: green !important;
+  color: green !important;
 }
 
 .mat-form-field-underline {
-    background-color: green !important;
+  background-color: green !important;
+}
+
+.breadcrumb {
+  margin: 5px;
+  width: 100%;
 }
 
 .xng-breadcrumb-root {
-    padding: 8px 16px;
-    display: inline-block;
-    border-radius: 4px;
-    background-color: #fff;
-    color: #333;
-}
+  padding: 2px 16px;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+} */
 
-.xng-breadcrumb-separator {
-    padding: 0 4px;
-}
+/* .xng-breadcrumb-separator {
+  padding: 0 4px;
+} */
