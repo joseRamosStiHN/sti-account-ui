@@ -1,0 +1,97 @@
+<div class="w-full flex flex-col mt-5 gap-2">
+  <h2
+    class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl"
+  >
+    Facturas de Proveedores
+  </h2>
+  <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
+    <dx-date-range-box [(value)]="currentValue" class=""> </dx-date-range-box>
+    <button
+      type="button"
+      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 rounded-md text-sm px-5 py-2 me-1 mt-1 focus:outline-none"
+      (click)="onSearch()"
+    >
+      Consultar
+    </button>
+  </div>
+  <div class="w-full">
+    <dx-data-grid
+      id="gridContainer"
+      [dataSource]="dataSource"
+      [allowColumnReordering]="true"
+      [rowAlternationEnabled]="true"
+      [allowColumnResizing]="true"
+      [allowColumnReordering]="true"
+      [showBorders]="true"
+      [width]="'100%'"
+      [height]="'600px'"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 25, 50, 100]"
+      ></dxo-pager>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="true"
+      ></dxo-search-panel>
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+      <dxi-column caption="Documento" dataField="document"></dxi-column>
+      <dxi-column
+        caption="Fecha"
+        dataField="dateAt"
+        dataType="date"
+        alignment="center"
+      ></dxi-column>
+      <dxi-column
+        caption="Valor"
+        dataField="amount"
+        dataType="currency"
+        alignment="right"
+      ></dxi-column>
+      <dxi-column
+        caption="Estado"
+        dataField="status"
+        alignment="center"
+      ></dxi-column>
+      <dxi-column
+        caption="No Partida"
+        alignment="center"
+        dataField="entryNumber"
+      ></dxi-column>
+      <dxi-column type="buttons" cellTemplate="cellButtonsTemplate" width="50">
+        <div *dxTemplate="let factura of 'cellButtonsTemplate'">
+          @if(factura.data.status === 'Borrador'){
+          <button
+            type="button"
+            title="Editar"
+            class="dx-link dx-icon-edit dx-link-icon"
+            (click)="onButtonClick(factura.data)"
+          ></button>
+          }@else{<button
+            title="Ver"
+            type="button"
+            class="dx-link dx-icon-description dx-link-icon"
+            (click)="onButtonClick(factura.data)"
+          ></button
+          >}
+        </div>
+      </dxi-column>
+
+      <dxo-toolbar>
+        <dxi-item name="groupPanel"></dxi-item>
+        <dxi-item name="searchPanel"></dxi-item>
+        <dxi-item location="after">
+          <dx-button
+            icon="add"
+            hint="Agregar factura"
+            aria-placeholder="Agregar factura"
+            (onClick)="goToClient()"
+          >
+          </dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+    </dx-data-grid>
+  </div>
+</div>
