@@ -1,41 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import config from 'devextreme/core/config';
 import { confirm } from 'devextreme/ui/dialog';
+import {
+  ClientBilling,
+  IAccount,
+  IMovement,
+  Transaction,
+  typeToast,
+} from '../models/models';
+import { Router } from '@angular/router';
 
-interface Transaction {
-  accountId: number;
-  amount: number;
-  movement: string;
-}
-
-interface IAccount {
-  code: string;
-  name: string;
-}
-
-interface IMovement {
-  name: string;
-  code: string;
-}
-
-interface ClientBilling {
-  id?: number;
-  billingNumber: string;
-  date: Date;
-  currency: string;
-  exchangeRate: number;
-  description: string;
-  status?: string;
-}
-enum typeToast {
-  Info = 'info',
-  Error = 'error',
-  Success = 'success',
-  Warning = 'warning',
-}
 @Component({
   selector: 'app-client',
   templateUrl: './client.component.html',
@@ -78,7 +54,8 @@ export class ClientComponent {
     },
   ];
   //
-  constructor(private router: Router) {
+  private readonly router = inject(Router);
+  constructor() {
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,

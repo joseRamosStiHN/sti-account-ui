@@ -13,6 +13,8 @@ import {
   DxDateRangeBoxModule,
   DxToastModule,
 } from 'devextreme-angular';
+import { ProviderComponent } from './components/provider/provider.component';
+import { ProviderListComponent } from './components/provider-list/provider-list.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,8 @@ import {
     ClientComponent,
     DashboardComponent,
     ClientListComponent,
+    ProviderComponent,
+    ProviderListComponent,
   ],
   exports: [AccountingPageComponent],
   imports: [

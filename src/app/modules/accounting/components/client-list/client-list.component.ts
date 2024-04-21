@@ -1,22 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { BillingListClient } from '../models/models';
 
-interface BillingListClient {
-  id: number;
-  document: string;
-  account: string;
-  dateAt: Date;
-  amount: number;
-  status: string;
-  entryNumber: string;
-}
-
+const msInDay = 1000 * 60 * 60 * 24;
+const now = new Date();
+const initialValue: [Date, Date] = [
+  new Date(now.getTime() - msInDay * 30),
+  new Date(now.getTime()),
+];
 @Component({
   selector: 'app-client-list',
   templateUrl: './client-list.component.html',
   styleUrl: './client-list.component.css',
 })
-export class ClientListComponent {
+export class ClientListComponent implements OnInit {
   dataSource: BillingListClient[] = [
     {
       id: 1,
@@ -92,9 +89,27 @@ export class ClientListComponent {
     },
   ];
 
-  constructor(private router: Router) {}
+  currentValue: [Date, Date] = initialValue;
+  private readonly router = inject(Router);
+
+  constructor() {}
+  ngOnInit(): void {
+    //TODO: aqui hacer el llamadas inicial del API para mostras los primeros 30 dias
+  }
+
+  onSearch(): void {
+    const [dateIni, dateEnd] = this.currentValue;
+    //TODO: aqui Laurent
+    /*
+      se debe hacer un llamadas al un api que retiren los registros en las fechas especificadas
+    */
+  }
 
   goToClient = () => {
     this.router.navigate(['/accounting/client-invoicing']);
   };
+
+  onButtonClick(data: any) {
+    this.router.navigate(['/accounting/client-invoicing', data.id]);
+  }
 }

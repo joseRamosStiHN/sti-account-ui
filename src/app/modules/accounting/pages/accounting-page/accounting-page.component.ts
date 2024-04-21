@@ -13,7 +13,7 @@ export class AccountingPageComponent implements OnInit {
   ngOnInit(): void {
     this.navigationService.setNavLinks([
       { label: 'Clientes', path: '/accounting/client-list' },
-      { label: 'Proveedores', path: '/accounting/provider-invoicing' },
+      { label: 'Proveedores', path: '/accounting/provider-list' },
       { label: 'Reportes', path: '/accounting/provider-invoicing' },
       { label: 'Configuraciones', path: '/accounting/provider-invoicing' },
     ]);

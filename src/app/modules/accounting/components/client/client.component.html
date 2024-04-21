@@ -233,16 +233,24 @@
             valueExpr="code"
             displayExpr="name"
           ></dxo-lookup>
+          <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
         <dxi-column
           dataField="monto"
           caption="Monto"
           dataType="number"
-          [format]="{ type: 'currency', precision: 4 }"
+          [format]="{ type: 'currency', precision: 2 }"
           [customizeText]="customCurrencyText"
           alignment="center"
           [width]="120"
-        ></dxi-column>
+        >
+          <dxo-form-item
+            editorType="dxNumberBox"
+            [editorOptions]="{ format: '#,##0.##', min: 0 }"
+          >
+          </dxo-form-item>
+          <dxi-validation-rule type="required"></dxi-validation-rule>
+        </dxi-column>
         <dxi-column
           dataField="movimiento"
           caption="Movimiento"
@@ -254,6 +262,7 @@
             valueExpr="code"
             displayExpr="name"
           ></dxo-lookup>
+          <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
 
         <dxo-toolbar>
