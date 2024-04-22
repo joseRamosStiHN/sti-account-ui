@@ -15,6 +15,9 @@ import {
 } from 'devextreme-angular';
 import { ProviderComponent } from './components/provider/provider.component';
 import { ProviderListComponent } from './components/provider-list/provider-list.component';
+import { ConfigurationComponent } from './components/configuration/configuration.component';
+import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
+import { AccountComponent } from './components/configuration/account/account.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +27,9 @@ import { ProviderListComponent } from './components/provider-list/provider-list.
     ClientListComponent,
     ProviderComponent,
     ProviderListComponent,
+    ConfigurationComponent,
+    GeneralBalanceComponent,
+    AccountComponent,
   ],
   exports: [AccountingPageComponent],
   imports: [

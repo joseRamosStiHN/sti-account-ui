@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { NavigationService } from '../../../../shared/navigation.service';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-accounting-page',
@@ -8,14 +7,16 @@ import { RouterModule } from '@angular/router';
   styleUrl: './accounting-page.component.css',
 })
 export class AccountingPageComponent implements OnInit {
-  constructor(private navigationService: NavigationService) {}
+  private readonly navigationService = inject(NavigationService);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.navigationService.setNavLinks([
       { label: 'Clientes', path: '/accounting/client-list' },
       { label: 'Proveedores', path: '/accounting/provider-list' },
-      { label: 'Reportes', path: '/accounting/provider-invoicing' },
-      { label: 'Configuraciones', path: '/accounting/provider-invoicing' },
+      { label: 'Reportes', path: '/accounting/reports' },
+      { label: 'Configuraciones', path: '/accounting/configuration' },
     ]);
   }
 }
