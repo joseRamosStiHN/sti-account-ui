@@ -1,19 +1,20 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { AccountService } from '../../services/account.service';
 
 interface AccountList {
   id: number;
-  codeAccount: string;
+  code: string;
   description: string;
-  categoryName: string;
-  categoryId: number;
-  accountParentName?: string | null;
-  accountParentId?: number | null;
+  parentId: number;
+  category: number;
+  typicalBalance?: string | null;
+  supportsRegistration?: boolean | null;
   status: string;
 }
 
-const myDataFake: AccountList[] = [
+/* const myDataFake: AccountList[] = [
   {
     id: 1,
     codeAccount: '01',
@@ -45,7 +46,7 @@ const myDataFake: AccountList[] = [
     accountParentId: null,
     status: 'Activa',
   },
-];
+]; */
 
 @Component({
   selector: 'app-configuration',
@@ -57,6 +58,7 @@ export class ConfigurationComponent implements OnInit {
 
   /*injections */
   private readonly router = inject(Router);
+  private accountService = inject(AccountService);
   constructor() {}
 
   ngOnInit(): void {
@@ -65,7 +67,14 @@ export class ConfigurationComponent implements OnInit {
       aqui debe hacer la integración cambie el metodo fakeData por el servicio
       
     */
-    this.dataSource = this.fakeData();
+    this.accountService.getAllAccount().subscribe((response: any) => {
+      if (response.code === 200 && response.data) {
+        this.dataSource = response.data;
+        console.log(this.dataSource);
+      } else {
+        console.error('Error al obtener datos de cuentas');
+      }
+    });
   }
 
   onEditAccount(e: AccountList) {
@@ -75,8 +84,8 @@ export class ConfigurationComponent implements OnInit {
     this.router.navigate(['/accounting/configuration/new-account']);
   };
 
-  private fakeData(): AccountList[] {
-    const copyData = [...myDataFake];
-    return copyData;
-  }
+  //private fakeData(): AccountList[] {
+  //const copyData = [...myDataFake];
+  //return copyData;
+  //}
 }
