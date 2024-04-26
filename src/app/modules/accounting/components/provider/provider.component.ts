@@ -11,6 +11,21 @@ import {
 } from '../models/models';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TransactionService } from '../../services/transaction.service';
+import { TransactionModel } from '../models/TransactionModel';
+import { AccountService } from '../../services/account.service';
+
+
+interface AccountList {
+  id: number;
+  code: string;
+  description: string;
+  parentId: number;
+  category: number;
+  typicalBalance?: string | null;
+  supportsRegistration?: boolean | null;
+  status: string;
+}
 
 @Component({
   selector: 'app-provider',
@@ -33,32 +48,53 @@ export class ProviderComponent {
     exchangeRate: 0,
     description: '',
   };
+
+  
   listAccount: IAccount[] = [
     {
-      code: '1',
+      code: '16',
       name: 'Cuentas por Cobrar',
     },
     {
-      code: '2',
+      code: '16',
       name: 'Cuentas por pagar',
     },
   ];
   listMovement: IMovement[] = [
     {
-      code: 'DEBE',
+      code: 'D',
       name: 'Debe',
     },
     {
-      code: 'HABER',
+      code: 'C',
       name: 'Haber',
     },
   ];
+
+  acountList: AccountList[] = [];
+
+
   private readonly router = inject(Router);
+  private readonly transactionService = inject(TransactionService);
+  private accountService = inject(AccountService);
+
+
   constructor() {
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
       serverDecimalSeparator: '.',
+    });
+  }
+
+  ngOnInit(): void {
+    this.accountService.getAllAccount().subscribe((response: any) => {
+      if (response.code === 200 && response.data) {
+        this.acountList = response.data;
+        console.log(this.acountList);
+      } else {
+        console.error('Error al obtener datos de cuentas');
+      }
     });
   }
 
@@ -70,17 +106,43 @@ export class ProviderComponent {
       //TODO: Laurent aqui hace la integración
       //el servicio deberia retornar el id de la transaccion y su estado
       //set id
-      this.providerBilling.id = 1;
-      this.providerBilling.status = 'Draft';
-      //cuando todo este OK use
-      this.toastType = typeToast.Success;
-      this.messageToast = 'Registros insertados exitosamente';
-      this.showToast = true;
-      // en caso de error usar
-      /*  this.toastType = typeToast.Error;
+      const transactionData: TransactionModel = {
+        createAtDate: this.providerBilling.date,
+        reference: this.providerBilling.billingNumber,
+        documentType: 1,
+        exchangeRate: this.providerBilling.exchangeRate,
+        descriptionPda: this.providerBilling.description,
+        currency: this.providerBilling.currency,
+        detail: this.dataSource.map((detail) => {
+          return {
+            accountId: detail.accountId,
+            amount: detail.amount,
+            motion: detail.movement,
+          };
+        }),
+      };
+
+      this.transactionService.createTransaction(transactionData).subscribe(
+        (response: any) => {
+          this.providerBilling.id = 1;
+          this.providerBilling.status = 'Draft';
+          //cuando todo este OK use
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Registros insertados exitosamente';
+          this.showToast = true;
+        },
+        (error: any) => {
+          // en caso de error usar
+          /*  this.toastType = typeToast.Error;
           this.messageToast = '<Aqui va el mensaje de error>'; 
           this.showToast = true;
       */
+          console.error('Error creating transaction:', error);
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al crear la transacción';
+          this.showToast = true;
+        }
+      );
     }
   }
 
