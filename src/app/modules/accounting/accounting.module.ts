@@ -18,6 +18,7 @@ import { ProviderListComponent } from './components/provider-list/provider-list.
 import { ConfigurationComponent } from './components/configuration/configuration.component';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 import { AccountComponent } from './components/configuration/account/account.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,7 @@ import { AccountComponent } from './components/configuration/account/account.com
     GeneralBalanceComponent,
     AccountComponent,
   ],
-  exports: [AccountingPageComponent],
+  exports: [AccountingPageComponent, HttpClientModule],
   imports: [
     CommonModule,
     AppRoutingModule,
@@ -41,6 +42,7 @@ import { AccountComponent } from './components/configuration/account/account.com
     DxDateRangeBoxModule,
     DxButtonModule,
     FormsModule,
+    HttpClientModule,
     ReactiveFormsModule,
   ],
 })
