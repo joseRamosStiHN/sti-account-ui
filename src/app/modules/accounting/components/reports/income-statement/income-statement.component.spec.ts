@@ -1,0 +1,22 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { IncomeStatementComponent } from './IncomeStatementComponent';
+
+describe('IncomeStatementComponent', () => {
+  let component: IncomeStatementComponent;
+  let fixture: ComponentFixture<IncomeStatementComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [IncomeStatementComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(IncomeStatementComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

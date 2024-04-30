@@ -1,0 +1,16 @@
+<div class="w-100 mt-5">
+  <h2 class="text-2xl font-semibold text-center mb-5">Estado de Resultados</h2>
+  <dx-pivot-grid
+    id="incomes"
+    [dataSource]="pivotDataSource"
+    [showBorders]="true"
+    [showColumnGrandTotals]="false"
+    [showColumnTotals]="false"
+    [allowSortingBySummary]="true"
+    [texts]="{ grandTotal: 'Total del Ejercicio' }"
+    height="600"
+    [scrolling]="{ useNative: true }"
+    class="capitalize"
+  >
+  </dx-pivot-grid>
+</div>
