@@ -9,6 +9,7 @@ import { ProviderListComponent } from './components/provider-list/provider-list.
 import { ConfigurationComponent } from './components/configuration/configuration.component';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 import { AccountComponent } from './components/configuration/account/account.component';
+import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
 
 const routes: Routes = [
   {
@@ -28,6 +29,8 @@ const routes: Routes = [
         path: 'configuration/update-account/:id',
         component: AccountComponent,
       },
+      { path: 'reports', component: GeneralBalanceComponent },
+      { path: 'reports/incomes', component: IncomeStatementComponent },
     ],
   },
 ];

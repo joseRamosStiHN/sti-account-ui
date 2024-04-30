@@ -11,13 +11,16 @@ import { ClientListComponent } from './components/client-list/client-list.compon
 import {
   DxButtonModule,
   DxDateRangeBoxModule,
+  DxPivotGridModule,
   DxToastModule,
+  DxTreeListModule,
 } from 'devextreme-angular';
 import { ProviderComponent } from './components/provider/provider.component';
 import { ProviderListComponent } from './components/provider-list/provider-list.component';
 import { ConfigurationComponent } from './components/configuration/configuration.component';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 import { AccountComponent } from './components/configuration/account/account.component';
+import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +33,7 @@ import { AccountComponent } from './components/configuration/account/account.com
     ConfigurationComponent,
     GeneralBalanceComponent,
     AccountComponent,
+    IncomeStatementComponent,
   ],
   exports: [AccountingPageComponent],
   imports: [
@@ -37,6 +41,8 @@ import { AccountComponent } from './components/configuration/account/account.com
     AppRoutingModule,
     RouterModule,
     DxDataGridModule,
+    DxTreeListModule,
+    DxPivotGridModule,
     DxToastModule,
     DxDateRangeBoxModule,
     DxButtonModule,
