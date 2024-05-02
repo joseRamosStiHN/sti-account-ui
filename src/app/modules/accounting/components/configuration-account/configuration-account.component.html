@@ -1,0 +1,55 @@
+<div class="w-100 mt-5">
+  <h2
+    class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl"
+  >
+    Configuración de Cuentas
+  </h2>
+
+  <div class="tabpanel-demo">
+    <div class="widget-container">
+      <dx-tab-panel
+        class="dx-theme-background-color"
+        width="100%"
+        [height]="418"
+        [animationEnabled]="true"
+        [swipeEnabled]="true"
+        [dataSource]="dataSource"
+        [tabsPosition]="tabsPosition"
+        [stylingMode]="stylingMode"
+        [iconPosition]="iconPosition"
+      >
+        <div *dxTemplate="let tabPanelItem of 'item'">
+          <div class="tabpanel-item">
+            <table>
+              <thead>
+                <tr>
+              <td scope="row">Mes</td>
+                  <td>Enero</td>
+                  <td>Febrero</td>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr>
+              <td>Total</td>
+                  <td>15</td>
+                  <td>25</td>
+                </tr>
+              </tfoot>
+              <tbody>
+                <tr>
+              <td>Agua</td>
+                  <td>10</td>
+                  <td>15</td>
+                </tr>
+                <tr>
+              <td>Gas</td>
+                  <td>5</td>
+                  <td>10</td>
+                </tr>
+              </tbody>
+            </table>          </div>
+        </div>
+      </dx-tab-panel>
+    </div>
+  </div>
+</div>
