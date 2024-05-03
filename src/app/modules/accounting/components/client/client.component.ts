@@ -13,6 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import { TransactionModel } from '../models/TransactionModel';
+import { ToastType } from 'devextreme/ui/toast';
 
 @Component({
   selector: 'app-client',
@@ -24,7 +25,7 @@ export class ClientComponent {
   totalDebit: number = 0;
   messageToast: string = '';
   showToast: boolean = false;
-  toastType: string = typeToast.Info;
+  toastType: ToastType = typeToast.Info;
   buttonTextPosting: string = 'Confirmar';
   disablePosting: boolean = false;
   clientBilling: ClientBilling = {
