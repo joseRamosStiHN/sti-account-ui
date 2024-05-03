@@ -10,7 +10,12 @@ import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { ClientListComponent } from './components/client-list/client-list.component';
 import {
   DxButtonModule,
+  DxCheckBoxModule,
   DxDateRangeBoxModule,
+  DxPopupModule,
+  DxSelectBoxModule,
+  DxTabPanelModule,
+  DxTemplateModule,
   DxToastModule,
 } from 'devextreme-angular';
 import { ProviderComponent } from './components/provider/provider.component';
@@ -19,6 +24,7 @@ import { ConfigurationComponent } from './components/configuration/configuration
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 import { AccountComponent } from './components/configuration/account/account.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ConfigurationAccountComponent } from './components/configuration-account/configuration-account.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +37,9 @@ import { HttpClientModule } from '@angular/common/http';
     ConfigurationComponent,
     GeneralBalanceComponent,
     AccountComponent,
+    ConfigurationAccountComponent,
+    
+    
   ],
   exports: [AccountingPageComponent, HttpClientModule],
   imports: [
@@ -44,6 +53,10 @@ import { HttpClientModule } from '@angular/common/http';
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
+    DxTabPanelModule, DxCheckBoxModule, DxSelectBoxModule, DxTemplateModule,
+    DxPopupModule,
+    DxButtonModule,
+    DxTemplateModule,
   ],
 })
 export class AccountingModule {}
