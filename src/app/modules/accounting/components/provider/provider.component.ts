@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import { TransactionModel } from '../models/TransactionModel';
 import { AccountService } from '../../services/account.service';
+import { ToastType } from 'devextreme/ui/toast';
 
 
 interface AccountList {
@@ -37,7 +38,7 @@ export class ProviderComponent {
   totalDebit: number = 0;
   messageToast: string = '';
   showToast: boolean = false;
-  toastType: string = typeToast.Info;
+  toastType:ToastType = typeToast.Info;
   buttonTextPosting: string = 'Confirmar';
   disablePosting: boolean = false;
   dataSource: Transaction[] = [];
