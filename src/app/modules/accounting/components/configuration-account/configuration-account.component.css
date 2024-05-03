@@ -120,3 +120,57 @@
 ::ng-deep .dx-theme-fluent.dx-color-scheme-blue-dark .task-item {
   background-color: #1f1f1f;
 }
+
+
+.select-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex-direction: column;
+  /* margin-top: 50px; */
+}
+
+.small-label {
+  font-size: 18px; 
+  margin-right: 12px; 
+  font-weight: 600;
+}
+
+.custom-select {
+  width: 500px; /* Ancho personalizado del select-box */
+}
+
+::ng-deep .label {
+  font-size: 12px;
+}
+
+::ng-deep .demo-container {
+  height: 450px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+}
+
+::ng-deep .button-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+::ng-deep .dx-popup-content {
+  font-size: 12px;
+}
+
+::ng-deep .caption {
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+
+::ng-deep .content {
+  display: flex;
+  justify-content: space-between;
+}
