@@ -229,9 +229,9 @@
           [editorOptions]="{ searchEnabled: true }"
         >
           <dxo-lookup
-            [dataSource]="listAccount"
-            valueExpr="code"
-            displayExpr="name"
+            [dataSource]="acountList"
+            valueExpr="id"
+            displayExpr="description"
           ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>

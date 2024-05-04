@@ -14,6 +14,8 @@ import { Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import { TransactionModel } from '../models/TransactionModel';
 import { ToastType } from 'devextreme/ui/toast';
+import { AccountService } from '../../services/account.service';
+import { AccountModel } from '../models/AccountModel';
 
 @Component({
   selector: 'app-client',
@@ -36,16 +38,7 @@ export class ClientComponent {
     description: '',
   };
   dataSource: Transaction[] = [];
-  listAccount: IAccount[] = [
-    {
-      code: '16',
-      name: 'Cuentas por Cobrar',
-    },
-    {
-      code: '16',
-      name: 'Cuentas por pagar',
-    },
-  ];
+
   listMovement: IMovement[] = [
     {
       code: 'D',
@@ -56,15 +49,28 @@ export class ClientComponent {
       name: 'Haber',
     },
   ];
+  acountList: AccountModel[] = [];
+
   //
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
+  private accountService = inject(AccountService);
 
   constructor() {
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
       serverDecimalSeparator: '.',
+    });
+  }
+
+  ngOnInit(): void {
+    this.accountService.getAllAccount().subscribe((response: any[]) => {
+      if (Array.isArray(response)) {
+        this.acountList = response;
+      } else {
+        console.error('Error al obtener datos de cuentas');
+      }
     });
   }
 
