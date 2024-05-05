@@ -26,6 +26,8 @@ import { ConfigurationComponent } from './components/configuration/configuration
 
 import { AccountComponent } from './components/configuration/account/account.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ReportServiceService } from './services/report-service.service';
+import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 
 @NgModule({
   declarations: [
