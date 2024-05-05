@@ -20,7 +20,7 @@ import { ProviderListComponent } from './components/provider-list/provider-list.
 import { ConfigurationComponent } from './components/configuration/configuration.component';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 import { AccountComponent } from './components/configuration/account/account.component';
-import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -35,7 +35,7 @@ import { IncomeStatementComponent } from './components/reports/income-statement/
     AccountComponent,
     IncomeStatementComponent,
   ],
-  exports: [AccountingPageComponent],
+  exports: [AccountingPageComponent, HttpClientModule],
   imports: [
     CommonModule,
     AppRoutingModule,
@@ -47,6 +47,7 @@ import { IncomeStatementComponent } from './components/reports/income-statement/
     DxDateRangeBoxModule,
     DxButtonModule,
     FormsModule,
+    HttpClientModule,
     ReactiveFormsModule,
   ],
 })

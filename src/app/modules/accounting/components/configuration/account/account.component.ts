@@ -2,16 +2,18 @@ import { Component, inject, OnInit } from '@angular/core';
 
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AccountService } from '../../../services/account.service';
 
 interface FormAccount {
   id?: number;
   description?: string;
   code?: string;
   parentId?: number;
-  categoryId?: number;
-  topicallyAmount?: string;
+  category?: number;
+  typicalBalance?: string;
   hasEntry?: boolean;
   isActive: boolean;
+  status: string;
 }
 interface Account {
   id: number;
@@ -62,12 +64,15 @@ export class AccountComponent implements OnInit {
     description: '',
     code: '',
     isActive: true,
+    status: "Activo"
   };
   accounts!: Account[];
   categories!: KeyValue[];
 
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly accountService = inject(AccountService);
+
   constructor() {}
 
   ngOnInit(): void {
@@ -84,6 +89,14 @@ export class AccountComponent implements OnInit {
       this.id = params.get('id');
       this.accountForm.isActive = false;
       //aqui puede ver si hay datos y llenar el objeto del formulario
+      // TODO: Cargar el objeto del formulario si hay un ID
+      if (this.id) {
+        this.accountService
+          .findAccoundById(Number(this.id))
+          .subscribe((account: any) => {
+            this.accountForm = account.data;
+          });
+      }
     });
   }
 
@@ -99,8 +112,18 @@ export class AccountComponent implements OnInit {
       if (!this.id) {
         //flujo de nuevo
         //salir
-        this.router.navigate(['accounting/configuration']);
-        return;
+        this.accountService.createAccount(this.accountForm).subscribe(() => {
+          this.router.navigate(['accounting/configuration']);
+        });
+        console.log(this.accountForm);
+        //this.router.navigate(['accounting/configuration']);
+        //return;
+      } else {
+        this.accountService
+          .updateAccount(Number(this.id), this.accountForm)
+          .subscribe(() => {
+            this.router.navigate(['accounting/configuration']);
+          });
       }
 
       //flujo de Editar

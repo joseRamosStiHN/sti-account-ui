@@ -11,6 +11,8 @@ import {
   typeToast,
 } from '../models/models';
 import { Router } from '@angular/router';
+import { TransactionService } from '../../services/transaction.service';
+import { TransactionModel } from '../models/TransactionModel';
 
 @Component({
   selector: 'app-client',
@@ -35,26 +37,28 @@ export class ClientComponent {
   dataSource: Transaction[] = [];
   listAccount: IAccount[] = [
     {
-      code: '1',
+      code: '16',
       name: 'Cuentas por Cobrar',
     },
     {
-      code: '2',
+      code: '16',
       name: 'Cuentas por pagar',
     },
   ];
   listMovement: IMovement[] = [
     {
-      code: 'DEBE',
+      code: 'D',
       name: 'Debe',
     },
     {
-      code: 'HABER',
+      code: 'C',
       name: 'Haber',
     },
   ];
   //
   private readonly router = inject(Router);
+  private readonly transactionService = inject(TransactionService);
+
   constructor() {
     config({
       defaultCurrency: 'HNL',
@@ -71,17 +75,37 @@ export class ClientComponent {
       //TODO: Laurent aqui hace la integración
       //el servicio deberia retornar el id de la transaccion y su estado
       //set id
-      this.clientBilling.id = 1;
-      this.clientBilling.status = 'Draft';
-      //cuando todo este OK use
-      this.toastType = typeToast.Success;
-      this.messageToast = 'Registros insertados exitosamente';
-      this.showToast = true;
-      // en caso de error usar
-      /*  this.toastType = typeToast.Error;
-          this.messageToast = '<Aqui va el mensaje de error>'; 
+      const transactionData: TransactionModel = {
+        createAtDate: this.clientBilling.date,
+        reference: this.clientBilling.billingNumber,
+        documentType: 1,
+        exchangeRate: this.clientBilling.exchangeRate,
+        descriptionPda: this.clientBilling.description,
+        currency: this.clientBilling.currency,
+        detail: this.dataSource.map((detail) => {
+          return {
+            accountId: detail.accountId,
+            amount: detail.amount,
+            motion: detail.movement,
+          };
+        }),
+      };
+
+      this.transactionService.createTransaction(transactionData).subscribe(
+        (response: any) => {
+          this.clientBilling.id = 1;
+          this.clientBilling.status = 'Draft';
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
-      */
+        },
+        (error: any) => {
+          console.error('Error creating transaction:', error);
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al crear la transacción';
+          this.showToast = true;
+        }
+      );
     }
   }
 
