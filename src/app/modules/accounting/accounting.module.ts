@@ -18,9 +18,12 @@ import {
 import { ProviderComponent } from './components/provider/provider.component';
 import { ProviderListComponent } from './components/provider-list/provider-list.component';
 import { ConfigurationComponent } from './components/configuration/configuration.component';
-import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
+
 import { AccountComponent } from './components/configuration/account/account.component';
 import { HttpClientModule } from '@angular/common/http';
+import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
+import { ReportServiceService } from './services/report-service.service';
+import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +38,7 @@ import { HttpClientModule } from '@angular/common/http';
     AccountComponent,
     IncomeStatementComponent,
   ],
+  providers: [ReportServiceService],
   exports: [AccountingPageComponent, HttpClientModule],
   imports: [
     CommonModule,

@@ -7,9 +7,10 @@ import { ClientListComponent } from './components/client-list/client-list.compon
 import { ProviderComponent } from './components/provider/provider.component';
 import { ProviderListComponent } from './components/provider-list/provider-list.component';
 import { ConfigurationComponent } from './components/configuration/configuration.component';
-import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
+
 import { AccountComponent } from './components/configuration/account/account.component';
 import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
+import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 
 const routes: Routes = [
   {
