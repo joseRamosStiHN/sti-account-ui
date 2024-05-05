@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GeneralBalanceComponent } from './general-balance.component';
+import { GeneralBalanceComponent } from './GeneralBalanceComponent';
 
 describe('GeneralBalanceComponent', () => {
   let component: GeneralBalanceComponent;
@@ -8,10 +8,9 @@ describe('GeneralBalanceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GeneralBalanceComponent]
-    })
-    .compileComponents();
-    
+      declarations: [GeneralBalanceComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(GeneralBalanceComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

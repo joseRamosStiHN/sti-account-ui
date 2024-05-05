@@ -1,37 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 
 import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
+import { GeneralBalance } from '../../models/APIModels';
+import { ReportServiceService } from '../../../services/report-service.service';
 
-interface GeneralBance {
-  id: number;
-  parentId: number | null;
-  accountName: string;
-  category: string;
-  amount: number;
-  total: number | null;
-  isRoot: boolean;
-}
-export interface GeneralBalance2 {
+interface GeneralBalance2 {
   accountName: string;
   id: number;
   parentId: number | null;
   category: string;
   amount: number;
   total: number | null;
-  isRoot: boolean;
+  root: boolean;
   children?: GeneralBalance2[];
   isCollapsed: boolean;
   depth: number;
 }
 
-const DATA: GeneralBance[] = [
+const DATA: GeneralBalance[] = [
   {
     accountName: 'Activo',
     id: 1,
     parentId: null,
     category: 'Activo',
     amount: 0,
-    isRoot: true,
+    root: true,
     total: null,
   },
   {
@@ -41,7 +34,7 @@ const DATA: GeneralBance[] = [
     category: 'Activo',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Efectivo y Equipamiento',
@@ -50,7 +43,7 @@ const DATA: GeneralBance[] = [
     category: 'Activo',
     amount: 1000,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Deposito a Plazo',
@@ -59,7 +52,7 @@ const DATA: GeneralBance[] = [
     category: 'Activo',
     amount: 1200,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Activo No Corriente',
@@ -68,7 +61,7 @@ const DATA: GeneralBance[] = [
     category: 'Activo',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Otros Activo',
@@ -77,7 +70,7 @@ const DATA: GeneralBance[] = [
     category: 'Activo',
     amount: -250,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Propiedad Planta y Equipo',
@@ -86,7 +79,7 @@ const DATA: GeneralBance[] = [
     category: 'Activo',
     amount: 1020.79,
     total: null,
-    isRoot: false,
+    root: false,
   },
 
   {
@@ -96,7 +89,7 @@ const DATA: GeneralBance[] = [
     category: 'Pasivo',
     amount: 0,
     total: null,
-    isRoot: true,
+    root: true,
   },
   {
     accountName: 'Pasivo Corriente',
@@ -105,7 +98,7 @@ const DATA: GeneralBance[] = [
     category: 'Pasivo',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Pasivo Financiero',
@@ -114,7 +107,7 @@ const DATA: GeneralBance[] = [
     category: 'Pasivo',
     amount: 100.21,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     accountName: 'Cuentas Por Pagar',
@@ -123,7 +116,7 @@ const DATA: GeneralBance[] = [
     category: 'Pasivo',
     amount: 1800,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 60,
@@ -132,7 +125,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 0,
     total: null,
-    isRoot: true,
+    root: true,
   },
   {
     id: 61,
@@ -141,7 +134,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 62,
@@ -150,7 +143,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 20.58,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 63,
@@ -159,7 +152,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 64,
@@ -168,7 +161,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 1000,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 65,
@@ -177,7 +170,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 66,
@@ -186,7 +179,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 0,
     total: null,
-    isRoot: false,
+    root: false,
   },
   {
     id: 67,
@@ -195,7 +188,7 @@ const DATA: GeneralBance[] = [
     category: 'Patrimonio',
     amount: 50,
     total: null,
-    isRoot: false,
+    root: false,
   },
 ];
 
@@ -205,15 +198,20 @@ const DATA: GeneralBance[] = [
   styleUrl: './general-balance.component.css',
 })
 export class GeneralBalanceComponent implements OnInit {
-  dataSource: GeneralBance[] = [];
+  dataSource: GeneralBalance[] = [];
   treeData: GeneralBalance2[] = [];
   values: any = [];
   summaryTotal: number = 0;
+
+  private readonly reportService = inject(ReportServiceService, {
+    optional: true,
+  });
+  constructor() {}
+
   ngOnInit(): void {
-    this.buildTree();
+    this.setInitValues();
+
     this.calculateSummary();
-    // this.dataSource = DATA;
-    //  this.test();
   }
 
   onContentReady(e: any): void {
@@ -226,9 +224,9 @@ export class GeneralBalanceComponent implements OnInit {
     // console.log(e.component.getRootNode());
   }
 
-  buildTree(): void {
+  buildTree(data: GeneralBalance[]): void {
     const tree = new Map<number, GeneralBalance2>();
-    DATA.forEach((item) => {
+    data.forEach((item) => {
       tree.set(item.id, {
         ...item,
         isCollapsed: true,
@@ -236,8 +234,9 @@ export class GeneralBalanceComponent implements OnInit {
         children: [],
       });
     });
+    console.log(tree);
 
-    DATA.forEach((item) => {
+    data.forEach((item) => {
       if (item.parentId !== null) {
         const parent = tree.get(item.parentId);
         if (tree.get(item.id)) {
@@ -269,7 +268,10 @@ export class GeneralBalanceComponent implements OnInit {
     this.summaryTotal = 0;
     // Sumar todos los nodos raíz con categorías específicas
     this.treeData.forEach((root) => {
-      if (root.category === 'Pasivo' || root.category === 'Patrimonio') {
+      if (
+        root.category.toUpperCase() === 'PASIVO' ||
+        root.category.toUpperCase() === 'PATRIMONIO'
+      ) {
         this.summaryTotal += root.total ?? 0;
       }
     });
@@ -324,18 +326,13 @@ export class GeneralBalanceComponent implements OnInit {
     return childrenTotal;
   }
 
-  private test() {
-    const map = new Map<number, number>();
-    DATA.forEach((v) => {
-      if (!v.isRoot && v.parentId !== null) {
-        const currentAmount = map.get(v.parentId) || 0;
-        map.set(v.parentId, currentAmount + v.amount);
-      }
-    });
-    DATA.forEach((item) => {
-      if (!item.isRoot && map.has(item.id)) {
-        item.total = map.get(item.id) as number;
-      }
-    });
+  private setInitValues() {
+    this.reportService
+      ?.getGeneralBalanceReport()
+      .subscribe((data: GeneralBalance[]) => {
+        console.log(data);
+        this.dataSource = data;
+        this.buildTree(data);
+      });
   }
 }
