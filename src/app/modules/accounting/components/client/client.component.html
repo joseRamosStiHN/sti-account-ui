@@ -229,9 +229,9 @@
           [editorOptions]="{ searchEnabled: true }"
         >
           <dxo-lookup
-            [dataSource]="listAccount"
-            valueExpr="code"
-            displayExpr="name"
+            [dataSource]="acountList"
+            valueExpr="id"
+            displayExpr="description"
           ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
@@ -328,10 +328,10 @@
       <small class="col-span-1"
         >Total Haber: {{ totalCredit | currency : "L" }}</small
       >
-    </div> -->
+    </div> [type]="toastType" -->
   </form>
 
-  <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+  <dx-toast [(visible)]="showToast" [type]="toastType"  [message]="messageToast">
     <dxo-position my="top" at="top" of="#clientForm"> </dxo-position>
   </dx-toast>
 </div>

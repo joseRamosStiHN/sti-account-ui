@@ -14,18 +14,8 @@ import { Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
 import { TransactionModel } from '../models/TransactionModel';
 import { AccountService } from '../../services/account.service';
-
-
-interface AccountList {
-  id: number;
-  code: string;
-  description: string;
-  parentId: number;
-  category: number;
-  typicalBalance?: string | null;
-  supportsRegistration?: boolean | null;
-  status: string;
-}
+import { ToastType } from 'devextreme/ui/toast';
+import { AccountModel } from '../models/AccountModel';
 
 @Component({
   selector: 'app-provider',
@@ -37,7 +27,7 @@ export class ProviderComponent {
   totalDebit: number = 0;
   messageToast: string = '';
   showToast: boolean = false;
-  toastType: string = typeToast.Info;
+  toastType: ToastType = typeToast.Info;
   buttonTextPosting: string = 'Confirmar';
   disablePosting: boolean = false;
   dataSource: Transaction[] = [];
@@ -49,17 +39,6 @@ export class ProviderComponent {
     description: '',
   };
 
-  
-  listAccount: IAccount[] = [
-    {
-      code: '16',
-      name: 'Cuentas por Cobrar',
-    },
-    {
-      code: '16',
-      name: 'Cuentas por pagar',
-    },
-  ];
   listMovement: IMovement[] = [
     {
       code: 'D',
@@ -71,13 +50,11 @@ export class ProviderComponent {
     },
   ];
 
-  acountList: AccountList[] = [];
-
+  acountList: AccountModel[] = [];
 
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
   private accountService = inject(AccountService);
-
 
   constructor() {
     config({
@@ -88,10 +65,9 @@ export class ProviderComponent {
   }
 
   ngOnInit(): void {
-    this.accountService.getAllAccount().subscribe((response: any) => {
-      if (response.code === 200 && response.data) {
-        this.acountList = response.data;
-        console.log(this.acountList);
+    this.accountService.getAllAccount().subscribe((response: any[]) => {
+      if (Array.isArray(response)) {
+        this.acountList = response;
       } else {
         console.error('Error al obtener datos de cuentas');
       }
@@ -126,17 +102,11 @@ export class ProviderComponent {
         (response: any) => {
           this.providerBilling.id = 1;
           this.providerBilling.status = 'Draft';
-          //cuando todo este OK use
           this.toastType = typeToast.Success;
           this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
         },
         (error: any) => {
-          // en caso de error usar
-          /*  this.toastType = typeToast.Error;
-          this.messageToast = '<Aqui va el mensaje de error>'; 
-          this.showToast = true;
-      */
           console.error('Error creating transaction:', error);
           this.toastType = typeToast.Error;
           this.messageToast = 'Error al crear la transacción';

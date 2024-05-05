@@ -17,6 +17,7 @@ export class AccountingPageComponent implements OnInit {
       { label: 'Proveedores', path: '/accounting/provider-list' },
       { label: 'Reportes', path: '/accounting/reports' },
       { label: 'Configuraciones', path: '/accounting/configuration' },
+      { label: 'Configuración Cuentas', path: '/accounting/configuration-account' },
     ]);
   }
 }

@@ -3,27 +3,20 @@ import { Component, inject, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
+import { AccountModel } from '../../models/AccountModel';
 
-interface FormAccount {
-  id?: number;
-  description?: string;
-  code?: string;
-  parentId?: number;
-  category?: number;
-  typicalBalance?: string;
-  hasEntry?: boolean;
-  isActive: boolean;
-  status: string;
-}
+
 interface Account {
   id: number;
   code: string;
   name: string;
 }
+
 interface KeyValue {
   id: number;
   name: string;
 }
+
 const listOfCategory: KeyValue[] = [
   {
     id: 1,
@@ -60,11 +53,11 @@ const listAccounts: Account[] = [
 export class AccountComponent implements OnInit {
   accountPrefix: string = '';
   id: string | null = null;
-  accountForm: FormAccount = {
+  accountForm: AccountModel = {
     description: '',
     code: '',
-    isActive: true,
-    status: "Activo"
+    status: 'ACTIVO',
+    balances: []
   };
   accounts!: Account[];
   categories!: KeyValue[];
@@ -94,7 +87,9 @@ export class AccountComponent implements OnInit {
         this.accountService
           .findAccoundById(Number(this.id))
           .subscribe((account: any) => {
-            this.accountForm = account.data;
+            this.accountForm = account;
+            this.accountForm.balances = account.balances;
+            console.log(this.accountForm.balances)
           });
       }
     });
@@ -110,14 +105,10 @@ export class AccountComponent implements OnInit {
       //como se cuando hat un id, lo sabemos cuando recuperamos desde la url,
       //en onInit asignamos el valor
       if (!this.id) {
-        //flujo de nuevo
-        //salir
         this.accountService.createAccount(this.accountForm).subscribe(() => {
           this.router.navigate(['accounting/configuration']);
         });
         console.log(this.accountForm);
-        //this.router.navigate(['accounting/configuration']);
-        //return;
       } else {
         this.accountService
           .updateAccount(Number(this.id), this.accountForm)
@@ -125,8 +116,6 @@ export class AccountComponent implements OnInit {
             this.router.navigate(['accounting/configuration']);
           });
       }
-
-      //flujo de Editar
     }
   }
 

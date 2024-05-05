@@ -108,8 +108,8 @@
         >
         <select
           id="select-hasEntry"
-          [(ngModel)]="accountForm.hasEntry"
-          name="hasEntry"
+          [(ngModel)]="accountForm.supportsRegistration"
+          name="supportsRegistration"
           required
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
         >
@@ -144,19 +144,43 @@
       <h3 class="font-semibold text-slate-700">Historial de Saldos</h3>
       <dx-data-grid
         id="account-history"
+        [dataSource]="accountForm.balances"
         [showBorders]="true"
         [width]="'100%'"
         height="350"
       >
-        <dxi-column caption="Saldo" dataType="currency"></dxi-column>
-        <dxi-column caption="Fecha" dataType="date"></dxi-column>
+        <dxi-column
+          caption="Saldo"
+          dataField="initialBalance"
+          dataType="number"
+          [alignment]="'center'"
+        ></dxi-column>
+        <dxi-column
+          caption="Fecha"
+          dataField="createAtDate"
+          dataType="date"
+          [alignment]="'center'"
+        ></dxi-column>
         <dxi-column
           caption="Periodo Actual?"
-          alignment="center"
+          dataField="isActual"
+          [alignment]="'center'"
           width="120"
-        ></dxi-column>
+        >
+          <div *dxTemplate="let data of 'data'">
+            <i
+              class="fa-solid fa-check text-green-500"
+              *ngIf="data.value"
+            ></i>
+            <i
+              class="fa-solid fa-xmark text-red-500"
+              *ngIf="!data.value"
+            ></i>
+          </div>
+        </dxi-column>
       </dx-data-grid>
     </div>
+    
     }
 
     <div class="flex justify-end">

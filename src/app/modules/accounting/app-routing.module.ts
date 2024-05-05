@@ -11,6 +11,7 @@ import { ConfigurationComponent } from './components/configuration/configuration
 import { AccountComponent } from './components/configuration/account/account.component';
 import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
+import { ConfigurationAccountComponent } from './components/configuration-account/configuration-account.component';
 
 const routes: Routes = [
   {
@@ -30,8 +31,6 @@ const routes: Routes = [
         path: 'configuration/update-account/:id',
         component: AccountComponent,
       },
-      { path: 'reports', component: GeneralBalanceComponent },
-      { path: 'reports/incomes', component: IncomeStatementComponent },
     ],
   },
 ];
