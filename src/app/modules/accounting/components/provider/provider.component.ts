@@ -8,14 +8,14 @@ import {
   IMovement,
   Transaction,
   typeToast,
-} from '../models/models';
+} from '../../models/models';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
-import { TransactionModel } from '../models/TransactionModel';
+import { TransactionModel } from '../../models/TransactionModel';
 import { AccountService } from '../../services/account.service';
 import { ToastType } from 'devextreme/ui/toast';
-import { AccountModel } from '../models/AccountModel';
+import { AccountModel } from '../../models/AccountModel';
 
 @Component({
   selector: 'app-provider',
@@ -50,7 +50,7 @@ export class ProviderComponent {
     },
   ];
 
-  acountList: AccountModel[] = [];
+  accountList: AccountModel[] = [];
 
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
@@ -65,24 +65,62 @@ export class ProviderComponent {
   }
 
   ngOnInit(): void {
-    this.accountService.getAllAccount().subscribe((response: any[]) => {
+    this.accountService.getAllAccount().subscribe({
+      next: (data) => {
+        this.accountList = data.map((item) => {
+          return { id: item.id, description: item.name } as AccountModel;
+        });
+      },
+    });
+
+    /* this.accountService.getAllAccount().subscribe((response: any[]) => {
       if (Array.isArray(response)) {
         this.acountList = response;
       } else {
         console.error('Error al obtener datos de cuentas');
       }
-    });
+    }); */
   }
 
   onSubmit(e: NgForm) {
     console.log('valid? ', e.valid);
     if (e.valid && this.validate()) {
-      console.log('data:', this.providerBilling);
-      console.log('dataSource', this.dataSource);
+      //console.log('data:', this.providerBilling);
+      //console.log('dataSource', this.dataSource);
+
+      const transactionData: TransactionModel = {
+        createAtDate: this.providerBilling.date,
+        reference: this.providerBilling.billingNumber,
+        documentType: 1,
+        exchangeRate: this.providerBilling.exchangeRate,
+        descriptionPda: this.providerBilling.description,
+        currency: this.providerBilling.currency,
+        detail: this.dataSource.map((detail) => {
+          return {
+            accountId: detail.accountId,
+            amount: detail.amount,
+            motion: detail.movement,
+          };
+        }),
+      };
+      this.transactionService.createTransaction(transactionData).subscribe({
+        next: (data) => {
+          console.log({ data });
+          this.providerBilling.id = data.id;
+          this.providerBilling.status = 'Draft';
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Registros insertados exitosamente';
+          this.showToast = true;
+        },
+        error: (err) => console.error('error', err),
+      });
+
+      console.log({ transactionData });
+
       //TODO: Laurent aqui hace la integración
       //el servicio deberia retornar el id de la transaccion y su estado
       //set id
-      const transactionData: TransactionModel = {
+      /*  const transactionData: TransactionModel = {
         createAtDate: this.providerBilling.date,
         reference: this.providerBilling.billingNumber,
         documentType: 1,
@@ -112,7 +150,7 @@ export class ProviderComponent {
           this.messageToast = 'Error al crear la transacción';
           this.showToast = true;
         }
-      );
+      ); */
     }
   }
 
@@ -157,18 +195,15 @@ export class ProviderComponent {
           options.totalValue = 0;
           break;
         case 'calculate':
-          if (
-            options.name === 'totalDebit' &&
-            options.value.movimiento === 'DEBE'
-          ) {
+          if (options.name === 'totalDebit' && options.value.movement === 'D') {
             // si es el item de debito y el movimiento el `DEBE`
-            options.totalValue += options.value.monto;
+            options.totalValue += options.value.amount;
           } else if (
             // si es el item de credito y movimiento es el `HABER`
             options.name === 'totalCredit' &&
-            options.value.movimiento === 'HABER'
+            options.value.movement === 'C'
           ) {
-            options.totalValue += options.value.monto;
+            options.totalValue += options.value.amount;
           }
           break;
       }
@@ -201,7 +236,6 @@ export class ProviderComponent {
       this.messageToast = 'Debe agregar al menos 2 transacciones';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida number of tnx');
       return false;
     }
     // operar sobre el total y verificar que lleve a cero la operación

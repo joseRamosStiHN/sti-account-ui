@@ -229,7 +229,7 @@
           [editorOptions]="{ searchEnabled: true }"
         >
           <dxo-lookup
-            [dataSource]="acountList"
+            [dataSource]="accountList"
             valueExpr="id"
             displayExpr="description"
           ></dxo-lookup>
@@ -270,9 +270,9 @@
             <div
               class="flex flex-col text-center border border-b-0 px-1.5 shadow"
             >
-              <label class="block font-mono">Total Haber </label>
-              <small class="block font-mono font-medium text-green-900">
-                {{ totalCredit.toString() | currency : "L. " }}</small
+              <label class="block font-mono">Total Debe </label>
+              <small class="block font-mono font-medium text-red-900">
+                {{ totalDebit | currency : "L. " }}</small
               >
             </div>
           </dxi-item>
@@ -280,12 +280,13 @@
             <div
               class="flex flex-col text-center border border-b-0 px-1.5 shadow"
             >
-              <label class="block font-mono">Total Debe </label>
-              <small class="block font-mono font-medium text-red-900">
-                {{ totalDebit.toString() | currency : "L. " }}</small
+              <label class="block font-mono">Total Haber </label>
+              <small class="block font-mono font-medium text-green-900">
+                {{ totalCredit | currency : "L. " }}</small
               >
             </div>
           </dxi-item>
+
           <dxi-item name="addRowButton"></dxi-item>
         </dxo-toolbar>
 
@@ -331,7 +332,7 @@
     </div>  [type]="toastType"-->
   </form>
 
-  <dx-toast [(visible)]="showToast"  [type]="toastType"  [message]="messageToast">
+  <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
     <dxo-position my="top" at="top" of="#clientForm"> </dxo-position>
   </dx-toast>
 </div>

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BillingListProvider } from '../models/models';
+import { BillingListProvider } from '../../models/models';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
