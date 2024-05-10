@@ -4,27 +4,34 @@
   >
     Listado de cuentas
   </h2>
+
   <dx-data-grid
     id="account-list-grid"
     [dataSource]="accountList"
     [width]="'100%'"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
+    [remoteOperations]="false"
+    [rowAlternationEnabled]="true"
     [showBorders]="true"
   >
+    <dxo-search-panel
+      [visible]="true"
+      [highlightCaseSensitive]="true"
+    ></dxo-search-panel>
     <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+    <dxo-paging [pageSize]="15"> </dxo-paging>
+    <dxo-pager [visible]="true"> </dxo-pager>
 
     <dxi-column
       caption="Código"
-      dataField="code"
+      dataField="accountCode"
       width="90"
     ></dxi-column>
-    <dxi-column caption="Nombre" dataField="description"></dxi-column>
-    <dxi-column
-      caption="Cuenta Padre"
-      dataField="parentId"
-    ></dxi-column>
-    <dxi-column caption="Categoría" dataField="category"></dxi-column>
+    <dxi-column caption="Nombre" dataField="name"></dxi-column>
+    <dxi-column caption="Cuenta Padre" dataField="parentName"></dxi-column>
+    <dxi-column caption="Categoría" dataField="categoryName"></dxi-column>
     <dxi-column
       caption="Estado"
       dataField="status"

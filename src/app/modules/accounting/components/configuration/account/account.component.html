@@ -46,7 +46,6 @@
           id="parent-account"
           [(ngModel)]="accountForm.parentId"
           name="parentId"
-          required
           (change)="onValueChange($event)"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
         >
@@ -168,19 +167,13 @@
           width="120"
         >
           <div *dxTemplate="let data of 'data'">
-            <i
-              class="fa-solid fa-check text-green-500"
-              *ngIf="data.value"
-            ></i>
-            <i
-              class="fa-solid fa-xmark text-red-500"
-              *ngIf="!data.value"
-            ></i>
+            <i class="fa-solid fa-check text-green-500" *ngIf="data.value"></i>
+            <i class="fa-solid fa-xmark text-red-500" *ngIf="!data.value"></i>
           </div>
         </dxi-column>
       </dx-data-grid>
     </div>
-    
+
     }
 
     <div class="flex justify-end">

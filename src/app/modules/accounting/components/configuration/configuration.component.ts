@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { AccountService } from '../../services/account.service';
-import { AccountModel } from '../models/AccountModel';
-
+import { AccountModel } from '../../models/AccountModel';
+import { AccountAPIResponse } from '../../models/APIModels';
+import { RowPreparedEvent } from 'devextreme/ui/data_grid';
 
 @Component({
   selector: 'app-configuration',
@@ -11,26 +11,24 @@ import { AccountModel } from '../models/AccountModel';
   styleUrl: './configuration.component.css',
 })
 export class ConfigurationComponent implements OnInit {
-
-  accountList: AccountModel[] = [];
-
+  accountList: AccountAPIResponse[] = [];
+  loadingData: boolean = true;
   /*injections */
   private readonly router = inject(Router);
-  private accountService = inject(AccountService);
+  private readonly accountService = inject(AccountService);
+
   constructor() {}
 
   ngOnInit(): void {
-    //TODO: Laurent
-    /*
-      aqui debe hacer la integración cambie el metodo fakeData por el servicio
-      
-    */
-    this.accountService.getAllAccount().subscribe((response: any[]) => {
-      if (Array.isArray(response)) {
-        this.accountList = response;
-      } else {
-        console.error('Error al obtener datos de cuentas');
-      }
+    this.accountService.getAllAccount().subscribe({
+      next: (data) => {
+        this.accountList = data;
+        this.loadingData = false;
+      },
+      error: (err) => {
+        this.loadingData = false;
+        console.log('we got and error', err);
+      },
     });
   }
 
@@ -41,9 +39,4 @@ export class ConfigurationComponent implements OnInit {
   goToNewAccount = () => {
     this.router.navigate(['/accounting/configuration/new-account']);
   };
-
-  //private fakeData(): AccountList[] {
-  //const copyData = [...myDataFake];
-  //return copyData;
-  //}
 }

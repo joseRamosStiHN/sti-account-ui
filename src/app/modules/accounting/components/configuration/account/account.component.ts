@@ -3,47 +3,17 @@ import { Component, inject, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../../services/account.service';
-import { AccountModel } from '../../models/AccountModel';
-
+import { AccountModel } from '../../../models/AccountModel';
+import {
+  AccountAPIResponse,
+  AccountCategories,
+} from '../../../models/APIModels';
 
 interface Account {
   id: number;
   code: string;
   name: string;
 }
-
-interface KeyValue {
-  id: number;
-  name: string;
-}
-
-const listOfCategory: KeyValue[] = [
-  {
-    id: 1,
-    name: 'Categoría 1',
-  },
-  {
-    id: 2,
-    name: 'Categoría 2',
-  },
-  {
-    id: 3,
-    name: 'Categoría 3',
-  },
-];
-
-const listAccounts: Account[] = [
-  {
-    code: '01',
-    id: 1,
-    name: 'Activo',
-  },
-  {
-    code: '02',
-    id: 2,
-    name: 'Pasivo',
-  },
-];
 
 @Component({
   selector: 'app-account',
@@ -57,10 +27,10 @@ export class AccountComponent implements OnInit {
     description: '',
     code: '',
     status: 'ACTIVO',
-    balances: []
+    balances: [],
   };
   accounts!: Account[];
-  categories!: KeyValue[];
+  categories!: AccountCategories[];
 
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -69,53 +39,34 @@ export class AccountComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    //this.id = 1;
-    //TODO: Laurent
-    /*
-      Aqui debe integrar y agregar la logica de cuando es editar o cuando es nuevo
-      cuando es editar llene el objeto accountForm
-    */
+    this.accountService.getCategories().subscribe({
+      next: (data) => (this.categories = data),
+      error: (err) => console.error('Error al obtener datos', err),
+    });
 
-    this.accounts = this.fakeAccountsList();
-    this.categories = this.fakeDataCategory();
+    this.accountService.getAllAccount().subscribe({
+      next: (data) => this.fillAccounts(data),
+    });
+
     this.activeRouter.paramMap.subscribe((params) => {
       this.id = params.get('id');
-      this.accountForm.isActive = false;
-      //aqui puede ver si hay datos y llenar el objeto del formulario
-      // TODO: Cargar el objeto del formulario si hay un ID
-      if (this.id) {
-        this.accountService
-          .findAccoundById(Number(this.id))
-          .subscribe((account: any) => {
-            this.accountForm = account;
-            this.accountForm.balances = account.balances;
-            console.log(this.accountForm.balances)
-          });
+      const findId = Number(this.id);
+      if (findId) {
+        this.accountService.findAccountById(findId).subscribe({
+          next: (data) => this.fillForm(data),
+          error: (err) => console.error('error: we got ', err),
+        });
       }
     });
   }
 
   onSubmit(e: NgForm) {
     if (e.valid) {
-      //TODO: Laurent
-      /*
-        Aqui es donde debe hacer la integracion 
-        cuando es nuevo el id no va existir 
-      */
-      //como se cuando hat un id, lo sabemos cuando recuperamos desde la url,
-      //en onInit asignamos el valor
       if (!this.id) {
-        this.accountService.createAccount(this.accountForm).subscribe(() => {
-          this.router.navigate(['accounting/configuration']);
-        });
-        console.log(this.accountForm);
-      } else {
-        this.accountService
-          .updateAccount(Number(this.id), this.accountForm)
-          .subscribe(() => {
-            this.router.navigate(['accounting/configuration']);
-          });
+        this.createAccount();
+        return;
       }
+      this.updateAccount();
     }
   }
 
@@ -124,17 +75,52 @@ export class AccountComponent implements OnInit {
 
     if (target) {
       const id = Number(target.value);
-      const data = listAccounts.find((f) => f.id === id);
+      const data = this.accounts.find((f) => f.id === id);
       this.accountPrefix = data?.code ?? '';
     }
   }
 
-  /*FAKE DATA */
-  private fakeAccountsList(): Account[] {
-    return listAccounts;
+  private createAccount(): void {
+    this.accountService.createAccount(this.accountForm).subscribe(() => {
+      this.router.navigate(['accounting/configuration']);
+    });
   }
 
-  private fakeDataCategory(): KeyValue[] {
-    return listOfCategory;
+  private updateAccount(): void {
+    this.accountService
+      .updateAccount(Number(this.id), this.accountForm)
+      .subscribe(() => {
+        this.router.navigate(['accounting/configuration']);
+      });
+  }
+
+  private fillForm(data: AccountAPIResponse): void {
+    this.accountForm.id = data.id;
+    this.accountForm.category = data.categoryId;
+    this.accountForm.code = data.accountCode;
+    this.accountForm.description = data.name;
+    if (data.typicallyBalance.toUpperCase() === 'CREDITO') {
+      this.accountForm.typicalBalance = 'C';
+    } else {
+      this.accountForm.typicalBalance = 'D';
+    }
+    this.accountForm.supportsRegistration = data.supportEntry;
+    this.accountForm.parentId = data.parentId;
+    this.accountPrefix = data.parentCode ?? '';
+    this.accountForm.isActive =
+      data.status.toUpperCase() === 'ACTIVA' ? true : false;
+  }
+
+  private fillAccounts(data: AccountAPIResponse[]): void {
+    const result = data.map((v) => {
+      return { id: v.id, code: v.accountCode, name: v.name } as Account;
+    });
+
+    if (this.id) {
+      const findId = Number(this.id);
+      this.accounts = result.filter((account) => account.id !== findId);
+      return;
+    }
+    this.accounts = result;
   }
 }
