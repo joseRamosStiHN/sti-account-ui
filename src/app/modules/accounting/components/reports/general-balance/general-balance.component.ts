@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 
 import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
-import { GeneralBalance } from '../../models/APIModels';
+import { GeneralBalance } from '../../../models/APIModels';
 import { ReportServiceService } from '../../../services/report-service.service';
 
 interface GeneralBalance2 {
@@ -16,6 +16,121 @@ interface GeneralBalance2 {
   isCollapsed: boolean;
   depth: number;
 }
+
+const data2: any[] = [
+  {
+    id: 4,
+    accountName: 'Activo Corriente',
+    parentId: 1,
+    category: 'CREDITO',
+    amount: 50.03,
+    root: false,
+  },
+  {
+    id: 5,
+    accountName: 'Efectivo y Equipo',
+    parentId: 4,
+    category: 'CREDITO',
+    amount: 40.01,
+    root: false,
+  },
+  {
+    id: 6,
+    accountName: 'Deposito a Plazo',
+    parentId: 4,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: false,
+  },
+  {
+    id: 7,
+    accountName: 'Activo No Corriente',
+    parentId: 1,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: false,
+  },
+  {
+    id: 8,
+    accountName: 'Propiedad Planta y Equipo',
+    parentId: 7,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: false,
+  },
+  {
+    id: 9,
+    accountName: 'Pasivo Corriente',
+    parentId: 2,
+    category: 'CREDITO',
+    amount: -50.0,
+    root: false,
+  },
+  {
+    id: 10,
+    accountName: 'Pasivo Financiero',
+    parentId: 9,
+    category: 'CREDITO',
+    amount: -40.01,
+    root: false,
+  },
+  {
+    id: 11,
+    accountName: 'Cuenta x Pagar',
+    parentId: 9,
+    category: 'CREDITO',
+    amount: 10.03,
+    root: false,
+  },
+  {
+    id: 12,
+    accountName: 'Patrimonio',
+    parentId: 3,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: false,
+  },
+  {
+    id: 13,
+    accountName: 'Capital Social',
+    parentId: 12,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: false,
+  },
+  {
+    id: 14,
+    accountName: 'Ganancias Acumuladas',
+    parentId: 12,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: false,
+  },
+  {
+    id: 1,
+    accountName: 'Activo',
+    parentId: null,
+    category: 'CREDITO',
+    amount: 50.0,
+    root: true,
+  },
+  {
+    id: 2,
+    accountName: 'Pasivo',
+    parentId: null,
+    category: 'CREDITO',
+    amount: -50.0,
+    root: true,
+  },
+  {
+    id: 3,
+    accountName: 'Patrimonio',
+    parentId: null,
+    category: 'CREDITO',
+    amount: 0.0,
+    root: true,
+  },
+];
 
 const DATA: GeneralBalance[] = [
   {
@@ -274,6 +389,7 @@ export class GeneralBalanceComponent implements OnInit {
       ) {
         this.summaryTotal += root.total ?? 0;
       }
+      //2500.01
     });
   }
 
@@ -330,7 +446,20 @@ export class GeneralBalanceComponent implements OnInit {
     this.reportService
       ?.getGeneralBalanceReport()
       .subscribe((data: GeneralBalance[]) => {
-        console.log(data);
+        const indexActive = data.findIndex(
+          (item) => item.accountName.toUpperCase() === 'ACTIVO'
+        );
+        const indexPasivo = data.findIndex(
+          (item) => item.accountName.toUpperCase() === 'PASIVO'
+        );
+
+        const pasivo = data[indexPasivo];
+        data.splice(indexPasivo, 1);
+        data.unshift(pasivo);
+        const active = data[indexActive];
+        data.splice(indexActive, 1);
+        data.unshift(active);
+
         this.dataSource = data;
         this.buildTree(data);
       });

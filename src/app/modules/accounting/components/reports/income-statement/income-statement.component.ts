@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import config from 'devextreme/core/config';
 import { Options as DataSourceConfig } from 'devextreme/ui/pivot_grid/data_source';
-import Globalize from 'globalize';
+
 interface Incomes {
   id: number;
   category: string;
