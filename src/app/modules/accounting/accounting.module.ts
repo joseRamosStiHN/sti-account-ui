@@ -28,6 +28,8 @@ import { AccountComponent } from './components/configuration/account/account.com
 import { HttpClientModule } from '@angular/common/http';
 import { ReportServiceService } from './services/report-service.service';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
+import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
+import { ConfigurationAccountComponent } from './components/configuration-account/configuration-account.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +41,8 @@ import { GeneralBalanceComponent } from './components/reports/general-balance/ge
     ProviderListComponent,
     ConfigurationComponent,
     GeneralBalanceComponent,
+    IncomeStatementComponent,
+    ConfigurationAccountComponent,
     AccountComponent,
   ],
   providers: [ReportServiceService],
