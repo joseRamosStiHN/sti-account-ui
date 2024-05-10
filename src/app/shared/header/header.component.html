@@ -1,5 +1,5 @@
 <!-- header.component.html -->
-<header class="w-[100%]">
+<header class="w-[100%] z-auto">
   <nav class="border-b-2 h-14">
     <div class="flex justify-between gap-1 items-center p-2">
       <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -9,18 +9,24 @@
         ></span>
       </a>
 
-      <div class="min-h-14" id="navbar-sticky">
+      <div class="h-12" id="navbar-sticky">
         <ul
-          class="flex p-1 border-gray-700 xl:gap-5 md:gap-2 rounded-md text-sm"
+          class="flex gap-1 p-1 border-gray-700 xl:gap-5 md:gap-2 rounded-md text-sm z-[999]"
         >
           @for (n of nav; track $index) {
           <li>
+            @if(n.child) {
+
+            <app-dropdown label="{{ n.label }}" [children]="n.child" />
+
+            }@else {
             <a
               [routerLink]="n.path"
               class="block py-2 px-3 font-bold p-1.5 rounded hover:bg-blue-900 hover:text-slate-50"
               aria-current="page"
               >{{ n.label }}</a
             >
+            }
           </li>
           }
         </ul>

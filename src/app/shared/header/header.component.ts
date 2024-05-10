@@ -6,19 +6,21 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService, NavStiLink } from '../navigation.service';
+import { DropdownComponent } from '../components/dropdown/dropdown.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.css',
   imports: [
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     CommonModule,
     RouterModule,
+    DropdownComponent,
   ],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.css',
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
