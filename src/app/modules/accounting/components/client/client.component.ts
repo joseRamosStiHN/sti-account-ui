@@ -9,13 +9,14 @@ import {
   IMovement,
   Transaction,
   typeToast,
-} from '../models/models';
-import { Router } from '@angular/router';
+} from '../../models/models';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TransactionService } from '../../services/transaction.service';
-import { TransactionModel } from '../models/TransactionModel';
+import { TransactionModel } from '../../models/TransactionModel';
 import { ToastType } from 'devextreme/ui/toast';
 import { AccountService } from '../../services/account.service';
-import { AccountModel } from '../models/AccountModel';
+import { AccountModel } from '../../models/AccountModel';
+import { BillingClientResponse } from '../../models/APIModels';
 
 @Component({
   selector: 'app-client',
@@ -23,6 +24,8 @@ import { AccountModel } from '../models/AccountModel';
   styleUrl: './client.component.css',
 })
 export class ClientComponent {
+  allowAddEntry: boolean = true;
+  id: string | null = null;
   totalCredit: number = 0;
   totalDebit: number = 0;
   messageToast: string = '';
@@ -30,13 +33,7 @@ export class ClientComponent {
   toastType: ToastType = typeToast.Info;
   buttonTextPosting: string = 'Confirmar';
   disablePosting: boolean = false;
-  clientBilling: ClientBilling = {
-    billingNumber: '',
-    date: new Date(),
-    currency: '',
-    exchangeRate: 0,
-    description: '',
-  };
+  clientBilling: ClientBilling;
   dataSource: Transaction[] = [];
 
   listMovement: IMovement[] = [
@@ -49,14 +46,22 @@ export class ClientComponent {
       name: 'Haber',
     },
   ];
-  acountList: AccountModel[] = [];
+  accountList: AccountModel[] = [];
 
   //
   private readonly router = inject(Router);
+  private readonly activeRouter = inject(ActivatedRoute);
   private readonly transactionService = inject(TransactionService);
-  private accountService = inject(AccountService);
+  private readonly accountService = inject(AccountService);
 
   constructor() {
+    this.clientBilling = {
+      billingNumber: '',
+      date: new Date(),
+      currency: '',
+      exchangeRate: 0,
+      description: '',
+    };
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
@@ -65,23 +70,32 @@ export class ClientComponent {
   }
 
   ngOnInit(): void {
-    this.accountService.getAllAccount().subscribe((response: any[]) => {
-      if (Array.isArray(response)) {
-        this.acountList = response;
-      } else {
-        console.error('Error al obtener datos de cuentas');
+    this.accountService.getAllAccount().subscribe({
+      next: (data) => {
+        this.accountList = data.map((item) => {
+          return { id: item.id, description: item.name } as AccountModel;
+        });
+      },
+    });
+
+    this.activeRouter.paramMap.subscribe((params) => {
+      this.id = params.get('id');
+      this.clientBilling.id = Number(this.id);
+      const findId = Number(this.id);
+      if (findId) {
+        this.transactionService.getTransactionById(findId).subscribe({
+          next: (data) => this.fillBilling(data),
+        });
       }
     });
   }
 
   onSubmit(e: NgForm) {
-    console.log('valid? ', e.valid);
+    /*   console.log('valid? ', e.valid);
+    console.log('data:', this.clientBilling);
+    console.log('dataSource', this.dataSource); */
     if (e.valid && this.validate()) {
-      console.log('data:', this.clientBilling);
-      console.log('dataSource', this.dataSource);
-      //TODO: Laurent aqui hace la integración
-      //el servicio deberia retornar el id de la transaccion y su estado
-      //set id
+      // set values
       const transactionData: TransactionModel = {
         createAtDate: this.clientBilling.date,
         reference: this.clientBilling.billingNumber,
@@ -91,6 +105,7 @@ export class ClientComponent {
         currency: this.clientBilling.currency,
         detail: this.dataSource.map((detail) => {
           return {
+            id: detail.id,
             accountId: detail.accountId,
             amount: detail.amount,
             motion: detail.movement,
@@ -98,21 +113,41 @@ export class ClientComponent {
         }),
       };
 
-      this.transactionService.createTransaction(transactionData).subscribe(
-        (response: any) => {
-          this.clientBilling.id = 1;
-          this.clientBilling.status = 'Draft';
+      //is an update
+      if (this.id) {
+        transactionData.id = Number(this.id);
+        this.transactionService
+          .updateTransaction(transactionData.id, transactionData)
+          .subscribe({
+            next: (data) => {
+              this.fillBilling(data);
+              this.toastType = typeToast.Success;
+              this.messageToast = 'Actualizados Exitosamente';
+            },
+            error: (err) => {
+              this.toastType = typeToast.Error;
+              this.messageToast = 'No se pudo Actualizar los datos';
+              this.showToast = true;
+              console.error('erro al actualizar transacción ', err);
+            },
+          });
+        return;
+      }
+
+      this.transactionService.createTransaction(transactionData).subscribe({
+        next: (data) => {
+          this.fillBilling(data);
           this.toastType = typeToast.Success;
           this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
         },
-        (error: any) => {
-          console.error('Error creating transaction:', error);
+        error: (err) => {
+          console.error('Error creating transaction:', err);
           this.toastType = typeToast.Error;
           this.messageToast = 'Error al crear la transacción';
           this.showToast = true;
-        }
-      );
+        },
+      });
     }
   }
 
@@ -127,7 +162,20 @@ export class ClientComponent {
         // si el usuario dio OK
         this.buttonTextPosting = 'confirmando...';
         this.disablePosting = true;
+        const transId = Number(this.id);
+        this.transactionService.postTransaction(transId).subscribe({
+          next: (data) => {
+            this.router.navigate(['/accounting/client-list']);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar publicar la transacción';
+            this.showToast = true;
 
+            this.buttonTextPosting = 'Confirmar';
+            this.disablePosting = false;
+          },
+        });
         //TODO: Laurent
         /*
           aqui cuando el usuario le dio confirma debe de llamar al api
@@ -144,7 +192,7 @@ export class ClientComponent {
     
         */
         //si todo fue OK redirigir al usuario
-        this.router.navigate(['/accounting/client-list']);
+        //this.router.navigate(['/accounting/client-list']);
       }
     });
   }
@@ -157,23 +205,25 @@ export class ClientComponent {
           options.totalValue = 0;
           break;
         case 'calculate':
-          if (
-            options.name === 'totalDebit' &&
-            options.value.movimiento === 'DEBE'
-          ) {
+          if (options.name === 'totalDebit' && options.value.movement === 'D') {
             // si es el item de debito y el movimiento el `DEBE`
-            options.totalValue += options.value.monto;
-          } else if (
-            // si es el item de credito y movimiento es el `HABER`
+            options.totalValue += options.value.amount;
+          }
+          if (
             options.name === 'totalCredit' &&
-            options.value.movimiento === 'HABER'
+            options.value.movement === 'C'
           ) {
-            options.totalValue += options.value.monto;
+            // si es el item de credito y movimiento es el `HABER`
+            options.totalValue += options.value.amount;
           }
           break;
       }
     }
   }
+
+  enableEdit = () => {
+    return this.clientBilling.status !== 'Success';
+  };
 
   customCurrencyText(cellInfo: any): string {
     return cellInfo.valueText.replace('USD', '$').replace('HNL', 'L');
@@ -216,5 +266,27 @@ export class ClientComponent {
     }
     // si todo `OK` retorna true
     return true;
+  }
+
+  private fillBilling(data: BillingClientResponse): void {
+    this.dataSource = data.transactionDetails.map((item) => {
+      return {
+        accountId: item.accountId,
+        amount: item.amount,
+        id: item.id,
+        movement: item.shortEntryType,
+      } as Transaction;
+    });
+    this.clientBilling.id = data.id;
+    this.clientBilling.currency = data.currency;
+    this.clientBilling.status =
+      data.status.charAt(0).toUpperCase() + data.status.slice(1).toLowerCase();
+    this.clientBilling.billingNumber = data.reference;
+    this.clientBilling.exchangeRate = data.exchangeRate;
+    this.clientBilling.date = data.date;
+    this.clientBilling.description = data.description;
+
+    //
+    this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
   }
 }

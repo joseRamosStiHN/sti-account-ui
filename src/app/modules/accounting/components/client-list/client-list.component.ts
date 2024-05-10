@@ -1,6 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BillingListClient } from '../models/models';
+import { BillingListClient } from '../../models/models';
+import { TransactionService } from '../../services/transaction.service';
+import { BillingClientResponse } from '../../models/APIModels';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -14,87 +16,18 @@ const initialValue: [Date, Date] = [
   styleUrl: './client-list.component.css',
 })
 export class ClientListComponent implements OnInit {
-  dataSource: BillingListClient[] = [
-    {
-      id: 1,
-      amount: 122.35,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura 0001',
-      entryNumber: '1',
-      status: 'Borrador',
-    },
-    {
-      id: 2,
-      amount: 100.0,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura 0002',
-      entryNumber: '87',
-      status: 'Posted',
-    },
-    {
-      id: 3,
-      amount: 60.35,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura',
-      entryNumber: '3',
-      status: 'Borrador',
-    },
-    {
-      id: 4,
-      amount: 120.35,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura',
-      entryNumber: '12',
-      status: 'Borrador',
-    },
-    {
-      id: 5,
-      amount: 50000.001,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura',
-      entryNumber: '23',
-      status: 'Borrador',
-    },
-    {
-      id: 6,
-      amount: 20000.35,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura',
-      entryNumber: '2',
-      status: 'Borrador',
-    },
-    {
-      id: 7,
-      amount: 17622.35,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura',
-      entryNumber: '5',
-      status: 'Borrador',
-    },
-    {
-      id: 8,
-      amount: 23332121.35,
-      account: 'Cuentas por pagar',
-      dateAt: new Date(),
-      document: 'Factura',
-      entryNumber: '6',
-      status: 'Borrador',
-    },
-  ];
+  dataSource: BillingListClient[] = [];
 
   currentValue: [Date, Date] = initialValue;
   private readonly router = inject(Router);
-
+  private readonly transService = inject(TransactionService);
   constructor() {}
   ngOnInit(): void {
     //TODO: aqui hacer el llamadas inicial del API para mostras los primeros 30 dias
+    this.transService.getAllClientBilling().subscribe({
+      next: (data) => this.fillDataSource(data),
+      error: (err) => console.error('error while made a request, ', err),
+    });
   }
 
   onSearch(): void {
@@ -111,5 +44,17 @@ export class ClientListComponent implements OnInit {
 
   onButtonClick(data: any) {
     this.router.navigate(['/accounting/client-invoicing', data.id]);
+  }
+
+  private fillDataSource(data: BillingClientResponse[]): void {
+    this.dataSource = data.map((item) => {
+      return {
+        id: item.id,
+        document: item.reference,
+        dateAt: item.date,
+        status: item.status,
+        description: item.description,
+      } as BillingListClient;
+    });
   }
 }

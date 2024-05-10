@@ -3,7 +3,7 @@
     <div class="w-100 flex justify-between mb-5">
       <h2 class="text-2xl font-semibold">Factura de Clientes</h2>
     </div>
-    @if(clientBilling.id && clientBilling.status === 'Draft'){
+    @if(clientBilling.id !==null && clientBilling.status === 'Draft'){
     <button
       (click)="posting()"
       [disabled]="disablePosting"
@@ -25,40 +25,6 @@
       >
     </button>
     }
-
-    <!--  <button
-      class="relative px-10 h-10 font-medium text-white transition duration-300 bg-orange-400 rounded-md hover:bg-orange-500 ease"
-    >
-      <span class="absolute bottom-0 left-0 h-full -ml-2">
-        <svg
-          viewBox="0 0 487 487"
-          class="w-auto h-full opacity-100 object-stretch"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 .3c67 2.1 134.1 4.3 186.3 37 52.2 32.7 89.6 95.8 112.8 150.6 23.2 54.8 32.3 101.4 61.2 149.9 28.9 48.4 77.7 98.8 126.4 149.2H0V.3z"
-            fill="#FFF"
-            fill-rule="nonzero"
-            fill-opacity=".1"
-          ></path>
-        </svg>
-      </span>
-      <span class="absolute top-0 right-0 w-12 h-full -mr-3">
-        <svg
-          viewBox="0 0 487 487"
-          class="object-cover w-full h-full"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M487 486.7c-66.1-3.6-132.3-7.3-186.3-37s-95.9-85.3-126.2-137.2c-30.4-51.8-49.3-99.9-76.5-151.4C70.9 109.6 35.6 54.8.3 0H487v486.7z"
-            fill="#FFF"
-            fill-rule="nonzero"
-            fill-opacity=".1"
-          ></path>
-        </svg>
-      </span>
-      <span class="relative">{{ buttonTextPosting }}</span>
-    </button> -->
   </div>
   <form
     id="clientForm"
@@ -149,8 +115,8 @@
             id="exchangeRate"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
           >
-            <option selected>24.7012</option>
-            <option>24.7821</option>
+            <option value="24.7" selected>24.7012</option>
+            <option value="24.50">24.50</option>
           </select>
           <div
             *ngIf="
@@ -207,9 +173,9 @@
         <dxo-editing
           mode="form"
           [useIcons]="true"
-          [allowAdding]="true"
-          [allowDeleting]="true"
-          [allowUpdating]="true"
+          [allowAdding]="allowAddEntry"
+          [allowDeleting]="enableEdit"
+          [allowUpdating]="enableEdit"
         />
         <dxi-column
           caption="#"
@@ -229,7 +195,7 @@
           [editorOptions]="{ searchEnabled: true }"
         >
           <dxo-lookup
-            [dataSource]="acountList"
+            [dataSource]="accountList"
             valueExpr="id"
             displayExpr="description"
           ></dxo-lookup>
@@ -270,9 +236,9 @@
             <div
               class="flex flex-col text-center border border-b-0 px-1.5 shadow"
             >
-              <label class="block font-mono">Total Haber </label>
-              <small class="block font-mono font-medium text-green-900">
-                {{ totalCredit | currency : "L. " }}</small
+              <label class="block font-mono">Total Debe </label>
+              <small class="block font-mono font-medium text-red-900">
+                {{ totalDebit | currency : "L. " }}</small
               >
             </div>
           </dxi-item>
@@ -280,12 +246,13 @@
             <div
               class="flex flex-col text-center border border-b-0 px-1.5 shadow"
             >
-              <label class="block font-mono">Total Debe </label>
-              <small class="block font-mono font-medium text-red-900">
-                {{ totalDebit | currency : "L. " }}</small
+              <label class="block font-mono">Total Haber </label>
+              <small class="block font-mono font-medium text-green-900">
+                {{ totalCredit | currency : "L. " }}</small
               >
             </div>
           </dxi-item>
+
           <dxi-item name="addRowButton"></dxi-item>
         </dxo-toolbar>
 
@@ -304,6 +271,7 @@
     </div>
 
     <div class="justify-end mt-10">
+      @if(clientBilling.status !== "Success"){
       <a
         [routerLink]="'/accounting'"
         class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
@@ -316,6 +284,7 @@
       >
         Guardar
       </button>
+      }
     </div>
 
     <!--  <div
@@ -331,7 +300,7 @@
     </div> [type]="toastType" -->
   </form>
 
-  <dx-toast [(visible)]="showToast" [type]="toastType"  [message]="messageToast">
+  <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
     <dxo-position my="top" at="top" of="#clientForm"> </dxo-position>
   </dx-toast>
 </div>

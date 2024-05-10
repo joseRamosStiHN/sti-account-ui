@@ -5,7 +5,7 @@
     Facturas de clientes
   </h2>
   <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
-    <dx-date-range-box [(value)]="currentValue" class=""> </dx-date-range-box>
+    <dx-date-range-box [(value)]="currentValue"> </dx-date-range-box>
     <button
       type="button"
       class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 rounded-md text-sm px-5 py-2 me-1 mt-1 focus:outline-none"
@@ -37,28 +37,27 @@
       ></dxo-search-panel>
       <dxo-group-panel [visible]="true"></dxo-group-panel>
 
-      <dxi-column caption="Documento" dataField="document"></dxi-column>
+      <dxi-column caption="Factura" dataField="document"></dxi-column>
+      <dxi-column caption="Descripción" dataField="description"></dxi-column>
       <dxi-column
         caption="Fecha"
         dataField="dateAt"
         dataType="date"
         alignment="center"
+        width="90"
       ></dxi-column>
-      <dxi-column
-        caption="Valor"
-        dataField="amount"
-        dataType="currency"
-        alignment="right"
-      ></dxi-column>
+
       <dxi-column
         caption="Estado"
         dataField="status"
         alignment="center"
+        width="120"
       ></dxi-column>
       <dxi-column
         caption="No Partida"
         alignment="center"
         dataField="entryNumber"
+        width="120"
       ></dxi-column>
       <dxi-column type="buttons" cellTemplate="cellButtonsTemplate" width="50">
         <div *dxTemplate="let factura of 'cellButtonsTemplate'">
