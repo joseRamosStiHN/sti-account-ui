@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 export interface NavStiLink {
   label: string;
   path: string;
+  child?: NavStiLink[];
 }
 
 @Injectable({
