@@ -15,9 +15,27 @@ export class AccountingPageComponent implements OnInit {
     this.navigationService.setNavLinks([
       { label: 'Clientes', path: '/accounting/client-list' },
       { label: 'Proveedores', path: '/accounting/provider-list' },
-      { label: 'Reportes', path: '/accounting/reports' },
-      { label: 'Configuraciones', path: '/accounting/configuration' },
-      { label: 'Configuración Cuentas', path: '/accounting/configuration-account' },
+      {
+        label: 'Reportes',
+        path: '',
+        child: [
+          {
+            label: 'Balance General',
+            path: '/accounting/report/general-balance',
+          },
+          { label: 'Estado de Resultados', path: '/accounting/report/incomes' },
+        ],
+      },
+      {
+        label: 'Configuraciones',
+        path: '',
+        child: [
+          {
+            label: 'Configuración Cuentas',
+            path: '/accounting/configuration/accounts',
+          },
+        ],
+      },
     ]);
   }
 }
