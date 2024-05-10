@@ -2,7 +2,7 @@ export interface AccountModel {
   id?: number;
   code?: string;
   description?: string;
-  parentId?: number;
+  parentId?: number | null;
   category?: number;
   typicalBalance?: string | null;
   supportsRegistration?: boolean | null;
@@ -12,8 +12,8 @@ export interface AccountModel {
 }
 
 export interface BalancesModel {
-    id: number;
-    initialBalance: number;
-    createAtDate: string;
-    isActual: boolean;
+  id: number;
+  initialBalance: number;
+  createAtDate: string;
+  isActual: boolean;
 }
