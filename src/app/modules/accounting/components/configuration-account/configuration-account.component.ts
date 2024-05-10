@@ -34,29 +34,19 @@ export class ConfigurationAccountComponent {
 
   dataSource: TabPanelItem[];
 
-  tabsPositions: DxTabPanelTypes.Position[] = [
-    'left',
-    'top',
-    'right',
-    'bottom',
-  ];
+  tabsPositions: any[] = ['left', 'top', 'right', 'bottom'];
 
   acountList: AccountList[] = [];
 
-  tabsPosition: DxTabPanelTypes.Position = this.tabsPositions[0];
+  tabsPosition: any = this.tabsPositions[0];
 
-  stylingModes: DxTabPanelTypes.TabsStyle[] = ['secondary', 'primary'];
+  stylingModes: any[] = ['secondary', 'primary'];
 
-  stylingMode: DxTabPanelTypes.TabsStyle = this.stylingModes[0];
+  stylingMode: any = this.stylingModes[0];
 
-  iconPositions: DxTabPanelTypes.TabsIconPosition[] = [
-    'top',
-    'start',
-    'end',
-    'bottom',
-  ];
+  iconPositions: any[] = ['top', 'start', 'end', 'bottom'];
 
-  iconPosition: DxTabPanelTypes.TabsIconPosition = this.iconPositions[0];
+  iconPosition: any[] = this.iconPositions[0];
 
   private accountService = inject(AccountService);
 
