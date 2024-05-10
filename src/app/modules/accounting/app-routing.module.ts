@@ -31,6 +31,12 @@ const routes: Routes = [
         path: 'configuration/update-account/:id',
         component: AccountComponent,
       },
+      {
+        path: 'configuration/accounts',
+        component: ConfigurationComponent,
+      },
+      { path: 'report/general-balance', component: GeneralBalanceComponent },
+      { path: 'report/incomes', component: IncomeStatementComponent },
     ],
   },
 ];
