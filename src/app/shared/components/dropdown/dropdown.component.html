@@ -33,6 +33,7 @@
       @for (item of children; track $index) {
       <li>
         <a
+          (click)="onClick()"
           [routerLink]="item.path"
           class="block px-4 py-2 hover:bg-blue-900 hover:text-white"
           aria-current="page"

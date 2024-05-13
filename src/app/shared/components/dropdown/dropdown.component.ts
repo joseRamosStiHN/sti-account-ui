@@ -33,4 +33,11 @@ export class DropdownComponent {
       this.show = false;
     }
   }
+
+  @HostListener('document:onMouseLeve', ['$event'])
+  onMouseLeve(event: MouseEvent) {
+    const targetElement = event.target as HTMLElement;
+    console.log(this.elementRef.nativeElement.contains(targetElement));
+    //this.show = false;
+  }
 }
