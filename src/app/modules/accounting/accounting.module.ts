@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AccountingPageComponent } from './pages/accounting-page/accounting-page.component';
-import { ClientComponent } from './components/client/client.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
-import { ClientListComponent } from './components/client-list/client-list.component';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -20,23 +18,26 @@ import {
   DxToastModule,
   DxTreeListModule,
 } from 'devextreme-angular';
-import { ProviderComponent } from './components/provider/provider.component';
-import { ProviderListComponent } from './components/provider-list/provider-list.component';
-import { ConfigurationComponent } from './components/configuration/configuration.component';
 
-import { AccountComponent } from './components/configuration/account/account.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ReportServiceService } from './services/report-service.service';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
 import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
 import { ConfigurationAccountComponent } from './components/configuration-account/configuration-account.component';
 
+import { ProviderListComponent } from './pages/InvoiceProvider/provider-list/provider-list.component';
+import { ProviderComponent } from './pages/InvoiceProvider/provider/provider.component';
+import { ClientListComponent } from './pages/InvoiceClient/client-list/client-list.component';
+import { ClientComponent } from './pages/InvoiceClient/client/client.component';
+import { ConfigurationComponent } from './pages/Accounts/configuration.component';
+import { AccountComponent } from './pages/Accounts/create/account.component';
+
 @NgModule({
   declarations: [
     AccountingPageComponent,
     ClientComponent,
-    DashboardComponent,
     ClientListComponent,
+    DashboardComponent,
     ProviderComponent,
     ProviderListComponent,
     ConfigurationComponent,

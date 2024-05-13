@@ -1,17 +1,17 @@
-import { Component, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ClientComponent } from './components/client/client.component';
 import { AccountingPageComponent } from './pages/accounting-page/accounting-page.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { ClientListComponent } from './components/client-list/client-list.component';
-import { ProviderComponent } from './components/provider/provider.component';
-import { ProviderListComponent } from './components/provider-list/provider-list.component';
-import { ConfigurationComponent } from './components/configuration/configuration.component';
 
-import { AccountComponent } from './components/configuration/account/account.component';
 import { IncomeStatementComponent } from './components/reports/income-statement/income-statement.component';
 import { GeneralBalanceComponent } from './components/reports/general-balance/general-balance.component';
-import { ConfigurationAccountComponent } from './components/configuration-account/configuration-account.component';
+
+import { ProviderComponent } from './pages/InvoiceProvider/provider/provider.component';
+import { ProviderListComponent } from './pages/InvoiceProvider/provider-list/provider-list.component';
+import { ClientListComponent } from './pages/InvoiceClient/client-list/client-list.component';
+import { ClientComponent } from './pages/InvoiceClient/client/client.component';
+import { ConfigurationComponent } from './pages/Accounts/configuration.component';
+import { AccountComponent } from './pages/Accounts/create/account.component';
 
 const routes: Routes = [
   {
