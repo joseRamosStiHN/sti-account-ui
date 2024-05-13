@@ -7,7 +7,7 @@ export interface GeneralBalance {
   total: number | null;
   root: boolean;
 }
-export interface ClientTransactionDetail {
+export interface TransactionDetailResponse {
   id: number;
   accountCode: string;
   accountId: number;
@@ -17,7 +17,7 @@ export interface ClientTransactionDetail {
   shortEntryType: string;
 }
 
-export interface BillingClientResponse {
+export interface TransactionResponse {
   id: number;
   reference: string;
   status: string;
@@ -27,7 +27,7 @@ export interface BillingClientResponse {
   description: string;
   date: Date;
   currency: string;
-  transactionDetails: ClientTransactionDetail[];
+  transactionDetails: TransactionDetailResponse[];
 }
 
 export interface AccountCategories {

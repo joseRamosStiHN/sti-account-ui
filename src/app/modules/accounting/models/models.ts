@@ -45,3 +45,12 @@ export enum typeToast {
   Success = 'success',
   Warning = 'warning',
 }
+
+export enum DocumentType {
+  INVOICE_CLIENT = 1,
+  INVOICE_PROVIDER = 2,
+  BANKS = 3,
+  CREDIT_NOTE = 4,
+  DEBIT_NOTE = 5,
+  ADJUSTMENT = 6,
+}
