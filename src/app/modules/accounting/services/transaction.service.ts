@@ -1,7 +1,7 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { BillingClientResponse } from '../models/APIModels';
+import { TransactionResponse } from '../models/APIModels';
 import { TransactionModel } from '../models/TransactionModel';
 
 @Injectable({
@@ -40,9 +40,9 @@ export class TransactionService {
    *
    * @return response()
    */
-  createTransaction(data: any): Observable<BillingClientResponse> {
+  createTransaction(data: any): Observable<TransactionResponse> {
     return this.httpClient
-      .post<BillingClientResponse>(
+      .post<TransactionResponse>(
         this.apiURL + '/api/v1/transaction',
         JSON.stringify(data),
         this.httpOptions
@@ -51,22 +51,24 @@ export class TransactionService {
       .pipe(catchError(this.errorHandler));
   }
 
-  getAllClientBilling(): Observable<BillingClientResponse[]> {
-    const url = `${this.apiURL}/api/v1/transaction`;
-    return this.httpClient.get<BillingClientResponse[]>(url);
+  getAllTransactionByDocumentType(
+    documentId: number
+  ): Observable<TransactionResponse[]> {
+    const url = `${this.apiURL}/api/v1/transaction/by-document/${documentId}`;
+    return this.httpClient.get<TransactionResponse[]>(url);
   }
 
-  getTransactionById(id: number): Observable<BillingClientResponse> {
+  getTransactionById(id: number): Observable<TransactionResponse> {
     const url = `${this.apiURL}/api/v1/transaction/${id}`;
-    return this.httpClient.get<BillingClientResponse>(url);
+    return this.httpClient.get<TransactionResponse>(url);
   }
 
   updateTransaction(
     id: number,
     data: TransactionModel
-  ): Observable<BillingClientResponse> {
+  ): Observable<TransactionResponse> {
     const url = `${this.apiURL}/api/v1/transaction/${id}`;
-    return this.httpClient.put<BillingClientResponse>(
+    return this.httpClient.put<TransactionResponse>(
       url,
       JSON.stringify(data),
       this.httpOptions
