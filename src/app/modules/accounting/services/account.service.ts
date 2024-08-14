@@ -2,12 +2,13 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AccountAPIResponse, AccountCategories } from '../models/APIModels';
+import { environment } from '@environment/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccountService {
-  private apiURL = 'http://34.226.208.171';
+  private apiURL = environment.API;
 
   /*------------------------------------------
   --------------------------------------------
