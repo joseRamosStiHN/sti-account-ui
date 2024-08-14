@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { BillingListClient, DocumentType } from '../../../models/models';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
-import { map, Observable } from 'rxjs';
+import { catchError, filter, map, Observable, of, tap } from 'rxjs';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -18,7 +18,8 @@ const initialValue: [Date, Date] = [
 })
 export class ClientListComponent implements OnInit {
   dataSource$: Observable<BillingListClient[]> | undefined;
-
+  error: Error | null = null;
+  roles: string[] = ['admin', 'teller'];
   currentValue: [Date, Date] = initialValue;
   private readonly router = inject(Router);
   private readonly transService = inject(TransactionService);
@@ -26,7 +27,18 @@ export class ClientListComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource$ = this.transService
       .getAllTransactionByDocumentType(DocumentType.INVOICE_CLIENT)
-      .pipe(map((data) => this.fillDataSource(data)));
+      .pipe(
+        map((data) => this.fillDataSource(data)),
+        tap({
+          error: (err) => {
+            this.error = err;
+          },
+        }),
+        catchError((err) => {
+          console.log('handler error in component');
+          return of([]);
+        })
+      );
   }
 
   onSearch(): void {
