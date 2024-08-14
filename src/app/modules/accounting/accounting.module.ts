@@ -31,6 +31,9 @@ import { ClientListComponent } from './pages/InvoiceClient/client-list/client-li
 import { ClientComponent } from './pages/InvoiceClient/client/client.component';
 import { ConfigurationComponent } from './pages/Accounts/configuration.component';
 import { AccountComponent } from './pages/Accounts/create/account.component';
+import { CardAccountingComponent } from './components/card-accounting/card-accounting.component';
+import { JournalPageComponent } from './pages/journal-page/journal-page.component';
+import { showControlDirective } from 'src/app/shared/directives/showControlDirective';
 
 @NgModule({
   declarations: [
@@ -45,6 +48,9 @@ import { AccountComponent } from './pages/Accounts/create/account.component';
     IncomeStatementComponent,
     ConfigurationAccountComponent,
     AccountComponent,
+    CardAccountingComponent,
+    JournalPageComponent,
+    showControlDirective,
   ],
   providers: [ReportServiceService],
   exports: [AccountingPageComponent, HttpClientModule],
