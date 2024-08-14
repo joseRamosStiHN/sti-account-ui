@@ -90,7 +90,7 @@ export class ProviderComponent {
       const transactionData: TransactionModel = {
         createAtDate: this.providerBilling.date,
         reference: this.providerBilling.billingNumber,
-        documentType: 1,
+        documentType: 2, // mejorar esta parte para tener un enum u otra estructura
         exchangeRate: this.providerBilling.exchangeRate,
         descriptionPda: this.providerBilling.description,
         currency: this.providerBilling.currency,

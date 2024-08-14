@@ -43,28 +43,27 @@
       ></dxo-search-panel>
       <dxo-group-panel [visible]="true"></dxo-group-panel>
 
-      <dxi-column caption="Documento" dataField="document"></dxi-column>
+      <dxi-column caption="Factura" dataField="document"></dxi-column>
+      <dxi-column caption="Descripción" dataField="description"></dxi-column>
       <dxi-column
         caption="Fecha"
         dataField="dateAt"
         dataType="date"
         alignment="center"
+        width="90"
       ></dxi-column>
-      <dxi-column
-        caption="Valor"
-        dataField="amount"
-        dataType="currency"
-        alignment="right"
-      ></dxi-column>
+
       <dxi-column
         caption="Estado"
         dataField="status"
         alignment="center"
+        width="120"
       ></dxi-column>
       <dxi-column
         caption="No Partida"
         alignment="center"
         dataField="entryNumber"
+        width="120"
       ></dxi-column>
       <dxi-column type="buttons" cellTemplate="cellButtonsTemplate" width="50">
         <div *dxTemplate="let factura of 'cellButtonsTemplate'">
