@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NavigationService, NavStiLink } from '../navigation.service';
 import { RouterModule } from '@angular/router';
@@ -12,11 +12,10 @@ import { RouterModule } from '@angular/router';
 })
 export class NavigationComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
-  nav: NavStiLink[] = [];
+  nav!: NavStiLink[];
 
-  constructor(private navigate: NavigationService) {
-    console.log('enter to NavigationComponent');
-  }
+  private navigate = inject(NavigationService);
+  constructor() {}
 
   ngOnInit(): void {
     this.subscription.add(
