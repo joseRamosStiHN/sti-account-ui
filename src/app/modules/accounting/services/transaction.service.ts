@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { TransactionResponse } from '../models/APIModels';
 import { TransactionModel } from '../models/TransactionModel';
+import { environment } from '@environment/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionService {
-  private apiURL = 'http://34.226.208.171';
+  private apiURL = environment.API;
 
   /*------------------------------------------
   --------------------------------------------
@@ -55,7 +56,14 @@ export class TransactionService {
     documentId: number
   ): Observable<TransactionResponse[]> {
     const url = `${this.apiURL}/api/v1/transaction/by-document/${documentId}`;
-    return this.httpClient.get<TransactionResponse[]>(url);
+    return this.httpClient.get<TransactionResponse[]>(url).pipe(
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
   }
 
   getTransactionById(id: number): Observable<TransactionResponse> {
