@@ -20,12 +20,13 @@ const initialValue: [Date, Date] = [
 export class ProviderListComponent {
   dataSource$: Observable<BillingListProvider[]> | undefined;
 
-  currentValue: [Date, Date] = initialValue;
+  currentValue!: [Date, Date];
   private readonly router = inject(Router);
   private readonly service = inject(TransactionService);
 
   constructor() {}
   ngOnInit(): void {
+    this.currentValue = [new Date(), new Date()];
     this.dataSource$ = this.service
       .getAllTransactionByDocumentType(DocumentType.INVOICE_PROVIDER)
       .pipe(map((trans) => this.fillDataSource(trans)));
