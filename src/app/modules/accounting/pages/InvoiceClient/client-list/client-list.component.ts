@@ -20,11 +20,12 @@ export class ClientListComponent implements OnInit {
   dataSource$: Observable<BillingListClient[]> | undefined;
   error: Error | null = null;
   roles: string[] = ['admin', 'teller'];
-  currentValue: [Date, Date] = initialValue;
+  currentValue!: [Date, Date];
   private readonly router = inject(Router);
   private readonly transService = inject(TransactionService);
   constructor() {}
   ngOnInit(): void {
+    this.currentValue = [new Date(), new Date()];
     this.dataSource$ = this.transService
       .getAllTransactionByDocumentType(DocumentType.INVOICE_CLIENT)
       .pipe(
