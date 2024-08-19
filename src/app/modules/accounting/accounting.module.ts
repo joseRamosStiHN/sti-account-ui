@@ -32,8 +32,10 @@ import { ClientComponent } from './pages/InvoiceClient/client/client.component';
 import { ConfigurationComponent } from './pages/Accounts/configuration.component';
 import { AccountComponent } from './pages/Accounts/create/account.component';
 import { CardAccountingComponent } from './components/card-accounting/card-accounting.component';
-import { JournalPageComponent } from './pages/journal-page/journal-page.component';
+import { JournalPageComponent } from './pages/journal-page/journal/journal-page.component';
+import { JournalListComponent } from './pages/journal-page/journal-list/journal-list.component';
 import { showControlDirective } from 'src/app/shared/directives/showControlDirective';
+import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 
 @NgModule({
   declarations: [
@@ -50,9 +52,12 @@ import { showControlDirective } from 'src/app/shared/directives/showControlDirec
     AccountComponent,
     CardAccountingComponent,
     JournalPageComponent,
-    showControlDirective,
+    JournalListComponent,
+    showControlDirective
   ],
-  providers: [ReportServiceService],
+  providers: [ReportServiceService,
+    JournalService
+  ],
   exports: [AccountingPageComponent, HttpClientModule],
   imports: [
     CommonModule,

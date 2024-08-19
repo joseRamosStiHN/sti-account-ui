@@ -12,6 +12,8 @@ import { ClientListComponent } from './pages/InvoiceClient/client-list/client-li
 import { ClientComponent } from './pages/InvoiceClient/client/client.component';
 import { ConfigurationComponent } from './pages/Accounts/configuration.component';
 import { AccountComponent } from './pages/Accounts/create/account.component';
+import { JournalListComponent } from 'src/app/modules/accounting/pages/journal-page/journal-list/journal-list.component';
+import { JournalPageComponent } from 'src/app/modules/accounting/pages/journal-page/journal/journal-page.component';
 
 const routes: Routes = [
   {
@@ -37,6 +39,8 @@ const routes: Routes = [
       },
       { path: 'report/general-balance', component: GeneralBalanceComponent },
       { path: 'report/incomes', component: IncomeStatementComponent },
+      { path: 'journal-list', component: JournalListComponent },
+      { path: 'journal/new-journal', component: JournalPageComponent },
     ],
   },
 ];
