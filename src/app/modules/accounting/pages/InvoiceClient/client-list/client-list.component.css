@@ -1,0 +1,7 @@
+::ng-deep .dx-pager {
+    border: thin solid #ddd;
+}
+  
+::ng-deep .dx-pager .dx-page-sizes .dx-page-size:hover {
+    background-color: #ddd;
+  }
