@@ -1,0 +1,66 @@
+<div class="mt-2 px-1 h-[80vh] relative">
+    <div class="flex flex-row justify-between">
+        <div class="w-100 flex justify-between mb-5">
+            <h2 class="text-2xl font-semibold">Nuevo Periodo</h2>
+        </div>
+    </div>
+    <form id="periodForm" class="w-100" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
+        <div class="container">
+
+            <div class="flex flex-col gap-2">
+                <div class="form-group">
+                    <label for="nameJourney" class="block mb-2 text-sm text-gray-900">Nombre Periodo</label>
+                    <input [(ngModel)]="periodForm.name" id="nameJourney" name="nameJourney" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
+                            w-96 p-2" placeholder="" required />
+                    <div *ngIf="
+                            itemForm.submitted &&
+                            itemForm.form.controls['nameJourney'].getError('required')
+                          ">
+                        <small class="text-xs text-red-900">Nombre de Periodo es requerido.</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lossAccount" class="block mb-2 text-sm text-gray-900">Tipo de Periodo</label>
+                    <select [(ngModel)]="periodForm.typePeriod" (ngModelChange)="changeDate($event)" 
+                    required="true" name="lossAccount" id="lossAccount"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                        focus:ring-blue-500 focus:border-blue-500 block w-96 p-2">
+                        <option *ngFor="let type of periodList" [value]="type">{{ type }}
+                        </option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['lossAccount'].getError('required')">
+                        <small class="text-xs text-red-900">Tipo de periodo es requerido.</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <dx-date-range-box class="w-1/2"
+                        [(value)]="currentValue"
+                        (onValueChanged)="currentValueChanged($event)">
+                    </dx-date-range-box>
+
+                    <!-- <div *ngIf="itemForm.submitted && itemForm.form.controls['range-period'].errors?.['required']">
+                        <small class="text-xs text-red-900">Fechas son requeridas.</small>
+                    </div> -->
+                </div>
+
+            </div>
+
+            <div class="justify-end mt-10 absolute right-4 bottom-10">
+                <button type="button" (click)="goBack()"
+                    class=" h-10 :outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                    Cancelar
+                </button>
+                <button type="submit"
+                    class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 
+                    focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 h-10">
+                    Guardar
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+    <dxo-position my="top" at="top" of="#periodForm"> </dxo-position>
+  </dx-toast>

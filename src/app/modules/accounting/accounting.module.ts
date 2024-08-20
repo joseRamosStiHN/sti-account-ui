@@ -36,6 +36,8 @@ import { JournalPageComponent } from './pages/journal-page/journal/journal-page.
 import { JournalListComponent } from './pages/journal-page/journal-list/journal-list.component';
 import { showControlDirective } from 'src/app/shared/directives/showControlDirective';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
+import { PeriodListComponent } from './pages/period-page/period-list/period-list.component';
+import { PeriodComponent } from './pages/period-page/period/period.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +55,9 @@ import { JournalService } from 'src/app/modules/accounting/services/journal.serv
     CardAccountingComponent,
     JournalPageComponent,
     JournalListComponent,
-    showControlDirective
+    showControlDirective,
+    PeriodListComponent,
+    PeriodComponent
   ],
   providers: [ReportServiceService,
     JournalService

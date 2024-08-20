@@ -1,0 +1,53 @@
+<div class="w-100 mt-5">
+    <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+        Periodo Contable
+    </h2>
+    <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
+        <dx-date-range-box [(value)]="currentValue" (onValueChanged)="currentValueChanged($event)"></dx-date-range-box> 
+        <!-- {{ error }} -->
+        <button
+          showControl
+          [hasPermission]="1"
+          [roles]="roles"
+          type="button"
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 rounded-md text-sm px-5 py-2 me-1 mt-1 focus:outline-none"
+          (click)="onSearch()"
+        >
+          Consultar
+        </button>
+      </div>
+
+    <dx-data-grid id="account-list-grid" [dataSource]="periodList$ | async" [repaintChangesOnly]="true"
+        [loadPanel]="{ enabled: true }" [width]="'100%'" [allowColumnReordering]="true" [allowColumnResizing]="true"
+        [remoteOperations]="false" [rowAlternationEnabled]="true" [showBorders]="true">
+        <dxo-sorting mode="multiple"></dxo-sorting>
+        <dxo-header-filter [visible]="true"></dxo-header-filter>
+        <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+        <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+        <dxo-paging [pageSize]="15"> </dxo-paging>
+        <dxo-pager [visible]="true"> </dxo-pager>
+
+        <dxi-column caption="id" dataField="id" width="90"></dxi-column>
+        <dxi-column caption="Nombre del periodp" dataField="name"></dxi-column>
+        <dxi-column caption="Fecha inicio" dataField="startDate" width="200" alignment="center"></dxi-column>
+        <dxi-column caption="fecha fin" dataField="endDate"  alignment="center"  width="200"></dxi-column>
+        <dxi-column caption="Tipo de peridod" dataField="typePeriod" alignment="center"></dxi-column>
+        <dxi-column caption="Estado" dataField="status" alignment="center" width="150"></dxi-column>
+        <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
+            <div *dxTemplate="let account of 'cellButtonTemplate'">
+                <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditPeriod(account.data)"></button>
+            </div>
+        </dxi-column>
+
+        <dxo-toolbar>
+            <dxi-item name="groupPanel"></dxi-item>
+            <dxi-item name="searchPanel"></dxi-item>
+            <dxi-item location="after">
+                <dx-button icon="add" hint="Agregar Periodo" aria-placeholder="Agregar Periodo"
+                    (onClick)="goToNewJournal()">
+                </dx-button>
+            </dxi-item>
+        </dxo-toolbar>
+    </dx-data-grid>
+</div>

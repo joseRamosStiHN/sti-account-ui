@@ -12,8 +12,10 @@ import { ClientListComponent } from './pages/InvoiceClient/client-list/client-li
 import { ClientComponent } from './pages/InvoiceClient/client/client.component';
 import { ConfigurationComponent } from './pages/Accounts/configuration.component';
 import { AccountComponent } from './pages/Accounts/create/account.component';
-import { JournalListComponent } from 'src/app/modules/accounting/pages/journal-page/journal-list/journal-list.component';
-import { JournalPageComponent } from 'src/app/modules/accounting/pages/journal-page/journal/journal-page.component';
+import { JournalListComponent } from './pages/journal-page/journal-list/journal-list.component';
+import { JournalPageComponent } from './pages/journal-page/journal/journal-page.component';
+import { PeriodListComponent } from './pages/period-page/period-list/period-list.component';
+import { PeriodComponent } from './pages/period-page/period/period.component';
 
 const routes: Routes = [
   {
@@ -41,6 +43,9 @@ const routes: Routes = [
       { path: 'report/incomes', component: IncomeStatementComponent },
       { path: 'journal-list', component: JournalListComponent },
       { path: 'journal/new-journal', component: JournalPageComponent },
+      { path: 'period-list', component: PeriodListComponent },
+      { path: 'period/new-period', component: PeriodComponent },
+      { path: 'period/:id', component: PeriodComponent },
     ],
   },
 ];
