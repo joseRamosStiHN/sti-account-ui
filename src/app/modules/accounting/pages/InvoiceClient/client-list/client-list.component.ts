@@ -28,9 +28,8 @@ export class ClientListComponent implements OnInit {
   private readonly transService = inject(TransactionService);
   constructor() { }
   ngOnInit(): void {
-    this.currentValue = initialValue.map(date =>
-      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-    );
+
+    this.currentValue = initialValue;
 
     this.dataSource$ = this.transService
       .getAllTransactionByDocumentType(DocumentType.INVOICE_CLIENT)
@@ -52,24 +51,31 @@ export class ClientListComponent implements OnInit {
  
 
   onSearch(): void {
-    const [dateIniStr, dateEndStr] = this.currentValue;
-    const [yearIni, monthIni, dayIni] = dateIniStr.toString().split('-').map(num => parseInt(num, 10));
-    const [yearEnd, monthEnd, dayEnd] = dateEndStr.toString().split('-').map(num => parseInt(num, 10));
-    const dateIni = new Date(yearIni, monthIni - 1, dayIni);
-    const dateEnd = new Date(yearEnd, monthEnd - 1, dayEnd);
+    let [dateInit, dateEnd] = this.currentValue;
 
-    if (dateEnd < dateIni) {
+  
+    if (dateEnd < dateInit) {  
       return;
     }
 
-   this.dataSource$ = this.dataSource$?.pipe(
-      map(data => {
-        return data.filter(invoice => {
-          const invoiceDate = new Date(invoice.dateAt); 
-          return invoiceDate >= dateIni && invoiceDate <= dateEnd;
-        });
+    dateInit = new Date(dateInit);
+    dateEnd = new Date(dateEnd);
+
+    this.dataSource$ = this.transService
+    .getTransactionByDate(DocumentType.INVOICE_CLIENT,dateInit,dateEnd)
+    .pipe(
+      map((data) => this.fillDataSource(data)),
+      tap({
+        error: (err) => {
+          this.error = err;
+        },
+      }),
+      catchError((err) => {
+        console.log('handler error in component');
+        return of([]);
       })
-    )
+    );
+
   }
 
   goToClient = () => {
@@ -94,8 +100,10 @@ export class ClientListComponent implements OnInit {
   }
 
   currentValueChanged(event: any): void {
-    const date: [string,string] = event.value;
-    this.currentValue = date.map(date=> date.toString().replaceAll("/","-"));
+    const date: [Date,Date] = event.value;
+    this.currentValue = date;
   };
+
+ 
 
 }

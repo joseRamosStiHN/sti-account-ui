@@ -66,6 +66,21 @@ export class TransactionService {
     );
   }
 
+  getTransactionByDate(documentId: number,dateInit:Date,dateEnd:Date): Observable<TransactionResponse[]> {
+    let dateInitFormat:string = this.formateDate(dateInit);
+    let dateEndFormat:string = this.formateDate(dateEnd);
+
+    const url = `https://ce9b321d-d740-4953-9b3d-bdea0a2a7011.mock.pstmn.io/api/v1/transaction/by-document/${documentId}?date-init=${dateInitFormat}&date-end=${dateEndFormat}`;
+    return this.httpClient.get<TransactionResponse[]>(url).pipe(
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
+
   getTransactionById(id: number): Observable<TransactionResponse> {
     const url = `${this.apiURL}/api/v1/transaction/${id}`;
     return this.httpClient.get<TransactionResponse>(url);
@@ -101,5 +116,10 @@ export class TransactionService {
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
     return throwError(errorMessage);
+  }
+
+
+  formateDate(date: any): string {
+    return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
   }
 }
