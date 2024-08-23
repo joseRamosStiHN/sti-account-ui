@@ -1,9 +1,9 @@
 export interface PeriodModel {
     id?:number;
-    name: string
-    startDate: string
-    endDate: string
-    typePeriod: string
+    description: string
+    startDate: Date
+    endDate: Date
+    closureType: string
     status: boolean
   }
   

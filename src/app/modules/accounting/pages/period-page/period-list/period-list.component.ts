@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
+import { PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
@@ -20,6 +21,8 @@ const initialValue: [Date, Date] = [
   styleUrl: './period-list.component.css'
 })
 export class PeriodListComponent {
+
+
   periodList$: Observable<PeriodModel[]> | undefined;
 
   private readonly router = inject(Router);
@@ -30,10 +33,26 @@ export class PeriodListComponent {
 
 
   ngOnInit(): void {
-    this.currentValue = initialValue.map(date =>
-      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+    this.currentValue = initialValue;
+    this.periodList$ = this.accountService.getAllPeriods().pipe(
+      map((periods: PeriodsResponse[]) =>
+        
+        periods.map(period => (
+          {
+          ...period,
+          status: period.status === 'ACTIVO'
+        }))
+      )
     );
-    this.periodList$ = this.accountService.getAllPeriods();    
+
+    this.periodList$.forEach((data)=>{
+      console.log(data);
+      
+    })
+      
+  
+     
+    
 
   }
 
@@ -51,21 +70,32 @@ export class PeriodListComponent {
    
   }
 
+  fillData(period:PeriodModel[]){
+
+    
+  }
+
   onEditPeriod(e: any) {
-    console.log("si");
-    console.log(e.id);
     
-    
-    this.router.navigate(['/accounting/period', e.id]);
+    this.router.navigate(['/accounting/configuration/period/update', e.id]);
   }
 
   goToNewJournal = () => {
-    this.router.navigate(['/accounting/period/new-period']);
+    this.router.navigate(['/accounting/configuration/period/create']);
   };
 
 
   currentValueChanged(event: any): void {
-    const date: [string,string] = event.value;
-    this.currentValue = date.map(date=> date.toString().replaceAll("/","-"));
+    const date: [Date,Date] = event.value;
+    this.currentValue = date;
   };
+
+  formatDate(rowData: any): string {
+    const date = new Date(rowData.startDate);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Los meses son 0-indexados
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
 }

@@ -53,3 +53,23 @@ export interface AccountAPIResponse {
 export interface APIGeneralBalanceReportResponse {
   data: GeneralBalance[];
 }
+
+
+export interface PeriodsResponse {
+  id:number;
+  description: string
+  startDate: Date
+  endDate: Date
+  closureType: string
+  status: string
+}
+
+
+export interface PeriodsRequest {
+  id?:number;
+  description: string
+  startDate: Date
+  endDate: Date
+  closureType: string
+  status: string
+}

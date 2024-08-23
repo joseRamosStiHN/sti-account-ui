@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
+import { PeriodsRequest, PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
 import { typeToast } from 'src/app/modules/accounting/models/models';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
@@ -42,11 +43,11 @@ export class PeriodComponent {
   constructor() {
     this.currentValue = [new Date(), new Date()];
     this.periodForm = {
-      name: "",
-      startDate: "",
-      endDate: "",
-      typePeriod: "",
-      status: false
+      description: "",
+      startDate: new Date(),
+      endDate:new Date(),
+      closureType: "",
+      status:true,
     };
   }
 
@@ -56,7 +57,6 @@ export class PeriodComponent {
       const findId = Number(this.id);
       if (findId) {
         this.periodService.getPeriodById(findId).subscribe({
-
           next: (data) => this.fillPeriod(data),
         });
       }
@@ -65,6 +65,7 @@ export class PeriodComponent {
 
 
   changeDate(event: string) {
+
     if (event == 'mensual') {
       let initialMensual = [
         new Date(pastNow.getTime()),
@@ -100,6 +101,7 @@ export class PeriodComponent {
   async save(e: NgForm) {
 
     if (e.valid && this.validate()) {
+      
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
         'Advertencia'
@@ -109,7 +111,18 @@ export class PeriodComponent {
       }
 
       if (this.id) {
-        this.periodService.updatePeriod(Number(this.id),this.periodForm).subscribe({
+
+        let periodsRequest:PeriodsRequest = {
+          id:Number(this.id),
+          description:this.periodForm.description,
+          closureType:this.periodForm.closureType,
+          startDate:this.periodForm.startDate,
+          endDate:this.periodForm.endDate,
+          status:""
+        }
+        periodsRequest.status =  (this.periodForm.status)?"ACTIVO":"INACTIVO";
+
+        this.periodService.updatePeriod(Number(this.id),periodsRequest).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
             this.messageToast = 'Registros actualizados exitosamente';
@@ -127,7 +140,21 @@ export class PeriodComponent {
         });
         
       }else{
-        this.periodService.createPeriod(this.periodForm).subscribe({
+
+        let periodsRequest:PeriodsRequest = {
+          id:Number(this.id),
+          description:this.periodForm.description,
+          closureType:this.periodForm.closureType,
+          startDate:this.periodForm.startDate,
+          endDate:this.periodForm.endDate,
+          status:""
+        }
+        periodsRequest.status = "ACTIVO";
+
+        console.log(periodsRequest);
+        
+      
+        this.periodService.createPeriod(periodsRequest).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
             this.messageToast = 'Registros insertados exitosamente';
@@ -149,26 +176,23 @@ export class PeriodComponent {
 
   }
 
-  currentValueChanged(event: any): void {
+  currentValueChanged(event: any): void {    
     this.currentValue = event.value;
+    this.periodForm.startDate = event.value[0];
+    this.periodForm.endDate = event.value[1];
   };
 
-  goBack() {
-    this.router.navigate(['accounting/period-list']);
-  }
 
+  private fillPeriod(data:PeriodsResponse): void {
 
-  private fillPeriod(data: PeriodModel): void {
-
-    this.periodForm.name = data.name;
+    this.periodForm.description = data.description;
     this.periodForm.startDate = data.startDate;
     this.periodForm.endDate = data.endDate;
     this.currentValue = [new Date(data.startDate), new Date(data.endDate)];
-    this.periodForm.typePeriod = data.typePeriod.toLocaleLowerCase();
-    this.periodForm.status = data.status;
+    this.periodForm.closureType = data.closureType.toLocaleLowerCase();
+    this.periodForm.status = data.status =="ACTIVO"? true : false;
 
   }
-
 
   private validate(): boolean {
     this.messageToast = '';
@@ -181,7 +205,7 @@ export class PeriodComponent {
       this.toastType = typeToast.Warning;
       return false;
     }
-    if (this.validateDays(initialDate, endDate, this.periodForm.typePeriod)) {
+    if (this.validateDays(initialDate, endDate, this.periodForm.closureType)) {
       this.messageToast = 'Fecha final no debe ser mayor al periodo establecido';
       this.showToast = true;
       this.toastType = typeToast.Warning;
@@ -196,7 +220,6 @@ export class PeriodComponent {
     const differenceInMs = dateEnd.getTime() - dateStart.getTime();
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
     const differenceInDays = Math.floor(differenceInMs / millisecondsPerDay);
-    
 
     if (type == 'mensual' && differenceInDays <= 30) {
       return false;
@@ -218,5 +241,12 @@ export class PeriodComponent {
   formateDate(date: any): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
+
+  goBack() {
+    this.router.navigate(['/accounting/configuration/period']);
+  }
+
+
+
 
 }

@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@environment/environment';
 import { catchError, Observable, throwError } from 'rxjs';
+import { PeriodsRequest, PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 
 @Injectable({
@@ -8,7 +10,7 @@ import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 })
 export class PeriodService {
 
-  private apiURL = 'https://ce9b321d-d740-4953-9b3d-bdea0a2a7011.mock.pstmn.io';
+  private apiURL = environment.API;
 
   /*------------------------------------------
   --------------------------------------------
@@ -29,9 +31,9 @@ export class PeriodService {
    *
    * @return response()
    */
-  getAllPeriods(): Observable<PeriodModel[]> {
-    const url = `${this.apiURL}/api/v1/transaction/accounting/period`;
-    return this.httpClient.get<PeriodModel[]>(url).pipe(
+  getAllPeriods(): Observable<PeriodsResponse[]> {
+    const url = `${this.apiURL}/api/v1/accounting-periods`;
+    return this.httpClient.get<PeriodsResponse[]>(url).pipe(
       catchError(() => {
         console.error('catch error in service');
         return throwError(() => {
@@ -41,9 +43,9 @@ export class PeriodService {
     );
   }
 
-  getPeriodById(id: number): Observable<PeriodModel> {
-    const url = `${this.apiURL}/api/v1/transaction/accounting/period/${id}`;
-    return this.httpClient.get<PeriodModel>(url);
+  getPeriodById(id: number): Observable<PeriodsResponse> {
+    const url = `${this.apiURL}/api/v1/accounting-periods/${id}`;
+    return this.httpClient.get<PeriodsResponse>(url);
   }
 
 
@@ -52,10 +54,10 @@ export class PeriodService {
    *
    * @return response()
    */
-   createPeriod(data: PeriodModel): Observable<PeriodModel> {
+   createPeriod(data: PeriodsRequest): Observable<PeriodModel> {
     return this.httpClient
       .post<PeriodModel>(
-        this.apiURL + '/api/v1/transaction/accounting/period',
+        this.apiURL + '/api/v1/accounting-periods',
         JSON.stringify(data),
         this.httpOptions
       )
@@ -66,10 +68,10 @@ export class PeriodService {
 
   updatePeriod(
     id: number,
-    data: PeriodModel
-  ): Observable<PeriodModel> {
-    const url = `${this.apiURL}/api/v1/transaction/accounting/period${id}`;
-    return this.httpClient.put<PeriodModel>(
+    data: PeriodsRequest
+  ): Observable<PeriodsResponse> {
+    const url = `${this.apiURL}/api/v1/accounting-periods/${id}`;
+    return this.httpClient.put<PeriodsResponse>(
       url,
       JSON.stringify(data),
       this.httpOptions

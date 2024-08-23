@@ -43,9 +43,9 @@ const routes: Routes = [
       { path: 'report/incomes', component: IncomeStatementComponent },
       { path: 'journal-list', component: JournalListComponent },
       { path: 'journal/new-journal', component: JournalPageComponent },
-      { path: 'period-list', component: PeriodListComponent },
-      { path: 'period/new-period', component: PeriodComponent },
-      { path: 'period/:id', component: PeriodComponent },
+      { path: 'configuration/period', component: PeriodListComponent },
+      { path: 'configuration/period/create', component: PeriodComponent },
+      { path: 'configuration/period/update/:id', component: PeriodComponent },
     ],
   },
 ];
