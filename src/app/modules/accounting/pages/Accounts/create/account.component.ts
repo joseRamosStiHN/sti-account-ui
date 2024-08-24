@@ -32,6 +32,8 @@ export class AccountComponent implements OnInit {
   accounts!: Account[];
   categories!: AccountCategories[];
 
+  accountFatherIsRequired:boolean=false;
+
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
@@ -45,7 +47,11 @@ export class AccountComponent implements OnInit {
     });
 
     this.accountService.getAllAccount().subscribe({
-      next: (data) => this.fillAccounts(data),
+      next: (data) =>{
+         data = data.filter(account => account.supportEntry == false);
+  
+         this.fillAccounts(data)      
+      }
     });
 
     this.activeRouter.paramMap.subscribe((params) => {
@@ -122,5 +128,9 @@ export class AccountComponent implements OnInit {
       return;
     }
     this.accounts = result;
+  }
+
+  onValueStatus(event:any){
+    this.accountFatherIsRequired = event.target.value;
   }
 }
