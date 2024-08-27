@@ -27,56 +27,60 @@ export class PeriodListComponent {
 
   private readonly router = inject(Router);
   private readonly accountService = inject(PeriodService);
-  
+
   currentValue!: (string | number | Date)[];
   roles: string[] = ['admin', 'teller'];
 
 
   ngOnInit(): void {
     this.currentValue = initialValue;
-    this.periodList$ = this.accountService.getAllPeriods().pipe(
-      map((periods: PeriodsResponse[]) =>
-        
-        periods.map(period => (
-          {
-          ...period,
-          status: period.status === 'ACTIVO'
-        }))
-      )
-    );
 
-    this.periodList$.forEach((data)=>{
-      console.log(data);
-      
-    })
-      
-  
-     
-    
+    this.periodList$ = this.accountService.getAllPeriods().pipe(
+      map((periods: PeriodModel[]) => {
+
+        return periods.map((period: PeriodModel) => {
+
+          let startDate: Date;
+          if (period.startPeriod) {
+            startDate = new Date(period.startPeriod);
+          } else {
+            startDate = new Date(); 
+          }
+
+          if (!period.endPeriod) {
+            period.endPeriod = new Date(startDate);
+          }
+
+          if (period.closureType === "Mensual") {
+            period.endPeriod.setDate(startDate.getDate() + 30);
+          } else if (period.closureType === "Trimestral") {
+            period.endPeriod.setDate(startDate.getDate() + 90);
+          } else if (period.closureType === "Semestral") {
+            period.endPeriod.setDate(startDate.getDate() + 180);
+          }
+          return period
+        })
+
+      })
+    );
 
   }
 
   onSearch(): void {
-    const [dateIniStr, dateEndStr] = this.currentValue;
-    const [yearIni, monthIni, dayIni] = dateIniStr.toString().split('-').map(num => parseInt(num, 10));
-    const [yearEnd, monthEnd, dayEnd] = dateEndStr.toString().split('-').map(num => parseInt(num, 10));
-    const dateIni = new Date(yearIni, monthIni - 1, dayIni);
-    const dateEnd = new Date(yearEnd, monthEnd - 1, dayEnd);
+   let [dateInit, dateEnd] = this.currentValue;
 
-    if (dateEnd < dateIni) {
+    if (dateEnd < dateInit) {
       return;
     }
-
-   
   }
 
-  fillData(period:PeriodModel[]){
+  fillData(period: PeriodModel[]) {
 
-    
+
   }
 
   onEditPeriod(e: any) {
-    
+
     this.router.navigate(['/accounting/configuration/period/update', e.id]);
   }
 
@@ -86,14 +90,22 @@ export class PeriodListComponent {
 
 
   currentValueChanged(event: any): void {
-    const date: [Date,Date] = event.value;
+    const date: [Date, Date] = event.value;
     this.currentValue = date;
   };
 
-  formatDate(rowData: any): string {
-    const date = new Date(rowData.startDate);
+  formatDateEnd(rowData: any): string {
+    const date = new Date(rowData.endPeriod);
     const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Los meses son 0-indexados
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  formatDateInit(rowData: any): string {
+    const date = new Date(rowData.startPeriod);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }

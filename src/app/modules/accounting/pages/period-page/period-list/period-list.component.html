@@ -4,7 +4,6 @@
     </h2>
     <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
         <dx-date-range-box [(value)]="currentValue" (onValueChanged)="currentValueChanged($event)"></dx-date-range-box> 
-        <!-- {{ error }} -->
         <button
           showControl
           [hasPermission]="1"
@@ -29,10 +28,10 @@
         <dxo-pager [visible]="true"> </dxo-pager>
 
         <dxi-column caption="id" dataField="id" width="90"></dxi-column>
-        <dxi-column caption="Nombre del periodo" dataField="description"></dxi-column>
-        <dxi-column caption="Fecha inicio" dataField="startDate" width="200" [calculateDisplayValue]="formatDate"  alignment="center"></dxi-column>
-        <dxi-column caption="fecha fin" dataField="endDate" width="200" [calculateDisplayValue]="formatDate"  alignment="center"></dxi-column>
         <dxi-column caption="Tipo de perido" dataField="closureType" alignment="center"></dxi-column>
+        <dxi-column caption="fecha Inicio"  width="200" [calculateDisplayValue]="formatDateInit"  alignment="center"></dxi-column>
+        <dxi-column caption="fecha fin" width="200" [calculateDisplayValue]="formatDateEnd"  alignment="center"></dxi-column>
+
         <dxi-column caption="Estado" dataField="status" alignment="center" width="150"></dxi-column>
         <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
             <div *dxTemplate="let account of 'cellButtonTemplate'">

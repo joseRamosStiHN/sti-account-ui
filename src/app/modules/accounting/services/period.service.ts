@@ -31,9 +31,9 @@ export class PeriodService {
    *
    * @return response()
    */
-  getAllPeriods(): Observable<PeriodsResponse[]> {
+  getAllPeriods(): Observable<PeriodModel[]> {
     const url = `${this.apiURL}/api/v1/accounting-periods`;
-    return this.httpClient.get<PeriodsResponse[]>(url).pipe(
+    return this.httpClient.get<PeriodModel[]>(url).pipe(
       catchError(() => {
         console.error('catch error in service');
         return throwError(() => {
@@ -43,9 +43,9 @@ export class PeriodService {
     );
   }
 
-  getPeriodById(id: number): Observable<PeriodsResponse> {
+  getPeriodById(id: number): Observable<PeriodModel> {
     const url = `${this.apiURL}/api/v1/accounting-periods/${id}`;
-    return this.httpClient.get<PeriodsResponse>(url);
+    return this.httpClient.get<PeriodModel>(url);
   }
 
 
@@ -54,24 +54,23 @@ export class PeriodService {
    *
    * @return response()
    */
-   createPeriod(data: PeriodsRequest): Observable<PeriodModel> {
+   createPeriod(data: PeriodModel): Observable<PeriodModel> {
     return this.httpClient
       .post<PeriodModel>(
         this.apiURL + '/api/v1/accounting-periods',
         JSON.stringify(data),
         this.httpOptions
       )
-
       .pipe(catchError(this.errorHandler));
   }
 
 
   updatePeriod(
     id: number,
-    data: PeriodsRequest
-  ): Observable<PeriodsResponse> {
+    data: PeriodModel
+  ): Observable<PeriodModel> {
     const url = `${this.apiURL}/api/v1/accounting-periods/${id}`;
-    return this.httpClient.put<PeriodsResponse>(
+    return this.httpClient.put<PeriodModel>(
       url,
       JSON.stringify(data),
       this.httpOptions
