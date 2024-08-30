@@ -9,12 +9,14 @@ import {
   typeToast,
 } from '../../../models/models';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionModel } from '../../../models/TransactionModel';
 import { AccountService } from '../../../services/account.service';
 import { ToastType } from 'devextreme/ui/toast';
 import { AccountModel } from '../../../models/AccountModel';
+import { TransactionResponse } from 'src/app/modules/accounting/models/APIModels';
+import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 
 @Component({
   selector: 'app-provider',
@@ -23,6 +25,7 @@ import { AccountModel } from '../../../models/AccountModel';
 })
 export class ProviderComponent {
   totalCredit: number = 0;
+  id: string | null = null;
   totalDebit: number = 0;
   messageToast: string = '';
   showToast: boolean = false;
@@ -54,6 +57,8 @@ export class ProviderComponent {
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
   private accountService = inject(AccountService);
+  private readonly activeRouter = inject(ActivatedRoute);
+  private readonly periodService = inject(PeriodService);
 
   constructor() {
     config({
@@ -66,55 +71,86 @@ export class ProviderComponent {
   ngOnInit(): void {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
-        this.accountList = data.map((item) => {
-          return { id: item.id, description: item.name } as AccountModel;
-        });
+        this.accountList = data
+          .filter(item => item.supportEntry && item.balances.length > 0)
+          .map(item => ({
+            id: item.id,
+            description: item.name
+          } as AccountModel));
+
       },
     });
 
-    /* this.accountService.getAllAccount().subscribe((response: any[]) => {
-      if (Array.isArray(response)) {
-        this.acountList = response;
-      } else {
-        console.error('Error al obtener datos de cuentas');
+    this.activeRouter.paramMap.subscribe((params) => {
+      this.id = params.get('id');
+      const findId = Number(this.id);
+      if (findId) {
+        this.transactionService.getTransactionById(findId).subscribe({
+          next: (data) => this.fillBilling(data),
+        });
+      }else{
+        //verifica que haya un periodo activo para poder crear partida
+        this.periodService.getStatusPeriod().subscribe({
+          next: (status) => {
+            if (!status) {              
+              this.react();
+            }
+          },
+          error: (err) => this.router.navigate(['/accounting/provider-list']),
+        }
+        );
       }
-    }); */
+    });
+
   }
 
-  onSubmit(e: NgForm) {
+  async onSubmit(e: NgForm) {
     console.log('valid? ', e.valid);
     if (e.valid && this.validate()) {
-      //console.log('data:', this.providerBilling);
-      //console.log('dataSource', this.dataSource);
 
-      const transactionData: TransactionModel = {
-        createAtDate: this.providerBilling.date,
-        reference: this.providerBilling.billingNumber,
-        documentType: 2, // mejorar esta parte para tener un enum u otra estructura
-        exchangeRate: this.providerBilling.exchangeRate,
-        descriptionPda: this.providerBilling.description,
-        currency: this.providerBilling.currency,
-        detail: this.dataSource.map((detail) => {
-          return {
-            accountId: detail.accountId,
-            amount: detail.amount,
-            motion: detail.movement,
-          };
-        }),
-      };
-      this.transactionService.createTransaction(transactionData).subscribe({
-        next: (data) => {
-          console.log({ data });
-          this.providerBilling.id = data.id;
-          this.providerBilling.status = 'Draft';
-          this.toastType = typeToast.Success;
-          this.messageToast = 'Registros insertados exitosamente';
-          this.showToast = true;
-        },
-        error: (err) => console.error('error', err),
-      });
+      let dialogo = await confirm(
+        `¿Está seguro de que desea realizar esta acción?`,
+        'Advertencia'
+      );
 
-      console.log({ transactionData });
+      if (!dialogo) {
+        return;
+      }
+      if (this.id) {
+        //Cuando Actualiza la Factura de proveedores
+
+
+      } else {
+
+        const transactionData: TransactionModel = {
+          createAtDate: this.providerBilling.date,
+          reference: this.providerBilling.billingNumber,
+          documentType: 2,
+          exchangeRate: this.providerBilling.exchangeRate,
+          descriptionPda: this.providerBilling.description,
+          currency: this.providerBilling.currency,
+          detail: this.dataSource.map((detail) => {
+            return {
+              accountId: detail.accountId,
+              amount: detail.amount,
+              motion: detail.movement,
+            };
+          }),
+        };
+        this.transactionService.createTransaction(transactionData).subscribe({
+          next: (data) => {
+            console.log({ data });
+            this.providerBilling.id = data.id;
+            this.providerBilling.status = 'Draft';
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Registros insertados exitosamente';
+            this.showToast = true;
+          },
+          error: (err) => console.error('error', err),
+        });
+      }
+
+
 
       //TODO: Laurent aqui hace la integración
       //el servicio deberia retornar el id de la transaccion y su estado
@@ -161,26 +197,25 @@ export class ProviderComponent {
 
     dialogo.then(async (d) => {
       if (d) {
-        // si el usuario dio OK
+
         this.buttonTextPosting = 'confirmando...';
         this.disablePosting = true;
 
-        //TODO: Laurent
-        /*
-          aqui cuando el usuario le dio confirma debe de llamar al api
-          debe de enviar el estado al que va a cambiar que seria POST(o el que ponga Edwin)
-          y el id de la transacción
-          si todo va bien lo vamos a enviar a otra sección
-          en caso de error usar:
-               this.toastType = typeToast.Error;
-               this.messageToast = '<Aqui va el mensaje de error>'; 
-               this.showToast = true;
+        const transId = Number(this.id);
+        this.transactionService.postTransaction(transId).subscribe({
+          next: (data) => {
+            this.router.navigate(['/accounting/provider-list']);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar publicar la transacción';
+            this.showToast = true;
 
-                this.buttonTextPosting = 'Confirmar';
-                this.disablePosting = false;
-    
-        */
-        //si todo fue OK redirigir al usuario
+            this.buttonTextPosting = 'Confirmar';
+            this.disablePosting = false;
+          },
+        });
+
         this.router.navigate(['/accounting/client-list']);
       }
     });
@@ -249,5 +284,35 @@ export class ProviderComponent {
     }
     // si todo `OK` retorna true
     return true;
+  }
+
+  private fillBilling(data: TransactionResponse): void {
+    this.dataSource = data.transactionDetails.map((item) => {
+      return {
+        accountId: item.accountId,
+        amount: item.amount,
+        id: item.id,
+        movement: item.shortEntryType,
+      } as Transaction;
+    });
+    this.providerBilling.id = data.id;
+    this.providerBilling.currency = data.currency;
+    this.providerBilling.status =
+      data.status.charAt(0).toUpperCase() + data.status.slice(1).toLowerCase();
+    this.providerBilling.billingNumber = data.reference;
+    this.providerBilling.exchangeRate = data.exchangeRate;
+    this.providerBilling.date = data.date;
+    this.providerBilling.description = data.description;
+
+
+  }
+
+  async react() {
+    let dialogo = await confirm(`¿No existe un periodo Activo desea activarlo?`, 'Advertencia');
+    if (!dialogo) {
+      window.history.back()
+      return;
+    }
+    this.router.navigate(['/accounting/configuration/period']);
   }
 }
