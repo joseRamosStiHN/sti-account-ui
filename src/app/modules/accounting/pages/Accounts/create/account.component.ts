@@ -8,6 +8,9 @@ import {
   AccountAPIResponse,
   AccountCategories,
 } from '../../../models/APIModels';
+import { error } from 'console';
+import { ToastType } from 'devextreme/ui/toast';
+import { typeToast } from 'src/app/modules/accounting/models/models';
 
 interface Account {
   id: number;
@@ -31,6 +34,12 @@ export class AccountComponent implements OnInit {
   };
   accounts!: Account[];
   categories!: AccountCategories[];
+
+
+  messageToast: string = '';
+  showToast: boolean = false;
+  toastType: ToastType = typeToast.Info;
+
 
   accountFatherIsRequired:boolean=false;
 
@@ -87,8 +96,19 @@ export class AccountComponent implements OnInit {
   }
 
   private createAccount(): void {
-    this.accountService.createAccount(this.accountForm).subscribe(() => {
-      this.router.navigate(['accounting/configuration']);
+    this.accountService.createAccount(this.accountForm).subscribe({
+      next: (result) => {
+        this.router.navigate(['accounting/configuration']);
+      },
+      error: (err) => {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'No se pudo crear la cuenta';
+        if (err.error[0].message == 'The account code already exists.') {
+          this.toastType = typeToast.Warning
+          this.messageToast = 'El codigo de la cuenta ya existe.';
+        }
+        this.showToast = true;
+      }
     });
   }
 

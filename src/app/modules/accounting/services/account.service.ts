@@ -1,4 +1,4 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AccountAPIResponse, AccountCategories } from '../models/APIModels';
@@ -55,9 +55,16 @@ export class AccountService {
         this.apiURL + '/api/v1/accounts',
         JSON.stringify(data),
         this.httpOptions
-      )
-
-      .pipe(catchError(this.errorHandler));
+      ).pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 400) {
+            return throwError(error);
+          } 
+          return this.errorHandler(error);
+          
+        })
+       
+      );
   }
 
   /**
