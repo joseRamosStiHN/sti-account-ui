@@ -35,34 +35,7 @@ export class PeriodListComponent {
   ngOnInit(): void {
     this.currentValue = initialValue;
 
-    this.periodList$ = this.accountService.getAllPeriods().pipe(
-      map((periods: PeriodModel[]) => {
-
-        return periods.map((period: PeriodModel) => {
-
-          let startDate: Date;
-          if (period.startPeriod) {
-            startDate = new Date(period.startPeriod);
-          } else {
-            startDate = new Date(); 
-          }
-
-          if (!period.endPeriod) {
-            period.endPeriod = new Date(startDate);
-          }
-
-          if (period.closureType === "Mensual") {
-            period.endPeriod.setDate(startDate.getDate() + 30);
-          } else if (period.closureType === "Trimestral") {
-            period.endPeriod.setDate(startDate.getDate() + 90);
-          } else if (period.closureType === "Semestral") {
-            period.endPeriod.setDate(startDate.getDate() + 180);
-          }
-          return period
-        })
-
-      })
-    );
+    this.periodList$ = this.accountService.getAllPeriods();
 
   }
 
