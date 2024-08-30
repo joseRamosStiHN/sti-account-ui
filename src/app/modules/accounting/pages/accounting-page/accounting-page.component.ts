@@ -38,6 +38,10 @@ export class AccountingPageComponent implements OnInit {
             label: 'Configuración Periodos',
             path: '/accounting/configuration/period',
           },
+          {
+            label: 'Configuración Saldos',
+            path: '/accounting/configuration/balance/accounts',
+          },
         ],
       },
     ]);

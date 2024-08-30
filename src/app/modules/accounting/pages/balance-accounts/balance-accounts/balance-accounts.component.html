@@ -1,0 +1,56 @@
+<div class="w-100">
+  <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+    Saldo inciales
+  </h2>
+  <div class="w-100 mb-2">
+    <div id="data-grid-demo">
+      <dx-data-grid id="gridContainer" [dataSource]="accountForm.balances" [showBorders]="true"
+      (onRowUpdated)="update($event)"
+        (onRowInserted)="save($event)">
+        <dxo-paging [enabled]="false"></dxo-paging>
+        <dxo-editing mode="popup" [allowUpdating]="activeEdit" [allowAdding]="activeAdd" [allowDeleting]="false">
+          <dxo-popup title="Employee Info" [showTitle]="true" [width]="700" [height]="525">
+          </dxo-popup>
+          <dxo-form>
+            <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+
+              <dxi-item caption="Saldo inicial" dataField="initialBalance" [editorType]="'dxNumberBox'" [editorOptions]="{
+            format: { type: 'currency', precision: 2, currency: 'HNL' },
+            showSpinButtons: true,
+            min: 1,       
+            max: null,      
+            useGrouping: true
+          }" [validationRules]="[
+            { type: 'required', message: 'El saldo inicial es obligatorio' },
+            { type: 'numeric', message: 'El saldo inicial debe ser un número válido' }
+          ]">
+              </dxi-item>
+
+            <dxi-item caption="Tipo de Saldo" dataField="typicalBalance" [editorType]="'dxSelectBox'" [editorOptions]="{
+            items: listMovement,
+            valueField: 'ID',
+            displayField: 'name',
+            placeholder: 'Seleccione un tipo de movimiento'
+          }"[validationRules]="[
+          { type: 'required', message: 'El movimiento es obligatorio' }
+        ]">
+              </dxi-item>
+            </dxi-item>
+
+          </dxo-form>
+        </dxo-editing>
+        <dxi-column caption="Saldo" dataField="initialBalance"
+          [format]="{ type: 'currency', precision: 2, currency: 'HNL' }">
+        </dxi-column>
+        <dxi-column caption="Tipo de Saldo" dataField="typicalBalance" alignment="center"></dxi-column>
+        <dxi-column caption="Es Actual?" dataField="isCurrent" alignment="center"></dxi-column>
+      </dx-data-grid>
+    </div>
+
+
+  </div>
+
+</div>
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+  <dxo-position my="top" at="top" of="#periodForm"> </dxo-position>
+</dx-toast>

@@ -16,6 +16,8 @@ import { JournalListComponent } from './pages/journal-page/journal-list/journal-
 import { JournalPageComponent } from './pages/journal-page/journal/journal-page.component';
 import { PeriodListComponent } from './pages/period-page/period-list/period-list.component';
 import { PeriodComponent } from './pages/period-page/period/period.component';
+import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
+import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
 
 const routes: Routes = [
   {
@@ -46,6 +48,8 @@ const routes: Routes = [
       { path: 'configuration/period', component: PeriodListComponent },
       { path: 'configuration/period/create', component: PeriodComponent },
       { path: 'configuration/period/update/:id', component: PeriodComponent },
+      { path: 'configuration/balance/accounts', component: BalanceListComponent},
+      { path: 'configuration/balance/accounts/inital/:id', component: BalanceAccountsComponent},
     ],
   },
 ];

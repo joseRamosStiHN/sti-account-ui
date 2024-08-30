@@ -12,8 +12,10 @@ export interface AccountModel {
 }
 
 export interface BalancesModel {
-  id: number;
+  id?: number;
+  accountId:number;
   initialBalance: number;
-  createAtDate: string;
+  createAtDate: Date;
   isActual: boolean;
+  typicalBalance:string
 }

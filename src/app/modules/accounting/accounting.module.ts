@@ -38,6 +38,8 @@ import { showControlDirective } from 'src/app/shared/directives/showControlDirec
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { PeriodListComponent } from './pages/period-page/period-list/period-list.component';
 import { PeriodComponent } from './pages/period-page/period/period.component';
+import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
+import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { PeriodComponent } from './pages/period-page/period/period.component';
     JournalListComponent,
     showControlDirective,
     PeriodListComponent,
-    PeriodComponent
+    PeriodComponent,
+    BalanceListComponent,
+    BalanceAccountsComponent
   ],
   providers: [ReportServiceService,
     JournalService
