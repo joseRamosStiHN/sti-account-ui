@@ -16,6 +16,7 @@ import { ToastType } from 'devextreme/ui/toast';
 import { AccountService } from '../../../services/account.service';
 import { AccountModel } from '../../../models/AccountModel';
 import { TransactionResponse } from '../../../models/APIModels';
+import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 
 @Component({
   selector: 'app-client',
@@ -52,7 +53,7 @@ export class ClientComponent {
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly transactionService = inject(TransactionService);
   private readonly accountService = inject(AccountService);
-
+  private readonly periodService = inject(PeriodService);
   constructor() {
     this.clientBilling = {
       billingNumber: '',
@@ -71,9 +72,12 @@ export class ClientComponent {
   ngOnInit(): void {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
-        this.accountList = data.map((item) => {
-          return { id: item.id, description: item.name } as AccountModel;
-        });
+        this.accountList = data
+          .filter(item => item.supportEntry && item.balances.length > 0)
+          .map(item => ({
+            id: item.id,
+            description: item.name
+          } as AccountModel));
       },
     });
 
@@ -85,6 +89,16 @@ export class ClientComponent {
         this.transactionService.getTransactionById(findId).subscribe({
           next: (data) => this.fillBilling(data),
         });
+      } else {
+        this.periodService.getStatusPeriod().subscribe({
+          next: (status) => {
+            if (!status) {
+              this.react();
+            }
+          },
+          error: (err) => this.router.navigate(['/accounting/client-list']),
+        }
+        );
       }
     });
   }
@@ -283,5 +297,14 @@ export class ClientComponent {
 
     //
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
+  }
+
+  async react() {
+    let dialogo = await confirm(`¿No existe un periodo Activo desea activarlo?`, 'Advertencia');
+    if (!dialogo) {
+      window.history.back()
+      return;
+    }
+    this.router.navigate(['/accounting/configuration/period']);
   }
 }
