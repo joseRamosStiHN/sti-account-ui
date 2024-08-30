@@ -7,6 +7,8 @@ import { BalanceResponse } from 'src/app/modules/accounting/models/BalancesModel
 import { IMovement, typeToast } from 'src/app/modules/accounting/models/models';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { BalancesAccountsService } from 'src/app/modules/accounting/services/balances-accounts.service';
+import { PeriodService } from 'src/app/modules/accounting/services/period.service';
+import { confirm } from 'devextreme/ui/dialog';
 
 
 export class State {
@@ -48,7 +50,7 @@ export class BalanceAccountsComponent {
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly accountService = inject(AccountService);
   private readonly balanceService = inject(BalancesAccountsService);
-
+  private readonly periodService = inject(PeriodService);
 
   constructor() {
     this.listMovement = ['Debito', 'Credito'];
@@ -57,6 +59,16 @@ export class BalanceAccountsComponent {
   ngOnInit(): void {
     this.activeAdd =false;
     this.activeEdit =false;
+
+    this.periodService.getStatusPeriod().subscribe({
+      next: (status) => {
+        if (!status) {
+          this.react();
+        }
+      },
+      error: (err) => console.error('error: we got ', err),
+    }
+    );
 
     this.activeRouter.paramMap.subscribe((params) => {
       this.id = params.get('id');
@@ -95,14 +107,17 @@ export class BalanceAccountsComponent {
         this.showToast = true;
       },
     });
+
+    setTimeout(() => {
+      
+    this.ngOnInit();
  
+    }, 100);
 
   }
 
 
   update(e: any){
-
-    console.log(e.data);
     
     let balance: BalancesModel = {
 
@@ -164,5 +179,16 @@ export class BalanceAccountsComponent {
       this.activeEdit = true;
     }
 
+  }
+
+  async react(){
+
+    let dialogo = await confirm(`¿No existe un periodo Activo desea activarlo?`, 'Advertencia');
+    if (!dialogo) {
+      window.history.back()
+      return;
+    }
+
+    this.router.navigate(['/accounting/configuration/period']);
   }
 }

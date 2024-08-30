@@ -77,6 +77,24 @@ export class PeriodService {
     );
   }
 
+
+   /**
+   * Method that brings a list with all the accounting journal
+   *
+   * @return response()
+   */
+   getStatusPeriod(): Observable<boolean> {
+    const url = `${this.apiURL}/api/v1/accounting-periods/active-period`;
+    return this.httpClient.get<boolean>(url).pipe(
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
+
   /**
    * Error Handler Method
    *
