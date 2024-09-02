@@ -36,6 +36,14 @@ export class ClientComponent {
   clientBilling: ClientBilling;
   dataSource: Transaction[] = [];
 
+
+  editorOptions = {
+    itemTemplate: 'accounts',
+    searchEnabled: true ,
+    searchMode:'contains',
+    searchExpr:['description', 'code']
+  };
+
   listMovement: IMovement[] = [
     {
       code: 'D',
@@ -76,7 +84,8 @@ export class ClientComponent {
           .filter(item => item.supportEntry && item.balances.length > 0)
           .map(item => ({
             id: item.id,
-            description: item.name
+            description: item.name,
+            code:item.accountCode
           } as AccountModel));
       },
     });
@@ -103,7 +112,7 @@ export class ClientComponent {
     });
   }
 
-  onSubmit(e: NgForm) {
+  async onSubmit(e: NgForm) {
     if (e.valid && this.validate()) {
       const transactionData: TransactionModel = {
         createAtDate: this.clientBilling.date,
@@ -121,6 +130,17 @@ export class ClientComponent {
           };
         }),
       };
+
+
+      let dialogo = await confirm(
+        `¿Está seguro de que desea realizar esta acción?`,
+        'Advertencia'
+      );
+
+      if (!dialogo) {
+        return;
+      }
+
 
       //is an update
       if (this.id) {
@@ -307,4 +327,5 @@ export class ClientComponent {
     }
     this.router.navigate(['/accounting/configuration/period']);
   }
+  
 }

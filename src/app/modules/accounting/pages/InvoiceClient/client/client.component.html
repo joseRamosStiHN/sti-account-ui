@@ -188,17 +188,8 @@
           [allowEditing]="false"
         >
         </dxi-column>
-        <dxi-column
-          dataField="accountId"
-          caption="Cuenta"
-          alignment="center"
-          [editorOptions]="{ searchEnabled: true }"
-        >
-          <dxo-lookup
-            [dataSource]="accountList"
-            valueExpr="id"
-            displayExpr="description"
-          ></dxo-lookup>
+        <dxi-column dataField="accountId" caption="Cuenta" alignment="center"[editorOptions]="editorOptions">
+          <dxo-lookup [dataSource]="accountList" valueExpr="id" displayExpr="codee" ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
         <dxi-column
@@ -258,6 +249,11 @@
 
         <div *dxTemplate="let d of 'indexTemplate'">
           <span>{{ d.rowIndex + 1 }}</span>
+        </div>
+        <div class="relative" *dxTemplate="let account of 'accounts'">
+          <strong class="absolute left-0.5">{{account.code}}
+          </strong>
+          <small class="absolute right-0.5 text-gray-400">{{account.description}}</small>
         </div>
 
         <dxo-summary>
