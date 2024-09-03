@@ -2,19 +2,14 @@
     <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
         Periodo Contable
     </h2>
-    <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
-        <dx-date-range-box [(value)]="currentValue" (onValueChanged)="currentValueChanged($event)"></dx-date-range-box> 
-        <button
-          showControl
-          [hasPermission]="1"
-          [roles]="roles"
-          type="button"
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 rounded-md text-sm px-5 py-2 me-1 mt-1 focus:outline-none"
-          (click)="onSearch()"
-        >
-          Consultar
+    <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2" id="periodAccount">
+        <dx-date-range-box [(value)]="currentValue" (onValueChanged)="currentValueChanged($event)"></dx-date-range-box>
+        <button showControl [hasPermission]="1" [roles]="roles" type="button"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 rounded-md text-sm px-5 py-2 me-1 mt-1 focus:outline-none"
+            (click)="onSearch()">
+            Consultar
         </button>
-      </div>
+    </div>
 
     <dx-data-grid id="account-list-grid" [dataSource]="periodList$ | async" [repaintChangesOnly]="true"
         [loadPanel]="{ enabled: true }" [width]="'100%'" [allowColumnReordering]="true" [allowColumnResizing]="true"
@@ -27,18 +22,42 @@
         <dxo-paging [pageSize]="15"> </dxo-paging>
         <dxo-pager [visible]="true"> </dxo-pager>
 
-        <dxi-column caption="id" dataField="id" width="90"></dxi-column>
         <dxi-column caption="Tipo de perido" dataField="closureType" alignment="center"></dxi-column>
-        <dxi-column caption="fecha Inicio"  width="200" [calculateDisplayValue]="formatDateInit"  alignment="center"></dxi-column>
-        <dxi-column caption="fecha fin" width="200" [calculateDisplayValue]="formatDateEnd"  alignment="center"></dxi-column>
+        <dxi-column caption="fecha Inicio" width="200" [calculateDisplayValue]="formatDateInit"
+            alignment="center"></dxi-column>
+        <dxi-column caption="fecha fin" width="200" [calculateDisplayValue]="formatDateEnd"
+            alignment="center"></dxi-column>
 
-        <dxi-column caption="Estado" dataField="status" alignment="center" width="150"></dxi-column>
+            <dxi-column
+            caption="Estado"
+            dataField="status"
+            [width]="100"
+            cellTemplate="cellTemplate"
+          ></dxi-column>
+
         <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
             <div *dxTemplate="let account of 'cellButtonTemplate'">
                 <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditPeriod(account.data)"></button>
             </div>
         </dxi-column>
-
+        <div *dxTemplate="let data of 'cellTemplate'">
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" value="" class="sr-only peer" 
+                [disabled]="data.value"
+                [(ngModel)]="data.data.status" 
+                (change)="updatePeriod(data)">
+                <div
+                    class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
+                     peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
+                     peer dark:bg-gray-700 peer-checked:after:translate-x-full 
+                     rtl:peer-checked:after:-translate-x-full
+                      peer-checked:after:border-white after:content-[''] 
+                      after:absolute after:top-[2px] after:start-[2px] after:bg-white
+                       after:border-gray-300 after:border after:rounded-full after:h-5 
+                       after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                </div>
+            </label>
+          </div>
         <dxo-toolbar>
             <dxi-item name="groupPanel"></dxi-item>
             <dxi-item name="searchPanel"></dxi-item>
@@ -50,3 +69,6 @@
         </dxo-toolbar>
     </dx-data-grid>
 </div>
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+    <dxo-position my="top" at="top" of="#periodAccount"> </dxo-position>
+</dx-toast>

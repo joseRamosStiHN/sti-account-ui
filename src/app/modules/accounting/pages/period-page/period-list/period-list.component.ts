@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, Observable } from 'rxjs';
-import { PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
+import {Observable } from 'rxjs';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
-import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
+import { confirm } from 'devextreme/ui/dialog';
+import { ToastType } from 'devextreme/ui/toast';
+import { typeToast } from 'src/app/modules/accounting/models/models';
 
 
 const msInDay = 1000 * 60 * 60 * 24;
@@ -22,11 +23,23 @@ const initialValue: [Date, Date] = [
 })
 export class PeriodListComponent {
 
+  editorOptions = {
+    itemTemplate: 'accounts'
+  };
+
+
+
+  messageToast: string = '';
+  showToast: boolean = false;
+  toastType: ToastType = typeToast.Info;
+
+
+  
 
   periodList$: Observable<PeriodModel[]> | undefined;
 
   private readonly router = inject(Router);
-  private readonly accountService = inject(PeriodService);
+  private readonly periodoService = inject(PeriodService);
 
   currentValue!: (string | number | Date)[];
   roles: string[] = ['admin', 'teller'];
@@ -35,7 +48,7 @@ export class PeriodListComponent {
   ngOnInit(): void {
     this.currentValue = initialValue;
 
-    this.periodList$ = this.accountService.getAllPeriods();
+    this.periodList$ = this.periodoService.getAllPeriods();
 
   }
 
@@ -83,4 +96,31 @@ export class PeriodListComponent {
     return `${day}-${month}-${year}`;
   }
 
+
+  async updatePeriod(data:any){
+    let dialogo = await confirm(`¿Está seguro de que desea activar este periodo?`, 'Advertencia');
+    if (!dialogo) {
+      data.data.status = false;      
+      return;
+    }
+
+    this.periodoService.updatePeriod(Number(data.data.id), data.data).subscribe({
+      next: (data) => {
+        this.toastType = typeToast.Success;
+        this.messageToast = 'Registros actualizados exitosamente';
+        this.showToast = true;
+        
+      },
+      error: (err) => {
+        console.error('Error creating transaction:', err);
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Error al crear el periodo';
+        this.showToast = true;
+      },
+    });
+
+
+    
+    
+  }
 }
