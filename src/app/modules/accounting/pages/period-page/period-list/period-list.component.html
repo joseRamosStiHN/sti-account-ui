@@ -21,7 +21,17 @@
 
         <dxo-paging [pageSize]="15"> </dxo-paging>
         <dxo-pager [visible]="true"> </dxo-pager>
-
+        <dxi-column
+        caption="#"
+        [width]="50"
+        [minWidth]="20"
+        alignment="center"
+        cellTemplate="indexTemplate"
+        [showEditorAlways]="false"
+        [formItem]="{ visible: false }"
+        [allowEditing]="false"
+      >
+        </dxi-column>
         <dxi-column caption="Tipo de perido" dataField="closureType" alignment="center"></dxi-column>
         <dxi-column caption="fecha Inicio" width="200" [calculateDisplayValue]="formatDateInit"
             alignment="center"></dxi-column>
@@ -40,6 +50,9 @@
                 <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditPeriod(account.data)"></button>
             </div>
         </dxi-column>
+        <div *dxTemplate="let d of 'indexTemplate'">
+            <span>{{ d.rowIndex + 1 }}</span>
+          </div>
         <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" value="" class="sr-only peer" 

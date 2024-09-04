@@ -118,9 +118,12 @@ export class PeriodListComponent {
         this.showToast = true;
       },
     });
+    this.periodList$ = undefined;
 
+    setTimeout(() => {
+      this.periodList$ = this.periodoService.getAllPeriods();
+    }, 1000);
 
-    
-    
-  }
+ 
+   }
 }
