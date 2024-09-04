@@ -39,9 +39,9 @@ export class ClientComponent {
 
   editorOptions = {
     itemTemplate: 'accounts',
-    searchEnabled: true ,
-    searchMode:'contains',
-    searchExpr:['description', 'code']
+    searchEnabled: true,
+    searchMode: 'contains',
+    searchExpr: ['description', 'code']
   };
 
   listMovement: IMovement[] = [
@@ -81,11 +81,11 @@ export class ClientComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0)
+          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == '1')
           .map(item => ({
             id: item.id,
             description: item.name,
-            code:item.accountCode
+            code: item.accountCode
           } as AccountModel));
       },
     });
@@ -162,6 +162,7 @@ export class ClientComponent {
           });
         return;
       }
+
 
       this.transactionService.createTransaction(transactionData).subscribe({
         next: (data) => {
@@ -294,6 +295,20 @@ export class ClientComponent {
       return false;
     }
     // si todo `OK` retorna true
+
+    const hasDuplicateAccountId = this.dataSource.some((item, index) => {
+      return this.dataSource.filter(obj => obj.accountId === item.accountId).length > 1;
+    });
+
+    if (hasDuplicateAccountId) {
+      this.messageToast =
+        'No se puede registrar la misma cuenta en la transaccion';
+      this.showToast = true;
+      this.toastType = typeToast.Error;
+
+      return false;
+    }
+
     return true;
   }
 
@@ -327,5 +342,5 @@ export class ClientComponent {
     }
     this.router.navigate(['/accounting/configuration/period']);
   }
-  
+
 }

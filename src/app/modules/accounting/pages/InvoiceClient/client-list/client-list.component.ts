@@ -87,11 +87,16 @@ export class ClientListComponent implements OnInit {
   }
 
   private fillDataSource(data: TransactionResponse[]): BillingListClient[] {
+
+    
     return data.map((item) => {
+
+      
       return {
         id: item.id,
         document: item.reference,
         dateAt: item.date,
+        creationDate: new Date(item.creationDate),
         status:
           item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
         description: item.description,

@@ -26,6 +26,7 @@ export interface TransactionResponse {
   documentName: string;
   description: string;
   date: Date;
+  creationDate:Date;
   currency: string;
   transactionDetails: TransactionDetailResponse[];
 }
@@ -37,7 +38,7 @@ export interface AccountCategories {
 
 export interface AccountAPIResponse {
   accountCode: string;
-  accountTypes:string
+  accountType:string
   balances: any[];
   categoryId: number;
   categoryName: string;

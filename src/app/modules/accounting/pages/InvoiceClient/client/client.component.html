@@ -1,7 +1,7 @@
 <div class="mt-2 px-1">
   <div class="flex flex-row justify-between">
     <div class="w-100 flex justify-between mb-5">
-      <h2 class="text-2xl font-semibold">Factura de Clientes</h2>
+      <h2 class="text-2xl font-semibold">Facturacion de Clientes</h2>
     </div>
     @if(clientBilling.id !==null && clientBilling.status === 'Draft'){
     <button
@@ -189,7 +189,7 @@
         >
         </dxi-column>
         <dxi-column dataField="accountId" caption="Cuenta" alignment="center"[editorOptions]="editorOptions">
-          <dxo-lookup [dataSource]="accountList" valueExpr="code" displayExpr="code" ></dxo-lookup>
+          <dxo-lookup [dataSource]="accountList" valueExpr="id" displayExpr="code" ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
         <dxi-column
@@ -225,9 +225,9 @@
         <dxo-toolbar>
           <dxi-item location="before">
             <div
-              class="flex flex-col text-center border border-b-0 px-1.5 shadow"
+              class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow"
             >
-              <label class="block font-mono">Total Debe </label>
+              <label class="block font-mono font-semibold">Total Debe </label>
               <small class="block font-mono font-medium text-red-900">
                 {{ totalDebit | currency : "L. " }}</small
               >
@@ -235,9 +235,9 @@
           </dxi-item>
           <dxi-item location="before">
             <div
-              class="flex flex-col text-center border border-b-0 px-1.5 shadow"
+              class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow"
             >
-              <label class="block font-mono">Total Haber </label>
+              <label class="block font-mono font-semibold">Total Haber </label>
               <small class="block font-mono font-medium text-green-900">
                 {{ totalCredit | currency : "L. " }}</small
               >
@@ -250,10 +250,10 @@
         <div *dxTemplate="let d of 'indexTemplate'">
           <span>{{ d.rowIndex + 1 }}</span>
         </div>
-        <div class="relative" *dxTemplate="let account of 'accounts'">
-          <strong class="absolute left-0.5">{{account.code}}
+        <div class="" *dxTemplate="let account of 'accounts'">
+          <strong class="">{{account.code}}
           </strong>
-          <small class="absolute right-0.5 text-gray-400">{{account.description}}</small>
+          <small class="text-gray-400">{{account.description}}</small>
         </div>
 
         <dxo-summary>
@@ -267,6 +267,13 @@
     </div>
 
     <div class="justify-end mt-10">
+      <a
+        [routerLink]="'/accounting/client-list'"
+          class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
+          >
+         Regresar
+      </a>
+
       @if(clientBilling.status !== "Success"){
       <a
         [routerLink]="'/accounting'"

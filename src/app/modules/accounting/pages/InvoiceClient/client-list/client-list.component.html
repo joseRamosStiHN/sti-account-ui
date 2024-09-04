@@ -49,12 +49,23 @@
       <dxi-column caption="Factura" dataField="document"></dxi-column>
       <dxi-column caption="Descripción" dataField="description"></dxi-column>
       <dxi-column
-        caption="Fecha"
-        dataField="dateAt"
-        dataType="date"
-        alignment="center"
-        width="90"
-      ></dxi-column>
+      caption="Fecha Creacion"
+      dataField="creationDate"
+      format="shortDate"
+      dataType="date"
+      alignment="center"
+      format="dd/MM/yyyy"
+      width="150"
+    ></dxi-column>
+      <dxi-column
+      caption="Fecha Registro"
+      dataField="dateAt"
+      dataType="date"
+      alignment="center"
+      width="150"
+    ></dxi-column>
+ 
+      
 
       <dxi-column
         caption="Estado"
