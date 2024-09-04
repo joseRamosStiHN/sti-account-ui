@@ -37,6 +37,7 @@ export interface AccountCategories {
 
 export interface AccountAPIResponse {
   accountCode: string;
+  accountTypes:string
   balances: any[];
   categoryId: number;
   categoryName: string;
@@ -72,4 +73,9 @@ export interface PeriodsRequest {
   endDate: Date
   closureType: string
   status: string
+}
+
+export interface AccountTypeResponse{
+  id:number
+  name:string
 }

@@ -1,7 +1,7 @@
 import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { AccountAPIResponse, AccountCategories } from '../models/APIModels';
+import { AccountAPIResponse, AccountCategories, AccountTypeResponse } from '../models/APIModels';
 import { environment } from '@environment/environment';
 
 @Injectable({
@@ -101,5 +101,17 @@ export class AccountService {
   getCategories(): Observable<AccountCategories[]> {
     const url = `${this.apiURL}/api/v1/accounts/categories`;
     return this.httpClient.get<AccountCategories[]>(url);
+  }
+
+
+  /**
+   * Method that brings a list of accountsType
+   *
+   * @return response()
+   */
+  getAllAccountType(): Observable<AccountTypeResponse[]> {
+    return this.httpClient.get<AccountTypeResponse[]>(
+      this.apiURL + '/api/v1/accounts/account-type'
+    );
   }
 }

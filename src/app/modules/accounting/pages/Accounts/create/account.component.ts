@@ -7,6 +7,7 @@ import { AccountModel } from '../../../models/AccountModel';
 import {
   AccountAPIResponse,
   AccountCategories,
+  AccountTypeResponse,
 } from '../../../models/APIModels';
 import { error } from 'console';
 import { ToastType } from 'devextreme/ui/toast';
@@ -29,11 +30,18 @@ export class AccountComponent implements OnInit {
   accountForm: AccountModel = {
     description: '',
     code: '',
+    accountType: '',
     status: 'ACTIVO',
-    balances: [],
+    balances: [{
+      typicalBalance: "",
+      initialBalance: 0,
+      isCurrent: true,
+    }
+    ],
   };
-  accounts!: Account[];
+  accounts: Account[] = [];
   categories!: AccountCategories[];
+  accountTypes!: AccountTypeResponse[];
 
 
   messageToast: string = '';
@@ -41,13 +49,13 @@ export class AccountComponent implements OnInit {
   toastType: ToastType = typeToast.Info;
 
 
-  accountFatherIsRequired:boolean=false;
+  accountFatherIsRequired: boolean = false;
 
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.accountService.getCategories().subscribe({
@@ -56,10 +64,10 @@ export class AccountComponent implements OnInit {
     });
 
     this.accountService.getAllAccount().subscribe({
-      next: (data) =>{
-         data = data.filter(account => account.supportEntry == false);
-  
-         this.fillAccounts(data)      
+      next: (data) => {
+        data = data.filter(account => account.supportEntry == false);
+
+        this.fillAccounts(data)
       }
     });
 
@@ -85,17 +93,15 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  onValueChange(e: Event): void {
-    const target = e.target as HTMLSelectElement;
-
-    if (target) {
-      const id = Number(target.value);
-      const data = this.accounts.find((f) => f.id === id);
-      this.accountPrefix = data?.code ?? '';
-    }
-  }
 
   private createAccount(): void {
+
+    if (this.accountForm.parentId) {
+      this.accountForm.code = this.accountPrefix + '-' + this.accountForm.code;
+    }
+    if (!this.accountFatherIsRequired) {
+      this.accountForm.balances = [];
+    }
     this.accountService.createAccount(this.accountForm).subscribe({
       next: (result) => {
         this.router.navigate(['accounting/configuration']);
@@ -135,6 +141,9 @@ export class AccountComponent implements OnInit {
     this.accountPrefix = data.parentCode ?? '';
     this.accountForm.isActive =
       data.status.toUpperCase() === 'ACTIVA' ? true : false;
+    this.accountForm.balances = data.balances;
+   
+
   }
 
   private fillAccounts(data: AccountAPIResponse[]): void {
@@ -148,9 +157,47 @@ export class AccountComponent implements OnInit {
       return;
     }
     this.accounts = result;
+
+
   }
 
-  onValueStatus(event:any){
-    this.accountFatherIsRequired = event.target.value;
+  onValueChange(id: number): void {
+    const account = this.accounts.find((data) => data.id == id);
+    if (account?.id) {
+      this.accountPrefix = account.code;
+    }
   }
+
+  onValueStatus(event: any) {
+    this.accountFatherIsRequired = event.target.value === 'true' ? true : false;
+
+    if (this.accountFatherIsRequired) {
+      this.accountService.getAllAccountType().subscribe({
+        next: (data) => {
+          this.accountTypes = data;
+        }
+      });
+    }
+
+  }
+
+  validateDecimal(event: KeyboardEvent): void {
+    const inputChar = String.fromCharCode(event.charCode);
+    const currentValue = (event.target as HTMLInputElement).value;
+
+    if (!/^\d*\.?\d*$/.test(inputChar)) {
+      event.preventDefault();
+      return;
+    }
+
+    if (inputChar === '.' && currentValue.includes('.')) {
+      event.preventDefault();
+      return;
+    }
+    if (currentValue.includes('.') && currentValue.split('.')[1].length >= 2) {
+      event.preventDefault();
+    }
+  }
+
+
 }

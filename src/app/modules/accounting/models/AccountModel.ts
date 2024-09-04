@@ -1,6 +1,7 @@
 export interface AccountModel {
   id?: number;
   code?: string;
+  accountType?:string
   description?: string;
   parentId?: number | null;
   category?: number;
@@ -13,9 +14,10 @@ export interface AccountModel {
 
 export interface BalancesModel {
   id?: number;
-  accountId:number;
+  accountId?:number;
   initialBalance: number;
-  createAtDate: Date;
-  isActual: boolean;
+  createAtDate?: Date;
+  isActual?: boolean;
   typicalBalance:string
+  isCurrent?:boolean
 }

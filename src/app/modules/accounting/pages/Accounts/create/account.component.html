@@ -26,15 +26,19 @@
       </div>
       <div>
         <Label for="parent-account" class="block mb-2 text-sm text-gray-900">Cuenta Padre</Label>
-        <select id="parent-account" [(ngModel)]="accountForm.parentId" name="parentId" (change)="onValueChange($event)"
-          [required]="accountFatherIsRequired"
-          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-          <option selected></option>
-          @for (item of accounts; track $index) {
-          <option [value]="item.id">{{ item.name }}</option>
-          }
-        </select>
-        <div *ngIf="itemForm.submitted && itemForm.form.controls['parentId'].getError('required')">
+        <dx-select-box [(value)]="accountForm.parentId" [dataSource]="accounts"  name="parentId" 
+        [searchEnabled]="true" valueExpr="id"
+          displayExpr="code"  [searchExpr]="['name', 'code']" 
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+           focus:ring-blue-500 focus:border-blue-500 block w-full p-2 h-12"
+           (valueChange)="onValueChange($event)">
+          <div class="" *dxTemplate="let data of 'item'">
+              <strong class="">{{data.code}}
+              </strong>
+              <small class="text-gray-400">{{data.name}}</small>
+          </div>
+        </dx-select-box>
+        <div *ngIf="itemForm.submitted && accountFatherIsRequired === true && !accountForm.parentId">
           <small class="text-xs text-red-900">Cuenta Padre es requerido.</small>
         </div>
       </div>
@@ -50,9 +54,9 @@
               Código de cuenta</Label>
             <input [(ngModel)]="accountForm.code" name="code" required id="account-code"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2" />
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['code'].getError('required')">
-                <small class="text-xs text-red-900">Codigo es requerido.</small>
-              </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['code'].getError('required')">
+              <small class="text-xs text-red-900">Codigo es requerido.</small>
+            </div>
           </div>
         </div>
       </div>
@@ -69,9 +73,8 @@
       </div>
       <div>
         <Label for="select-hasEntry" class="block mb-2 text-sm text-gray-900">Admite Registros</Label>
-        <select id="select-hasEntry" [(ngModel)]="accountForm.supportsRegistration"
-        (change)="onValueStatus($event)"
-        name="supportsRegistration" required
+        <select id="select-hasEntry" [(ngModel)]="accountForm.supportsRegistration" (change)="onValueStatus($event)"
+          name="supportsRegistration" required
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
           <option value="true">Si</option>
           <option value="false">No</option>
@@ -80,6 +83,48 @@
           <small class="text-xs text-red-900">Admite Registros es requerido.</small>
         </div>
       </div>
+
+      @if(accountFatherIsRequired === true && !this.id){
+      <div>
+        <Label for="select-hasEntry" class="block mb-2 text-sm text-gray-900">Saldo Inicial</Label>
+        <input type="text"
+        inputmode="decimal"
+        pattern="^\d+(\.\d{1,2})?$"
+        id="txt-balance"
+        [(ngModel)]="accountForm.balances[0].initialBalance"
+        name="balance"
+        [value]="accountForm.balances[0].initialBalance"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+        (keypress)="validateDecimal($event)" />
+ 
+      
+      </div>
+      <div>
+        <Label for="select-hasEntry" class="block mb-2 text-sm text-gray-900">Tipo de Saldo</Label>
+        <select id="select-hasEntry" [(ngModel)]="accountForm.balances[0].typicalBalance"
+          name="saldo" required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+          <option value="D">Debe</option>
+          <option value="C">Haber</option>
+        </select>
+
+      </div>
+      <div>
+        <Label for="select-accountType" class="block mb-2 text-sm text-gray-900">Tipo</Label>
+        <select id="select-accountType" [(ngModel)]="accountForm.accountType"
+          name="accountType" required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+          @for (type of accountTypes; track $index) {
+            <option [value]="type.id">
+              {{ type.name }}
+            </option>
+          }
+        </select>
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['accountType'].getError('required')">
+          <small class="text-xs text-red-900">Tipo es requerido.</small>
+        </div>
+      </div>
+      }
       <div class="clear-both"></div>
     </div>
     @if(id){
@@ -110,7 +155,6 @@
         </dxi-column>
       </dx-data-grid>
     </div>
-
     }
 
     <div class="flex justify-end">
