@@ -17,6 +17,7 @@ import { ToastType } from 'devextreme/ui/toast';
 import { AccountModel } from '../../../models/AccountModel';
 import { TransactionResponse } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
+import { JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
 
 @Component({
   selector: 'app-provider',
@@ -39,6 +40,13 @@ export class ProviderComponent {
     currency: '',
     exchangeRate: 0,
     description: '',
+  };
+
+  editorOptions = {
+    itemTemplate: 'accounts',
+    searchEnabled: true,
+    searchMode: 'contains',
+    searchExpr: ['description', 'code']
   };
 
   listMovement: IMovement[] = [
@@ -72,10 +80,11 @@ export class ProviderComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0)
+        .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Compras)
           .map(item => ({
             id: item.id,
-            description: item.name
+            description: item.name,
+            code: item.accountCode
           } as AccountModel));
 
       },
@@ -116,27 +125,45 @@ export class ProviderComponent {
       if (!dialogo) {
         return;
       }
+
+
+      const transactionData: TransactionModel = {
+          
+        createAtDate: this.providerBilling.date,
+        reference: this.providerBilling.billingNumber,
+        documentType: 2,
+        exchangeRate: this.providerBilling.exchangeRate,
+        descriptionPda: this.providerBilling.description,
+        currency: this.providerBilling.currency,
+        detail: this.dataSource.map((detail) => {
+          return {
+            accountId: detail.accountId,
+            amount: detail.amount,
+            motion: detail.movement,
+          };
+        }),
+      }
       if (this.id) {
         //Cuando Actualiza la Factura de proveedores
 
+        this.transactionService
+          .updateTransaction(Number(transactionData.id), transactionData)
+          .subscribe({
+            next: (data) => {
+              this.fillBilling(data);
+              this.toastType = typeToast.Success;
+              this.messageToast = 'Actualizados Exitosamente';
+            },
+            error: (err) => {
+              this.toastType = typeToast.Error;
+              this.messageToast = 'No se pudo Actualizar los datos';
+              this.showToast = true;
+              console.error('erro al actualizar transacción ', err);
+            },
+          });
+        return;
 
-      } else {
-
-        const transactionData: TransactionModel = {
-          createAtDate: this.providerBilling.date,
-          reference: this.providerBilling.billingNumber,
-          documentType: 2,
-          exchangeRate: this.providerBilling.exchangeRate,
-          descriptionPda: this.providerBilling.description,
-          currency: this.providerBilling.currency,
-          detail: this.dataSource.map((detail) => {
-            return {
-              accountId: detail.accountId,
-              amount: detail.amount,
-              motion: detail.movement,
-            };
-          }),
-        };
+      } 
         this.transactionService.createTransaction(transactionData).subscribe({
           next: (data) => {
             console.log({ data });
@@ -148,7 +175,7 @@ export class ProviderComponent {
           },
           error: (err) => console.error('error', err),
         });
-      }
+      
 
 
 
@@ -282,6 +309,20 @@ export class ProviderComponent {
       //console.log('invalida balance');
       return false;
     }
+
+    const hasDuplicateAccountId = this.dataSource.some((item, index) => {
+      return this.dataSource.filter(obj => obj.accountId === item.accountId).length > 1;
+    });
+
+    if (hasDuplicateAccountId) {
+      this.messageToast =
+        'No se puede registrar la misma cuenta en la transaccion';
+      this.showToast = true;
+      this.toastType = typeToast.Error;
+
+      return false;
+    }
+
     // si todo `OK` retorna true
     return true;
   }
@@ -315,4 +356,8 @@ export class ProviderComponent {
     }
     this.router.navigate(['/accounting/configuration/period']);
   }
+
+  goBack() {
+    window.history.back();
+   }
 }

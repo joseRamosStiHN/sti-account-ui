@@ -24,6 +24,7 @@ export class AccountingPageComponent implements OnInit {
             path: '/accounting/report/general-balance',
           },
           { label: 'Estado de Resultados', path: '/accounting/report/incomes' },
+          { label: 'Mayores Contables', path: '/accounting/report/senior-accountants' },
         ],
       },
       {
@@ -41,6 +42,10 @@ export class AccountingPageComponent implements OnInit {
           {
             label: 'Configuración Saldos',
             path: '/accounting/configuration/balance/accounts',
+          },
+          {
+            label: 'Configuración Diarios',
+            path: '/accounting/configuration/journal-list',
           },
         ],
       },
