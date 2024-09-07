@@ -1,7 +1,7 @@
 <div class="mt-2 px-1">
   <div class="flex flex-row justify-between">
     <div class="w-100 flex justify-between mb-5">
-      <h2 class="text-2xl font-semibold">Facturacion de Clientes</h2>
+      <h2 class="text-2xl font-semibold">Factura de Cliente</h2>
     </div>
     @if(clientBilling.id !==null && clientBilling.status === 'Draft'){
     <button
@@ -267,14 +267,17 @@
     </div>
 
     <div class="justify-end mt-10">
-      <a
-        [routerLink]="'/accounting/client-list'"
-          class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
-          >
-         Regresar
-      </a>
+     
+      <button
+      type="button"
+      (click)="goBack()"
+      class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
+    >
+      regresar
+    </button>
 
       @if(clientBilling.status !== "Success"){
+        
       <a
         [routerLink]="'/accounting'"
         class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"

@@ -18,6 +18,7 @@ import { PeriodListComponent } from './pages/period-page/period-list/period-list
 import { PeriodComponent } from './pages/period-page/period/period.component';
 import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
 import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
+import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/senior-accountants/senior-accountants.component';
 
 const routes: Routes = [
   {
@@ -43,13 +44,15 @@ const routes: Routes = [
       },
       { path: 'report/general-balance', component: GeneralBalanceComponent },
       { path: 'report/incomes', component: IncomeStatementComponent },
-      { path: 'journal-list', component: JournalListComponent },
-      { path: 'journal/new-journal', component: JournalPageComponent },
+      { path: 'configuration/journal-list', component: JournalListComponent },
+      { path: 'configuration/journal/new-journal', component: JournalPageComponent },
+      { path: 'configuration/journal/update-journal/:id', component: JournalPageComponent },
       { path: 'configuration/period', component: PeriodListComponent },
       { path: 'configuration/period/create', component: PeriodComponent },
       { path: 'configuration/period/update/:id', component: PeriodComponent },
       { path: 'configuration/balance/accounts', component: BalanceListComponent},
       { path: 'configuration/balance/accounts/inital/:id', component: BalanceAccountsComponent},
+      { path: 'report/senior-accountants', component: SeniorAccountantsComponent},
     ],
   },
 ];

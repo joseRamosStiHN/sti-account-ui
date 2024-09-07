@@ -17,6 +17,7 @@ import { AccountService } from '../../../services/account.service';
 import { AccountModel } from '../../../models/AccountModel';
 import { TransactionResponse } from '../../../models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
+import { JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
 
 @Component({
   selector: 'app-client',
@@ -81,7 +82,7 @@ export class ClientComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == '1')
+          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Ventas)
           .map(item => ({
             id: item.id,
             description: item.name,
@@ -343,4 +344,7 @@ export class ClientComponent {
     this.router.navigate(['/accounting/configuration/period']);
   }
 
+  goBack() {
+   window.history.back();
+  }
 }
