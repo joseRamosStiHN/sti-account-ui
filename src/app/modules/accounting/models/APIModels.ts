@@ -38,7 +38,7 @@ export interface AccountCategories {
 
 export interface AccountAPIResponse {
   accountCode: string;
-  accountType:string
+  accountType:number
   balances: any[];
   categoryId: number;
   categoryName: string;

@@ -40,6 +40,7 @@ import { PeriodListComponent } from './pages/period-page/period-list/period-list
 import { PeriodComponent } from './pages/period-page/period/period.component';
 import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
 import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
+import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/senior-accountants/senior-accountants.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accou
     PeriodListComponent,
     PeriodComponent,
     BalanceListComponent,
-    BalanceAccountsComponent
+    BalanceAccountsComponent,
+    SeniorAccountantsComponent
   ],
   providers: [ReportServiceService,
     JournalService

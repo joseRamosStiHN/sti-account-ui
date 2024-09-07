@@ -4,6 +4,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { TransactionResponse } from '../models/APIModels';
 import { TransactionModel } from '../models/TransactionModel';
 import { environment } from '@environment/environment';
+import { LeaderAccounts } from 'src/app/modules/accounting/models/LeederAccountsDetail';
 
 @Injectable({
   providedIn: 'root',
@@ -102,6 +103,18 @@ export class TransactionService {
     const url = `${this.apiURL}/api/v1/transaction/${id}/post`;
     return this.httpClient.put(url, null, this.httpOptions);
   }
+
+
+    /**
+   * Method that brings a list with all seniorsAccounts
+   *
+   * @return response()
+   */
+    getAllLedgerAcounts(): Observable<LeaderAccounts[]> {
+      return this.httpClient.get<LeaderAccounts[]>(
+        this.apiURL + '/api/v1/ledger-accounts'
+      );
+    }
 
   /**
    * Error Handler Method
