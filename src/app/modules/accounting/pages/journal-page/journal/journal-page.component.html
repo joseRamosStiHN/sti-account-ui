@@ -1,268 +1,404 @@
-<div class="mt-2 px-1 h-[80vh] relative">
-    <div class="flex flex-row justify-between">
-        <div class="w-100 flex justify-between mb-5">
-            <h2 class="text-2xl font-semibold">Nuevo Diario</h2>
-        </div>
+<div class="container mx-auto">
+  <!-- form -->
+  <form
+    id="journalForm"
+    #itemForm="ngForm"
+    class="w-full flex flex-col gap-2 mt-5"
+    (ngSubmit)="onSubmit(itemForm)"
+  >
+    <div class="flex flex-row">
+      <!-- left components -->
+      <div class="basis-1/2 p-2">
+        <fieldset class="flex flex-col gap-2">
+          <legend class="text-2xl font-semibold mb-5">Diario</legend>
+          <div class="form">
+            <label for="nameJourney" class="block mb-2 text-sm text-gray-900"
+              >Nombre del Diario</label
+            >
+            <input
+              [(ngModel)]="journalForm.diaryName"
+              id="nameJourney"
+              name="nameJourney"
+              type="text"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder="Factura de Clientes"
+              required
+            />
+            <div
+              *ngIf="
+                itemForm.submitted &&
+                itemForm.form.controls['nameJourney'].getError('required')
+              "
+            >
+              <small class="text-xs text-red-900"
+                >Nombre de Diario es requerido.</small
+              >
+            </div>
+          </div>
+          <div class="form">
+            <label for="type" class="block mb-2 text-sm text-gray-900"
+              >Tipo</label
+            >
+            <select
+              [(ngModel)]="journalForm.accountType"
+              (change)="onChangeType($event)"
+              required="true"
+              name="type"
+              id="type"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            >
+              <option
+                *ngFor="let journal of journalTypes | async"
+                [value]="journal.id"
+                [disabled]="journal.isActive"
+              >
+                {{ journal.name }}
+              </option>
+            </select>
+            <div
+              *ngIf="
+                itemForm.submitted &&
+                itemForm.form.controls['type'].getError('required')
+              "
+            >
+              <small class="text-xs text-red-900">Tipo es requerido.</small>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <!-- right components -->
+      <div class="basis-1/2 p-2 min-h-20">
+        <fieldset
+          class="border border-gray-500 border-dotted rounded-md mt-4 min-h-48"
+        >
+          <legend class="font-medium ml-2">Información Contable</legend>
+          <div class="form p-2" *ngIf="selectedTypeName !== null">
+            <label for="defaultAccount" class="block mb-2 text-sm text-gray-900"
+              >Cuenta {{ selectedTypeName }} Predeterminada
+            </label>
+            <select
+              [(ngModel)]="journalForm.defaultAccount"
+              required="true"
+              name="defaultAccount"
+              id="defaultAccount"
+              class="border border-gray-300 block w-full p-2 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            >
+              <option
+                *ngFor="let account of accountsFilter"
+                [value]="account.id"
+              >
+                {{ account.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form p-2">
+            <label for="code" class="block mb-2 text-sm text-gray-900"
+              >Código Corto</label
+            >
+            <input
+              [(ngModel)]="journalForm.code"
+              id="code"
+              name="code"
+              type="text"
+              class="block w-fit p-2 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder="INV1"
+              required
+            />
+            <div
+              *ngIf="
+                itemForm.submitted &&
+                itemForm.form.controls['code'].getError('required')
+              "
+            >
+              <small class="text-xs text-red-900">Código es requerido.</small>
+            </div>
+          </div>
+        </fieldset>
+      </div>
     </div>
-    <form id="jorunalForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
-        <div class="container">
-            <div class="grid grid-cols-2 gap-2">
-                <div class="flex flex-col gap-2">
-                    <div class="form-group">
-                        <label for="nameJourney" class="block mb-2 text-sm text-gray-900">Nombre del Diario</label>
-                        <input [(ngModel)]="journalForm.diaryName" 
-                        id="nameJourney" name="nameJourney" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
-                            w-4/5 p-2" placeholder="" required />
-                        <div *ngIf="
-                            itemForm.submitted &&
-                            itemForm.form.controls['nameJourney'].getError('required')
-                          ">
-                            <small class="text-xs text-red-900">Nombre de Diario es requerido.</small>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
-                        <select [(ngModel)]="journalForm.accountType" (change)="onChangeType($event)"
-                        required="true" name="type" id="type"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                            focus:ring-blue-500 focus:border-blue-500 block w-4/5 p-2">
-                            <option *ngFor="let journal of journalTypes" [value]="journal.id">{{ journal.name }}</option>
-                        </select>
-                        <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')">
-                            <small class="text-xs text-red-900">Tipo es requerido.</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-2">
+    <!-- buttons -->
+    <div class="basis-full items-start">
+      <a
+        [routerLink]="'/accounting/configuration/journal-list'"
+        class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
+      >
+        Cancelar
+      </a>
+      <button
+        type="submit"
+        class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none active:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
+      >
+        Guardar
+      </button>
+    </div>
+  </form>
+</div>
 
-                    @if (journalForm.accountType == JournalTypes.Compras || journalForm.accountType == JournalTypes.Varios || journalForm.accountType == JournalTypes.Ventas) {
-
-                    <div class="border md:border-dotted border-black rounded-2xl p-4 relative">
-                        <div class="absolute left-4 -top-3 bg-white">
-                            <small><strong>Informacion Contable</strong></small>
-                        </div>
-                        <div class="form-group">
-                            <label for="defaultAccount" class="block mb-2 text-sm text-gray-900">Cuenta de ingreso
-                                predeterminada</label>
-                            <select 
-                            [(ngModel)]="journalForm.defaultAccount" required="true" name="defaultAccount" id="defaultAccount"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                    focus:ring-blue-500 focus:border-blue-500 block w-6/12 p-2">
-                                <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}</option>
-                            </select>
-                            <div
-                                *ngIf="itemForm.submitted && itemForm.form.controls['defaultAccount'].getError('required')">
-                                <small class="text-xs text-red-900">Cuenta de ingreso predeterminada es requerida.</small>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="code" class="block mb-2 text-sm text-gray-900">Codigo</label>
-                            <input [(ngModel)]="journalForm.code" id="code" name="code" type="text"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
-                                        w-6/12 p-2" placeholder="" required />
-                            <div *ngIf="
-                                        itemForm.submitted &&
-                                        itemForm.form.controls['code'].getError('required')
-                                      ">
-                                <small class="text-xs text-red-900">Codigo es requerido.</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    } @else if (journalForm.accountType == JournalTypes.Efectivo) {
-
-                    <div class="border md:border-dotted border-black rounded-2xl p-4 relative">
-                        <div class="absolute left-4 -top-3 bg-white">
-                            <small><strong>Informacion Contable</strong></small>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="flex flex-col gap-2">
-                                <div class="form-group">
-                                    <label for="accountCash" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Efectivo</label>
-                                    <select [(ngModel)]="journalForm.cashAccount" required="true" name="accountCash"
-                                        id="accountCash" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['accountCash'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de Efectivo requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="transitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Transito</label>
-                                    <select [(ngModel)]="journalForm.transitAccount" required="true" name="transitAccount"
-                                        id="transitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['transitAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de Transito es requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="code" class="block mb-2 text-sm text-gray-900">Codigo</label>
-                                    <input [(ngModel)]="journalForm.code" id="code" name="code"
-                                        type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
-                                                    w-full p-2" placeholder="" required />
-                                    <div *ngIf="
-                                                    itemForm.submitted &&
-                                                    itemForm.form.controls['code'].getError('required')
-                                                  ">
-                                        <small class="text-xs text-red-900">Codigo es requerido.</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <div class="form-group">
-                                    <label for="lossAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Perdidas</label>
-                                    <select [(ngModel)]="journalForm.lossAccount" required="true" name="lossAccount"
-                                        id="lossAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['lossAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de perdida requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="profitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Ganancias</label>
-                                    <select [(ngModel)]="journalForm.profitAccount" required="true" name="profitAccount"
-                                        id="profitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['profitAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de Ganancias es requerida.</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    } @else if (journalForm.accountType == JournalTypes.Bancos) {
-
-                    <div class="border md:border-dotted border-black rounded-2xl p-4 relative">
-                        <div class="absolute left-4 -top-3 bg-white">
-                            <small><strong>Informacion Contable</strong></small>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="flex flex-col gap-2">
-                                <div class="form-group">
-                                    <label for="bankAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Banco</label>
-                                    <select [(ngModel)]="journalForm.bankAccount" required="true" name="bankAccount"
-                                        id="bankAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['bankAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de Banco requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="transitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Transito</label>
-                                    <select [(ngModel)]="journalForm.transitAccount" required="true" name="transitAccount"
-                                        id="transitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['transitAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de Transito requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="profitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Ganancias</label>
-                                    <select [(ngModel)]="journalForm.profitAccount" required="true" name="profitAccount"
-                                        id="profitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['profitAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de Ganancias es requerida.</small>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <div class="form-group">
-                                    <label for="accountNumber" class="block mb-2 text-sm text-gray-900">Numero de Cuenta</label>
-                                    <select [(ngModel)]="journalForm.accountNumber" required="true" name="accountNumber"
-                                        id="accountNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['accountNumber'].getError('required')">
-                                        <small class="text-xs text-red-900">Número de cuenta es requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="lossAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
-                                        Perdidas</label>
-                                    <select [(ngModel)]="journalForm.lossAccount" required="true" name="lossAccount"
-                                        id="lossAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        *ngIf="itemForm.submitted && itemForm.form.controls['lossAccount'].getError('required')">
-                                        <small class="text-xs text-red-900">Cuenta de perdida es requerida.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="code" class="block mb-2 text-sm text-gray-900">Codigo</label>
-                                    <input [(ngModel)]="journalForm.code" id="code" name="code"
-                                        type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
-                                                    w-4/5 p-2" placeholder="" required />
-                                    <div *ngIf="
-                                                    itemForm.submitted &&
-                                                    itemForm.form.controls['code'].getError('required')
-                                                  ">
-                                        <small class="text-xs text-red-900">Codigo es requerido.</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    }
-                </div>
-                <div class="justify-end mt-10 absolute left-0 bottom-10">
-                    <a [routerLink]="'/accounting/configuration/journal-list'"
-                        class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
-                        Cancelar
-                    </a>
-                    <button type="submit"
-                        class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
-                        Guardar
-                    </button>
-                </div>
+<!-- <div class="mt-2 px-1 h-[80vh] relative">
+        <div class="flex flex-row justify-between">
+            <div class="w-100 flex justify-between mb-5">
+                <h2 class="text-2xl font-semibold">Nuevo Diario</h2>
             </div>
         </div>
-    </form>
-</div>
-<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
-    <dxo-position my="top" at="top" of="#jorunalForm"> </dxo-position>
-  </dx-toast>
+        <form id="jorunalForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+            <div class="container">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex flex-col gap-2">
+                        <div class="form-group">
+                            <label for="nameJourney" class="block mb-2 text-sm text-gray-900">Nombre del Diario</label>
+                            <input [(ngModel)]="journalForm.diaryName" 
+                            id="nameJourney" name="nameJourney" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
+                                w-4/5 p-2" placeholder="" required />
+                            <div *ngIf="
+                                itemForm.submitted &&
+                                itemForm.form.controls['nameJourney'].getError('required')
+                            ">
+                                <small class="text-xs text-red-900">Nombre de Diario es requerido.</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
+                            <select [(ngModel)]="journalForm.accountType" (change)="onChangeType($event)"
+                            required="true" name="type" id="type"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                focus:ring-blue-500 focus:border-blue-500 block w-4/5 p-2">
+                                <option *ngFor="let journal of journalTypes" [value]="journal.id">{{ journal.name }}</option>
+                            </select>
+                            <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')">
+                                <small class="text-xs text-red-900">Tipo es requerido.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+
+                        @if (journalForm.accountType == JournalTypes.Compras || journalForm.accountType == JournalTypes.Varios || journalForm.accountType == JournalTypes.Ventas) {
+
+                        <div class="border md:border-dotted border-black rounded-2xl p-4 relative">
+                            <div class="absolute left-4 -top-3 bg-white">
+                                <small><strong>Informacion Contable</strong></small>
+                            </div>
+                            <div class="form-group">
+                                <label for="defaultAccount" class="block mb-2 text-sm text-gray-900">Cuenta de ingreso
+                                    predeterminada</label>
+                                <select 
+                                [(ngModel)]="journalForm.defaultAccount" required="true" name="defaultAccount" id="defaultAccount"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                        focus:ring-blue-500 focus:border-blue-500 block w-6/12 p-2">
+                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}</option>
+                                </select>
+                                <div
+                                    *ngIf="itemForm.submitted && itemForm.form.controls['defaultAccount'].getError('required')">
+                                    <small class="text-xs text-red-900">Cuenta de ingreso predeterminada es requerida.</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="code" class="block mb-2 text-sm text-gray-900">Codigo</label>
+                                <input [(ngModel)]="journalForm.code" id="code" name="code" type="text"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
+                                            w-6/12 p-2" placeholder="" required />
+                                <div *ngIf="
+                                            itemForm.submitted &&
+                                            itemForm.form.controls['code'].getError('required')
+                                        ">
+                                    <small class="text-xs text-red-900">Codigo es requerido.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        } @else if (journalForm.accountType == JournalTypes.Efectivo) {
+
+                        <div class="border md:border-dotted border-black rounded-2xl p-4 relative">
+                            <div class="absolute left-4 -top-3 bg-white">
+                                <small><strong>Informacion Contable</strong></small>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="flex flex-col gap-2">
+                                    <div class="form-group">
+                                        <label for="accountCash" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Efectivo</label>
+                                        <select [(ngModel)]="journalForm.cashAccount" required="true" name="accountCash"
+                                            id="accountCash" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['accountCash'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de Efectivo requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Transito</label>
+                                        <select [(ngModel)]="journalForm.transitAccount" required="true" name="transitAccount"
+                                            id="transitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['transitAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de Transito es requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="code" class="block mb-2 text-sm text-gray-900">Codigo</label>
+                                        <input [(ngModel)]="journalForm.code" id="code" name="code"
+                                            type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
+                                                        w-full p-2" placeholder="" required />
+                                        <div *ngIf="
+                                                        itemForm.submitted &&
+                                                        itemForm.form.controls['code'].getError('required')
+                                                    ">
+                                            <small class="text-xs text-red-900">Codigo es requerido.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <div class="form-group">
+                                        <label for="lossAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Perdidas</label>
+                                        <select [(ngModel)]="journalForm.lossAccount" required="true" name="lossAccount"
+                                            id="lossAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['lossAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de perdida requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Ganancias</label>
+                                        <select [(ngModel)]="journalForm.profitAccount" required="true" name="profitAccount"
+                                            id="profitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                    <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['profitAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de Ganancias es requerida.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        } @else if (journalForm.accountType == JournalTypes.Bancos) {
+
+                        <div class="border md:border-dotted border-black rounded-2xl p-4 relative">
+                            <div class="absolute left-4 -top-3 bg-white">
+                                <small><strong>Informacion Contable</strong></small>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="flex flex-col gap-2">
+                                    <div class="form-group">
+                                        <label for="bankAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Banco</label>
+                                        <select [(ngModel)]="journalForm.bankAccount" required="true" name="bankAccount"
+                                            id="bankAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                        focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                        <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['bankAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de Banco requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Transito</label>
+                                        <select [(ngModel)]="journalForm.transitAccount" required="true" name="transitAccount"
+                                            id="transitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                        focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                        <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['transitAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de Transito requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profitAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Ganancias</label>
+                                        <select [(ngModel)]="journalForm.profitAccount" required="true" name="profitAccount"
+                                            id="profitAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                        focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                        <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['profitAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de Ganancias es requerida.</small>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <div class="form-group">
+                                        <label for="accountNumber" class="block mb-2 text-sm text-gray-900">Numero de Cuenta</label>
+                                        <select [(ngModel)]="journalForm.accountNumber" required="true" name="accountNumber"
+                                            id="accountNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                        focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                        <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['accountNumber'].getError('required')">
+                                            <small class="text-xs text-red-900">Número de cuenta es requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lossAccount" class="block mb-2 text-sm text-gray-900">Cuenta de
+                                            Perdidas</label>
+                                        <select [(ngModel)]="journalForm.lossAccount" required="true" name="lossAccount"
+                                            id="lossAccount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                                                        focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                                                        <option *ngFor="let account of accountsFilter" [value]="account.id">{{ account.name }}
+                                            </option>
+                                        </select>
+                                        <div
+                                            *ngIf="itemForm.submitted && itemForm.form.controls['lossAccount'].getError('required')">
+                                            <small class="text-xs text-red-900">Cuenta de perdida es requerida.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="code" class="block mb-2 text-sm text-gray-900">Codigo</label>
+                                        <input [(ngModel)]="journalForm.code" id="code" name="code"
+                                            type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
+                                                        w-4/5 p-2" placeholder="" required />
+                                        <div *ngIf="
+                                                        itemForm.submitted &&
+                                                        itemForm.form.controls['code'].getError('required')
+                                                    ">
+                                            <small class="text-xs text-red-900">Codigo es requerido.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    <div class="justify-end mt-10 absolute left-0 bottom-10">
+                        <a [routerLink]="'/accounting/configuration/journal-list'"
+                            class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                            Cancelar
+                        </a>
+                        <button type="submit"
+                            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+        <dxo-position my="top" at="top" of="#jorunalForm"> </dxo-position>
+    </dx-toast> -->

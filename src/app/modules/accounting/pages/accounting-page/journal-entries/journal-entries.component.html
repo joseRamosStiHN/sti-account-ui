@@ -1,0 +1,74 @@
+<div class="container mx-auto">
+  <h2 class="mt-5 text-2xl font-semibold">Asientos Contables</h2>
+  <dx-data-grid
+    id="gridJournalEntry"
+    [dataSource]="data$ | async"
+    class="mt-5"
+    keyExpr="id"
+    [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true"
+    [allowColumnResizing]="true"
+    [allowColumnReordering]="true"
+    [showBorders]="true"
+    [width]="'100%'"
+  >
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-paging [pageSize]="15"></dxo-paging>
+    <dxo-pager
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 25, 50, 100]"
+    ></dxo-pager>
+    <dxo-search-panel
+      [visible]="true"
+      [highlightCaseSensitive]="true"
+    ></dxo-search-panel>
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+    <dxi-column
+      caption="Fecha"
+      dataField="date"
+      format="shortDate"
+      dataType="date"
+      alignment="center"
+      format="dd/MM/yyyy"
+      width="90"
+    ></dxi-column>
+    <dxi-column
+      alignment="center"
+      caption="Número"
+      dataField="referenceNumber"
+    ></dxi-column>
+    <dxi-column
+      alignment="center"
+      caption="Referencia"
+      dataField="reference"
+    ></dxi-column>
+    <dxi-column
+      alignment="center"
+      caption="Diario"
+      dataField="journalEntry"
+    ></dxi-column>
+    <dxi-column
+      alignment="center"
+      caption="Total"
+      dataType="currency"
+      dataField="total"
+    ></dxi-column>
+    <dxi-column
+      alignment="center"
+      caption="Estado"
+      dataField="status"
+    ></dxi-column>
+
+    <dxo-summary>
+      <dxi-total-item
+        column="total"
+        summaryType="sum"
+        [valueFormat]="{ currency: 'HNL' }"
+        valueFormat="currency"
+        displayFormat="Total L. {0}"
+      ></dxi-total-item>
+    </dxo-summary>
+  </dx-data-grid>
+</div>
