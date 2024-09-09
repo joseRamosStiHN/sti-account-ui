@@ -131,31 +131,56 @@
           </div>
         </div>
       </div>
-      <div class="mb-2 mt-1">
-        <label for="txt_description" class="block mb-2 text-sm text-gray-900"
-          >Descripción de la partida</label
-        >
-        <input
-          [(ngModel)]="clientBilling.description"
-          type="text"
-          name="description"
-          id="txt_description"
-          maxlength="150"
-          class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Ingresa una Descripción corta acerca de la partida contable"
-          required
-        />
 
-        <div
-          *ngIf="
-            itemForm.submitted &&
-            itemForm.form.controls['description'].getError('required')
-          "
-        >
-          <small class="text-xs text-red-900">La descripción requerida.</small>
+      <div class="w-full flex flex-row gap-2">
+        <div class="basis-1/2">
+          <div class="mb-2 mt-1">
+            <label
+              for="txt_description"
+              class="block mb-2 text-sm text-gray-900"
+              >Descripción de la partida</label
+            >
+            <input
+              [(ngModel)]="clientBilling.description"
+              type="text"
+              name="description"
+              id="txt_description"
+              maxlength="150"
+              class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Ingresa una Descripción corta acerca de la partida contable"
+              required
+            />
+
+            <div
+              *ngIf="
+                itemForm.submitted &&
+                itemForm.form.controls['description'].getError('required')
+              "
+            >
+              <small class="text-xs text-red-900"
+                >La descripción requerida.</small
+              >
+            </div>
+          </div>
+        </div>
+        <div class="basis-1/2">
+          <label
+            for="select_journey"
+            class="block mt-1 mb-2 text-sm text-gray-900"
+            >Diario</label
+          >
+          <select
+            [(ngModel)]="clientBilling.currency"
+            required
+            name="select_journey"
+            id="select_journy"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
+          >
+            <option>Factura de Clientes</option>
+            <option>Factura de clientes Contado</option>
+          </select>
         </div>
       </div>
-
       <dx-data-grid
         id="grid-billing-client"
         class="mx-auto mt-2 py-2"
@@ -188,8 +213,17 @@
           [allowEditing]="false"
         >
         </dxi-column>
-        <dxi-column dataField="accountId" caption="Cuenta" alignment="center"[editorOptions]="editorOptions">
-          <dxo-lookup [dataSource]="accountList" valueExpr="id" displayExpr="code" ></dxo-lookup>
+        <dxi-column
+          dataField="accountId"
+          caption="Cuenta"
+          alignment="center"
+          [editorOptions]="editorOptions"
+        >
+          <dxo-lookup
+            [dataSource]="accountList"
+            valueExpr="id"
+            displayExpr="code"
+          ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
         <dxi-column
@@ -251,9 +285,8 @@
           <span>{{ d.rowIndex + 1 }}</span>
         </div>
         <div class="" *dxTemplate="let account of 'accounts'">
-          <strong class="">{{account.code}}
-          </strong>
-          <small class="text-gray-400">{{account.description}}</small>
+          <strong class="">{{ account.code }} </strong>
+          <small class="text-gray-400">{{ account.description }}</small>
         </div>
 
         <dxo-summary>
@@ -267,17 +300,16 @@
     </div>
 
     <div class="justify-end mt-10">
-     
       <button
-      type="button"
-      (click)="goBack()"
-      class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
-    >
-      regresar
-    </button>
+        type="button"
+        (click)="goBack()"
+        class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"
+      >
+        regresar
+      </button>
 
       @if(clientBilling.status !== "Success"){
-        
+
       <a
         [routerLink]="'/accounting'"
         class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2"

@@ -26,7 +26,7 @@ export interface TransactionResponse {
   documentName: string;
   description: string;
   date: Date;
-  creationDate:Date;
+  creationDate: Date;
   currency: string;
   transactionDetails: TransactionDetailResponse[];
 }
@@ -38,7 +38,7 @@ export interface AccountCategories {
 
 export interface AccountAPIResponse {
   accountCode: string;
-  accountType:number
+  accountType: number;
   balances: any[];
   categoryId: number;
   categoryName: string;
@@ -56,27 +56,25 @@ export interface APIGeneralBalanceReportResponse {
   data: GeneralBalance[];
 }
 
-
 export interface PeriodsResponse {
-  id:number;
-  description: string
-  startDate: Date
-  endDate: Date
-  closureType: string
-  status: string
+  id: number;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  closureType: string;
+  status: string;
 }
-
 
 export interface PeriodsRequest {
-  id?:number;
-  description: string
-  startDate: Date
-  endDate: Date
-  closureType: string
-  status: string
+  id?: number;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  closureType: string;
+  status: string;
 }
 
-export interface AccountTypeResponse{
-  id:number
-  name:string
+export interface AccountTypeResponse {
+  id: number;
+  name: string;
 }

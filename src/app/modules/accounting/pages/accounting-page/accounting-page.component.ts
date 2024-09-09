@@ -16,6 +16,14 @@ export class AccountingPageComponent implements OnInit {
       { label: 'Clientes', path: '/accounting/client-list' },
       { label: 'Proveedores', path: '/accounting/provider-list' },
       {
+        label: 'Contabilidad',
+        path: '',
+        child: [
+          { label: 'Asientos Contables', path: '/accounting/journal-entries' },
+          { label: 'Apuntes Contables', path: '/accounting/journal-items' },
+        ],
+      },
+      {
         label: 'Reportes',
         path: '',
         child: [
@@ -24,7 +32,10 @@ export class AccountingPageComponent implements OnInit {
             path: '/accounting/report/general-balance',
           },
           { label: 'Estado de Resultados', path: '/accounting/report/incomes' },
-          { label: 'Mayores Contables', path: '/accounting/report/senior-accountants' },
+          {
+            label: 'Mayores Contables',
+            path: '/accounting/report/senior-accountants',
+          },
         ],
       },
       {
