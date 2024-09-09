@@ -41,6 +41,8 @@ import { PeriodComponent } from './pages/period-page/period/period.component';
 import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
 import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
 import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/senior-accountants/senior-accountants.component';
+import { JournalEntriesComponent } from './pages/accounting-page/journal-entries/journal-entries.component';
+import { JournalItemsComponent } from './pages/accounting-page/journal-items/journal-items.component';
 
 @NgModule({
   declarations: [
@@ -63,11 +65,12 @@ import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/sen
     PeriodComponent,
     BalanceListComponent,
     BalanceAccountsComponent,
-    SeniorAccountantsComponent
+    SeniorAccountantsComponent,
+
+    JournalEntriesComponent,
+    JournalItemsComponent,
   ],
-  providers: [ReportServiceService,
-    JournalService
-  ],
+  providers: [ReportServiceService, JournalService],
   exports: [AccountingPageComponent, HttpClientModule],
   imports: [
     CommonModule,

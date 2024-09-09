@@ -19,6 +19,8 @@ import { PeriodComponent } from './pages/period-page/period/period.component';
 import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
 import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
 import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/senior-accountants/senior-accountants.component';
+import { JournalEntriesComponent } from 'src/app/modules/accounting/pages/accounting-page/journal-entries/journal-entries.component';
+import { JournalItemsComponent } from 'src/app/modules/accounting/pages/accounting-page/journal-items/journal-items.component';
 
 const routes: Routes = [
   {
@@ -45,14 +47,31 @@ const routes: Routes = [
       { path: 'report/general-balance', component: GeneralBalanceComponent },
       { path: 'report/incomes', component: IncomeStatementComponent },
       { path: 'configuration/journal-list', component: JournalListComponent },
-      { path: 'configuration/journal/new-journal', component: JournalPageComponent },
-      { path: 'configuration/journal/update-journal/:id', component: JournalPageComponent },
+      {
+        path: 'configuration/journal/new-journal',
+        component: JournalPageComponent,
+      },
+      {
+        path: 'configuration/journal/update-journal/:id',
+        component: JournalPageComponent,
+      },
       { path: 'configuration/period', component: PeriodListComponent },
       { path: 'configuration/period/create', component: PeriodComponent },
       { path: 'configuration/period/update/:id', component: PeriodComponent },
-      { path: 'configuration/balance/accounts', component: BalanceListComponent},
-      { path: 'configuration/balance/accounts/inital/:id', component: BalanceAccountsComponent},
-      { path: 'report/senior-accountants', component: SeniorAccountantsComponent},
+      {
+        path: 'configuration/balance/accounts',
+        component: BalanceListComponent,
+      },
+      {
+        path: 'configuration/balance/accounts/inital/:id',
+        component: BalanceAccountsComponent,
+      },
+      {
+        path: 'report/senior-accountants',
+        component: SeniorAccountantsComponent,
+      },
+      { path: 'journal-entries', component: JournalEntriesComponent },
+      { path: 'journal-items', component: JournalItemsComponent },
     ],
   },
 ];
