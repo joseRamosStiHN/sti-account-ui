@@ -1,4 +1,5 @@
 export interface JournalModel {
+  id?:number;
   diaryName: string
   accountType: number
   accountTypeName?:string | null,
@@ -11,10 +12,12 @@ export interface JournalModel {
   bankAccount?: number | null
   accountNumber?: number | null
   defaultAccountName?:string | null;
-  defaultAccount?: number | null
+  defaultAccount?: number | null;
+  defaultAccountCode?:string | null;
   cashAccountName?:string | null;
   bankAccountName?:string | null
   code: string
+  status?:boolean;
 }
 
 

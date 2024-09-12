@@ -169,15 +169,25 @@
             class="block mt-1 mb-2 text-sm text-gray-900"
             >Diario</label
           >
-          <select
+          <!-- <select
             [(ngModel)]="clientBilling.currency"
             required
             name="select_journey"
             id="select_journy"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
+          > -->
+          <select
+            [(ngModel)]="selectedJournal"
+            (change)="onChangeJournal($event)"
+            required
+            name="select_journey"
+            id="select_journy"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
           >
-            <option>Factura de Clientes</option>
-            <option>Factura de clientes Contado</option>
+            <option value="" disabled selected></option>
+            <option *ngFor="let journal of journalList" [ngValue]="journal">
+              {{ journal.accountTypeName }}
+            </option>
           </select>
         </div>
       </div>
@@ -192,7 +202,10 @@
         (onContentReady)="onContentReady($event)"
         [allowColumnResizing]="true"
         noDataText=""
-      >
+        (onRowInserted)="save($event)"
+        (onRowUpdated)="update($event)"
+        (onRowRemoved)="removed($event)"
+        >
         <dxo-load-panel [enabled]="true"></dxo-load-panel>
         <dxo-scrolling mode="virtual"></dxo-scrolling>
         <dxo-editing
@@ -218,11 +231,13 @@
           caption="Cuenta"
           alignment="center"
           [editorOptions]="editorOptions"
+     
         >
           <dxo-lookup
             [dataSource]="accountList"
             valueExpr="id"
             displayExpr="code"
+       
           ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
@@ -247,11 +262,14 @@
           caption="Movimiento"
           alignment="center"
           [width]="90"
+          [allowEditing]="false" 
+          [formItem]="{ visible: false }"
         >
           <dxo-lookup
             [dataSource]="listMovement"
             valueExpr="code"
             displayExpr="name"
+            
           ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column>
@@ -277,17 +295,26 @@
               >
             </div>
           </dxi-item>
-
-          <dxi-item name="addRowButton"></dxi-item>
+            <dxi-item
+              [widget]="'dxButton'"
+              [options]="{ text: 'Add Row', icon: 'add' }"
+              name="addRowButton"
+            ></dxi-item>
+    
         </dxo-toolbar>
-
         <div *dxTemplate="let d of 'indexTemplate'">
           <span>{{ d.rowIndex + 1 }}</span>
         </div>
         <div class="" *dxTemplate="let account of 'accounts'">
+          
           <strong class="">{{ account.code }} </strong>
-          <small class="text-gray-400">{{ account.description }}</small>
+          <small class="text-gray-400">{{account.description }}</small>
         </div>
+
+        <dxi-column type="buttons" [width]="110">
+          <dxi-button name="edit"></dxi-button>
+          <dxi-button name="delete"></dxi-button>
+        </dxi-column>
 
         <dxo-summary>
           <dxi-total-item name="totalDebit" summaryType="custom">

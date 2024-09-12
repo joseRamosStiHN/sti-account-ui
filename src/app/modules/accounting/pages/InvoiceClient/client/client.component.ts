@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { DxDataGridComponent, DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import config from 'devextreme/core/config';
 import { confirm } from 'devextreme/ui/dialog';
 import {
@@ -17,14 +17,17 @@ import { AccountService } from '../../../services/account.service';
 import { AccountModel } from '../../../models/AccountModel';
 import { TransactionResponse } from '../../../models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
-import { JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalModel, JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalService } from 'src/app/modules/accounting/services/journal.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-client',
   templateUrl: './client.component.html',
   styleUrl: './client.component.css',
 })
-export class ClientComponent {
+export class ClientComponent  {
+
   allowAddEntry: boolean = true;
   id: string | null = null;
   totalCredit: number = 0;
@@ -37,12 +40,28 @@ export class ClientComponent {
   clientBilling: ClientBilling;
   dataSource: Transaction[] = [];
 
+  journalList: JournalModel[] = [];
+  selectedJournal: JournalModel | null = null;
+
+
 
   editorOptions = {
     itemTemplate: 'accounts',
     searchEnabled: true,
     searchMode: 'contains',
-    searchExpr: ['description', 'code']
+    searchExpr: ['description', 'code'],
+    onOpened: (e: any) => {
+      const popupElement = e.component._popup.$content();
+      const listItems = popupElement.find('.dx-list-item');
+      listItems.each((index: number, item: any) => {
+        const codeAccount = item.textContent.split(' ')[0];
+        if (codeAccount == this.selectedJournal?.defaultAccountCode) {
+          item.style.display = 'none';
+          const container = popupElement[index];
+          container.style.height = '';
+        }
+      });
+    }
   };
 
   listMovement: IMovement[] = [
@@ -63,6 +82,8 @@ export class ClientComponent {
   private readonly transactionService = inject(TransactionService);
   private readonly accountService = inject(AccountService);
   private readonly periodService = inject(PeriodService);
+  private readonly journalService = inject(JournalService);
+
   constructor() {
     this.clientBilling = {
       billingNumber: '',
@@ -79,17 +100,13 @@ export class ClientComponent {
   }
 
   ngOnInit(): void {
-    this.accountService.getAllAccount().subscribe({
+
+    this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
-        this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Ventas)
-          .map(item => ({
-            id: item.id,
-            description: item.name,
-            code: item.accountCode
-          } as AccountModel));
+        this.journalList = data
+          .filter(item => item.accountType == JournalTypes.Ventas && item.status);
       },
-    });
+    })
 
     this.activeRouter.paramMap.subscribe((params) => {
       this.id = params.get('id');
@@ -98,7 +115,7 @@ export class ClientComponent {
       if (findId) {
         this.transactionService.getTransactionById(findId).subscribe({
           next: (data) => this.fillBilling(data),
-        });
+        }); const rows = document.querySelectorAll('.dx-data-row');
       } else {
         this.periodService.getStatusPeriod().subscribe({
           next: (status) => {
@@ -270,8 +287,28 @@ export class ClientComponent {
 
     // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
     // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
-    this.totalDebit = totalDebit; // actualiza en la vista
-    this.totalCredit = totalCredit;
+    // this.totalDebit = totalDebit; // actualiza en la vista
+    // this.totalCredit = totalCredit;
+
+    const rows = document.querySelectorAll('.dx-data-row');
+    rows.forEach(row => {
+      const tds = row.querySelectorAll("td");
+      tds.forEach(td => {
+        const codeAccount = td.textContent
+        if (codeAccount == 'Haber') {
+          const editButtons = row.querySelectorAll(".dx-link-edit");
+          const deleteButtons = row.querySelectorAll(".dx-link-delete");
+          editButtons.forEach(button => {
+            (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+          });
+
+          deleteButtons.forEach(button => {
+            (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+          });
+        }
+      })
+    });
+
   }
 
   private validate(): boolean {
@@ -335,6 +372,24 @@ export class ClientComponent {
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
   }
 
+  onChangeJournal(e: any) {
+
+    if (e.target.value) {
+      const codeAccount = this.selectedJournal?.defaultAccount;
+      this.accountService.getAllAccount().subscribe({
+        next: (data) => {
+          this.accountList = data
+            .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Ventas)
+            .map(item => ({
+              id: item.id,
+              description: item.name,
+              code: item.accountCode
+            } as AccountModel));
+        },
+      });
+    }
+  }
+
   async react() {
     let dialogo = await confirm(`¿No existe un periodo Activo desea activarlo?`, 'Advertencia');
     if (!dialogo) {
@@ -345,6 +400,95 @@ export class ClientComponent {
   }
 
   goBack() {
-   window.history.back();
+    window.history.back();
   }
+
+
+  save(e: any) {
+
+
+    e.data.movement = "D";
+    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    if (foundItems.length > 0) {
+      // Si se encuentran, modificamos los datos de todos los objetos encontrados
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
+    } else {
+
+      this.totalCredit = e.data.amount;
+      this.totalDebit = e.data.amount;
+
+      this.dataSource.push({
+        id: this.selectedJournal?.id ?? 0,
+        accountId: this.selectedJournal?.defaultAccount ?? 0,
+        amount: e.data.amount,
+        movement: 'C',
+
+      });
+
+
+      setTimeout(() => {
+        const rows = document.querySelectorAll('.dx-data-row');
+
+        rows.forEach(row => {
+          const tds = row.querySelectorAll("td");
+          tds.forEach(td => {
+            const codeAccount = td.textContent
+            if (codeAccount == 'Haber') {
+              const editButtons = row.querySelectorAll(".dx-link-edit");
+              const deleteButtons = row.querySelectorAll(".dx-link-delete");
+              editButtons.forEach(button => {
+                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+              });
+
+              deleteButtons.forEach(button => {
+                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+              });
+            }
+          })
+        });
+      }, 2);
+    }
+  }
+
+  update(e: any) {
+    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    if (foundItems.length > 0) {
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
+    }
+  }
+
+  removed(e: any) {
+
+    let debitos = this.dataSource.filter((data) => data.movement === 'D');
+    if (debitos.length > 0) {
+      let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
+    } else {
+      this.dataSource = [];
+      this.totalCredit = 0;
+      this.totalDebit = 0;
+
+
+    }
+  }
+
+  
+
+
 }
