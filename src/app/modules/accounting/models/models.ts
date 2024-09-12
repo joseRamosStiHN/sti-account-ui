@@ -23,6 +23,7 @@ export interface ClientBilling {
   exchangeRate: number;
   description: string;
   status?: string;
+  diaryType?:number;
 }
 
 export interface BillingListClient {

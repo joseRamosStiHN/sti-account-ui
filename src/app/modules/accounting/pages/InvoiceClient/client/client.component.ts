@@ -41,9 +41,7 @@ export class ClientComponent  {
   dataSource: Transaction[] = [];
 
   journalList: JournalModel[] = [];
-  selectedJournal: JournalModel | null = null;
-
-
+  selectedJournal?: JournalModel | null = null;
 
   editorOptions = {
     itemTemplate: 'accounts',
@@ -54,7 +52,11 @@ export class ClientComponent  {
       const popupElement = e.component._popup.$content();
       const listItems = popupElement.find('.dx-list-item');
       listItems.each((index: number, item: any) => {
+
+        this.selectedJournal = this.journalList.find((journal)=> journal.id == this.clientBilling.diaryType);
         const codeAccount = item.textContent.split(' ')[0];
+
+
         if (codeAccount == this.selectedJournal?.defaultAccountCode) {
           item.style.display = 'none';
           const container = popupElement[index];
@@ -92,6 +94,7 @@ export class ClientComponent  {
       exchangeRate: 0,
       description: '',
     };
+
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
@@ -139,6 +142,7 @@ export class ClientComponent  {
         exchangeRate: this.clientBilling.exchangeRate,
         descriptionPda: this.clientBilling.description,
         currency: this.clientBilling.currency,
+        diaryType:this.clientBilling.diaryType,
         detail: this.dataSource.map((detail) => {
           return {
             id: detail.id,
@@ -148,7 +152,6 @@ export class ClientComponent  {
           };
         }),
       };
-
 
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
@@ -180,6 +183,9 @@ export class ClientComponent  {
           });
         return;
       }
+
+
+      
 
 
       this.transactionService.createTransaction(transactionData).subscribe({
@@ -367,26 +373,23 @@ export class ClientComponent  {
     this.clientBilling.exchangeRate = data.exchangeRate;
     this.clientBilling.date = data.date;
     this.clientBilling.description = data.description;
-
+    this.clientBilling.diaryType= data.diaryType
     //
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
+
+    this.loadAccounts();
+
+    const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+    const haber = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
+    this.totalCredit = debe;
+    this.totalDebit = haber;
   }
 
   onChangeJournal(e: any) {
 
     if (e.target.value) {
-      const codeAccount = this.selectedJournal?.defaultAccount;
-      this.accountService.getAllAccount().subscribe({
-        next: (data) => {
-          this.accountList = data
-            .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Ventas)
-            .map(item => ({
-              id: item.id,
-              description: item.name,
-              code: item.accountCode
-            } as AccountModel));
-        },
-      });
+   
+     this.loadAccounts();
     }
   }
 
@@ -486,6 +489,20 @@ export class ClientComponent  {
 
 
     }
+  }
+
+  loadAccounts(){
+    this.accountService.getAllAccount().subscribe({
+      next: (data) => {
+        this.accountList = data
+          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Ventas)
+          .map(item => ({
+            id: item.id,
+            description: item.name,
+            code: item.accountCode
+          } as AccountModel));
+      },
+    });
   }
 
   

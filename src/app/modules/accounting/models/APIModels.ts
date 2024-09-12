@@ -29,6 +29,7 @@ export interface TransactionResponse {
   creationDate: Date;
   currency: string;
   transactionDetails: TransactionDetailResponse[];
+  diaryType:number;
 }
 
 export interface AccountCategories {

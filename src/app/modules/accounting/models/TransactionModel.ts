@@ -6,6 +6,7 @@ export interface TransactionModel {
   exchangeRate: number;
   descriptionPda: string;
   currency: string;
+  diaryType?:number;
   detail: TransactionDetailModel[];
 }
 
