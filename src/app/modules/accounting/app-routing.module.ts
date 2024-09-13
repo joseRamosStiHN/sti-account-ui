@@ -21,6 +21,8 @@ import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accou
 import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/senior-accountants/senior-accountants.component';
 import { JournalEntriesComponent } from 'src/app/modules/accounting/pages/accounting-page/journal-entries/journal-entries.component';
 import { JournalItemsComponent } from 'src/app/modules/accounting/pages/accounting-page/journal-items/journal-items.component';
+import { AccountingAdjustmentComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-adjustment/accounting-adjustment.component';
+import { AdjustmentListComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-adjustment/adjustment-list/adjustment-list.component';
 
 const routes: Routes = [
   {
@@ -72,6 +74,8 @@ const routes: Routes = [
       },
       { path: 'journal-entries', component: JournalEntriesComponent },
       { path: 'journal-items', component: JournalItemsComponent },
+      { path: 'adjustment-list', component: AdjustmentListComponent },
+      { path: 'new/adjustment', component: AccountingAdjustmentComponent },
     ],
   },
 ];

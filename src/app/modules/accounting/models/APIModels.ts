@@ -79,3 +79,37 @@ export interface AccountTypeResponse {
   id: number;
   name: string;
 }
+
+
+export interface AdjustmentRequest {
+  transactionId: number
+  reference: string
+  detailAdjustment: DetailAdjustment[]
+}
+
+export interface DetailAdjustment {
+  accountId: number
+  amount: number
+  motion: string
+}
+
+export interface AdjustmentResponse {
+  id: number
+  transactionId: number
+  reference: string
+  status: string
+  creationDate: any
+  invoiceNo:string
+  adjustmentDetails: AdjustmentDetail[]
+}
+
+export interface AdjustmentDetail {
+  id: number
+  accountId: number
+  accountName: string
+  accountCode: string
+  amount: number
+  entryType: string
+  shortEntryType: string
+}
+

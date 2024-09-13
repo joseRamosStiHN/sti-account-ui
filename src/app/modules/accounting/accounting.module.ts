@@ -40,9 +40,11 @@ import { PeriodListComponent } from './pages/period-page/period-list/period-list
 import { PeriodComponent } from './pages/period-page/period/period.component';
 import { BalanceListComponent } from './pages/balance-accounts/balance-list/balance-list.component';
 import { BalanceAccountsComponent } from './pages/balance-accounts/balance-accounts/balance-accounts.component';
-import { SeniorAccountantsComponent } from 'src/app/modules/accounting/pages/senior-accountants/senior-accountants.component';
+import { SeniorAccountantsComponent } from './pages/senior-accountants/senior-accountants.component';
 import { JournalEntriesComponent } from './pages/accounting-page/journal-entries/journal-entries.component';
 import { JournalItemsComponent } from './pages/accounting-page/journal-items/journal-items.component';
+import { AccountingAdjustmentComponent } from './pages/accounting-page/accounting-adjustment/accounting-adjustment.component';
+import { AdjustmentListComponent } from './pages/accounting-page/accounting-adjustment/adjustment-list/adjustment-list.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +71,8 @@ import { JournalItemsComponent } from './pages/accounting-page/journal-items/jou
 
     JournalEntriesComponent,
     JournalItemsComponent,
+    AccountingAdjustmentComponent,
+    AdjustmentListComponent
   ],
   providers: [ReportServiceService, JournalService],
   exports: [AccountingPageComponent, HttpClientModule],
