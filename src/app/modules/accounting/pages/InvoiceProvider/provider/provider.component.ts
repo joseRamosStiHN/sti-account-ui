@@ -130,7 +130,7 @@ export class ProviderComponent {
   }
 
   async onSubmit(e: NgForm) {
-    console.log('valid? ', e.valid);
+   
     if (e.valid && this.validate()) {
 
      
@@ -154,8 +154,6 @@ export class ProviderComponent {
         }),
       }
 
-      console.log(transactionData);
-      
 
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
@@ -188,7 +186,7 @@ export class ProviderComponent {
       } 
         this.transactionService.createTransaction(transactionData).subscribe({
           next: (data) => {
-            console.log({ data });
+          
             this.providerBilling.id = data.id;
             this.providerBilling.status = 'Draft';
             this.toastType = typeToast.Success;
@@ -424,9 +422,6 @@ export class ProviderComponent {
     });
   }
   save(e: any) {
-
-    console.log("e");
-    
 
 
     e.data.movement = "C";
