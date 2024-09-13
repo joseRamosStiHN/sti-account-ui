@@ -17,7 +17,8 @@ import { ToastType } from 'devextreme/ui/toast';
 import { AccountModel } from '../../../models/AccountModel';
 import { TransactionResponse } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
-import { JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalModel, JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 
 @Component({
   selector: 'app-provider',
@@ -34,6 +35,7 @@ export class ProviderComponent {
   buttonTextPosting: string = 'Confirmar';
   disablePosting: boolean = false;
   dataSource: Transaction[] = [];
+  journalList: JournalModel[] = [];
   providerBilling: ProviderClient = {
     billingNumber: '',
     date: new Date(),
@@ -42,11 +44,29 @@ export class ProviderComponent {
     description: '',
   };
 
+  selectedJournal?: JournalModel | null = null;
+
   editorOptions = {
     itemTemplate: 'accounts',
     searchEnabled: true,
     searchMode: 'contains',
-    searchExpr: ['description', 'code']
+    searchExpr: ['description', 'code'],
+    onOpened: (e: any) => {
+      const popupElement = e.component._popup.$content();
+      const listItems = popupElement.find('.dx-list-item');
+      listItems.each((index: number, item: any) => {
+
+        this.selectedJournal = this.journalList.find((journal)=> journal.id == this.providerBilling.diaryType);
+        const codeAccount = item.textContent.split(' ')[0];
+
+
+        if (codeAccount == this.selectedJournal?.defaultAccountCode) {
+          item.style.display = 'none';
+          const container = popupElement[index];
+          container.style.height = '';
+        }
+      });
+    }
   };
 
   listMovement: IMovement[] = [
@@ -67,6 +87,7 @@ export class ProviderComponent {
   private accountService = inject(AccountService);
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly periodService = inject(PeriodService);
+  private readonly journalService = inject(JournalService);
 
   constructor() {
     config({
@@ -77,18 +98,13 @@ export class ProviderComponent {
   }
 
   ngOnInit(): void {
-    this.accountService.getAllAccount().subscribe({
-      next: (data) => {
-        this.accountList = data
-        .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Compras)
-          .map(item => ({
-            id: item.id,
-            description: item.name,
-            code: item.accountCode
-          } as AccountModel));
 
+    this.journalService.getAllAccountingJournal().subscribe({
+      next: (data) => {
+        this.journalList = data
+          .filter(item => item.accountType == JournalTypes.Compras && item.status);
       },
-    });
+    })
 
     this.activeRouter.paramMap.subscribe((params) => {
       this.id = params.get('id');
@@ -117,14 +133,7 @@ export class ProviderComponent {
     console.log('valid? ', e.valid);
     if (e.valid && this.validate()) {
 
-      let dialogo = await confirm(
-        `¿Está seguro de que desea realizar esta acción?`,
-        'Advertencia'
-      );
-
-      if (!dialogo) {
-        return;
-      }
+     
 
 
       const transactionData: TransactionModel = {
@@ -135,6 +144,7 @@ export class ProviderComponent {
         exchangeRate: this.providerBilling.exchangeRate,
         descriptionPda: this.providerBilling.description,
         currency: this.providerBilling.currency,
+        diaryType:this.providerBilling.diaryType,
         detail: this.dataSource.map((detail) => {
           return {
             accountId: detail.accountId,
@@ -143,11 +153,23 @@ export class ProviderComponent {
           };
         }),
       }
+
+      console.log(transactionData);
+      
+
+      let dialogo = await confirm(
+        `¿Está seguro de que desea realizar esta acción?`,
+        'Advertencia'
+      );
+
+      if (!dialogo) {
+        return;
+      }
       if (this.id) {
         //Cuando Actualiza la Factura de proveedores
 
         this.transactionService
-          .updateTransaction(Number(transactionData.id), transactionData)
+          .updateTransaction(Number(this.id), transactionData)
           .subscribe({
             next: (data) => {
               this.fillBilling(data);
@@ -285,8 +307,26 @@ export class ProviderComponent {
 
     // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
     // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
-    this.totalDebit = totalDebit; // actualiza en la vista
-    this.totalCredit = totalCredit;
+
+
+    const rows = document.querySelectorAll('.dx-data-row');
+    rows.forEach(row => {
+      const tds = row.querySelectorAll("td");
+      tds.forEach(td => {
+        const codeAccount = td.textContent
+        if (codeAccount == 'Haber') {
+          const editButtons = row.querySelectorAll(".dx-link-edit");
+          const deleteButtons = row.querySelectorAll(".dx-link-delete");
+          editButtons.forEach(button => {
+            (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+          });
+
+          deleteButtons.forEach(button => {
+            (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+          });
+        }
+      })
+    });
   }
 
   private validate(): boolean {
@@ -344,8 +384,13 @@ export class ProviderComponent {
     this.providerBilling.exchangeRate = data.exchangeRate;
     this.providerBilling.date = data.date;
     this.providerBilling.description = data.description;
+    this.providerBilling.diaryType= data.diaryType
 
-
+    this.loadAccounts();
+    const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+    const haber = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
+    this.totalCredit = debe;
+    this.totalDebit = haber;
   }
 
   async react() {
@@ -356,6 +401,122 @@ export class ProviderComponent {
     }
     this.router.navigate(['/accounting/configuration/period']);
   }
+
+  onChangeJournal(e: any) {
+
+    if (e.target.value) {
+   
+     this.loadAccounts();
+    }
+  }
+
+  loadAccounts(){
+    this.accountService.getAllAccount().subscribe({
+      next: (data) => {
+        this.accountList = data
+          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Compras)
+          .map(item => ({
+            id: item.id,
+            description: item.name,
+            code: item.accountCode
+          } as AccountModel));
+      },
+    });
+  }
+  save(e: any) {
+
+    console.log("e");
+    
+
+
+    e.data.movement = "C";
+    let foundItems = this.dataSource.filter((data) => data.movement === 'D');
+    if (foundItems.length > 0) {
+
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
+
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+
+        item.amount = sum
+      });
+    } else {
+
+      this.totalCredit = e.data.amount;
+      this.totalDebit = e.data.amount;
+
+      this.dataSource.push({
+        id: this.selectedJournal?.id ?? 0,
+        accountId: this.selectedJournal?.defaultAccount ?? 0,
+        amount: e.data.amount,
+        movement: 'D',
+
+      });
+
+
+      setTimeout(() => {
+        const rows = document.querySelectorAll('.dx-data-row');
+
+        rows.forEach(row => {
+          const tds = row.querySelectorAll("td");
+          tds.forEach(td => {
+            const codeAccount = td.textContent
+            if (codeAccount == 'Debe') {
+              const editButtons = row.querySelectorAll(".dx-link-edit");
+              const deleteButtons = row.querySelectorAll(".dx-link-delete");
+              editButtons.forEach(button => {
+                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+              });
+
+              deleteButtons.forEach(button => {
+                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+              });
+            }
+          })
+        });
+      }, 2);
+    }
+
+    
+  }
+
+  update(e: any) {
+    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    if (foundItems.length > 0) {
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
+    }
+  }
+
+  removed(e: any) {
+
+    let debitos = this.dataSource.filter((data) => data.movement === 'D');
+    if (debitos.length > 0) {
+      let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
+    } else {
+      this.dataSource = [];
+      this.totalCredit = 0;
+      this.totalDebit = 0;
+
+
+    }
+  }
+
+  combineCodeAndDescription = (item: any) => {
+    return item ? `${item.description} ${item.code}` : '';
+  };
+
 
   goBack() {
     window.history.back();
