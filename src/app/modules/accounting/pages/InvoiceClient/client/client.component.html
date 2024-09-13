@@ -236,7 +236,7 @@
           <dxo-lookup
             [dataSource]="accountList"
             valueExpr="id"
-            displayExpr="code"
+            [displayExpr]="combineCodeAndDescription"
        
           ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
@@ -306,7 +306,6 @@
           <span>{{ d.rowIndex + 1 }}</span>
         </div>
         <div class="" *dxTemplate="let account of 'accounts'">
-          
           <strong class="">{{ account.code }} </strong>
           <small class="text-gray-400">{{account.description }}</small>
         </div>

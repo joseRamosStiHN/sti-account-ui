@@ -505,7 +505,9 @@ export class ClientComponent  {
     });
   }
 
-  
+  combineCodeAndDescription = (item: any) => {
+    return item ? `${item.description} ${item.code}` : '';
+  };
 
 
 }
