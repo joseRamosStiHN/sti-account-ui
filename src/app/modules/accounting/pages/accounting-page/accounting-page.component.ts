@@ -21,6 +21,8 @@ export class AccountingPageComponent implements OnInit {
         child: [
           { label: 'Asientos Contables', path: '/accounting/journal-entries' },
           { label: 'Apuntes Contables', path: '/accounting/journal-items' },
+          { label: 'Ajustes Contables', path: '/accounting/adjustment-list' },
+       
         ],
       },
       {

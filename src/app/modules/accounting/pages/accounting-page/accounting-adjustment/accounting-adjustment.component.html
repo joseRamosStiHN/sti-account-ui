@@ -1,0 +1,177 @@
+<div class="container mx-auto">
+    <h2 class="mt-5 text-2xl font-semibold">Ajuste Contable</h2>
+    <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+        <div class="grid grid-cols-2 gap-3 auto-cols-fr mt-10">
+            <div class="flex flex-row w-full">
+                <div class="flex-grow">
+                    <Label for="parent-account" class="block mb-2 text-sm text-gray-900">Referencia Contable</Label>
+                    <dx-select-box value="dataTable.referenceNumber" [dataSource]="dataTable" name="id"
+                        [searchEnabled]="true" [(ngModel)]="selectRow.referenceNumber" valueExpr="referenceNumber"
+                        displayExpr="referenceNumber" [searchExpr]="['referenceNumber', 'journalEntry']" 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                          focus:ring-blue-500 focus:border-blue-500 block w-full p-2 h-12"
+                          (valueChange)="onValueChange($event)">
+                        <div class="" *dxTemplate="let data of 'item'">
+                            <strong class="">pda {{data.numberPda}}
+                            </strong>
+                            <small class="text-gray-400">{{data.referenceNumber}}</small>
+                      
+                        </div>
+                    </dx-select-box>
+                    <div *ngIf="itemForm.submitted && selectRow.referenceNumber==''">
+                        <small class="text-xs text-red-900">Referencia Contable es requerido.</small>
+                      </div>
+                </div>
+                <div class="flex items-end justify-end">
+
+                    <button type="button" (click)="showModal()"
+                        class="flex-shrink-0 p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                        <span class="sr-only">Search</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+
+        <dx-data-grid id="grid-billing-client" class="mx-auto mt-4 py-2" [dataSource]="dataSource" [showBorders]="true"
+            [height]="400" [repaintChangesOnly]="true" [showRowLines]="true" (onContentReady)="onContentReady($event)"
+            [allowColumnResizing]="true" noDataText="">
+            <dxo-load-panel [enabled]="true"></dxo-load-panel>
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
+            <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="true"
+                [allowUpdating]="true" />
+            <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
+                [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
+            </dxi-column>
+            <dxi-column dataField="accountId" caption="Cuenta" alignment="center" [editorOptions]="editorOptions">
+                <dxo-lookup [dataSource]="accountList" valueExpr="id"
+                    [displayExpr]="combineCodeAndDescription"></dxo-lookup>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="amount" caption="Monto" dataType="number" [customizeText]="customCurrencyText"
+                alignment="center" [width]="120">
+                <dxo-form-item editorType="dxNumberBox" [editorOptions]="{ format: '#,##0.##', min: 0 }">
+                </dxo-form-item>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="movement" caption="Movimiento" alignment="center" [width]="90">
+                <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name"></dxo-lookup>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+
+            <dxo-toolbar>
+                <dxi-item location="before">
+                    <div class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow">
+                        <label class="block font-mono font-semibold">Total Debe </label>
+                        <small class="block font-mono font-medium text-red-900">
+                            {{ totalDebit | currency : "L. " }}</small>
+                    </div>
+                </dxi-item>
+                <dxi-item location="before">
+                    <div class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow">
+                        <label class="block font-mono font-semibold">Total Haber </label>
+                        <small class="block font-mono font-medium text-green-900">
+                            {{ totalCredit | currency : "L. " }}</small>
+                    </div>
+                </dxi-item>
+                <dxi-item [widget]="'dxButton'" [options]="{ text: 'Add Row', icon: 'add' }"
+                    name="addRowButton"></dxi-item>
+
+            </dxo-toolbar>
+            <div *dxTemplate="let d of 'indexTemplate'">
+                <span>{{ d.rowIndex + 1 }}</span>
+            </div>
+            <div class="" *dxTemplate="let account of 'accounts'">
+                <strong class="">{{ account.code }} </strong>
+                <small class="text-gray-400">{{account.description }}</small>
+            </div>
+
+            <dxi-column type="buttons" [width]="110">
+                <dxi-button name="edit"></dxi-button>
+                <dxi-button name="delete"></dxi-button>
+            </dxi-column>
+
+            <dxo-summary>
+                <dxi-total-item name="totalDebit" summaryType="custom">
+                </dxi-total-item>
+                <dxi-total-item name="totalCredit" summaryType="custom">
+                </dxi-total-item>
+            </dxo-summary>
+            <dxo-summary [calculateCustomSummary]="calculateSummary"></dxo-summary>
+        </dx-data-grid>
+        <div class="justify-end mt-10">
+            <button type="button" (click)="goBack()"
+                class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                regresar
+            </button>
+            <a [routerLink]="'/accounting'"
+                class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                Cancelar
+            </a>
+            <button type="submit"
+                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                Guardar
+            </button>
+
+        </div>
+    </form>
+</div>
+
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+    <dxo-position my="top" at="top" of="#clientForm"> </dxo-position>
+</dx-toast>
+
+<dx-popup [width]="900" [height]="540" [showTitle]="true" title="Seleccionar Partida" [dragEnabled]="false"
+    [hideOnOutsideClick]="true" [(visible)]="popupVisible" [showCloseButton]="true">
+    <div *dxTemplate="let data of 'content'">
+        <div class="popup-property-details">
+
+            <dx-data-grid id="gridJournalEntry" [dataSource]="dataTable" class="mt-5" keyExpr="id"
+                [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
+                [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'"
+                (onSelectionChanged)="onRowSelected($event)">
+
+                <dxo-selection mode="single" showCheckBoxesMode="always"></dxo-selection> <!-- Selección habilitada -->
+
+                <dxo-sorting mode="multiple"></dxo-sorting>
+                <dxo-header-filter [visible]="true"></dxo-header-filter>
+                <dxo-paging [pageSize]="15"></dxo-paging>
+                <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
+                <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+                <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+                <dxi-column caption="Fecha" dataField="date" format="shortDate" dataType="date" alignment="center"
+                    format="dd/MM/yyyy" width="90"></dxi-column>
+                <dxi-column alignment="center" caption="Partida" dataField="numberPda"></dxi-column>
+                <dxi-column alignment="center" caption="Número" dataField="referenceNumber"></dxi-column>
+
+                <dxi-column alignment="center" caption="Referencia" dataField="reference"></dxi-column>
+                <dxi-column alignment="center" caption="Diario" dataField="journalEntry"></dxi-column>
+                <dxi-column alignment="center" caption="Total" dataType="currency" dataField="total"></dxi-column>
+                <dxi-column alignment="center" caption="Estado" dataField="status"></dxi-column>
+            </dx-data-grid>
+
+            <div class="mt-10 flex justify-end">
+                <button type="button" (click)="showModal()"
+                    class="focus:outline-none text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                    Regresar
+                </button>
+
+
+                <button type="button" [disabled]="selectRow.id === 0" (click)="showModal()" [ngClass]="{
+                        'bg-teal-500 hover:bg-teal-600 focus:ring-teal-300': selectRow.id != 0,
+                        'bg-teal-300 cursor-not-allowed': selectRow.id === 0
+                      }"
+                    class="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">Seleccionar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</dx-popup>
