@@ -1,80 +1,32 @@
-
 <h2 class="text-2xl font-semibold mb-5 text-center mt-4">Mayores Contables</h2>
-<div class="grid grid-cols-2 gap-6 mt-14">
-    
-    @for (transaction of tranactionList$; track $index) {
 
-    <div class="flex flex-col">
-        <dx-data-grid #dataGrid id="employees" [dataSource]="transaction.details" [showRowLines]="true" [width]="'100%'"
-            [showBorders]="true" [columnAutoWidth]="true">
+<dx-data-grid id="gridJournalEntry" [dataSource]="tranactionList$" class="mt-5" keyExpr="id"
+    [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
+    [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'">
 
+    <dxo-sorting mode="multiple"></dxo-sorting>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-paging [pageSize]="15"></dxo-paging>
+    <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
+    <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
 
-            <dxi-column caption="Nombre Cuenta" dataField="name" alignment="center"
-                headerCellTemplate="titleHeaderTemplate">
+    <dxi-column caption="Fecha" dataField="date" format="shortDate" dataType="date" alignment="center"
+        format="dd/MM/yyyy" width="90"></dxi-column>
+    <dxi-column alignment="center" caption="Asiento Contable" dataField="diary"></dxi-column>
+    <dxi-column alignment="center" caption="Cuenta" dataField="account"></dxi-column>
 
-                <dxi-column caption="Debe" dataField="debit" cellTemplate="cellTemplateDebe" [width]="150"></dxi-column>
+    <dxi-column alignment="center" caption="Debe" dataType="currency" dataField="debit"></dxi-column>
+    <dxi-column alignment="center" caption="Haber" dataType="currency" dataField="credit"></dxi-column>
+    <dxi-column alignment="center" caption="Balance" dataField="balance"></dxi-column>
 
-                <dxi-column caption="Haber" dataField="credit" cellTemplate="cellTemplateHaber"
-                    [width]="150"></dxi-column>
-                <dxi-column caption="Fecha Creacion" dataField="date" format="shortDate" dataType="date"
-                    alignment="center" format="dd/MM/yyyy" width="150"></dxi-column>
-                <dxi-column caption="N. Partida" dataField="numberPda" alignment="center" [width]="100"></dxi-column>
+    <dxo-summary>
+        <dxi-total-item column="debit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }" valueFormat="currency"
+            displayFormat="L. {0}"></dxi-total-item>
+        <dxi-total-item column="credit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }" valueFormat="currency"
+            displayFormat="L. {0}"></dxi-total-item>
 
-
-            </dxi-column>
-            <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
-                <div *dxTemplate="let account of 'cellButtonTemplate'">
-                    <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditAccount(account.data)"></button>
-                </div>
-            </dxi-column>
-
-            <div *dxTemplate="let info of 'titleHeaderTemplate'">
-                <p class="font-bold text-black" style="font-size:16px ">{{transaction.accountName}}</p>
-            </div>
-            <div *dxTemplate="let data of 'cellTemplateHaber'">
-                @if(data.data.credit > 0){
-                {{data.data.credit}}
-                }
-            </div>
-            <div *dxTemplate="let data of 'cellTemplateDebe'">
-                @if(data.data.debit > 0){
-                {{data.data.debit}}
-                }
-            </div>
-            <dxo-summary>
-                <dxi-total-item column="debit" summaryType="sum" displayFormat="Total: {0}">
-                </dxi-total-item>
-                <dxi-total-item column="credit" summaryType="sum" displayFormat="Total: {0}">
-                </dxi-total-item>
-
-            </dxo-summary>
-
-
-        </dx-data-grid>
-        <div class="flex">
-            @if(transaction.totalDebits > transaction.totalCredits){
-            <p class="pl-[10px] font-bold">Saldo : <span class="text-red-500">{{transaction.balance}}</span> </p>
-
-            } @else {
-            <p class="pl-[150px] font-bold">Saldo : <span class="text-red-500">{{transaction.balance}}</span> </p>
-            }
-
-        </div>
-    </div>
-
-    }
-
-
-
-
-
-</div>
-
-<div class="justify-end mt-10">
-
-    <button type="button" (click)="goBack()"
-        class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
-        regresar
-    </button>
-
-</div>
+        <dxi-total-item column="balance" summaryType="sum" [valueFormat]="{ currency: 'HNL' }" valueFormat="currency"
+            displayFormat="L. {0}"></dxi-total-item>
+    </dxo-summary>
+</dx-data-grid>

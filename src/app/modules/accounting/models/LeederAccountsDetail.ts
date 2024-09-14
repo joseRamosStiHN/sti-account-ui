@@ -2,26 +2,27 @@
 
 
 
-export interface Detail {
-  transactionId: number
-  numberPda?: number
-  accountId: number
+export interface LeaderAccounts {
+  diaryId: number
+  diaryName: string
+  transactions: Transaction[]
+}
+
+export interface Transaction {
+  id: number
+  description: string
+  reference: string
+  creationDate: string
+  date: string
+  transactionsDetail: TransactionsDetail[]
+}
+
+export interface TransactionsDetail {
+  id: number
+  entryType: string
+  shortEntryType: string
   accountCode: string
   accountName: string
-  accountTypeName: string
-  accountType: number
-  debit: number
-  credit: number
-  date: string
+  amount: number
 }
-export interface LeaderAccounts {
-    accountId: number
-    accountName: string
-    accountCode: string
-    totalDebits: number
-    totalCredits: number
-    balance: number
-    details: Detail[]
-  }
 
- 
