@@ -41,7 +41,11 @@
 
         <dx-data-grid id="grid-billing-client" class="mx-auto mt-4 py-2" [dataSource]="dataSource" [showBorders]="true"
             [height]="400" [repaintChangesOnly]="true" [showRowLines]="true" (onContentReady)="onContentReady($event)"
-            [allowColumnResizing]="true" noDataText="">
+            [allowColumnResizing]="true" noDataText=""
+            (onRowInserted)="saveRow($event)"
+            (onRowUpdated)="updateRow()"
+            (onRowRemoved)="removedRow()"
+            >
             <dxo-load-panel [enabled]="true"></dxo-load-panel>
             <dxo-scrolling mode="virtual"></dxo-scrolling>
             <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="true"
@@ -60,7 +64,9 @@
                 </dxo-form-item>
                 <dxi-validation-rule type="required"></dxi-validation-rule>
             </dxi-column>
-            <dxi-column dataField="movement" caption="Movimiento" alignment="center" [width]="90">
+            <dxi-column dataField="movement" caption="Movimiento" alignment="center" [width]="90" 
+            [allowEditing]="false" 
+            [formItem]="{ visible: false }">
                 <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name"></dxo-lookup>
                 <dxi-validation-rule type="required"></dxi-validation-rule>
             </dxi-column>

@@ -5,11 +5,13 @@ import { IMovement, Transaction, typeToast } from 'src/app/modules/accounting/mo
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
-import { JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalModel, JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 import { NgForm } from '@angular/forms';
 import { AdjustmentRequest } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
+import { JournalService } from 'src/app/modules/accounting/services/journal.service';
+
 
 
 interface LocalData {
@@ -21,7 +23,10 @@ interface LocalData {
   total?: number;
   status?: string;
   date?: Date;
-  numberPda?:string
+  numberPda?: string
+  documentType?: number
+  diaryType?: number
+  details?: Transaction[]
 }
 
 @Component({
@@ -46,7 +51,7 @@ export class AccountingAdjustmentComponent {
     },
   ];
 
-
+  documentType!: number;
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
@@ -54,6 +59,7 @@ export class AccountingAdjustmentComponent {
   accountList: AccountModel[] = [];
   dataSource: Transaction[] = [];
   dataTable: LocalData[] = [];
+  journalForm!: JournalModel;
 
   // modal
   popupVisible = false;
@@ -61,6 +67,7 @@ export class AccountingAdjustmentComponent {
   private readonly accountService = inject(AccountService);
   private readonly transService = inject(TransactionService);
   private readonly adjustemntService = inject(AdjusmentService);
+  private readonly journalService = inject(JournalService);
 
   selectRow: LocalData = {
     id: 0,
@@ -72,7 +79,19 @@ export class AccountingAdjustmentComponent {
     itemTemplate: 'accounts',
     searchEnabled: true,
     searchMode: 'contains',
-    searchExpr: ['description', 'code']
+    searchExpr: ['description', 'code'],
+    onOpened: (e: any) => {
+      const popupElement = e.component._popup.$content();
+      const listItems = popupElement.find('.dx-list-item');
+      listItems.each((index: number, item: any) => {
+        const codeAccount = item.textContent.split(' ')[0];
+        if (codeAccount == this.journalForm?.defaultAccountCode) {
+          item.style.display = 'none';
+          const container = popupElement[index];
+          container.style.height = '';
+        }
+      });
+    }
   };
 
 
@@ -85,41 +104,53 @@ export class AccountingAdjustmentComponent {
       },
     });
 
-    this.accountService.getAllAccount().subscribe({
-      next: (data) => {
-        this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0)
-          .map(item => ({
-            id: item.id,
-            description: item.name,
-            code: item.accountCode
-          } as AccountModel));
-      },
-    });
+
   }
 
-  async save() {
-    if (this.validate()) {
-
-      console.log(this.dataSource);
-
-
-
-      let dialogo = await confirm(
-        `¿Está seguro de que desea realizar esta acción?`,
-        'Advertencia'
-      );
-
-      if (!dialogo) {
-        return;
-      }
-
-
-
-
-
+  async saveRow(event: any): Promise<void> {
+    if (this.documentType === JournalTypes.Ventas) {
+      event.data.movement = "C";
+      this.updateAmounts("D", "C");
+    } else {
+      event.data.movement = "D";
+      this.updateAmounts("C", "D");
     }
   }
+
+  removedRow(): void {
+    if (this.documentType === JournalTypes.Ventas) {
+      this.updateAmounts("D", "C");
+    } else {
+      this.updateAmounts("C", "D");
+    }
+  }
+
+
+  updateRow(): void {
+    if (this.documentType === JournalTypes.Ventas) {
+      this.updateAmounts("D", "C");
+    } else {
+      this.updateAmounts("C", "D");
+    }
+  }
+
+
+  private updateAmounts(movement: string, oppositeMovement: string): void {
+    const foundItems = this.dataSource.filter(data => data.movement === movement);
+    if (foundItems.length > 0) {
+      const sum = this.dataSource
+        .filter(data => data.movement === oppositeMovement)
+        .reduce((total, item) => total + item.amount, 0);
+
+      this.totalCredit = sum;
+      this.totalDebit = sum;
+
+      foundItems.forEach(item => {
+        item.amount = sum;
+      });
+    }
+  }
+
 
 
   // calcula el total en el componente del summary
@@ -156,8 +187,8 @@ export class AccountingAdjustmentComponent {
 
     // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
     // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
-    this.totalDebit = totalDebit; // actualiza en la vista
-    this.totalCredit = totalCredit;
+    // this.totalDebit = totalDebit; // actualiza en la vista
+    // this.totalCredit = totalCredit;
 
 
 
@@ -204,7 +235,7 @@ export class AccountingAdjustmentComponent {
 
   fillDataSource(data: any[]): LocalData[] {
 
-  
+
     return data.map((item: any) => {
       const totalDetail = item.transactionDetails.find((element: any) => {
         if (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") {
@@ -219,12 +250,22 @@ export class AccountingAdjustmentComponent {
         id: item.id,
         date: item.date,
         referenceNumber: item.reference,
-        numberPda:item.numberPda,
+        documentType: item.documentType,
+        numberPda: item.numberPda,
+        diaryType: item.diaryType,
         reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras
           ? "" : item.description,
         journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
         total: totalDetail.amount,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
+        details: item.transactionDetails.map((item: any) => {
+          return {
+            accountId: item.accountId,
+            amount: item.amount,
+            id: item.id,
+            movement: item.shortEntryType == "C" ? "D" : "C",
+          } as Transaction;
+        })
       } as LocalData;
 
 
@@ -235,12 +276,12 @@ export class AccountingAdjustmentComponent {
 
   async onSubmit(e: NgForm) {
     if (this.selectRow.referenceNumber != '' && this.validate()) {
-      
-      const request:AdjustmentRequest ={
 
-        transactionId:this.selectRow.id,
-        reference:"Ajuste",
-        detailAdjustment:this.dataSource.map((detail) => {
+      const request: AdjustmentRequest = {
+
+        transactionId: this.selectRow.id,
+        reference: "Ajuste",
+        detailAdjustment: this.dataSource.map((detail) => {
           return {
             id: detail.id,
             accountId: detail.accountId,
@@ -264,9 +305,9 @@ export class AccountingAdjustmentComponent {
           this.showToast = true;
         },
       });
-      
-      } 
-    
+
+    }
+
 
   }
 
@@ -287,18 +328,85 @@ export class AccountingAdjustmentComponent {
     window.history.back();
   }
 
-  onRowSelected(event: any) {
-    this.selectRow = event.selectedRowsData[0];
+  onRowSelected(event: any): void {
+    const reference = event.selectedRowsData[0];
+    if (reference && reference.referenceNumber) {
 
+
+      this.handleTransaction(reference.referenceNumber);
+    }
   }
 
-  onValueChange(reference:string): void {
-    const transaccion = this.dataTable.find((data) => data.referenceNumber== reference);
-    if (transaccion?.id) {
-      this.selectRow = transaccion;
-      
-    }    
-    
+
+  onValueChange(reference: string): void {
+    if (reference) {
+      this.handleTransaction(reference);
+    }
+  }
+
+
+  private handleTransaction(referenceNumber: string): void {
+    const transaccionEncontrada = this.dataTable.find(data => data.referenceNumber === referenceNumber);
+
+    const transaccion: LocalData = transaccionEncontrada
+      ? { ...transaccionEncontrada }
+      : { id: 0, referenceNumber: '' };
+
+    if (!transaccion) return;
+    this.documentType = transaccion.documentType!;
+
+    this.journalService.getJournalById(transaccion.diaryType!).subscribe(data => {
+      this.journalForm = data;
+    });
+
+
+    this.dataSource = transaccion.details!;
+    this.selectRow = transaccion;
+
+
+    this.handleDocumentType(transaccion.documentType);
+  }
+
+
+  private handleDocumentType(documentType: number | undefined): void {
+    if (documentType === JournalTypes.Ventas || documentType === JournalTypes.Compras) {
+      const accountType = documentType === JournalTypes.Ventas ? JournalTypes.Ventas : JournalTypes.Compras;
+      this.accountService.getAllAccount().subscribe({
+        next: (data) => {
+          this.accountList = data
+            .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType === accountType)
+            .map(item => ({
+              id: item.id,
+              description: item.name,
+              code: item.accountCode
+            } as AccountModel));
+        }
+      });
+      const accountToCheck = documentType === JournalTypes.Ventas ? 'Debe' : 'Haber';
+      setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
+    }
+  }
+
+  private hideEditDeleteButtons(accountToCheck: string): void {
+    const rows = document.querySelectorAll('.dx-data-row');
+    rows.forEach(row => {
+      const tds = row.querySelectorAll("td");
+      tds.forEach(td => {
+        const codeAccount = td.textContent;
+        if (codeAccount === accountToCheck) {
+          const editButtons = row.querySelectorAll(".dx-link-edit");
+          const deleteButtons = row.querySelectorAll(".dx-link-delete");
+
+          editButtons.forEach(button => {
+            (button as HTMLElement).style.display = 'none';
+          });
+
+          deleteButtons.forEach(button => {
+            (button as HTMLElement).style.display = 'none';
+          });
+        }
+      });
+    });
   }
 
 }
