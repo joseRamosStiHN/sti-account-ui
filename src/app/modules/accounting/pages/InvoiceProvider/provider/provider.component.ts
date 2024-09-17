@@ -312,7 +312,7 @@ export class ProviderComponent {
       const tds = row.querySelectorAll("td");
       tds.forEach(td => {
         const codeAccount = td.textContent
-        if (codeAccount == 'Haber') {
+        if (codeAccount == 'Debe') {
           const editButtons = row.querySelectorAll(".dx-link-edit");
           const deleteButtons = row.querySelectorAll(".dx-link-delete");
           editButtons.forEach(button => {
