@@ -45,6 +45,7 @@ import { JournalEntriesComponent } from './pages/accounting-page/journal-entries
 import { JournalItemsComponent } from './pages/accounting-page/journal-items/journal-items.component';
 import { AccountingAdjustmentComponent } from './pages/accounting-page/accounting-adjustment/accounting-adjustment.component';
 import { AdjustmentListComponent } from './pages/accounting-page/accounting-adjustment/adjustment-list/adjustment-list.component';
+import { TrialBalanceComponent } from 'src/app/modules/accounting/components/reports/trial-balance/trial-balance.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,8 @@ import { AdjustmentListComponent } from './pages/accounting-page/accounting-adju
     JournalEntriesComponent,
     JournalItemsComponent,
     AccountingAdjustmentComponent,
-    AdjustmentListComponent
+    AdjustmentListComponent,
+    TrialBalanceComponent
   ],
   providers: [ReportServiceService, JournalService],
   exports: [AccountingPageComponent, HttpClientModule],

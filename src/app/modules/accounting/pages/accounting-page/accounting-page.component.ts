@@ -38,6 +38,10 @@ export class AccountingPageComponent implements OnInit {
             label: 'Mayores Contables',
             path: '/accounting/report/senior-accountants',
           },
+          {
+            label: 'Balanza de Comprobacion',
+            path: '/accounting/report/trialbalance',
+          },
         ],
       },
       {

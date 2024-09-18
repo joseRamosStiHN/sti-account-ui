@@ -23,6 +23,7 @@ import { JournalEntriesComponent } from 'src/app/modules/accounting/pages/accoun
 import { JournalItemsComponent } from 'src/app/modules/accounting/pages/accounting-page/journal-items/journal-items.component';
 import { AccountingAdjustmentComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-adjustment/accounting-adjustment.component';
 import { AdjustmentListComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-adjustment/adjustment-list/adjustment-list.component';
+import { TrialBalanceComponent } from 'src/app/modules/accounting/components/reports/trial-balance/trial-balance.component';
 
 const routes: Routes = [
   {
@@ -48,6 +49,7 @@ const routes: Routes = [
       },
       { path: 'report/general-balance', component: GeneralBalanceComponent },
       { path: 'report/incomes', component: IncomeStatementComponent },
+      { path: 'report/trialbalance', component: TrialBalanceComponent },
       { path: 'configuration/journal-list', component: JournalListComponent },
       {
         path: 'configuration/journal/new-journal',

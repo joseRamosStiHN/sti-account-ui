@@ -1,0 +1,46 @@
+<div class="w-100 mt-5">
+    <h2 class="text-2xl font-semibold text-center mb-5">Balanza de Comprobacion</h2>
+    <dx-data-grid [dataSource]="trialBalanceData" [showBorders]="true" [columnAutoWidth]="true"
+        [searchPanel]="{ visible: false }" [paging]="{ pageSize: 5 }"
+        [pager]="{ showPageSizeSelector: true, allowedPageSizes: [5, 10, 20] }">
+
+        <dxo-editing mode="cell"></dxo-editing>
+
+        <dxi-column dataField="accountName" caption="Cuenta"></dxi-column>
+        <dxi-column caption="Balance Inicial" alignment="center">
+            <dxi-column dataField="initialDebit" caption="Debe"></dxi-column>
+            <dxi-column dataField="initialCredit" caption="Haber"></dxi-column>
+        </dxi-column>
+
+        <dxi-column caption="Sept 2024" alignment="center">
+            <dxi-column dataField="septDebit" caption="Debe"></dxi-column>
+            <dxi-column dataField="septCredit" caption="Haber"></dxi-column>
+        </dxi-column>
+
+
+        <dxi-column caption="Balance Final" alignment="center">
+            <dxi-column dataField="finalDebit" caption="Debe"></dxi-column>
+            <dxi-column dataField="finalCredit" caption="Haber"></dxi-column>
+        </dxi-column>
+
+
+        <dxo-summary>
+            <dxi-total-item column="accountName"  displayFormat="Total"> </dxi-total-item>
+
+            <dxi-total-item column="initialDebit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+                valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
+            <dxi-total-item column="initialCredit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+                valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
+            <dxi-total-item column="septDebit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+                valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
+            <dxi-total-item column="septCredit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+                valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
+            <dxi-total-item column="finalDebit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+                valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
+            <dxi-total-item column="finalCredit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+                valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
+        </dxo-summary>
+
+    </dx-data-grid>
+
+</div>
