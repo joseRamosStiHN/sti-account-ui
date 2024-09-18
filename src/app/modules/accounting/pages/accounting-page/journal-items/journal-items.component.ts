@@ -6,8 +6,9 @@ import { TransactionService } from 'src/app/modules/accounting/services/transact
 interface LocalJournalItem {
   id: number;
   date?: Date;
-  journalEntry?: string; // este es Número de Factura proveedor | cliente | banco | Varios etc...
+  journalEntry?: string; 
   defaultAccount?: string;
+  numberPad:string;
   reference?: string;
   description?:string;
   debit?: number;
@@ -27,11 +28,6 @@ export class JournalItemsComponent implements OnInit {
   dataTable: LocalJournalItem[] = [];
 
   ngOnInit(): void {
-    const d = this.generateRandomLocalJournalItems();
-    this.data$ = new BehaviorSubject(d);
-
-
-
     this.transService.getAll().subscribe({
       next: (data) => {
         this.dataTable = this.fillDataSource(data);
@@ -43,6 +39,7 @@ export class JournalItemsComponent implements OnInit {
 
   fillDataSource(data: any[]): LocalJournalItem[] {
     const result: LocalJournalItem[] = [];
+
     
     data.forEach((item: any) => {
       item.transactionDetails.forEach((transaction: any) => {
@@ -54,6 +51,7 @@ export class JournalItemsComponent implements OnInit {
           date: item.creationDate,
           journalEntry:item.diaryName,
           defaultAccount: `${transaction.accountName} ${transaction.accountCode}`,
+          numberPad:item.numberPda,
           description: item.description,
           debit: debito,
           credit: credito,
@@ -67,26 +65,5 @@ export class JournalItemsComponent implements OnInit {
 
   }
 
-  generateRandomLocalJournalItems(): LocalJournalItem[] {
-    const types = ['Factura proveedor', 'Factura cliente', 'Banco', 'Varios'];
-    const randomData: LocalJournalItem[] = [];
-
-    for (let i = 0; i < 5; i++) {
-      const debit = parseFloat((Math.random() * 1000).toFixed(2));
-      const credit = parseFloat((Math.random() * 1000).toFixed(2));
-
-      randomData.push({
-        id: i + 1,
-        date: new Date(Date.now() - Math.floor(Math.random() * 10000000000)),
-        journalEntry: types[Math.floor(Math.random() * types.length)],
-        defaultAccount: `Account-${Math.floor(Math.random() * 1000)}`,
-        reference: `Ref-${Math.floor(Math.random() * 10000)}`,
-        debit: debit,
-        credit: credit,
-        balance: Number((debit - credit).toFixed(2)),
-      });
-    }
-
-    return randomData;
-  }
+  
 }

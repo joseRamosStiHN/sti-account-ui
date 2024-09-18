@@ -46,6 +46,11 @@
       dataField="defaultAccount"
     ></dxi-column>
     <dxi-column
+    alignment="center"
+    caption="Numero de partida"
+    dataField="numberPad"
+  ></dxi-column>
+    <dxi-column
       alignment="center"
       caption="Referencia"
       dataField="reference"
@@ -93,43 +98,4 @@
       ></dxi-total-item>
     </dxo-summary>
   </dx-data-grid>
-<!-- 
-  <dx-data-grid id="gridContainer" [dataSource]="dataTable" keyExpr="id" [showBorders]="true">
-    <dxo-selection mode="single"></dxo-selection>
-    <dxi-column dataField="reference" caption="Ref" [groupIndex]="0"></dxi-column>
-    <dxi-column dataField="defaultAccount"  caption="cuenta"></dxi-column>
-    <dxi-column dataField="date" dataType="date" caption="Fecha de Factura"></dxi-column>
-  
-    <dxi-column dataField="description" caption="Descripcion"></dxi-column>
-    <dxi-column dataField="debit" caption="debito"></dxi-column>
-    <dxi-column dataField="credit" caption="credito" alignment="right"   
-    [format]="{ type: 'currency', currency: 'HNL', precision: 2 }" 
-    [width]="160"></dxi-column>
-    <dxi-column dataField="balance" alignment="right"   
-    [format]="{ type: 'currency', currency: 'HNL', precision: 2 }" 
-    [width]="160"></dxi-column>
-
-    <dxo-summary>
-      <dxi-group-item column="debito" summaryType="sum" [alignByColumn]="true" 
-      [valueFormat]="{ type: 'currency', currency: 'HNL', precision: 2 }" > </dxi-group-item>
-
-      <dxi-group-item column="credito" summaryType="sum" [alignByColumn]="true" 
-      [valueFormat]="{ type: 'currency', currency: 'HNL', precision: 2 }" > </dxi-group-item>
-      <dxi-group-item column="balance" summaryType="sum" [alignByColumn]="true" 
-      [valueFormat]="{ type: 'currency', currency: 'HNL', precision: 2 }" > </dxi-group-item>
-
-        <dxi-total-item column="debito" summaryType="sum" 
-        [valueFormat]="{ type: 'currency', currency: 'HNL', precision: 2 }" displayFormat="Total: {0}">
-        </dxi-total-item>
-        <dxi-total-item column="credito" summaryType="sum" 
-        [valueFormat]="{ type: 'currency', currency: 'HNL', precision: 2 }" displayFormat="Total: {0}">
-        </dxi-total-item>
-        <dxi-total-item column="balance" summaryType="sum" displayFormat="Suma: {0}" 
-        [valueFormat]="{ type: 'currency', currency: 'HNL', precision: 2 }">
-
-        </dxi-total-item>
-    </dxo-summary>
-
-    <dxi-sort-by-group-summary-info summaryItem="count"></dxi-sort-by-group-summary-info>
-</dx-data-grid> -->
 </div>
