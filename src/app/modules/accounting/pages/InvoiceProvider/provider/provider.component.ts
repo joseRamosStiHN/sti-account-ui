@@ -54,16 +54,15 @@ export class ProviderComponent {
     onOpened: (e: any) => {
       const popupElement = e.component._popup.$content();
       const listItems = popupElement.find('.dx-list-item');
+      this.selectedJournal = this.journalList.find(
+        (journal) => journal.id === this.providerBilling.diaryType
+      );
       listItems.each((index: number, item: any) => {
-
-        this.selectedJournal = this.journalList.find((journal)=> journal.id == this.providerBilling.diaryType);
         const codeAccount = item.textContent.split(' ')[0];
-
-
-        if (codeAccount == this.selectedJournal?.defaultAccountCode) {
-          item.style.display = 'none';
-          const container = popupElement[index];
-          container.style.height = '';
+        const shouldHideItem = codeAccount === this.selectedJournal?.defaultAccountCode;
+        item.style.display = shouldHideItem ? 'none' : 'block';
+        if (shouldHideItem) {
+          popupElement[0].style.height = 'auto';
         }
       });
     }
@@ -403,6 +402,7 @@ export class ProviderComponent {
   onChangeJournal(e: any) {
 
     if (e.target.value) {
+      this.dataSource = [];
    
      this.loadAccounts();
     }
