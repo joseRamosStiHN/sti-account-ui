@@ -28,7 +28,7 @@ export class JournalItemsComponent implements OnInit {
   dataTable: LocalJournalItem[] = [];
 
   ngOnInit(): void {
-    this.transService.getAll().subscribe({
+    this.transService.getAllJournalEntries().subscribe({
       next: (data) => {
         this.dataTable = this.fillDataSource(data);
       },
@@ -37,12 +37,34 @@ export class JournalItemsComponent implements OnInit {
   }
 
 
-  fillDataSource(data: any[]): LocalJournalItem[] {
+  fillDataSource(data: any): LocalJournalItem[] {
     const result: LocalJournalItem[] = [];
 
+   
+
     
-    data.forEach((item: any) => {
+    data.transactions.forEach((item: any) => {
       item.transactionDetails.forEach((transaction: any) => {
+        const debito = transaction.entryType === 'Credito' ? 0 : transaction.amount;
+        const credito = transaction.entryType === 'Debito' ? 0 : transaction.amount;
+        const localJournalItem: LocalJournalItem = {
+          id: item.id,
+          reference: "",
+          date: item.creationDate,
+          journalEntry:item.diaryName,
+          defaultAccount: `${transaction.accountName} ${transaction.accountCode}`,
+          numberPad:item.numberPda,
+          description: item.description,
+          debit: debito,
+          credit: credito,
+          balance: Number((debito - credito).toFixed(2)),
+        };
+        result.push(localJournalItem);
+      });
+    });
+
+    data.adjustments.forEach((item: any) => {
+      item.adjustmentDetails.forEach((transaction: any) => {
         const debito = transaction.entryType === 'Credito' ? 0 : transaction.amount;
         const credito = transaction.entryType === 'Debito' ? 0 : transaction.amount;
         const localJournalItem: LocalJournalItem = {

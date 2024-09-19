@@ -27,52 +27,62 @@ export class JournalEntriesComponent implements OnInit {
   private readonly transService = inject(TransactionService);
 
 
-  dataTable:LocalData[]= [];
+  dataTable: LocalData[] = [];
 
   ngOnInit(): void {
     const d = this.generateRandomLocalData();
     this.data$ = new BehaviorSubject(d);
-    
-    this.transService.getAll().subscribe({
+
+    this.transService.getAllJournalEntries().subscribe({
       next: (data) => {
         this.dataTable = this.fillDataSource(data);
       },
     });
-    
+
   }
 
 
-  fillDataSource(data: any[]): LocalData[] {
+  fillDataSource(data: any): LocalData[] {
+    const result: LocalData[] = [];
 
-     return data.map((item: any) => {
-      const totalDetail = item.transactionDetails.find((element: any) => {
-        if (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") {
-          return true; 
-        } else if (item.documentType === JournalTypes.Compras && element.entryType === "Debito") {
-          return true;
-        }
-        return false;
-      });
+    const mapTransactionToLocalData = (item: any, isAdjustment: boolean = false): LocalData => {
+      const totalDetail = isAdjustment
+        ? item.adjustmentDetails.reduce((acc: number, detail: any) => {
+          return detail.entryType === "Debito" ? acc + detail.amount : acc;
+        }, 0)
+        : item.transactionDetails.find((element: any) => {
+          return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
+            (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
+        });
 
-     
-      
+      const totalAmount = isAdjustment ? totalDetail : totalDetail ? totalDetail.amount : 0;
 
       return {
         id: item.id,
-        date:item.date,
-        referenceNumber: item.reference,
-        reference:item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras
-        ? "" : item.description,
-        journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas":"Compras",
-        total:totalDetail.amount,
+        date: isAdjustment ? item.creationDate : item.date,
+        referenceNumber: isAdjustment ? item.invoiceNo : item.reference,
+        reference: (item.documentType === JournalTypes.Ventas || item.documentType === JournalTypes.Compras)
+          ? "" : isAdjustment ? item.reference : item.description,
+        journalEntry: item.documentType === JournalTypes.Ventas ? "Ventas" : "Compras",
+        total: totalAmount,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
-      } as LocalData;
-      
-      
-    })
+      };
+    };
 
-    
+
+    data.transactions.forEach((item: any) => {
+      result.push(mapTransactionToLocalData(item));
+    });
+
+
+    data.adjustments.forEach((item: any) => {
+      result.push(mapTransactionToLocalData(item, true));
+    });
+
+
+    return result;
   }
+
 
   generateRandomLocalData(): LocalData[] {
     let randomData: LocalData[] = [];
@@ -92,14 +102,14 @@ export class JournalEntriesComponent implements OnInit {
     // }
     this.transService.getAll().subscribe({
       next: (data) => {
-        randomData = data.map((item :any)=> ({
-            id: item.id,
-            referenceNumber: item.entryNumber,
-            reference: item.description,
-            journalEntry:item.documentType,
-            total:100,
-            status:"Borrado"
-          } as LocalData));
+        randomData = data.map((item: any) => ({
+          id: item.id,
+          referenceNumber: item.entryNumber,
+          reference: item.description,
+          journalEntry: item.documentType,
+          total: 100,
+          status: "Borrado"
+        } as LocalData));
       },
     });
     return randomData;

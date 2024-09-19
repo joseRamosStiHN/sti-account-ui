@@ -117,6 +117,18 @@ export class TransactionService {
     }
 
   /**
+   * Method that brings a list with all journal entries
+   *
+   * @return response()
+   */
+  getAllJournalEntries(): Observable<any> {
+    return this.httpClient
+      .get(this.apiURL + '/api/v1/journal-entry')
+
+      .pipe(catchError(this.errorHandler));
+  }
+
+  /**
    * Error Handler Method
    *
    * @return response()
