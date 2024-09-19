@@ -51,16 +51,15 @@ export class ClientComponent  {
     onOpened: (e: any) => {
       const popupElement = e.component._popup.$content();
       const listItems = popupElement.find('.dx-list-item');
+      this.selectedJournal = this.journalList.find(
+        (journal) => journal.id === this.clientBilling.diaryType
+      );
       listItems.each((index: number, item: any) => {
-
-        this.selectedJournal = this.journalList.find((journal)=> journal.id == this.clientBilling.diaryType);
         const codeAccount = item.textContent.split(' ')[0];
-
-
-        if (codeAccount == this.selectedJournal?.defaultAccountCode) {
-          item.style.display = 'none';
-          const container = popupElement[index];
-          container.style.height = '';
+        const shouldHideItem = codeAccount === this.selectedJournal?.defaultAccountCode;
+        item.style.display = shouldHideItem ? 'none' : 'block';
+        if (shouldHideItem) {
+          popupElement[0].style.height = 'auto';
         }
       });
     }
@@ -108,6 +107,9 @@ export class ClientComponent  {
       next: (data) => {
         this.journalList = data
           .filter(item => item.accountType == JournalTypes.Ventas && item.status);
+
+          console.log(this.journalList);
+          
       },
     })
 
@@ -388,8 +390,8 @@ export class ClientComponent  {
   onChangeJournal(e: any) {
 
     if (e.target.value) {
-   
-     this.loadAccounts();
+      this.dataSource = [];
+      this.loadAccounts();
     }
   }
 
@@ -495,7 +497,8 @@ export class ClientComponent  {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType == JournalTypes.Ventas)
+          .filter(item => item.supportEntry && item.balances.length > 0 
+            && item.accountType == JournalTypes.Ventas)
           .map(item => ({
             id: item.id,
             description: item.name,
