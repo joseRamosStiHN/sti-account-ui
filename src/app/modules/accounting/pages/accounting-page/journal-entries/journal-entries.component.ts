@@ -63,8 +63,8 @@ export class JournalEntriesComponent implements OnInit {
         referenceNumber: isAdjustment ? item.invoiceNo : item.reference,
         reference: (item.documentType === JournalTypes.Ventas || item.documentType === JournalTypes.Compras)
           ? "" : isAdjustment ? item.reference : item.description,
-        journalEntry: item.documentType === JournalTypes.Ventas ? "Ventas" : "Compras",
-        total: totalAmount,
+        journalEntry: item.diaryName,
+        total: isAdjustment ? totalAmount * -1 : totalAmount,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
       };
     };

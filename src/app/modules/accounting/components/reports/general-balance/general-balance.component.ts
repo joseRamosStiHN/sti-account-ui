@@ -321,7 +321,7 @@ export class GeneralBalanceComponent implements OnInit {
   private readonly reportService = inject(ReportServiceService, {
     optional: true,
   });
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.setInitValues();
@@ -445,7 +445,10 @@ export class GeneralBalanceComponent implements OnInit {
   private setInitValues() {
     this.reportService
       ?.getGeneralBalanceReport()
-      .subscribe((data: GeneralBalance[]) => {
+      .subscribe((response: any) => {
+        // Convertir el JSON a la estructura de GeneralBalance[]
+        const data: GeneralBalance[] = this.convertToGeneralBalance(response);
+
         const indexActive = data.findIndex(
           (item) => item.accountName.toUpperCase() === 'ACTIVO'
         );
@@ -464,4 +467,38 @@ export class GeneralBalanceComponent implements OnInit {
         this.buildTree(data);
       });
   }
+
+  convertToGeneralBalance(response: any): GeneralBalance[] {
+    return [
+      ...response.assets.map((item: any) => ({
+        id: item.accountId,                     
+        parentId: item.parentId,                        
+        accountName: item.accountName,          
+        category: item.category,                  
+        amount: item.balance,                  
+        total: null,                            
+        root: true                              
+      })),
+      ...response.liabilities.map((item: any) => ({
+        id: item.accountId,
+        parentId: item.parentId,                              
+        accountName: item.accountName,
+        category: item.category,               
+        amount: item.balance,
+        total: null,
+        root: true
+      })),
+      ...response.equity.map((item: any) => ({
+        id: item.accountId,
+        parentId: item.parentId,                               
+        accountName: item.accountName,
+        category: item.category,                  
+        amount: item.balance,
+        total: null,
+        root: true
+      }))
+    ];
+  }
+  
+
 }
