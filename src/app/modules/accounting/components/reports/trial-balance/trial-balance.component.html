@@ -12,9 +12,9 @@
             <dxi-column dataField="initialCredit" caption="Haber"></dxi-column>
         </dxi-column>
 
-        <dxi-column caption="Sept 2024" alignment="center">
-            <dxi-column dataField="septDebit" caption="Debe"></dxi-column>
-            <dxi-column dataField="septCredit" caption="Haber"></dxi-column>
+        <dxi-column [caption]="periodName" alignment="center" headerCellTemplate="titleHeaderTemplate">
+            <dxi-column dataField="periodDebit" caption="Debe"></dxi-column>
+            <dxi-column dataField="periodCredit" caption="Haber"></dxi-column>
         </dxi-column>
 
 
@@ -23,6 +23,10 @@
             <dxi-column dataField="finalCredit" caption="Haber"></dxi-column>
         </dxi-column>
 
+        <div *dxTemplate="let info of 'titleHeaderTemplate'">
+            <h3 style="font-size:16px; margin: 0;">{{periodName}}</h3>
+            <strong>{{periodDate}}</strong>
+        </div>
 
         <dxo-summary>
             <dxi-total-item column="accountName"  displayFormat="Total"> </dxi-total-item>
@@ -31,9 +35,9 @@
                 valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
             <dxi-total-item column="initialCredit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
                 valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
-            <dxi-total-item column="septDebit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+            <dxi-total-item column="periodDebit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
                 valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
-            <dxi-total-item column="septCredit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
+            <dxi-total-item column="periodCredit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
                 valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>
             <dxi-total-item column="finalDebit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }"
                 valueFormat="currency" displayFormat="L. {0}"> </dxi-total-item>

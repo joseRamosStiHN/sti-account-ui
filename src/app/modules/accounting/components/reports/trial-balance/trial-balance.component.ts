@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Options as DataSourceConfig } from 'devextreme/ui/pivot_grid/data_source';
 import config from 'devextreme/core/config';
+import { ReportServiceService } from 'src/app/modules/accounting/services/report-service.service';
+import { TrialBalaceResponse } from 'src/app/modules/accounting/models/APIModels';
 
 
 interface Incomes {
@@ -119,17 +121,42 @@ const DATA: Incomes[] = [
 export class TrialBalanceComponent {
   trialBalanceData: any[] = [];
 
+  periodName:string= "Periodo";
+  periodDate:string="";
+
+  private readonly reportService = inject(ReportServiceService, {
+    optional: true,
+  });
+
   constructor() {}
 
   ngOnInit(): void {
-    // Simulación de la Balanza de Comprobación
-    this.trialBalanceData = [
-      { accountName: 'Caja', initialDebit: 10000.32, initialCredit: 0, septDebit: 2000, septCredit: 1000, finalDebit: 11000, finalCredit: 0 },
-      { accountName: 'Banco', initialDebit: 5000, initialCredit: 0, septDebit: 3000, septCredit: 4000, finalDebit: 4000, finalCredit: 0 },
-      { accountName: 'Clientes', initialDebit: 2000, initialCredit: 0, septDebit: 1000, septCredit: 500, finalDebit: 2500, finalCredit: 0 },
-      { accountName: 'Proveedores', initialDebit: 0, initialCredit: 3000, septDebit: 0, septCredit: 2000, finalDebit: 0, finalCredit: 5000 },
-      { accountName: 'Capital Social', initialDebit: 0, initialCredit: 5000, septDebit: 0, septCredit: 0, finalDebit: 0, finalCredit: 5000 }
-    ];
+
+    this.reportService?.getTrialBalance().subscribe((data: TrialBalaceResponse) => {
+      this.periodName = `${data.closureType}`;
+      this.periodDate = `${this.convertDates(data.startPeriod)} - ${this.convertDates(data.endPeriod)}`;
+
+
+      this.trialBalanceData = data.balanceDiaries.map(diary => ({
+        accountName: diary.diaryName,
+        initialDebit: diary.initialBalance[0]?.debit || 0,
+        initialCredit: diary.initialBalance[0]?.credit || 0,
+        periodDebit: diary.balancePeriod[0]?.debit || 0, 
+        periodCredit: diary.balancePeriod[0]?.credit || 0,
+        finalDebit: diary.finalBalance[0]?.debit || 0,
+        finalCredit: diary.finalBalance[0]?.credit || 0
+      }));
+    });
+  }
+
+
+  convertDates(fecha: string): string {
+    const fechaObj = new Date(fecha);
+    const dia = ('0' + fechaObj.getDate()).slice(-2);
+    const mes = ('0' + (fechaObj.getMonth() + 1)).slice(-2);
+    const anio = fechaObj.getFullYear();
+  
+    return `${dia}/${mes}/${anio}`;
   }
 
 }
