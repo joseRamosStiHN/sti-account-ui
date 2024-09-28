@@ -3,6 +3,9 @@ export interface Transaction {
   accountId: number;
   amount: number;
   movement: string;
+  accountName?:string;
+  debit?:number,
+  credit?:number
 }
 
 export interface IAccount {

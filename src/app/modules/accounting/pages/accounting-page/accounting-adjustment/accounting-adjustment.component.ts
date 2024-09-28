@@ -29,6 +29,20 @@ interface LocalData {
   details?: Transaction[]
 }
 
+interface TransactionPda {
+  numberPda: number,
+  totalDebit:number,
+  totalCredit:number,
+  details: DetailsPda[]
+}
+
+export interface DetailsPda {
+  id: number;
+  nameAccount: string;
+  debe: number;
+  haber: number;
+}
+
 @Component({
   selector: 'app-accounting-adjustment',
   templateUrl: './accounting-adjustment.component.html',
@@ -58,11 +72,20 @@ export class AccountingAdjustmentComponent {
 
   accountList: AccountModel[] = [];
   dataSource: Transaction[] = [];
+  transactionOriginal: TransactionPda = {
+    numberPda:0,
+    totalDebit:0,
+    totalCredit:0,
+    details:[]
+  }
+
   dataTable: LocalData[] = [];
   journalForm!: JournalModel;
 
   // modal
   popupVisible = false;
+
+  description: string = '';
 
   private readonly accountService = inject(AccountService);
   private readonly transService = inject(TransactionService);
@@ -83,12 +106,13 @@ export class AccountingAdjustmentComponent {
     onOpened: (e: any) => {
       const popupElement = e.component._popup.$content();
       const listItems = popupElement.find('.dx-list-item');
+  
       listItems.each((index: number, item: any) => {
         const codeAccount = item.textContent.split(' ')[0];
-        if (codeAccount == this.journalForm?.defaultAccountCode) {
-          item.style.display = 'none';
-          const container = popupElement[index];
-          container.style.height = '';
+        const shouldHideItem = codeAccount === this.journalForm?.defaultAccountCode;
+        item.style.display = shouldHideItem ? 'none' : 'block';
+        if (shouldHideItem) {
+          popupElement[0].style.height = 'auto';
         }
       });
     }
@@ -109,45 +133,58 @@ export class AccountingAdjustmentComponent {
 
   async saveRow(event: any): Promise<void> {
     if (this.documentType === JournalTypes.Ventas) {
-      event.data.movement = "C";
-      this.updateAmounts("D", "C");
+  
+      
+      this.updateAmounts();
     } else {
-      event.data.movement = "D";
-      this.updateAmounts("C", "D");
+   
+      this.updateAmounts();
     }
   }
 
   removedRow(): void {
     if (this.documentType === JournalTypes.Ventas) {
-      this.updateAmounts("D", "C");
+      this.updateAmounts();
     } else {
-      this.updateAmounts("C", "D");
+      this.updateAmounts();
     }
   }
 
 
   updateRow(): void {
     if (this.documentType === JournalTypes.Ventas) {
-      this.updateAmounts("D", "C");
+      this.updateAmounts();
     } else {
-      this.updateAmounts("C", "D");
+      this.updateAmounts();
     }
   }
 
 
-  private updateAmounts(movement: string, oppositeMovement: string): void {
-    const foundItems = this.dataSource.filter(data => data.movement === movement);
-    if (foundItems.length > 0) {
-      const sum = this.dataSource
-        .filter(data => data.movement === oppositeMovement)
-        .reduce((total, item) => total + item.amount, 0);
+  private updateAmounts(): void {
+    
+    if (this.dataSource.length > 0) {
+      const sumDebit = this.dataSource
+      .reduce((total, item) => {
+        return total + (item.debit ?? 0);
+      }, 0);
 
-      this.totalCredit = sum;
-      this.totalDebit = sum;
+      const sumCredit = this.dataSource
+      .reduce((total, item) => {
+        return total + (item.credit ?? 0);
+      }, 0);
 
-      foundItems.forEach(item => {
-        item.amount = sum;
-      });
+      console.log(this.dataSource);
+      
+
+      console.log(sumDebit);
+      
+
+      this.totalCredit = sumCredit;
+      this.totalDebit = sumDebit;
+
+      // foundItems.forEach(item => {
+      //   item.amount = sumDebit;
+      // });
     }
   }
 
@@ -236,7 +273,8 @@ export class AccountingAdjustmentComponent {
   fillDataSource(data: any[]): LocalData[] {
 
 
-    return data.map((item: any) => {
+    return data.filter((item:any)=> item.status == "SUCCESS")
+    .map((item: any) => {
       const totalDetail = item.transactionDetails.find((element: any) => {
         if (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") {
           return true;
@@ -264,6 +302,9 @@ export class AccountingAdjustmentComponent {
             amount: item.amount,
             id: item.id,
             movement: item.shortEntryType == "C" ? "D" : "C",
+            accountName:item.accountName,
+            debit:item.shortEntryType === "D"?item.amount :0,
+            credit:item.shortEntryType == "C"?item.amount:0
           } as Transaction;
         })
       } as LocalData;
@@ -275,21 +316,37 @@ export class AccountingAdjustmentComponent {
   }
 
   async onSubmit(e: NgForm) {
+    console.log(e.form.value);
+    
     if (this.selectRow.referenceNumber != '' && this.validate()) {
 
       const request: AdjustmentRequest = {
 
         transactionId: this.selectRow.id,
         reference: "Ajuste",
+        descriptionAdjustment: e.form.value.description,
         detailAdjustment: this.dataSource.map((detail) => {
           return {
             id: detail.id,
             accountId: detail.accountId,
-            amount: detail.amount,
-            motion: detail.movement,
+            debit: detail.debit ?? 0,  
+            credit: detail.credit ?? 0 
           };
         }),
       };
+      console.log(request);
+
+      let dialogo = await confirm(
+        `¿Está seguro de que desea realizar esta acción?`,
+        'Advertencia'
+      );
+
+      if (!dialogo) {
+        return;
+      }
+
+
+      
 
       this.adjustemntService.createAdjusment(request).subscribe({
         next: (data) => {
@@ -361,6 +418,25 @@ export class AccountingAdjustmentComponent {
 
 
     this.dataSource = transaccion.details!;
+
+
+    this.transactionOriginal = {
+      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0, 
+     totalDebit: transaccion.details?.filter(data => data.movement === "D")
+        .reduce((total, item) => total + item.amount, 0),
+     totalCredit: transaccion.details?.filter(data => data.movement === "C")
+        .reduce((total, item) => total + item.amount, 0),
+      details: transaccion.details?.map(item => ({
+        id: item.id,
+        nameAccount: item.accountName,
+        debe: item.movement== 'D'?item.amount :0,
+        haber:  item.movement== 'C'?item.amount :0,
+      })) as DetailsPda[]
+    } as TransactionPda;
+
+    
+
+
     this.selectRow = transaccion;
 
 
