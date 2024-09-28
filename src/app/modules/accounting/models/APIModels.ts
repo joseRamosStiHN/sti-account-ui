@@ -7,6 +7,16 @@ export interface GeneralBalance {
   total: number | null;
   root: boolean;
 }
+
+export interface GeneralBalanceResponse {
+  accountId: number
+  accountName: string
+  parentId?: number
+  category: string
+  balance: number
+  root: boolean
+}
+
 export interface TransactionDetailResponse {
   id: number;
   accountCode: string;
@@ -84,13 +94,14 @@ export interface AccountTypeResponse {
 export interface AdjustmentRequest {
   transactionId: number
   reference: string
+  descriptionAdjustment:string
   detailAdjustment: DetailAdjustment[]
 }
 
 export interface DetailAdjustment {
   accountId: number
-  amount: number
-  motion: string
+  debit: number
+  credit: number
 }
 
 export interface AdjustmentResponse {

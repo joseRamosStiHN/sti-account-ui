@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 
 import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
-import { GeneralBalance } from '../../../models/APIModels';
+import { GeneralBalance, GeneralBalanceResponse } from '../../../models/APIModels';
 import { ReportServiceService } from '../../../services/report-service.service';
 
 interface GeneralBalance2 {
@@ -317,6 +317,7 @@ export class GeneralBalanceComponent implements OnInit {
   treeData: GeneralBalance2[] = [];
   values: any = [];
   summaryTotal: number = 0;
+  totalActivoSumary: number = 0;
 
   private readonly reportService = inject(ReportServiceService, {
     optional: true,
@@ -326,7 +327,7 @@ export class GeneralBalanceComponent implements OnInit {
   ngOnInit(): void {
     this.setInitValues();
 
-    this.calculateSummary();
+   
   }
 
   onContentReady(e: any): void {
@@ -339,7 +340,7 @@ export class GeneralBalanceComponent implements OnInit {
     // console.log(e.component.getRootNode());
   }
 
-  buildTree(data: GeneralBalance[]): void {
+  buildTree(data: GeneralBalance[]): void {    
     const tree = new Map<number, GeneralBalance2>();
     data.forEach((item) => {
       tree.set(item.id, {
@@ -349,7 +350,7 @@ export class GeneralBalanceComponent implements OnInit {
         children: [],
       });
     });
-    console.log(tree);
+ 
 
     data.forEach((item) => {
       if (item.parentId !== null) {
@@ -368,6 +369,8 @@ export class GeneralBalanceComponent implements OnInit {
       this.calculateTotals(root);
       this.assignDepth(this.treeData, 0);
     });
+
+    this.calculateSummary();
   }
 
   assignDepth(nodes: GeneralBalance2[], depth: number): void {
@@ -391,6 +394,10 @@ export class GeneralBalanceComponent implements OnInit {
       }
       //2500.01
     });
+
+   this.totalActivoSumary = this.treeData
+    .filter(node => node.category === 'ACTIVO')  // Filtra solo los nodos de la categoría 'ACTIVO'
+    .reduce((total, node) => total + (node.total ?? 0), 0);
   }
 
   createTotalNodes(node: GeneralBalance2): void {
@@ -445,32 +452,36 @@ export class GeneralBalanceComponent implements OnInit {
   private setInitValues() {
     this.reportService
       ?.getGeneralBalanceReport()
-      .subscribe((response: any) => {
+      .subscribe((response: GeneralBalanceResponse[]) => {
+
+        
         // Convertir el JSON a la estructura de GeneralBalance[]
-        const data: GeneralBalance[] = this.convertToGeneralBalance(response);
+        const dataBalance: GeneralBalance[] = this.convertToGeneralBalance(response);
 
-        const indexActive = data.findIndex(
-          (item) => item.accountName.toUpperCase() === 'ACTIVO'
-        );
-        const indexPasivo = data.findIndex(
-          (item) => item.accountName.toUpperCase() === 'PASIVO'
-        );
+    
 
-        const pasivo = data[indexPasivo];
-        data.splice(indexPasivo, 1);
-        data.unshift(pasivo);
-        const active = data[indexActive];
-        data.splice(indexActive, 1);
-        data.unshift(active);
+        // const indexActive = data.findIndex(
+        //   (item) => item.accountName.toUpperCase() === 'ACTIVO'
+        // );
+        // const indexPasivo = data.findIndex(
+        //   (item) => item.accountName.toUpperCase() === 'PASIVO'
+        // );
 
-        this.dataSource = data;
-        this.buildTree(data);
+        // const pasivo = data[indexPasivo];
+        // data.splice(indexPasivo, 1);
+        // data.unshift(pasivo);
+        // const active = data[indexActive];
+        // data.splice(indexActive, 1);
+        // data.unshift(active);
+
+        this.dataSource = dataBalance;
+        this.buildTree(dataBalance);
       });
   }
 
-  convertToGeneralBalance(response: any): GeneralBalance[] {
+  convertToGeneralBalance(response: GeneralBalanceResponse[]): GeneralBalance[] {
     return [
-      ...response.assets.map((item: any) => ({
+      ...response.map((item: any) => ({
         id: item.accountId,                     
         parentId: item.parentId,                        
         accountName: item.accountName,          
@@ -479,24 +490,6 @@ export class GeneralBalanceComponent implements OnInit {
         total: null,                            
         root: true                              
       })),
-      ...response.liabilities.map((item: any) => ({
-        id: item.accountId,
-        parentId: item.parentId,                              
-        accountName: item.accountName,
-        category: item.category,               
-        amount: item.balance,
-        total: null,
-        root: true
-      })),
-      ...response.equity.map((item: any) => ({
-        id: item.accountId,
-        parentId: item.parentId,                               
-        accountName: item.accountName,
-        category: item.category,                  
-        amount: item.balance,
-        total: null,
-        root: true
-      }))
     ];
   }
   

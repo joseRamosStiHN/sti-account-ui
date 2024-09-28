@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { GeneralBalance, TrialBalaceResponse } from '../models/APIModels';
+import { GeneralBalance, GeneralBalanceResponse, TrialBalaceResponse } from '../models/APIModels';
 import { environment } from '@environment/environment';
 import { Observable } from 'rxjs';
 
@@ -10,9 +10,9 @@ export class ReportServiceService {
   private readonly http = inject(HttpClient);
   constructor() {}
 
-  getGeneralBalanceReport() {
+  getGeneralBalanceReport():Observable<GeneralBalanceResponse[]> {
     const url = `${this.BASE_URL}/api/v1/balance/general`;
-    return this.http.get<GeneralBalance[]>(url);
+    return this.http.get<GeneralBalanceResponse[]>(url);
   }
 
   getTrialBalance():Observable<TrialBalaceResponse> {

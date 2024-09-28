@@ -1,85 +1,137 @@
 <div class="w-100 items-center mt-5">
-  <!--  {{ treeData | json }} -->
+
 
   <h2 class="text-2xl font-semibold mb-5 text-center">Balance General</h2>
-  <table class="w-full border mx-2 text-sm text-gray-500">
-    <thead class="text-sm text-gray-700 uppercase bg-gray-50">
-      <tr>
-        <th scope="col" class="px-4 py-2 border w-[75%]">Cuenta</th>
-        <th scope="col" class="px-4 py-2 border w-[25%]">Saldo</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for( node of treeData; track $index) {
-      <tr class="cursor-pointer" (click)="toggleCollapse(node)">
-        <td class="font-semibold pl-1 py-2 border-b-[1px] border-t-[1px]">
-          <span *ngIf="node.children?.length">
-            {{ node.isCollapsed ? "+" : "-" }}
-          </span>
-          {{ node.accountName }}
-        </td>
-        <td
-          class="py-2 border-b-[1px] border-t-[1px] text-right font-semibold border-blue-200"
-          [ngClass]="{
-            'bg-green-50 px-12': node.accountName === 'Activo',
-            'px-5': node.accountName !== 'Activo'
-          }"
-        >
-          {{ node.total | currency : "L." }}
-        </td>
-      </tr>
-      @if (node.children?.length && !node.isCollapsed) {
-      <tr>
-        <td colspan="2">
-          <table class="w-full">
-            <ng-container
-              *ngTemplateOutlet="
-                recursiveList;
-                context: { $implicit: node.children, depth: 1 }
-              "
-            ></ng-container>
-          </table>
-        </td>
-      </tr>
-      } }
-    </tbody>
-    <tbody class="mt-4">
-      <tr class="w-full border font-semibold">
-        <td cope="col" class="w-[75%] text-right py-5 px-2">
-          Pasivo + Patrimonio Neto:
-        </td>
-        <td cope="col" class="px-4 py-2 border w-[25%]">
-          {{ summaryTotal | currency : "L. " }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="flex flex-wrap">
 
-  <ng-template #recursiveList let-children let-parentDepth="depth">
-    @for ( child of children; track $index) {
-    <tr (click)="toggleCollapse(child)" class="cursor-pointer">
+    <div class="w-full md:w-1/2 pr-2 mt-4 md:mt-0"> <!-- Agregado mt-4 para márgenes superiores en pantallas pequeñas -->
+      <table class="w-full border mx-2 text-sm text-gray-500">
+        <thead class="text-sm text-gray-700 uppercase bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-2 border w-[75%]">Cuenta</th>
+            <th scope="col" class="px-4 py-2 border w-[25%]">Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Mostrar solo ACTIVOs -->
+          @for(node of treeData; track $index) {
+          <tr *ngIf="node.category === 'ACTIVO'" class="cursor-pointer" (click)="toggleCollapse(node)">
+            <td class="font-semibold pl-1 py-2 border-b-[1px] border-t-[1px]">
+              <span *ngIf="node.children?.length">{{ node.isCollapsed ? '+' : '-' }}</span>
+              {{ node.accountName }}
+            </td>
+            <td class="py-2 border-b-[1px] border-t-[1px] text-right font-semibold">
+              {{ node.total | currency : 'L.' }}
+            </td>
+          </tr>
+          <!-- Expansión de hijos de ACTIVOs -->
+          @if (node.children?.length && !node.isCollapsed) {
+          <tr>
+            <td colspan="2">
+              <table class="w-full">
+                <ng-container
+                  *ngTemplateOutlet="
+                    recursiveList;
+                    context: { $implicit: node.children, depth: 1, category: 'ACTIVO' }
+                  "
+                ></ng-container>
+              </table>
+            </td>
+          </tr>
+          } }
+        </tbody>
+        <tbody class="mt-4">
+          <tr class="w-full border font-semibold">
+            <td scope="col" class="w-[75%] text-right py-5 px-2">
+              TOTAL ACTIVO
+            </td>
+            <td scope="col" class="px-4 py-2 border w-[25%] text-right">
+              {{ totalActivoSumary | currency : "L. " }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+  
+    <div class="w-full md:w-1/2 pl-2 mt-4 md:mt-0"> <!-- Agregado mt-4 para márgenes superiores en pantallas pequeñas -->
+      <table class="w-full border mx-2 text-sm text-gray-500">
+        <thead class="text-sm text-gray-700 uppercase bg-gray-50">
+          <tr>
+            <th scope="col" class="px-4 py-2 border w-[75%]">Cuenta</th>
+            <th scope="col" class="px-4 py-2 border w-[25%]">Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Mostrar solo PASIVOs y PATRIMONIO -->
+          @for(node of treeData; track $index) {
+          <tr *ngIf="node.category === 'PASIVO' || node.category === 'PATRIMONIO'" class="cursor-pointer" (click)="toggleCollapse(node)">
+            <td class="font-semibold pl-1 py-2 border-b-[1px] border-t-[1px]">
+              <span *ngIf="node.children?.length">{{ node.isCollapsed ? '+' : '-' }}</span>
+              {{ node.accountName }}
+            </td>
+            <td class="py-2 border-b-[1px] border-t-[1px] text-right font-semibold">
+              {{ node.total | currency : 'L.' }}
+            </td>
+          </tr>
+          <!-- Expansión de hijos de PASIVOs y PATRIMONIO -->
+          @if (node.children?.length && !node.isCollapsed) {
+          <tr>
+            <td colspan="2">
+              <table class="w-full">
+                <ng-container
+                  *ngTemplateOutlet="
+                    recursiveList;
+                    context: { $implicit: node.children, depth: 1, category: 'PASIVOPATRIMONIO' }
+                  "
+                ></ng-container>
+              </table>
+            </td>
+          </tr>
+          } }
+        </tbody>
+  
+        <!-- Totales de PASIVO + PATRIMONIO Neto -->
+        <tbody class="mt-4">
+          <tr class="w-full border font-semibold">
+            <td scope="col" class="w-[75%] text-right py-5 px-2">
+              PASIVO + PATRIMONIO Neto:
+            </td>
+            <td scope="col" class="px-4 py-2 border w-[25%] text-right">
+              {{ summaryTotal | currency : "L. " }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  
+  
+  <!-- Template Recursivo -->
+  <ng-template #recursiveList let-children let-parentDepth="depth" let-category="category">
+    @for (child of children; track $index) {
+    <tr *ngIf="category === 'ACTIVO' && child.category === 'ACTIVO' || category === 'PASIVOPATRIMONIO' && (child.category === 'PASIVO' || child.category === 'PATRIMONIO')" (click)="toggleCollapse(child)" class="cursor-pointer">
       <td class="py-3" [style.padding-left.px]="parentDepth * 10">
-        <span *ngIf="child.children?.length">
-          {{ child.isCollapsed ? "-" : "+" }}</span
-        >
+        <span *ngIf="child.children?.length">{{ child.isCollapsed ? '-' : '+' }}</span>
         {{ child.accountName }}
       </td>
       <td class="px-4 py-2 text-right">
         @if(checkChildren(child.children)) {
-        {{ child.total | currency : "L. " }}
+        {{ child.total | currency : 'L. ' }}
         }@else {
-        {{ child.amount | currency : "L. " }}
+        {{ child.amount | currency : 'L. ' }}
         }
       </td>
     </tr>
-    @if (child.children?.length && child.isCollapsed) {
+    @if (child.children?.length && !child.isCollapsed) {
     <tr>
       <td colspan="2">
         <table class="w-full">
           <ng-container
             *ngTemplateOutlet="
               recursiveList;
-              context: { $implicit: child.children, depth: parentDepth + 1 }
+              context: { $implicit: child.children, depth: parentDepth + 1, category: category }
             "
           ></ng-container>
         </table>
@@ -87,7 +139,7 @@
     </tr>
     } }
   </ng-template>
-
+  
   <!--  <dx-tree-list
     id="generalBalance"
     [dataSource]="dataSource"
