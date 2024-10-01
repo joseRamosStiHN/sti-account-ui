@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import config from 'devextreme/core/config';
 import { Options as DataSourceConfig } from 'devextreme/ui/pivot_grid/data_source';
+import { IncomeStatement } from 'src/app/modules/accounting/models/APIModels';
+import { ReportServiceService } from 'src/app/modules/accounting/services/report-service.service';
 
 interface Incomes {
   id: number;
@@ -110,6 +112,8 @@ const DATA: Incomes[] = [
   }, */
 ];
 
+
+
 @Component({
   selector: 'app-income-statement',
   templateUrl: './income-statement.component.html',
@@ -117,6 +121,11 @@ const DATA: Incomes[] = [
 })
 export class IncomeStatementComponent implements OnInit {
   pivotDataSource!: DataSourceConfig;
+  incomnetStatment:IncomeStatement[]= [];
+  
+
+  private readonly reportService = inject(ReportServiceService);
+
 
   constructor() {
     config({
@@ -128,60 +137,71 @@ export class IncomeStatementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.pivotDataSource = {
-      fields: [
-        {
-          caption: 'Ingresos',
-          dataField: 'category',
-          area: 'row',
-          expanded: true,
-          sortOrder: 'desc',
-          width: 200,
-        },
-        {
-          caption: 'Cuenta Padre',
-          dataField: 'accountParent',
-          width: 250,
-          area: 'row',
-          expanded: false,
-        },
-        {
-          caption: 'Cuenta',
-          dataField: 'account',
-          area: 'row',
-          width: 200,
-          expanded: false,
-        },
-        {
-          caption: 'Fecha',
-          dataField: 'date',
-          area: 'column',
-        },
-        {
-          groupName: 'date',
-          groupInterval: 'quarter',
-          visible: false,
-
-          customizeText: function (cellInfo: any) {
-            console.log({ cellInfo });
-            return cellInfo.valueText?.toUpperCase();
+    this.reportService.getIncomeStatement().subscribe((data: IncomeStatement[]) => {
+      this.incomnetStatment = data;
+      this.pivotDataSource = {
+        fields: [
+          {
+            caption: 'Ingresos',
+            dataField: 'category',
+            area: 'row',
+            expanded: true,
+            sortOrder: 'desc',
+            width: 200,
           },
-        },
-        {
-          caption: 'Total',
-          dataField: 'amount',
-          dataType: 'number',
-          summaryType: 'sum',
-          format: 'currency',
-          area: 'data',
-        },
-        {
-          dataField: 'id',
-          area: 'filter',
-          visible: false,
-        },
-      ],
-      store: DATA,
-    };
+          {
+            caption: 'Cuenta Padre',
+            dataField: 'accountParent',
+            width: 250,
+            area: 'row',
+            expanded: false,
+          },
+          {
+            caption: 'Cuenta',
+            dataField: 'account',
+            area: 'row',
+            width: 200,
+            expanded: false,
+          },
+          {
+            caption: 'Fecha',
+            dataField: 'date',
+            area: 'column',
+          },
+          {
+            groupName: 'date',
+            groupInterval: 'quarter',
+            visible: false,
+  
+            customizeText: function (cellInfo: any) {
+              console.log({ cellInfo });
+              return cellInfo.valueText?.toUpperCase();
+            },
+          },
+          {
+            caption: 'Total',
+            dataField: 'amount',
+            dataType: 'number',
+            summaryType: 'sum',
+            format: 'currency',
+            area: 'data',
+          },
+          {
+            dataField: 'id',
+            area: 'filter',
+            visible: false,
+          },
+        ],
+        store: this.incomnetStatment,
+        // store:DATA
+      };
+
+     
+    });
+    
+    
   }
+  
+
+
 }

@@ -156,3 +156,13 @@ export interface FinalBalance {
   credit: number
 }
 
+export interface IncomeStatement {
+  id: number
+  category?: string
+  accountParent?: string
+  account: string
+  amount: number
+  date: Date
+}
+
+
