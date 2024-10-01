@@ -48,7 +48,8 @@ export class JournalEntriesComponent implements OnInit {
     const mapTransactionToLocalData = (item: any, isAdjustment: boolean = false): LocalData => {
       const totalDetail = isAdjustment
         ? item.adjustmentDetails.reduce((acc: number, detail: any) => {
-          return detail.entryType === "Debito" ? acc + detail.amount : acc;
+          const credit = detail.credit || 0;     
+            return acc + credit;
         }, 0)
         : item.transactionDetails.find((element: any) => {
           return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
@@ -64,7 +65,7 @@ export class JournalEntriesComponent implements OnInit {
         reference: (item.documentType === JournalTypes.Ventas || item.documentType === JournalTypes.Compras)
           ? "" : isAdjustment ? item.reference : item.description,
         journalEntry: item.diaryName,
-        total: isAdjustment ? totalAmount * -1 : totalAmount,
+        total:  totalAmount,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
       };
     };
