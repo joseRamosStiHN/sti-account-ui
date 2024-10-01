@@ -65,8 +65,8 @@ export class JournalItemsComponent implements OnInit {
 
     data.adjustments.forEach((item: any) => {
       item.adjustmentDetails.forEach((transaction: any) => {
-        const debito = transaction.entryType === 'Credito' ? 0 : transaction.amount;
-        const credito = transaction.entryType === 'Debito' ? 0 : transaction.amount;
+        const debito =  transaction.debit;
+        const credito = transaction.credit;
         const localJournalItem: LocalJournalItem = {
           id: item.id,
           reference: item.reference,
