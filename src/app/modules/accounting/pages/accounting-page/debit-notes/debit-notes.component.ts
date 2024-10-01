@@ -153,32 +153,45 @@ export class DebitNotesComponent {
 
   }
 
-  async saveRow(event: any): Promise<void> {
-    if (this.documentType === JournalTypes.Compras) {
+  async saveRow(e: any): Promise<void> {
 
+    e.data.movement = "D";
+    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    
+    if (foundItems.length > 0) {
 
-      this.updateAmounts();
-    } else {
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
 
-      this.updateAmounts();
+  
+        item.amount = sum
+      });
     }
+
+    this.updateAmounts();
   }
 
+ 
   removedRow(): void {
-    if (this.documentType === JournalTypes.Compras) {
-      this.updateAmounts();
-    } else {
-      this.updateAmounts();
-    }
-  }
 
+    this.updateAmounts();
+
+  }
 
   updateRow(): void {
-    if (this.documentType === JournalTypes.Compras) {
-      this.updateAmounts();
-    } else {
-      this.updateAmounts();
+
+    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    if (foundItems.length > 0) {
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
     }
+
+    this.updateAmounts();
+    
   }
 
 
@@ -194,13 +207,13 @@ export class DebitNotesComponent {
     const totalCredit = creditList.reduce((sum, item) => sum + item.amount, 0);
   
 
-    debitList.forEach(item => {
-      item.amount = totalCredit; 
+    creditList.forEach(item => {
+      item.amount = totalDebit; 
     });
   
 
     this.totalDebit = totalDebit;
-    this.totalCredit = totalCredit;
+    this.totalCredit = totalDebit;
   }
   
 
@@ -288,15 +301,9 @@ export class DebitNotesComponent {
 
   fillDataSource(data: any[]): LocalData[] {
 
-    console.log(data);
-    
-
 
     return data.filter((item: any) => item.status == "SUCCESS" && item.documentType === JournalTypes.Compras)
-      .map((item: any) => {
-
-        console.log(item);
-        
+      .map((item: any) => {        
 
         return {
           id: item.id,
@@ -405,13 +412,15 @@ export class DebitNotesComponent {
     if (!transaccion) return;
     this.documentType = transaccion.documentType!;
 
+    const copiaTransaction = {...transaccion};
+
     this.transactionOriginal = {
-      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0,
-      totalDebit: transaccion.details?.filter(data => data.movement === "D")
+      numberPda: copiaTransaction.numberPda ? parseInt(copiaTransaction.numberPda, 10) : 0,
+      totalDebit: copiaTransaction.details?.filter(data => data.movement === "D")
         .reduce((total, item) => total + item.amount, 0),
-      totalCredit: transaccion.details?.filter(data => data.movement === "C")
+      totalCredit: copiaTransaction.details?.filter(data => data.movement === "C")
         .reduce((total, item) => total + item.amount, 0),
-      details: transaccion.details?.map(item => ({
+      details: copiaTransaction.details?.map(item => ({
         id: item.id,
         nameAccount: item.accountName,
         debe: item.movement == 'D' ? item.amount : 0,
@@ -452,22 +461,22 @@ export class DebitNotesComponent {
 
       this.journalService.getJournalById(transaccion.diaryType!).subscribe(data => {
         JournalDefault = data;
-        const copiaDetails = [...(transaccion.details ?? [])];
-        const itemToRemove = copiaDetails.find(item => item.accountId === JournalDefault.defaultAccount);
+        const itemToRemove = transaccion.details?.find(item => item.accountId === JournalDefault.defaultAccount);
 
         if (itemToRemove) {
-          const index = copiaDetails.indexOf(itemToRemove);
-          if (index > -1) {
-            copiaDetails.splice(index, 1);
+          const index = transaccion.details?.indexOf(itemToRemove);
+   
+          if (index !== undefined && index >= 0) {
+            transaccion.details?.splice(index, 1);
           }
         }
 
         const accountToCheck = "Haber";
 
 
-        copiaDetails.forEach(details=> details.movement ="D" )
+        transaccion.details?.forEach(details=> details.movement ="D" )
 
-        copiaDetails.push({
+        transaccion.details?.push({
           "id": 0,
           "accountId": this.journalForm?.defaultAccount ?? 0,
           "amount": itemToRemove?.amount ?? 0,
@@ -477,7 +486,7 @@ export class DebitNotesComponent {
           "credit": 0
         });
 
-        this.dataSource = copiaDetails;
+        this.dataSource = transaccion?.details??[];
         setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
 
         this.updateAmounts();
