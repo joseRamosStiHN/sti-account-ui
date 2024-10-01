@@ -157,7 +157,7 @@
         }
         <dx-data-grid id="grid-billing-client" class="mx-auto mt-4 py-2" [dataSource]="dataSource" [showBorders]="true"
             [height]="400" [repaintChangesOnly]="true" [showRowLines]="true" (onContentReady)="onContentReady($event)"
-            [allowColumnResizing]="true" noDataText="" (onRowInserted)="saveRow($event)" (onRowUpdated)="updateRow()"
+            [allowColumnResizing]="true" noDataText="" (onRowInserted)="saveRow($event)" (onRowUpdated)="updateRow($event)"
             (onRowRemoved)="removedRow()">
             <dxo-load-panel [enabled]="true"></dxo-load-panel>
             <dxo-scrolling mode="virtual"></dxo-scrolling>

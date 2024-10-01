@@ -155,56 +155,68 @@ export class CreditNotesComponent {
 
   }
 
-  async saveRow(event: any): Promise<void> {
-    if (this.documentType === JournalTypes.Ventas) {
+  async saveRow(e: any): Promise<void> {
 
+    e.data.movement = "C";
+    let foundItems = this.dataSource.filter((data) => data.movement === 'D');
+    if (foundItems.length > 0) {
 
-      this.updateAmounts();
-    } else {
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
 
-      this.updateAmounts();
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
     }
+
+    this.updateAmounts();
   }
+
 
   removedRow(): void {
-    if (this.documentType === JournalTypes.Ventas) {
-      this.updateAmounts();
-    } else {
-      this.updateAmounts();
-    }
+
+    this.updateAmounts();
+
   }
 
 
-  updateRow(): void {
-    if (this.documentType === JournalTypes.Ventas) {
-      this.updateAmounts();
-    } else {
-      this.updateAmounts();
+  updateRow(e: any): void {
+
+    let foundItems = this.dataSource.filter((data) => data.movement === 'D');
+    if (foundItems.length > 0) {
+      foundItems.forEach((item) => {
+        const sum = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
+        this.totalCredit = sum;
+        this.totalDebit = sum;
+        item.amount = sum
+      });
     }
+
+    this.updateAmounts();
+    
   }
 
 
   private updateAmounts(): void {
     if (this.dataSource.length === 0) return;
-  
+
 
     const debitList = this.dataSource.filter(data => data.movement === 'D');
     const creditList = this.dataSource.filter(data => data.movement === 'C');
-  
 
-    const totalDebit = debitList.reduce((sum, item) => sum + item.amount, 0);
+
     const totalCredit = creditList.reduce((sum, item) => sum + item.amount, 0);
-  
+
 
     debitList.forEach(item => {
-      item.amount = totalCredit; 
+      item.amount = totalCredit;
     });
-  
 
-    this.totalDebit = totalDebit;
+    this.totalDebit = totalCredit;
     this.totalCredit = totalCredit;
   }
-  
+
 
 
 
@@ -291,7 +303,7 @@ export class CreditNotesComponent {
   fillDataSource(data: any[]): LocalData[] {
 
 
-    return data.filter((item: any) => item.status == "SUCCESS" && item.diaryType === JournalTypes.Ventas)
+    return data.filter((item: any) => item.status == "SUCCESS" && item.documentType === JournalTypes.Ventas)
       .map((item: any) => {
 
         return {
@@ -311,7 +323,7 @@ export class CreditNotesComponent {
               accountId: item.accountId,
               amount: item.amount,
               id: item.id,
-              movement: item.shortEntryType == "C" ? "D" : "C",
+              movement: item.shortEntryType == "C" ? "C" : "D",
               accountName: item.accountName,
               debit: item.shortEntryType === "D" ? item.amount : 0,
               credit: item.shortEntryType == "C" ? item.amount : 0
@@ -383,10 +395,10 @@ export class CreditNotesComponent {
     }
   }
 
-  onChangePercent(e:any){
+  onChangePercent(e: any) {
 
     this.handleDocumentType(this.selectRow);
-  
+
   }
 
 
@@ -401,13 +413,15 @@ export class CreditNotesComponent {
     if (!transaccion) return;
     this.documentType = transaccion.documentType!;
 
+    const copiaTransaction = {...transaccion};
+
     this.transactionOriginal = {
-      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0,
-      totalDebit: transaccion.details?.filter(data => data.movement === "D")
+      numberPda: copiaTransaction.numberPda ? parseInt(copiaTransaction.numberPda, 10) : 0,
+      totalDebit: copiaTransaction.details?.filter(data => data.movement === "D")
         .reduce((total, item) => total + item.amount, 0),
-      totalCredit: transaccion.details?.filter(data => data.movement === "C")
+      totalCredit: copiaTransaction.details?.filter(data => data.movement === "C")
         .reduce((total, item) => total + item.amount, 0),
-      details: transaccion.details?.map(item => ({
+      details: copiaTransaction.details?.map(item => ({
         id: item.id,
         nameAccount: item.accountName,
         debe: item.movement == 'D' ? item.amount : 0,
@@ -448,19 +462,22 @@ export class CreditNotesComponent {
 
       this.journalService.getJournalById(transaccion.diaryType!).subscribe(data => {
         JournalDefault = data;
-        const copiaDetails = [...(transaccion.details ?? [])];
-        const itemToRemove = copiaDetails.find(item => item.accountId === JournalDefault.defaultAccount);
+
+        const itemToRemove = transaccion.details?.find(item => item.accountId === JournalDefault.defaultAccount);
 
         if (itemToRemove) {
-          const index = copiaDetails.indexOf(itemToRemove);
-          if (index > -1) {
-            copiaDetails.splice(index, 1);
+          const index = transaccion.details?.indexOf(itemToRemove);
+   
+          if (index !== undefined && index >= 0) {
+            transaccion.details?.splice(index, 1);
           }
         }
 
         const accountToCheck = "Debe";
 
-        copiaDetails.push({
+        transaccion.details?.forEach(details => details.movement = "C")
+
+        transaccion.details?.push({
           "id": 0,
           "accountId": this.journalForm?.defaultAccount ?? 0,
           "amount": itemToRemove?.amount ?? 0,
@@ -470,7 +487,7 @@ export class CreditNotesComponent {
           "credit": 0
         });
 
-        this.dataSource = copiaDetails;
+        this.dataSource = transaccion?.details??[];
         setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
 
         this.updateAmounts();
