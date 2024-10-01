@@ -25,6 +25,7 @@ import { AccountingAdjustmentComponent } from 'src/app/modules/accounting/pages/
 import { AdjustmentListComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-adjustment/adjustment-list/adjustment-list.component';
 import { TrialBalanceComponent } from 'src/app/modules/accounting/components/reports/trial-balance/trial-balance.component';
 import { CreditNotesComponent } from 'src/app/modules/accounting/pages/accounting-page/credit-notes/credit-notes.component';
+import { DebitNotesComponent } from 'src/app/modules/accounting/pages/accounting-page/debit-notes/debit-notes.component';
 
 const routes: Routes = [
   {
@@ -80,6 +81,7 @@ const routes: Routes = [
       { path: 'adjustment-list', component: AdjustmentListComponent },
       { path: 'new/adjustment', component: AccountingAdjustmentComponent },
       { path: 'credit-notes', component: CreditNotesComponent },
+      { path: 'debit-notes', component: DebitNotesComponent },
     ],
   },
 ];

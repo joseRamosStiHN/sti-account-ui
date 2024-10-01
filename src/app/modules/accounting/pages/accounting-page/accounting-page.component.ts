@@ -23,6 +23,7 @@ export class AccountingPageComponent implements OnInit {
           { label: 'Apuntes Contables', path: '/accounting/journal-items' },
           { label: 'Ajustes Contables', path: '/accounting/adjustment-list' },
           { label: 'Notas de Credito', path: '/accounting/credit-notes' },
+          { label: 'Notas de Debito', path: '/accounting/debit-notes' },
        
         ],
       },

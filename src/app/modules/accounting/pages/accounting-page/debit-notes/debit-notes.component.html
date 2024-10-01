@@ -1,0 +1,297 @@
+<div class="container mx-auto">
+    <h2 class="mt-5 text-2xl font-semibold">Notas de Debito</h2>
+    <form id="noteCreditForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 auto-cols-fr mt-10">
+            <div class="flex flex-wrap">
+                <div class="flex-grow">
+                    <label for="parent-account" class="block mb-2 text-sm text-gray-900">Referencia Contable</label>
+                    <dx-select-box value="creditTransaction.referenceNumber" [dataSource]="creditTransaction" name="id"
+                        [searchEnabled]="true" [(ngModel)]="selectRow.referenceNumber" valueExpr="referenceNumber"
+                        displayExpr="referenceNumber" [searchExpr]="['referenceNumber', 'journalEntry']" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2 h-12"
+                        (valueChange)="onValueChange($event)">
+                        <div class="" *dxTemplate="let data of 'item'">
+                            <strong class="">pda {{data.numberPda}} </strong>
+                            <small class="text-gray-400">{{data.referenceNumber}}</small>
+                        </div>
+                    </dx-select-box>
+                    <div *ngIf="itemForm.submitted && selectRow.referenceNumber==''">
+                        <small class="text-xs text-red-900">Referencia Contable es requerido.</small>
+                    </div>
+                </div>
+
+                <div class="flex items-end justify-end mt-2 sm:mt-0">
+                    <button type="button" (click)="showModal()"
+                        class="flex-shrink-0 p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                        <span class="sr-only">Search</span>
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label for="date" class="block mb-2 text-sm text-gray-900">Fecha</label>
+                <input type="date" [(ngModel)]="creditNotes.date" id="date" name="date"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                    placeholder="" required />
+                <div *ngIf="
+                    itemForm.submitted &&
+                    itemForm.form.controls['date'].getError('required')
+                  ">
+                    <small class="text-xs text-red-900">La fecha es requerida.</small>
+                </div>
+            </div>
+            <div class="basis-1/2">
+                <label for="dayri" class="block mt-1 mb-2 text-sm text-gray-900">Diario</label>
+                <select [(ngModel)]="creditNotes.dayri" (change)="onChangeJournal($event)" name="dayri" id="dayri"
+                    required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none">
+                    <option value="" disabled></option>
+                    <option *ngFor="let journal of journalList" [ngValue]="journal.id">
+                        {{ journal.diaryName }}
+                    </option>
+                </select>
+                <div *ngIf="
+                    itemForm.submitted &&
+                    itemForm.form.controls['dayri'].getError('required')
+                  ">
+                    <small class="text-xs text-red-900">Diario es requerido</small>
+                </div>
+            </div>
+            <div>
+                <label for="applyPorcent" class="block mb-2 text-sm text-gray-900">Aplica Porcentaje</label>
+                <select [(ngModel)]="creditNotes.applyPorcent" required="true" name="applyPorcent" id="applyPorcent"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                    <option value="si">si</option>
+                    <option value="no" selected>no</option>
+                </select>
+            </div>
+            @if(creditNotes.applyPorcent ==="si"){
+            <div>
+                <label for="percent" class="block mb-2 text-sm text-gray-900">Porcentaje </label>
+                <select required name="percent" id="percent" [(ngModel)]="creditNotes.percent"
+                (change)="onChangePercent($event)"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                    <option value="0.05" selected>5</option>
+                    <option value="0.1">10</option>
+                    <option value="0.15">15</option>
+                    <option value="0.25">25</option>
+                    <option value="0.50">50</option>
+                    <option value="0.70">70</option>
+                </select>
+                <div *ngIf="
+                    itemForm.submitted &&
+                    itemForm.form.controls['percent'].getError('required')
+                  ">
+                    <small class="text-xs text-red-900">Porcentaje es requerido</small>
+                </div>
+            </div>
+            }
+
+            <div class="mb-2 mt-1">
+                <label for="description" class="block mb-2 text-sm text-gray-900">Descripción de Nota</label>
+                <input type="text" name="description" maxlength="150" [(ngModel)]="description" id="description"
+                    class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ingresa una Descripción corta de Nota de credito" required />
+                <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
+                    <small class="text-xs text-red-900">La descripción es requerida.</small>
+                </div>
+            </div>
+        </div>
+        @if(transactionOriginal.details.length > 0){
+        <div class="mt-10 border-2 border-gray-300">
+            <div class="flex justify-center m-2">
+                <h4>Partida #<strong>{{transactionOriginal.numberPda}}</strong> </h4>
+            </div>
+            <div class="relative overflow-x-auto ">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-900 bg-white">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-2 py-1">
+                                Nombre Cuenta
+                            </th>
+                            <th scope="col" class="px-2 py-1">
+                                Debe
+                            </th>
+                            <th scope="col" class="px-2 py-1">
+                                Haber
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (item of transactionOriginal.details; track $index) {
+                        <tr class="border-b">
+                            <th scope="row" class="px-2 py-1 font-medium text-gray-900 whitespace-nowrap">
+                                {{item.nameAccount}}
+                            </th>
+                            <td class="px-2 py-1">
+                                {{item.debe}}
+                            </td>
+                            <td class="px-2 py-1">
+                                {{item.haber}}
+                            </td>
+                        </tr>
+
+                        }
+
+                        <tr class="font-bold bg-gray-200">
+                            <th scope="row" class="px-2 py-1 font-bold text-gray-900 whitespace-nowrap">
+                                Total
+                            </th>
+                            <td class="px-2 py-1">
+                                {{transactionOriginal.totalDebit}}
+                            </td>
+                            <td class="px-2 py-1">
+                                {{transactionOriginal.totalCredit}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        }
+        <dx-data-grid id="grid-billing-client" class="mx-auto mt-4 py-2" [dataSource]="dataSource" [showBorders]="true"
+            [height]="400" [repaintChangesOnly]="true" [showRowLines]="true" (onContentReady)="onContentReady($event)"
+            [allowColumnResizing]="true" noDataText="" (onRowInserted)="saveRow($event)" (onRowUpdated)="updateRow()"
+            (onRowRemoved)="removedRow()">
+            <dxo-load-panel [enabled]="true"></dxo-load-panel>
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
+            <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="true"
+                [allowUpdating]="true" />
+
+            <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
+                [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
+            </dxi-column>
+            <dxi-column dataField="accountId" caption="Cuenta" alignment="center" [editorOptions]="editorOptions">
+                <dxo-lookup [dataSource]="accountList" valueExpr="id"
+                    [displayExpr]="combineCodeAndDescription"></dxo-lookup>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="amount" caption="Monto" dataType="number"
+                [format]="{ type: 'currency', precision: 2 }" [customizeText]="customCurrencyText" alignment="center"
+                [width]="120">
+                <dxo-form-item editorType="dxNumberBox" [editorOptions]="{ format: '#,##0.##', min: 0 }">
+                </dxo-form-item>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="movement" caption="Movimiento" alignment="center" [width]="90" [allowEditing]="false"
+                [formItem]="{ visible: false }">
+                <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name"></dxo-lookup>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+
+            <dxo-toolbar>
+                <dxi-item location="before">
+                    <div class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow">
+                        <label class="block font-mono font-semibold">Total Debe </label>
+                        <small class="block font-mono font-medium text-red-900">
+                            {{ totalDebit | currency : "L. " }}</small>
+                    </div>
+                </dxi-item>
+                <dxi-item location="before">
+                    <div class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow">
+                        <label class="block font-mono font-semibold">Total Haber </label>
+                        <small class="block font-mono font-medium text-green-900">
+                            {{ totalCredit | currency : "L. " }}</small>
+                    </div>
+                </dxi-item>
+                <dxi-item [widget]="'dxButton'" [options]="{ text: 'Add Row', icon: 'add' }"
+                    name="addRowButton"></dxi-item>
+
+            </dxo-toolbar>
+            <div *dxTemplate="let d of 'indexTemplate'">
+                <span>{{ d.rowIndex + 1 }}</span>
+            </div>
+            <div class="" *dxTemplate="let account of 'accounts'">
+                <strong class="">{{ account.code }} </strong>
+                <small class="text-gray-400">{{account.description }}</small>
+            </div>
+
+            <dxi-column type="buttons" [width]="110">
+                <dxi-button name="edit"></dxi-button>
+                <dxi-button name="delete"></dxi-button>
+            </dxi-column>
+
+            <dxo-summary>
+                <dxi-total-item name="totalDebit" summaryType="custom">
+                </dxi-total-item>
+                <dxi-total-item name="totalCredit" summaryType="custom">
+                </dxi-total-item>
+            </dxo-summary>
+            <dxo-summary [calculateCustomSummary]="calculateSummary"></dxo-summary>
+        </dx-data-grid>
+        <div class="justify-end mt-10">
+            <button type="button" (click)="goBack()"
+                class="focus:outline-none text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                regresar
+            </button>
+            <a [routerLink]="'/accounting'"
+                class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                Cancelar
+            </a>
+            <button type="submit"
+                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                Guardar
+            </button>
+
+        </div>
+    </form>
+</div>
+
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+    <dxo-position my="top" at="top" of="#noteCreditForm"> </dxo-position>
+</dx-toast>
+
+<dx-popup [width]="900" [height]="540" [showTitle]="true" title="Seleccionar Partida" [dragEnabled]="false"
+    [hideOnOutsideClick]="true" [(visible)]="popupVisible" [showCloseButton]="true">
+    <div *dxTemplate="let data of 'content'">
+        <div class="popup-property-details">
+
+            <dx-data-grid id="gridJournalEntry" [dataSource]="creditTransaction" class="mt-5" keyExpr="id"
+                [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
+                [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'"
+                (onSelectionChanged)="onRowSelected($event)">
+
+                <dxo-selection mode="single" showCheckBoxesMode="always"></dxo-selection> <!-- Selección habilitada -->
+
+                <dxo-sorting mode="multiple"></dxo-sorting>
+                <dxo-header-filter [visible]="true"></dxo-header-filter>
+                <dxo-paging [pageSize]="15"></dxo-paging>
+                <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
+                <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+                <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+                <dxi-column caption="Fecha" dataField="date" format="shortDate" dataType="date" alignment="center"
+                    format="dd/MM/yyyy" width="90"></dxi-column>
+                <dxi-column alignment="center" caption="Partida" dataField="numberPda"></dxi-column>
+                <dxi-column alignment="center" caption="Número" dataField="referenceNumber"></dxi-column>
+
+                <dxi-column alignment="center" caption="Referencia" dataField="reference"></dxi-column>
+                <dxi-column alignment="center" caption="Diario" dataField="journalEntry"></dxi-column>
+                <dxi-column alignment="center" caption="Total" dataType="currency" dataField="total"></dxi-column>
+                <dxi-column alignment="center" caption="Estado" dataField="status"></dxi-column>
+            </dx-data-grid>
+
+            <div class="mt-10 flex justify-end">
+                <button type="button" (click)="showModal()"
+                    class="focus:outline-none text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                    Regresar
+                </button>
+
+
+                <button type="button" [disabled]="selectRow.id === 0" (click)="showModal()" [ngClass]="{
+                        'bg-teal-500 hover:bg-teal-600 focus:ring-teal-300': selectRow.id != 0,
+                        'bg-teal-300 cursor-not-allowed': selectRow.id === 0
+                      }"
+                    class="focus:outline-none text-white font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">Seleccionar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</dx-popup>
