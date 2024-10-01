@@ -31,8 +31,8 @@ interface LocalData {
 
 interface TransactionPda {
   numberPda: number,
-  totalDebit:number,
-  totalCredit:number,
+  totalDebit: number,
+  totalCredit: number,
   details: DetailsPda[]
 }
 
@@ -73,10 +73,10 @@ export class AccountingAdjustmentComponent {
   accountList: AccountModel[] = [];
   dataSource: Transaction[] = [];
   transactionOriginal: TransactionPda = {
-    numberPda:0,
-    totalDebit:0,
-    totalCredit:0,
-    details:[]
+    numberPda: 0,
+    totalDebit: 0,
+    totalCredit: 0,
+    details: []
   }
 
   dataTable: LocalData[] = [];
@@ -106,7 +106,7 @@ export class AccountingAdjustmentComponent {
     onOpened: (e: any) => {
       const popupElement = e.component._popup.$content();
       const listItems = popupElement.find('.dx-list-item');
-  
+
       listItems.each((index: number, item: any) => {
         const codeAccount = item.textContent.split(' ')[0];
         const shouldHideItem = codeAccount === this.journalForm?.defaultAccountCode;
@@ -133,11 +133,11 @@ export class AccountingAdjustmentComponent {
 
   async saveRow(event: any): Promise<void> {
     if (this.documentType === JournalTypes.Ventas) {
-  
-      
+
+
       this.updateAmounts();
     } else {
-   
+
       this.updateAmounts();
     }
   }
@@ -161,23 +161,23 @@ export class AccountingAdjustmentComponent {
 
 
   private updateAmounts(): void {
-    
+
     if (this.dataSource.length > 0) {
       const sumDebit = this.dataSource
-      .reduce((total, item) => {
-        return total + (item.debit ?? 0);
-      }, 0);
+        .reduce((total, item) => {
+          return total + (item.debit ?? 0);
+        }, 0);
 
       const sumCredit = this.dataSource
-      .reduce((total, item) => {
-        return total + (item.credit ?? 0);
-      }, 0);
+        .reduce((total, item) => {
+          return total + (item.credit ?? 0);
+        }, 0);
 
       console.log(this.dataSource);
-      
+
 
       console.log(sumDebit);
-      
+
 
       this.totalCredit = sumCredit;
       this.totalDebit = sumDebit;
@@ -273,51 +273,50 @@ export class AccountingAdjustmentComponent {
   fillDataSource(data: any[]): LocalData[] {
 
 
-    return data.filter((item:any)=> item.status == "SUCCESS")
-    .map((item: any) => {
-      const totalDetail = item.transactionDetails.find((element: any) => {
-        if (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") {
-          return true;
-        } else if (item.documentType === JournalTypes.Compras && element.entryType === "Debito") {
-          return true;
-        }
-        return false;
-      });
+    return data.filter((item: any) => item.status == "SUCCESS")
+      .map((item: any) => {
+        const totalDetail = item.transactionDetails.find((element: any) => {
+          if (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") {
+            return true;
+          } else if (item.documentType === JournalTypes.Compras && element.entryType === "Debito") {
+            return true;
+          }
+          return false;
+        });
 
-      return {
-        id: item.id,
-        date: item.date,
-        referenceNumber: item.reference,
-        documentType: item.documentType,
-        numberPda: item.numberPda,
-        diaryType: item.diaryType,
-        reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras
-          ? "" : item.description,
-        journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
-        total: totalDetail.amount,
-        status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
-        details: item.transactionDetails.map((item: any) => {
-          return {
-            accountId: item.accountId,
-            amount: item.amount,
-            id: item.id,
-            movement: item.shortEntryType == "C" ? "D" : "C",
-            accountName:item.accountName,
-            debit:item.shortEntryType === "D"?item.amount :0,
-            credit:item.shortEntryType == "C"?item.amount:0
-          } as Transaction;
-        })
-      } as LocalData;
+        return {
+          id: item.id,
+          date: item.date,
+          referenceNumber: item.reference,
+          documentType: item.documentType,
+          numberPda: item.numberPda,
+          diaryType: item.diaryType,
+          reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras
+            ? "" : item.description,
+          journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
+          total: totalDetail.amount,
+          status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
+          details: item.transactionDetails.map((item: any) => {
+            return {
+              accountId: item.accountId,
+              amount: item.amount,
+              id: item.id,
+              movement: item.shortEntryType == "C" ? "C" : "D",
+              accountName: item.accountName,
+              debit: item.shortEntryType === "D" ? item.amount : 0,
+              credit: item.shortEntryType == "C" ? item.amount : 0
+            } as Transaction;
+          })
+        } as LocalData;
 
 
-    })
+      })
 
 
   }
 
   async onSubmit(e: NgForm) {
-    console.log(e.form.value);
-    
+
     if (this.selectRow.referenceNumber != '' && this.validate()) {
 
       const request: AdjustmentRequest = {
@@ -329,12 +328,11 @@ export class AccountingAdjustmentComponent {
           return {
             id: detail.id,
             accountId: detail.accountId,
-            debit: detail.debit ?? 0,  
-            credit: detail.credit ?? 0 
+            debit: detail.debit ?? 0,
+            credit: detail.credit ?? 0
           };
         }),
       };
-      console.log(request);
 
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
@@ -346,7 +344,7 @@ export class AccountingAdjustmentComponent {
       }
 
 
-      
+
 
       this.adjustemntService.createAdjusment(request).subscribe({
         next: (data) => {
@@ -417,25 +415,32 @@ export class AccountingAdjustmentComponent {
     });
 
 
-    this.dataSource = transaccion.details!;
-
 
     this.transactionOriginal = {
-      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0, 
-     totalDebit: transaccion.details?.filter(data => data.movement === "D")
+      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0,
+      totalDebit: transaccion.details?.filter(data => data.movement === "D")
         .reduce((total, item) => total + item.amount, 0),
-     totalCredit: transaccion.details?.filter(data => data.movement === "C")
+      totalCredit: transaccion.details?.filter(data => data.movement === "C")
         .reduce((total, item) => total + item.amount, 0),
       details: transaccion.details?.map(item => ({
         id: item.id,
         nameAccount: item.accountName,
-        debe: item.movement== 'D'?item.amount :0,
-        haber:  item.movement== 'C'?item.amount :0,
+        debe: item.movement == 'D' ? item.amount : 0,
+        haber: item.movement == 'C' ? item.amount : 0,
       })) as DetailsPda[]
     } as TransactionPda;
 
-    
+    const copiaTransaccion = { ...transaccion };
 
+    copiaTransaccion.details?.forEach((detail) => {
+      if (detail.movement === "D" || detail.movement === "C") {
+        const isDebit = detail.movement === "D";
+        detail.movement = isDebit ? "C" : "D";
+        [detail.debit, detail.credit] = isDebit ? [0, detail.debit] : [detail.credit, 0];
+      }
+    });
+    
+    this.dataSource = copiaTransaccion.details!;
 
     this.selectRow = transaccion;
 
