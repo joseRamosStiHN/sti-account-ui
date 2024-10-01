@@ -59,3 +59,16 @@ export enum DocumentType {
   DEBIT_NOTE = 5,
   ADJUSTMENT = 6,
 }
+
+
+export interface CreditNotes {
+  id?: number;
+  reference: number;
+  date: Date;
+  dayri: number;
+  applyPorcent: string;
+  percent: number;
+  description: string;
+
+}
+
