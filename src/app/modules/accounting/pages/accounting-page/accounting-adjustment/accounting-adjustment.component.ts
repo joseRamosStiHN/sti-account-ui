@@ -11,6 +11,7 @@ import { NgForm } from '@angular/forms';
 import { AdjustmentRequest } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 
@@ -54,6 +55,9 @@ export class AccountingAdjustmentComponent {
   totalDebit: number = 0;
   allowAddEntry: boolean = true;
 
+  status:string="";
+
+  id: string | null = null;
   listMovement: IMovement[] = [
     {
       code: 'D',
@@ -87,10 +91,13 @@ export class AccountingAdjustmentComponent {
 
   description: string = '';
 
+    //
+  private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
   private readonly transService = inject(TransactionService);
   private readonly adjustemntService = inject(AdjusmentService);
   private readonly journalService = inject(JournalService);
+  private readonly activeRouter = inject(ActivatedRoute);
 
   selectRow: LocalData = {
     id: 0,
@@ -122,14 +129,67 @@ export class AccountingAdjustmentComponent {
 
   ngOnInit() {
 
+
     this.transService.getAll().subscribe({
       next: (data) => {
         this.dataTable = this.fillDataSource(data);
       },
     });
+    this.activeRouter.paramMap.subscribe((params) => {
+      this.id = params.get('id');   
+      const findId = Number(this.id);
+      if (findId) {
+
+        this.allowAddEntry= false;
+        
+        this.adjustemntService.getAdjustmentById(findId).subscribe({
+          next: (data) => {
+            this.selectRow.referenceNumber=data.invoiceNo;
+            this.description = data.descriptionAdjustment;
+            this.status = data.status;
+    
+            const transaccion =  data.adjustmentDetails.map((item: any) => {
+              return {
+                accountId: item.accountId,
+                amount: item.amount,
+                id: item.id,
+                movement: item.typicalBalance,
+                accountName: item.accountName,
+                debit:  item.debit,
+                credit: item.credit
+              } as Transaction;
+            })
+            this.accountService.getAllAccount().subscribe({
+              next: (data) => {
+                this.accountList = data
+                  .filter(item => item.supportEntry && item.balances.length > 0 )
+                  .map(item => ({
+                    id: item.id,
+                    description: item.name,
+                    code: item.accountCode
+                  } as AccountModel));
+              }
+            });
+
+            this.dataSource = transaccion
+
+            setTimeout(() => {
+              this.hideEditDeleteButtons("Haber");
+            }, 10000);
+            
+            
+
+          }
+        });
+      }
+    });
+
 
 
   }
+
+
+
 
   async saveRow(event: any): Promise<void> {
     if (this.documentType === JournalTypes.Ventas) {
@@ -439,7 +499,7 @@ export class AccountingAdjustmentComponent {
         [detail.debit, detail.credit] = isDebit ? [0, detail.debit] : [detail.credit, 0];
       }
     });
-    
+
     this.dataSource = copiaTransaccion.details!;
 
     this.selectRow = transaccion;
@@ -487,6 +547,30 @@ export class AccountingAdjustmentComponent {
           });
         }
       });
+    });
+  }
+
+  posting() {
+    let dialogo = confirm(
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Advertencia'
+    );
+
+    dialogo.then(async (d) => {
+      if (d) {
+        const transId = Number(this.id);
+        this.adjustemntService.putStatusAdjusment(transId).subscribe({
+          next: (data) => {
+            this.router.navigate(['/accounting/adjustment-list']);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar publicar la transacción';
+            this.showToast = true;
+
+          },
+        });
+      }
     });
   }
 

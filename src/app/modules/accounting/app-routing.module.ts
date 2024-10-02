@@ -80,6 +80,7 @@ const routes: Routes = [
       { path: 'journal-items', component: JournalItemsComponent },
       { path: 'adjustment-list', component: AdjustmentListComponent },
       { path: 'new/adjustment', component: AccountingAdjustmentComponent },
+      { path: 'adjustment/:id', component: AccountingAdjustmentComponent },
       { path: 'credit-notes', component: CreditNotesComponent },
       { path: 'debit-notes', component: DebitNotesComponent },
     ],

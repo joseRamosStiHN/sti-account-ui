@@ -57,5 +57,9 @@ export class AdjustmentListComponent {
     this.router.navigate(['accounting/new/adjustment']);
   };
 
+  onButtonClick(data: any) {
+    this.router.navigate(['/accounting/adjustment', data.id]);
+  }
+
 
 }

@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
 import { catchError, Observable, throwError } from 'rxjs';
-import { AdjustmentRequest, AdjustmentResponse } from 'src/app/modules/accounting/models/APIModels';
+import { AdjustmentRequest, AdjustmentResponse, AdjustmentResponseById } from 'src/app/modules/accounting/models/APIModels';
 
 @Injectable({
   providedIn: 'root'
@@ -53,6 +53,17 @@ export class AdjusmentService {
   
         .pipe(catchError(this.errorHandler));
     }
+  
+    getAdjustmentById(id: number): Observable<AdjustmentResponseById> {
+      const url = `${this.apiURL}/api/v1/adjustment/${id}`;
+      return this.httpClient.get<AdjustmentResponseById>(url);
+    }
+
+    putStatusAdjusment(id: number): Observable<any> {
+      const url = `${this.apiURL}/api/v1/adjustment/${id}/post`;
+      return this.httpClient.put(url, null, this.httpOptions);
+    }
+  
 
 
      /**

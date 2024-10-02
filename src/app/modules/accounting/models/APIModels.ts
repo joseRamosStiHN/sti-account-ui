@@ -165,4 +165,29 @@ export interface IncomeStatement {
   date: Date
 }
 
+export interface AdjustmentResponseById{
+  id: number
+  transactionId: number
+  reference: string
+  descriptionAdjustment: any
+  invoiceNo: string
+  diaryName: string
+  numberPda: string
+  status: string
+  creationDate: string
+  adjustmentDetails: AdjustmentDetailById[]
+}
+
+export interface AdjustmentDetailById {
+  id: number
+  accountId: number
+  accountName: string
+  accountCode: string
+  debit: any
+  credit: any
+  typicalBalance: string
+  initialBalance: number
+}
+
+
 
