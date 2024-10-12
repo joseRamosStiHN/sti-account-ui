@@ -45,51 +45,39 @@ export class JournalEntriesComponent implements OnInit {
   fillDataSource(data: any): LocalData[] {
     const result: LocalData[] = [];
 
-    const mapTransactionToLocalData = (item: any, isAdjustment: boolean = false, 
-      isCreditNotes:boolean=false, isDebitNotes:boolean=false): LocalData => {
+    const mapTransactionToLocalData = (item: any, isAdjustment: boolean = false,
+      isCreditNotes: boolean = false, isDebitNotes: boolean = false): LocalData => {
       const totalDetail = isAdjustment
-        ? item.adjustmentDetails.reduce((acc: number, detail: any) => {
-          const type = detail.typicalBalance;
-          const credit = type == "C" && detail.shortEntryType == "C"? detail.amount : type =="D"
-          && detail.shortEntryType == "D"
-          ? detail.amount :0;    
-            return acc + credit;
+        ? item.adjustmentDetails.reduce((max: any, detail: any) => {
+          return detail.amount > max ? detail.amount : max;
         }, 0)
-        : isCreditNotes ? 
-        item.detailNote.reduce((acc: number, detail: any) => {
-          const type = detail.typicalBalance;
-          const credit = type == "C" && detail.shortEntryType == "C"? detail.amount : type =="D"
-          && detail.shortEntryType == "D"
-          ? detail.amount :0;    
-            return acc + credit;
-        }, 0)
-        
-        : isDebitNotes? item.detailNote.reduce((acc: number, detail: any) => {          
-          const type = detail.typicalBalance;
-        
-          const credit = type == "C" && detail.shortEntryType == "C"? detail.amount : type =="D"
-          && detail.shortEntryType == "D"
-          ? detail.amount :0;   
-            return acc + credit;
-        }, 0) 
-        : item.transactionDetails.find((element: any) => {
-          return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
-            (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
-        });
+        : isCreditNotes ?
+          item.detailNote.reduce((max: any, detail: any) => {
+            return detail.amount > max ? detail.amount : max;
+          }, 0)
+          : isDebitNotes ?
+            item.detailNote.reduce((max: any, detail: any) => {
+              return detail.amount > max ? detail.amount : max;
+            }, 0)
 
-      const totalAmount = isAdjustment ? totalDetail : 
-      isDebitNotes ? totalDetail :
-      isCreditNotes ? totalDetail:
-      totalDetail ? totalDetail.amount : 0;
+            : item.transactionDetails.find((element: any) => {
+              return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
+                (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
+            });
+
+      const totalAmount = isAdjustment ? totalDetail :
+        isDebitNotes ? totalDetail :
+          isCreditNotes ? totalDetail :
+            totalDetail ? totalDetail.amount : 0;
 
       return {
         id: item.id,
         date: isAdjustment ? item.creationDate : item.date,
         referenceNumber: isAdjustment || isDebitNotes || isCreditNotes ? item.invoiceNo : item.reference,
         reference: (item.documentType === JournalTypes.Ventas || item.documentType === JournalTypes.Compras)
-          ? "" : isAdjustment || isDebitNotes || isCreditNotes? item.reference : item.description ,
+          ? "" : isAdjustment || isDebitNotes || isCreditNotes ? item.reference : item.description,
         journalEntry: item.diaryName,
-        total:  totalAmount,
+        total: totalAmount,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
       };
     };
@@ -106,11 +94,11 @@ export class JournalEntriesComponent implements OnInit {
 
 
     data.debitNotes.forEach((item: any) => {
-      result.push(mapTransactionToLocalData(item, false,false,true));
+      result.push(mapTransactionToLocalData(item, false, false, true));
     });
 
     data.creditNotes.forEach((item: any) => {
-      result.push(mapTransactionToLocalData(item, false,true));
+      result.push(mapTransactionToLocalData(item, false, true));
     });
 
 
