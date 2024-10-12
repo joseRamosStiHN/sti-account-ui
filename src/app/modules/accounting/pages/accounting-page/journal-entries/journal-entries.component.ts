@@ -60,15 +60,12 @@ export class JournalEntriesComponent implements OnInit {
               return detail.amount > max ? detail.amount : max;
             }, 0)
 
-            : item.transactionDetails.find((element: any) => {
-              return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
-                (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
-            });
+            : item.transactionDetails.reduce((max: number, detail: any) => {
+              return Math.max(max, detail.amount);
+            }, 0);
 
-      const totalAmount = isAdjustment ? totalDetail :
-        isDebitNotes ? totalDetail :
-          isCreditNotes ? totalDetail :
-            totalDetail ? totalDetail.amount : 0;
+
+    
 
       return {
         id: item.id,
@@ -77,7 +74,7 @@ export class JournalEntriesComponent implements OnInit {
         reference: (item.documentType === JournalTypes.Ventas || item.documentType === JournalTypes.Compras)
           ? "" : isAdjustment || isDebitNotes || isCreditNotes ? item.reference : item.description,
         journalEntry: item.diaryName,
-        total: totalAmount,
+        total: totalDetail,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
       };
     };
