@@ -169,6 +169,12 @@ export class TransactionService {
     return this.httpClient.get<any[]>(url);
   }
 
+
+  getAllDebitNoteByTrasactionId(id: number): Observable<any[]> {
+    const url = `${this.apiURL}/api/v1/debit-notes/by-transaction/${id}`;
+    return this.httpClient.get<any[]>(url);
+  }
+
   /**
   * Method that brings a list adjusjentment
   *
@@ -209,6 +215,11 @@ export class TransactionService {
 
   putStatusCreditNotes(id: number): Observable<any> {
     const url = `${this.apiURL}/api/v1/credit-notes/${id}/post`;
+    return this.httpClient.put(url, null, this.httpOptions);
+  }
+
+  putStatusDebitNotes(id: number): Observable<any> {
+    const url = `${this.apiURL}/api/v1/debit-notes/${id}/post`;
     return this.httpClient.put(url, null, this.httpOptions);
   }
 

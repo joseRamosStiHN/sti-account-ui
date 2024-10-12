@@ -615,7 +615,7 @@ export class DebitNotesComponent {
   }
 
   getAllDebitByTransaction(id: number) {
-    this.transService.getAllCreditNoteByTrasactionId(id).subscribe({
+    this.transService.getAllDebitNoteByTrasactionId(id).subscribe({
       next: (data) => {
         this.listCredtiNotesByTransaction = data.map(transaction => ({
           numberPda: transaction.descriptionNote,
@@ -659,7 +659,7 @@ export class DebitNotesComponent {
     dialogo.then(async (d) => {
       if (d) {
         const transId = Number(this.id);
-        this.transService.putStatusCreditNotes(transId).subscribe({
+        this.transService.putStatusDebitNotes(transId).subscribe({
           next: (data) => {
             // this.router.navigate(['/accounting/creditnotes-list']);
           },
