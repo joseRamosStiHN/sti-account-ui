@@ -65,8 +65,48 @@ export class JournalItemsComponent implements OnInit {
 
     data.adjustments.forEach((item: any) => {
       item.adjustmentDetails.forEach((transaction: any) => {
-        const debito =  transaction.debit;
-        const credito = transaction.credit;
+        const debito =  transaction.shortEntryType =="D"? transaction.amount : 0;
+        const credito = transaction.shortEntryType =="C"? transaction.amount : 0;
+        const localJournalItem: LocalJournalItem = {
+          id: item.id,
+          reference: item.reference,
+          date: item.creationDate,
+          journalEntry:item.diaryName,
+          defaultAccount: `${transaction.accountName} ${transaction.accountCode}`,
+          numberPad:item.numberPda,
+          description: item.description,
+          debit: debito,
+          credit: credito,
+          balance: Number((debito - credito).toFixed(2)),
+        };
+        result.push(localJournalItem);
+      });
+    });
+
+    data.debitNotes.forEach((item: any) => {
+      item.detailNote.forEach((transaction: any) => {
+        const debito =  transaction.shortEntryType =="D"? transaction.amount : 0;
+        const credito = transaction.shortEntryType =="C"? transaction.amount : 0;
+        const localJournalItem: LocalJournalItem = {
+          id: item.id,
+          reference: item.reference,
+          date: item.creationDate,
+          journalEntry:item.diaryName,
+          defaultAccount: `${transaction.accountName} ${transaction.accountCode}`,
+          numberPad:item.numberPda,
+          description: item.description,
+          debit: debito,
+          credit: credito,
+          balance: Number((debito - credito).toFixed(2)),
+        };
+        result.push(localJournalItem);
+      });
+    });
+
+    data.creditNotes.forEach((item: any) => {
+      item.detailNote.forEach((transaction: any) => {
+        const debito =  transaction.shortEntryType =="D"? transaction.amount : 0;
+        const credito = transaction.shortEntryType =="C"? transaction.amount : 0;
         const localJournalItem: LocalJournalItem = {
           id: item.id,
           reference: item.reference,
