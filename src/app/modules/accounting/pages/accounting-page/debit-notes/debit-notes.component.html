@@ -1,5 +1,22 @@
 <div class="container mx-auto">
-    <h2 class="mt-5 text-2xl font-semibold">Notas de Debito</h2>
+    <div class="flex flex-row justify-between">
+        <h2 class="mt-5 text-2xl font-semibold">Notas de Debito</h2>
+        @if(status !==null && status === 'DRAFT'){
+
+        <button (click)="posting()"
+            class="relative h-8 mt-5 inline-flex items-center justify-start px-2 mr-2 overflow-hidden transition-all bg-orange-500 rounded-xl group">
+            <span
+                class="absolute top-0 right-0 inline-block w-4 h-3 transition-all duration-500 ease-in-out bg-orange-700 rounded group-hover:-mr-2 group-hover:-mt-1">
+                <span class="absolute top-0 right-0 w-4 h-3 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
+            </span>
+            <span
+                class="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-orange-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"></span>
+            <span
+                class="relative text-left text-white transition-colors duration-200 ease-in-out group-hover:text-white">Confirmar</span>
+        </button>
+        }
+    </div>
+    
     <form id="noteCreditForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 auto-cols-fr mt-10">
             <div class="flex flex-wrap">
@@ -35,7 +52,7 @@
 
             <div>
                 <label for="date" class="block mb-2 text-sm text-gray-900">Fecha</label>
-                <input type="date" [(ngModel)]="creditNotes.date" id="date" name="date"
+                <input type="date" [(ngModel)]="debitNotes.date" id="date" name="date"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
                     placeholder="" required />
                 <div *ngIf="
@@ -47,7 +64,7 @@
             </div>
             <div class="basis-1/2">
                 <label for="dayri" class="block mt-1 mb-2 text-sm text-gray-900">Diario</label>
-                <select [(ngModel)]="creditNotes.dayri" (change)="onChangeJournal($event)" name="dayri" id="dayri"
+                <select [(ngModel)]="debitNotes.dayri" (change)="onChangeJournal($event)" name="dayri" id="dayri"
                     required
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none">
                     <option value="" disabled></option>
@@ -62,91 +79,46 @@
                     <small class="text-xs text-red-900">Diario es requerido</small>
                 </div>
             </div>
-            <div>
-                <label for="applyPorcent" class="block mb-2 text-sm text-gray-900">Aplica Porcentaje</label>
-                <select [(ngModel)]="creditNotes.applyPorcent" required="true" name="applyPorcent" id="applyPorcent"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                    <option value="si">si</option>
-                    <option value="no" selected>no</option>
-                </select>
-            </div>
-            @if(creditNotes.applyPorcent ==="si"){
-            <div>
-                <label for="percent" class="block mb-2 text-sm text-gray-900">Porcentaje </label>
-                <select required name="percent" id="percent" [(ngModel)]="creditNotes.percent"
-                (change)="onChangePercent($event)"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                    <option value="0.05" selected>5</option>
-                    <option value="0.1">10</option>
-                    <option value="0.15">15</option>
-                    <option value="0.25">25</option>
-                    <option value="0.50">50</option>
-                    <option value="0.70">70</option>
-                </select>
-                <div *ngIf="
-                    itemForm.submitted &&
-                    itemForm.form.controls['percent'].getError('required')
-                  ">
-                    <small class="text-xs text-red-900">Porcentaje es requerido</small>
-                </div>
-            </div>
-            }
 
-            <div class="mb-2 mt-1">
-                <label for="description" class="block mb-2 text-sm text-gray-900">Descripción de Nota</label>
-                <input type="text" name="description" maxlength="150" [(ngModel)]="description" id="description"
-                    class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Ingresa una Descripción corta de Nota de credito" required />
-                <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
-                    <small class="text-xs text-red-900">La descripción es requerida.</small>
-                </div>
-            </div>
+
         </div>
         @if(transactionOriginal.details.length > 0){
-        <div class="mt-10 border-2 border-gray-300">
-            <div class="flex justify-center m-2">
-                <h4>Partida #<strong>{{transactionOriginal.numberPda}}</strong> </h4>
+        <div class="mt-6 mb-2 border border-gray-200 rounded-lg shadow-md">
+            <div
+                class="flex justify-between items-center p-3 bg-gradient-to-r from-gray-200 to-gray-100 text-gray-700 rounded-t-lg">
+                <h4 class="text-sm font-semibold italic">
+                    Partida #
+                    <span class="text-gray-600 font-bold">{{ transactionOriginal.numberPda }}</span>
+                </h4>
+                <button type="button" (click)="toggleDetails()"
+                    class="flex items-center text-sm font-semibold text-gray-700 hover:text-blue-600 focus:outline-none">
+                    <i class="fas" [ngClass]="showDetails ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    <span class="ml-1">{{ showDetails ? 'Ocultar detalles' : 'Mostrar detalles' }}</span>
+                </button>
             </div>
-            <div class="relative overflow-x-auto ">
-                <table class="w-full text-sm text-left rtl:text-right text-gray-900 bg-white">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+
+            <div *ngIf="showDetails" class="relative overflow-x-auto">
+                <table class="w-full text-xs text-left text-gray-700 bg-white rounded-b-lg">
+                    <thead class="text-xs font-semibold text-gray-500 uppercase bg-gray-100 border-b border-gray-200">
                         <tr>
-                            <th scope="col" class="px-2 py-1">
-                                Nombre Cuenta
-                            </th>
-                            <th scope="col" class="px-2 py-1">
-                                Debe
-                            </th>
-                            <th scope="col" class="px-2 py-1">
-                                Haber
-                            </th>
+                            <th scope="col" class="px-3 py-2">Nombre Cuenta</th>
+                            <th scope="col" class="px-3 py-2 border-l">Debe</th>
+                            <th scope="col" class="px-3 py-2 border-l">Haber</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @for (item of transactionOriginal.details; track $index) {
-                        <tr class="border-b">
-                            <th scope="row" class="px-2 py-1 font-medium text-gray-900 whitespace-nowrap">
-                                {{item.nameAccount}}
-                            </th>
-                            <td class="px-2 py-1">
-                                {{item.debe}}
-                            </td>
-                            <td class="px-2 py-1">
-                                {{item.haber}}
-                            </td>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr *ngFor="let item of transactionOriginal.details; let i = index" class="hover:bg-gray-50">
+                            <td class="px-3 py-2 font-medium text-gray-800">{{ item.nameAccount }}</td>
+                            <td class="px-3 py-2 text-right border-l">{{ item.debe | currency }}</td>
+                            <td class="px-3 py-2 text-right border-l">{{ item.haber | currency }}</td>
                         </tr>
 
-                        }
-
-                        <tr class="font-bold bg-gray-200">
-                            <th scope="row" class="px-2 py-1 font-bold text-gray-900 whitespace-nowrap">
-                                Total
-                            </th>
-                            <td class="px-2 py-1">
-                                {{transactionOriginal.totalDebit}}
+                        <!-- Total row -->
+                        <tr class="bg-gray-100 font-bold text-gray-900">
+                            <td class="px-3 py-2">Total</td>
+                            <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalDebit | currency }}
                             </td>
-                            <td class="px-2 py-1">
-                                {{transactionOriginal.totalCredit}}
+                            <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalCredit | currency }}
                             </td>
                         </tr>
                     </tbody>
@@ -155,14 +127,78 @@
         </div>
 
         }
+
+        <div *ngIf="listCredtiNotesByTransaction.length > 0">
+            <div *ngFor="let transactionOriginal of listCredtiNotesByTransaction; let i = index; trackBy: trackByFn">
+                <div class="border-b border-gray-200 shadow-md mb-2">
+                    <div
+                        class="flex justify-between items-center p-3 bg-gradient-to-r from-gray-200 to-gray-100 text-gray-700">
+                        <h4 class="text-sm font-semibold italic">
+                            Nota de Debito:
+                            <span class="text-gray-600 font-bold">{{ transactionOriginal.numberPda }}</span>
+                        </h4>
+                        <button type="button" (click)="toggleDetailsAdjustment(i)"
+                            class="flex items-center text-sm font-semibold text-gray-700 hover:text-blue-600 focus:outline-none">
+                            <i class="fas"
+                                [ngClass]="showDetailsAdjustment[i] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                            <span class="ml-1">{{ showDetailsAdjustment[i] ? 'Ocultar detalles' : 'Mostrar detalles'
+                                }}</span>
+                        </button>
+                    </div>
+
+                    <div *ngIf="showDetailsAdjustment[i]" class="relative overflow-x-auto">
+                        <div class="border-t border-gray-300 my-2"></div>
+                        <p class="pl-3"><small><strong>Fecha: </strong>{{transactionOriginal.date }}</small></p>
+                        <p class="pl-3"><small><strong>Usuario: </strong>{{transactionOriginal.user}}</small></p>
+                        <table class="w-full text-xs text-left text-gray-700 bg-white">
+                            <thead
+                                class="text-xs font-semibold text-gray-500 uppercase bg-gray-100 border-b border-gray-200">
+                                <tr>
+                                    <th scope="col" class="px-3 py-2">Nombre Cuenta</th>
+                                    <th scope="col" class="px-3 py-2 border-l">Debe</th>
+                                    <th scope="col" class="px-3 py-2 border-l">Haber</th>
+                                </tr>
+                            </thead>
+                    
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr *ngFor="let item of transactionOriginal.details" class="hover:bg-gray-50">
+                                    <td class="px-3 py-2 font-medium text-gray-800">{{ item.nameAccount }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ item.debe | currency }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ item.haber | currency }}</td>
+                                </tr>
+
+                                <tr class="bg-gray-100 font-bold text-gray-900">
+                                    <td class="px-3 py-2">Total</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalDebit |
+                                        currency }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalCredit |
+                                        currency }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="border-b border-gray-200 mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-2 mt-1">
+            <label for="description" class="block mb-2 text-sm text-gray-900">Descripción de Nota</label>
+            <input type="text" name="description" maxlength="150" [(ngModel)]="description" id="description"
+                class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingresa una Descripción corta de Nota de credito" required />
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
+                <small class="text-xs text-red-900">La descripción es requerida.</small>
+            </div>
+        </div>
         <dx-data-grid id="grid-billing-client" class="mx-auto mt-4 py-2" [dataSource]="dataSource" [showBorders]="true"
             [height]="400" [repaintChangesOnly]="true" [showRowLines]="true" (onContentReady)="onContentReady($event)"
             [allowColumnResizing]="true" noDataText="" (onRowInserted)="saveRow($event)" (onRowUpdated)="updateRow()"
             (onRowRemoved)="removedRow()">
             <dxo-load-panel [enabled]="true"></dxo-load-panel>
             <dxo-scrolling mode="virtual"></dxo-scrolling>
-            <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="true"
-                [allowUpdating]="true" />
+            <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="allowAddEntry"
+                [allowUpdating]="allowAddEntry" />
 
             <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
                 [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">

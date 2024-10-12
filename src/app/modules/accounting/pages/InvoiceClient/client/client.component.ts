@@ -497,7 +497,7 @@ export class ClientComponent  {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0 
+          .filter(item => item.supportEntry 
             && item.accountType == JournalTypes.Ventas)
           .map(item => ({
             id: item.id,

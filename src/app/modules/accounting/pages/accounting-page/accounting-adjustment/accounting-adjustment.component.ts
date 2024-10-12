@@ -8,7 +8,7 @@ import { ToastType } from 'devextreme/ui/toast';
 import { JournalModel, JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 import { NgForm } from '@angular/forms';
-import { AdjustmentRequest } from 'src/app/modules/accounting/models/APIModels';
+import { AdjustmentDetailById, AdjustmentRequest, AdjustmentResponseById } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,7 +31,7 @@ interface LocalData {
 }
 
 interface TransactionPda {
-  numberPda: number,
+  numberPda: string,
   totalDebit: number,
   totalCredit: number,
   details: DetailsPda[]
@@ -55,6 +55,8 @@ export class AccountingAdjustmentComponent {
   totalDebit: number = 0;
   allowAddEntry: boolean = true;
 
+  showDetailsAdjustment: boolean[] = [];
+
   status:string="";
 
   id: string | null = null;
@@ -77,11 +79,13 @@ export class AccountingAdjustmentComponent {
   accountList: AccountModel[] = [];
   dataSource: Transaction[] = [];
   transactionOriginal: TransactionPda = {
-    numberPda: 0,
+    numberPda: '',
     totalDebit: 0,
     totalCredit: 0,
     details: []
   }
+
+  listAdjustmentByTransaction:any[]=[];
 
   dataTable: LocalData[] = [];
   journalForm!: JournalModel;
@@ -124,6 +128,11 @@ export class AccountingAdjustmentComponent {
       });
     }
   };
+
+
+  constructor(){
+    this.initializeShowDetails();
+  }
 
 
 
@@ -173,9 +182,9 @@ export class AccountingAdjustmentComponent {
 
             this.dataSource = transaccion
 
-            setTimeout(() => {
-              this.hideEditDeleteButtons("Haber");
-            }, 10000);
+            // setTimeout(() => {
+            //   this.hideEditDeleteButtons("Haber");
+            // }, 10000);
             
             
 
@@ -223,28 +232,11 @@ export class AccountingAdjustmentComponent {
   private updateAmounts(): void {
 
     if (this.dataSource.length > 0) {
-      const sumDebit = this.dataSource
-        .reduce((total, item) => {
-          return total + (item.debit ?? 0);
-        }, 0);
+      const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+      const haber = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
+      this.totalCredit = haber;
+      this.totalDebit = debe;
 
-      const sumCredit = this.dataSource
-        .reduce((total, item) => {
-          return total + (item.credit ?? 0);
-        }, 0);
-
-      console.log(this.dataSource);
-
-
-      console.log(sumDebit);
-
-
-      this.totalCredit = sumCredit;
-      this.totalDebit = sumDebit;
-
-      // foundItems.forEach(item => {
-      //   item.amount = sumDebit;
-      // });
     }
   }
 
@@ -362,9 +354,7 @@ export class AccountingAdjustmentComponent {
               amount: item.amount,
               id: item.id,
               movement: item.shortEntryType == "C" ? "C" : "D",
-              accountName: item.accountName,
-              debit: item.shortEntryType === "D" ? item.amount : 0,
-              credit: item.shortEntryType == "C" ? item.amount : 0
+              accountName: item.accountName
             } as Transaction;
           })
         } as LocalData;
@@ -375,9 +365,15 @@ export class AccountingAdjustmentComponent {
 
   }
 
+  showDetails: boolean = false;
+
+  toggleDetails() {
+    this.showDetails = !this.showDetails;
+  }
+
   async onSubmit(e: NgForm) {
 
-    if (this.selectRow.referenceNumber != '' && this.validate()) {
+    if (e.valid && this.selectRow.referenceNumber != '' && this.validate()) {
 
       const request: AdjustmentRequest = {
 
@@ -388,8 +384,9 @@ export class AccountingAdjustmentComponent {
           return {
             id: detail.id,
             accountId: detail.accountId,
-            debit: detail.debit ?? 0,
-            credit: detail.credit ?? 0
+            amount:detail.amount,
+            motion:detail.movement
+            
           };
         }),
       };
@@ -402,9 +399,6 @@ export class AccountingAdjustmentComponent {
       if (!dialogo) {
         return;
       }
-
-
-
 
       this.adjustemntService.createAdjusment(request).subscribe({
         next: (data) => {
@@ -477,7 +471,7 @@ export class AccountingAdjustmentComponent {
 
 
     this.transactionOriginal = {
-      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0,
+      numberPda: transaccion.numberPda ,
       totalDebit: transaccion.details?.filter(data => data.movement === "D")
         .reduce((total, item) => total + item.amount, 0),
       totalCredit: transaccion.details?.filter(data => data.movement === "C")
@@ -490,22 +484,26 @@ export class AccountingAdjustmentComponent {
       })) as DetailsPda[]
     } as TransactionPda;
 
+
+    
+
     const copiaTransaccion = { ...transaccion };
+
+    this.getAllAdjustmentByTransaction(copiaTransaccion.id);    
 
     copiaTransaccion.details?.forEach((detail) => {
       if (detail.movement === "D" || detail.movement === "C") {
         const isDebit = detail.movement === "D";
         detail.movement = isDebit ? "C" : "D";
-        [detail.debit, detail.credit] = isDebit ? [0, detail.debit] : [detail.credit, 0];
       }
     });
 
     this.dataSource = copiaTransaccion.details!;
 
     this.selectRow = transaccion;
-
-
     this.handleDocumentType(transaccion.documentType);
+
+    this.updateAmounts();
   }
 
 
@@ -524,30 +522,8 @@ export class AccountingAdjustmentComponent {
         }
       });
       const accountToCheck = documentType === JournalTypes.Ventas ? 'Debe' : 'Haber';
-      setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
+
     }
-  }
-
-  private hideEditDeleteButtons(accountToCheck: string): void {
-    const rows = document.querySelectorAll('.dx-data-row');
-    rows.forEach(row => {
-      const tds = row.querySelectorAll("td");
-      tds.forEach(td => {
-        const codeAccount = td.textContent;
-        if (codeAccount === accountToCheck) {
-          const editButtons = row.querySelectorAll(".dx-link-edit");
-          const deleteButtons = row.querySelectorAll(".dx-link-delete");
-
-          editButtons.forEach(button => {
-            (button as HTMLElement).style.display = 'none';
-          });
-
-          deleteButtons.forEach(button => {
-            (button as HTMLElement).style.display = 'none';
-          });
-        }
-      });
-    });
   }
 
   posting() {
@@ -572,6 +548,44 @@ export class AccountingAdjustmentComponent {
         });
       }
     });
+  }
+
+
+  getAllAdjustmentByTransaction(id:number){
+    this.adjustemntService.getAllAdjustmentByTrasactionId(id).subscribe({
+      next: (data) => {
+        this.listAdjustmentByTransaction = data.map((transaction:any) => (
+          
+          {
+          numberPda: transaction.descriptionAdjustment ,
+          totalDebit: transaction.adjustmentDetails?.filter((item:any) => item.shortEntryType === "D")
+            .reduce((total:any, item:any) => total + item.amount, 0),
+          totalCredit: transaction.adjustmentDetails?.filter((item:any) => item.shortEntryType === "C")
+            .reduce((total:any, item:any) => total + item.amount, 0),
+            date:transaction.creationDate.substring(0,10),
+            user:transaction.user,
+          details: transaction.adjustmentDetails?.map((item:any) => ({
+            id: item.id,
+            nameAccount: item.accountName,
+            debe: item.shortEntryType === 'D' ? item.amount : 0,
+            haber: item.shortEntryType === 'C' ? item.amount : 0,
+          })) as DetailsPda[]
+        })) as TransactionPda[];
+    
+      }
+    });
+  }
+
+  initializeShowDetails() {
+    this.showDetailsAdjustment = this.listAdjustmentByTransaction.map(() => false);
+  }
+
+  toggleDetailsAdjustment(index: number) {
+    this.showDetailsAdjustment[index] = !this.showDetailsAdjustment[index];
+  }
+
+  trackByFn(index: number, item: any) {
+    return item.numberPda;  // Asumiendo que numberPda es único
   }
 
 }

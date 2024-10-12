@@ -100,8 +100,7 @@ export interface AdjustmentRequest {
 
 export interface DetailAdjustment {
   accountId: number
-  debit: number
-  credit: number
+
 }
 
 export interface AdjustmentResponse {
@@ -183,11 +182,9 @@ export interface AdjustmentDetailById {
   accountId: number
   accountName: string
   accountCode: string
-  debit: any
-  credit: any
+  amount: number
+  entryType: string
+  shortEntryType: string
   typicalBalance: string
   initialBalance: number
 }
-
-
-

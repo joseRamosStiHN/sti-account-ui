@@ -4,8 +4,6 @@ export interface Transaction {
   amount: number;
   movement: string;
   accountName?:string;
-  debit?:number,
-  credit?:number
 }
 
 export interface IAccount {
@@ -61,7 +59,7 @@ export enum DocumentType {
 }
 
 
-export interface CreditNotes {
+export interface Notes {
   id?: number;
   reference: number;
   date: Date;

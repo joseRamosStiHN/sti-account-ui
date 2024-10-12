@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { AccountModel } from 'src/app/modules/accounting/models/AccountModel';
-import { ClientBilling, CreditNotes, IMovement, Transaction, typeToast } from 'src/app/modules/accounting/models/models';
+import { ClientBilling, IMovement, Notes, Transaction, typeToast } from 'src/app/modules/accounting/models/models';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
@@ -11,6 +11,7 @@ import { NgForm } from '@angular/forms';
 import { AdjustmentRequest } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
+import { ActivatedRoute } from '@angular/router';
 
 
 
@@ -49,7 +50,7 @@ export interface DetailsPda {
   styleUrl: './debit-notes.component.css'
 })
 export class DebitNotesComponent {
-  creditNotes: CreditNotes = {
+  debitNotes: Notes = {
     reference: 0,
     date: new Date(),
     dayri: 0,
@@ -58,11 +59,14 @@ export class DebitNotesComponent {
     description: '',
   };
 
+  listCredtiNotesByTransaction: any[] = [];
+
   journalList: JournalModel[] = [];
 
   totalCredit: number = 0;
   totalDebit: number = 0;
   allowAddEntry: boolean = true;
+  id: string | null = null;
 
   listMovement: IMovement[] = [
     {
@@ -92,6 +96,8 @@ export class DebitNotesComponent {
   creditTransaction: LocalData[] = [];
   journalForm?: JournalModel;
 
+  status:string="";
+
   // modal
   popupVisible = false;
 
@@ -101,6 +107,7 @@ export class DebitNotesComponent {
   private readonly transService = inject(TransactionService);
   private readonly adjustemntService = inject(AdjusmentService);
   private readonly journalService = inject(JournalService);
+  private readonly activeRouter = inject(ActivatedRoute);
 
   selectRow: LocalData = {
     id: 0,
@@ -146,9 +153,54 @@ export class DebitNotesComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.accountType == JournalTypes.Varios && item.status);
+          .filter(item => item.accountType == JournalTypes.Compras && item.status);
       },
-    })
+    });
+
+    this.activeRouter.paramMap.subscribe((params) => {
+      this.id = params.get('id');   
+      const findId = Number(this.id);
+      if (findId) {
+
+        this.allowAddEntry= false;
+        
+        this.transService.getNoteDebitById(findId).subscribe({
+          next: (data) => {
+            this.selectRow.referenceNumber=data.invoiceNo;
+            this.description = data.descriptionNote;
+            this.debitNotes.date = data.date;
+            this.debitNotes.dayri = data.diaryType;
+
+            this.status = data.status;
+    
+            const transaccion =  data.detailNote.map((item: any) => {
+              return {
+                accountId: item.accountId,
+                amount: item.amount,
+                id: item.id,
+                movement: item.typicalBalance,
+                accountName: item.accountName,
+                debit:  item.debit,
+                credit: item.credit
+              } as Transaction;
+            })
+            this.accountService.getAllAccount().subscribe({
+              next: (data) => {
+                this.accountList = data
+                  .filter(item => item.supportEntry && item.balances.length > 0 )
+                  .map(item => ({
+                    id: item.id,
+                    description: item.name,
+                    code: item.accountCode
+                  } as AccountModel));
+              }
+            });
+
+            this.dataSource = transaccion
+          }
+        });
+      }
+    });
 
 
   }
@@ -157,13 +209,13 @@ export class DebitNotesComponent {
 
     e.data.movement = "D";
     let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    
+
     if (foundItems.length > 0) {
 
       foundItems.forEach((item) => {
         const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
 
-  
+
         item.amount = sum
       });
     }
@@ -171,7 +223,7 @@ export class DebitNotesComponent {
     this.updateAmounts();
   }
 
- 
+
   removedRow(): void {
 
     this.updateAmounts();
@@ -191,31 +243,31 @@ export class DebitNotesComponent {
     }
 
     this.updateAmounts();
-    
+
   }
 
 
   private updateAmounts(): void {
     if (this.dataSource.length === 0) return;
-  
+
 
     const debitList = this.dataSource.filter(data => data.movement === 'D');
     const creditList = this.dataSource.filter(data => data.movement === 'C');
-  
+
 
     const totalDebit = debitList.reduce((sum, item) => sum + item.amount, 0);
     const totalCredit = creditList.reduce((sum, item) => sum + item.amount, 0);
-  
+
 
     creditList.forEach(item => {
-      item.amount = totalDebit; 
+      item.amount = totalDebit;
     });
-  
+
 
     this.totalDebit = totalDebit;
     this.totalCredit = totalDebit;
   }
-  
+
 
 
 
@@ -303,7 +355,7 @@ export class DebitNotesComponent {
 
 
     return data.filter((item: any) => item.status == "SUCCESS" && item.documentType === JournalTypes.Compras)
-      .map((item: any) => {        
+      .map((item: any) => {
 
         return {
           id: item.id,
@@ -337,9 +389,26 @@ export class DebitNotesComponent {
 
   async onSubmit(e: NgForm) {
 
-    if (this.selectRow.referenceNumber != '' && this.validate()) {
+    if (this.selectRow.referenceNumber != '' && this.validate() && e.valid) {
 
+      const request: any = {
 
+        transactionId: this.selectRow.id,
+        descriptionNote: e.form.value.description,
+        diaryType: e.form.value.dayri,
+        createAtDate: e.form.value.date,
+        detailNote: this.dataSource.map((detail) => {
+          return {
+            accountId: detail.accountId,
+            amount: detail.amount,
+            motion: detail.movement
+
+          };
+        }),
+      };
+
+      console.log(request);
+      
 
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
@@ -349,6 +418,24 @@ export class DebitNotesComponent {
       if (!dialogo) {
         return;
       }
+
+
+
+      this.transService.createTransactionDebitNotes(request).subscribe({
+        next: (data) => {
+
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Registros insertados exitosamente';
+          this.showToast = true;
+        },
+        error: (err) => {
+          console.error('Error creating transaction:', err);
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al crear la transacción';
+          this.showToast = true;
+        },
+      });
+
     }
 
 
@@ -394,10 +481,10 @@ export class DebitNotesComponent {
     }
   }
 
-  onChangePercent(e:any){
+  onChangePercent(e: any) {
 
     this.handleDocumentType(this.selectRow);
-  
+
   }
 
 
@@ -412,7 +499,7 @@ export class DebitNotesComponent {
     if (!transaccion) return;
     this.documentType = transaccion.documentType!;
 
-    const copiaTransaction = {...transaccion};
+    const copiaTransaction = { ...transaccion };
 
     this.transactionOriginal = {
       numberPda: copiaTransaction.numberPda ? parseInt(copiaTransaction.numberPda, 10) : 0,
@@ -428,6 +515,8 @@ export class DebitNotesComponent {
       })) as DetailsPda[]
     } as TransactionPda;
 
+    this.getAllDebitByTransaction(transaccion.id);
+
 
     this.selectRow = transaccion;
 
@@ -439,8 +528,8 @@ export class DebitNotesComponent {
   private handleDocumentType(transaccion: LocalData): void {
 
 
-    if (this.creditNotes.dayri != 0 && transaccion.documentType != null) {
-      this.journalForm = this.journalList.find((item) => item.id == this.creditNotes.dayri);
+    if (this.debitNotes.dayri != 0 && transaccion.documentType != null) {
+      this.journalForm = this.journalList.find((item) => item.id == this.debitNotes.dayri);
 
 
       this.accountService.getAllAccount().subscribe({
@@ -465,7 +554,7 @@ export class DebitNotesComponent {
 
         if (itemToRemove) {
           const index = transaccion.details?.indexOf(itemToRemove);
-   
+
           if (index !== undefined && index >= 0) {
             transaccion.details?.splice(index, 1);
           }
@@ -474,7 +563,7 @@ export class DebitNotesComponent {
         const accountToCheck = "Haber";
 
 
-        transaccion.details?.forEach(details=> details.movement ="D" )
+        transaccion.details?.forEach(details => details.movement = "D")
 
         transaccion.details?.push({
           "id": 0,
@@ -482,11 +571,9 @@ export class DebitNotesComponent {
           "amount": itemToRemove?.amount ?? 0,
           "movement": "C",
           "accountName": this.journalForm?.defaultAccountName ?? '',
-          "debit": 0,
-          "credit": 0
         });
 
-        this.dataSource = transaccion?.details??[];
+        this.dataSource = transaccion?.details ?? [];
         setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
 
         this.updateAmounts();
@@ -518,6 +605,72 @@ export class DebitNotesComponent {
           });
         }
       });
+    });
+  }
+
+  showDetails: boolean = false;
+
+  toggleDetails() {
+    this.showDetails = !this.showDetails;
+  }
+
+  getAllDebitByTransaction(id: number) {
+    this.transService.getAllCreditNoteByTrasactionId(id).subscribe({
+      next: (data) => {
+        this.listCredtiNotesByTransaction = data.map(transaction => ({
+          numberPda: transaction.descriptionNote,
+          totalDebit: transaction.detailNote?.filter((item: any) => item.shortEntryType === "D")
+            .reduce((total: any, item: any) => total + item.amount, 0),
+          totalCredit: transaction.detailNote?.filter((item: any) => item.shortEntryType === "C")
+            .reduce((total: any, item: any) => total + item.amount, 0),
+            date:transaction.date,
+            user:transaction.user,
+          details: transaction.detailNote?.map((item: any) => ({
+            id: item.id,
+            nameAccount: item.accountName,
+            debe: item.shortEntryType === 'D' ? item.amount : 0,
+            haber: item.shortEntryType === 'C' ? item.amount : 0,
+          })) as DetailsPda[]
+        })) as any[];
+
+      }
+    });
+  }
+
+  showDetailsAdjustment: boolean[] = [];
+  initializeShowDetails() {
+    this.showDetailsAdjustment = this.listCredtiNotesByTransaction.map(() => false);
+  }
+
+  toggleDetailsAdjustment(index: number) {
+    this.showDetailsAdjustment[index] = !this.showDetailsAdjustment[index];
+  }
+
+  trackByFn(index: number, item: any) {
+    return item.numberPda;  // Asumiendo que numberPda es único
+  }
+
+  posting() {
+    let dialogo = confirm(
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Advertencia'
+    );
+
+    dialogo.then(async (d) => {
+      if (d) {
+        const transId = Number(this.id);
+        this.transService.putStatusCreditNotes(transId).subscribe({
+          next: (data) => {
+            // this.router.navigate(['/accounting/creditnotes-list']);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar publicar la transacción';
+            this.showToast = true;
+
+          },
+        });
+      }
     });
   }
 
