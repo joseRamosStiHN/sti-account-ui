@@ -27,7 +27,7 @@ export class SeniorAccountantsComponent {
 
 
 
-  tranactionList$: LocalSeniorAccount[] = []
+  tranactionList$: any[] = []
   loadingData: boolean = true;
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
@@ -50,18 +50,18 @@ export class SeniorAccountantsComponent {
   }
 
 
-  fillDataSource(data: LeaderAccounts[]): LocalSeniorAccount[] {
+  fillDataSource(data: any): LocalSeniorAccount[] {
     const result: LocalSeniorAccount[] = [];
   
-    data.forEach((diary) => {
-      diary.transactions.forEach((transaction) => {
-        transaction.transactionsDetail.forEach((detail) => {
+  
+      data.transactions.forEach((transaction:any) => {
+        transaction.transactionDetails.forEach((detail:any) => {
           const debit = detail.entryType === "Debito" ? detail.amount : 0;
           const credit = detail.entryType === "Credito" ? detail.amount : 0;
   
           const localSeniorAccount: LocalSeniorAccount = {
-            id: diary.diaryId,
-            diary: diary.diaryName,
+            id: transaction.id,
+            diary: transaction.diaryName,
             date: transaction.date,
             account: detail.accountName,
             reference: "",
@@ -73,7 +73,69 @@ export class SeniorAccountantsComponent {
           result.push(localSeniorAccount);
         });
       });
-    });
+
+      data.adjustments.forEach((transaction:any) => {
+        transaction.adjustmentDetails.forEach((detail:any) => {
+          const debit = detail.entryType === "Debito" ? detail.amount : 0;
+          const credit = detail.entryType === "Credito" ? detail.amount : 0;
+  
+          const localSeniorAccount: LocalSeniorAccount = {
+            id: transaction.id,
+            diary: transaction.diaryName,
+            date: transaction.creationDate,
+            account: detail.accountName,
+            reference: "",
+            debit,
+            credit,
+            balance: debit - credit
+          };
+  
+          result.push(localSeniorAccount);
+        });
+      });
+
+
+      data.debitNotes.forEach((transaction:any) => {
+        transaction.detailNote.forEach((detail:any) => {
+          const debit = detail.entryType === "Debito" ? detail.amount : 0;
+          const credit = detail.entryType === "Credito" ? detail.amount : 0;
+  
+          const localSeniorAccount: LocalSeniorAccount = {
+            id: transaction.id,
+            diary: transaction.diaryName,
+            date: transaction.date,
+            account: detail.accountName,
+            reference: "",
+            debit,
+            credit,
+            balance: debit - credit
+          };
+  
+          result.push(localSeniorAccount);
+        });
+      });
+
+      data.creditNotes.forEach((transaction:any) => {
+        transaction.detailNote.forEach((detail:any) => {
+          const debit = detail.entryType === "Debito" ? detail.amount : 0;
+          const credit = detail.entryType === "Credito" ? detail.amount : 0;
+  
+          const localSeniorAccount: LocalSeniorAccount = {
+            id: transaction.id,
+            diary: transaction.diaryName,
+            date: transaction.date,
+            account: detail.accountName,
+            reference: "",
+            debit,
+            credit,
+            balance: debit - credit
+          };
+  
+          result.push(localSeniorAccount);
+        });
+      });
+    
+    
   
     return result;
   }

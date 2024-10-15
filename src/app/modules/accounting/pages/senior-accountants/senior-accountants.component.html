@@ -16,17 +16,62 @@
     <dxi-column alignment="center" caption="Asiento Contable" dataField="diary"></dxi-column>
     <dxi-column alignment="center" caption="Cuenta" dataField="account"></dxi-column>
 
-    <dxi-column alignment="center" caption="Debe" dataType="currency" dataField="debit"></dxi-column>
-    <dxi-column alignment="center" caption="Haber" dataType="currency" dataField="credit"></dxi-column>
-    <dxi-column alignment="center" caption="Balance" dataField="balance"></dxi-column>
+    <dxi-column alignment="center" caption="Debe" dataType="currency" dataField="debit" [format]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"></dxi-column>
+    <dxi-column alignment="center" caption="Haber" dataType="currency" dataField="credit" [format]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"></dxi-column>
+    <dxi-column alignment="center" caption="Balance" dataField="balance" [format]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"></dxi-column>
 
-    <dxo-summary>
-        <dxi-total-item column="debit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }" valueFormat="currency"
-            displayFormat="L. {0}"></dxi-total-item>
-        <dxi-total-item column="credit" summaryType="sum" [valueFormat]="{ currency: 'HNL' }" valueFormat="currency"
-            displayFormat="L. {0}"></dxi-total-item>
-
-        <dxi-total-item column="balance" summaryType="sum" [valueFormat]="{ currency: 'HNL' }" valueFormat="currency"
-            displayFormat="L. {0}"></dxi-total-item>
-    </dxo-summary>
+      <dxo-summary>
+        <dxi-total-item
+          column="debit"
+          summaryType="sum"
+          valueFormat="currency"
+            [valueFormat]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
+    displayFormat="Total L. {0}"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="credit"
+          summaryType="sum"
+          valueFormat="currency"
+            [valueFormat]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
+    displayFormat="Total L. {0}"
+        ></dxi-total-item>
+  
+        <dxi-total-item
+          column="balance"
+          summaryType="sum"
+          valueFormat="currency"
+            [valueFormat]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
+    displayFormat="Total L. {0}"
+        ></dxi-total-item>
+      </dxo-summary>
 </dx-data-grid>

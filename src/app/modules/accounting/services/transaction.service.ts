@@ -110,9 +110,9 @@ export class TransactionService {
  *
  * @return response()
  */
-  getAllLedgerAcounts(): Observable<LeaderAccounts[]> {
-    return this.httpClient.get<LeaderAccounts[]>(
-      this.apiURL + '/api/v1/ledger-accounts'
+  getAllLedgerAcounts(): Observable<any[]> {
+    return this.httpClient.get<any[]>(
+      this.apiURL + '/api/v1/senior-accountants'
     );
   }
 
@@ -123,7 +123,7 @@ export class TransactionService {
    */
   getAllJournalEntries(): Observable<any> {
     return this.httpClient
-      .get(this.apiURL + '/api/v1/journal-entry')
+      .get(this.apiURL + '/api/v1/senior-accountants')
 
       .pipe(catchError(this.errorHandler));
   }
