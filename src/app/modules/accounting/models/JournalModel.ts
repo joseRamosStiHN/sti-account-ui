@@ -18,6 +18,7 @@ export interface JournalModel {
   bankAccountName?:string | null
   code: string
   status?:boolean;
+  numberPda?:string
 }
 
 

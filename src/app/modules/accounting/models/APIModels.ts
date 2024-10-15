@@ -40,6 +40,7 @@ export interface TransactionResponse {
   currency: string;
   transactionDetails: TransactionDetailResponse[];
   diaryType:number;
+  numberPda?:string
 }
 
 export interface AccountCategories {

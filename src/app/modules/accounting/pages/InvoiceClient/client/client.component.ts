@@ -108,7 +108,7 @@ export class ClientComponent  {
         this.journalList = data
           .filter(item => item.accountType == JournalTypes.Ventas && item.status);
 
-          console.log(this.journalList);
+          // console.log(this.journalList);
           
       },
     })
@@ -175,6 +175,10 @@ export class ClientComponent  {
               this.fillBilling(data);
               this.toastType = typeToast.Success;
               this.messageToast = 'Actualizados Exitosamente';
+              this.showToast = true;
+              setTimeout(() => {
+                this.router.navigate(['/accounting/client-list']);
+              }, 2000);
             },
             error: (err) => {
               this.toastType = typeToast.Error;
@@ -196,6 +200,9 @@ export class ClientComponent  {
           this.toastType = typeToast.Success;
           this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
+          setTimeout(() => {
+            this.router.navigate(['/accounting/client-list']);
+          }, 2000);
         },
         error: (err) => {
           console.error('Error creating transaction:', err);
@@ -221,6 +228,9 @@ export class ClientComponent  {
         const transId = Number(this.id);
         this.transactionService.postTransaction(transId).subscribe({
           next: (data) => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Transacción publicada con exito';
+            this.showToast = true;
             this.router.navigate(['/accounting/client-list']);
           },
           error: (err) => {

@@ -37,6 +37,7 @@ export interface BillingListClient {
   entryNumber: string;
   description?: string;
   creationDate?:Date;
+  numberPda?:string
 }
 
 export interface ProviderClient extends ClientBilling {}

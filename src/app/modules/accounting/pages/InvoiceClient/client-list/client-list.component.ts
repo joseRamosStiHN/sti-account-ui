@@ -100,6 +100,7 @@ export class ClientListComponent implements OnInit {
         status:
           item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
         description: item.description,
+        numberPda:item.numberPda
       } as BillingListClient;
     });
   }

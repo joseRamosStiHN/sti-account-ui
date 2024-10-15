@@ -57,6 +57,7 @@ export class ProviderListComponent {
         status:
           item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Publicado',
         description: item.description,
+        numberPda:item.numberPda
       } as BillingListProvider;
     });
   }

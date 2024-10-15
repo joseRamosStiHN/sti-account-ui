@@ -172,6 +172,12 @@ export class ProviderComponent {
               this.fillBilling(data);
               this.toastType = typeToast.Success;
               this.messageToast = 'Actualizados Exitosamente';
+              this.showToast = true;
+
+              setTimeout(() => {
+                this.router.navigate(['/accounting/provider-list']); 
+              }, 2000);
+             
             },
             error: (err) => {
               this.toastType = typeToast.Error;
@@ -191,6 +197,10 @@ export class ProviderComponent {
             this.toastType = typeToast.Success;
             this.messageToast = 'Registros insertados exitosamente';
             this.showToast = true;
+
+            setTimeout(() => {
+              this.router.navigate(['/accounting/provider-list']); 
+            }, 2000);
           },
           error: (err) => console.error('error', err),
         });
@@ -250,7 +260,13 @@ export class ProviderComponent {
         const transId = Number(this.id);
         this.transactionService.postTransaction(transId).subscribe({
           next: (data) => {
-            this.router.navigate(['/accounting/provider-list']);
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Transacción publicada con exito';
+            this.showToast = true;
+            setTimeout(() => {
+              this.router.navigate(['/accounting/provider-list']); 
+            }, 2000);
+        
           },
           error: (err) => {
             this.toastType = typeToast.Error;
@@ -461,11 +477,11 @@ export class ProviderComponent {
               const editButtons = row.querySelectorAll(".dx-link-edit");
               const deleteButtons = row.querySelectorAll(".dx-link-delete");
               editButtons.forEach(button => {
-                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+                (button as HTMLElement).style.display = 'none';
               });
 
               deleteButtons.forEach(button => {
-                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+                (button as HTMLElement).style.display = 'none'; 
               });
             }
           })
