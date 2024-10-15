@@ -16,11 +16,11 @@
   
         <dxi-column caption="Fecha Creacion" dataField="creationDate" format="shortDate" dataType="date"
           alignment="center" format="dd/MM/yyyy" width="150"></dxi-column>
-        <dxi-column caption="Referencia" dataField="reference"></dxi-column>
-        <dxi-column caption="Facura" alignment="center" dataField="invoiceNo"></dxi-column>
-        <dxi-column caption="Descipcion" alignment="center" dataField="description"></dxi-column>
+        <dxi-column caption="Referencia" dataField="reference" width="150"></dxi-column>
+        <dxi-column caption="No. Factura"  dataField="invoiceNo"></dxi-column>
+        <dxi-column caption="Descripción"  dataField="description"></dxi-column>
   
-        <dxi-column caption="Estado" dataField="status" alignment="center"></dxi-column>
+        <dxi-column caption="Estado" dataField="status" width="150"></dxi-column>
   
         <dxi-column type="buttons" cellTemplate="cellButtonsTemplate" width="100">
           <div *dxTemplate="let factura of 'cellButtonsTemplate'">

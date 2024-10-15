@@ -177,7 +177,7 @@ export class CreditNotesComponent {
                 accountId: item.accountId,
                 amount: item.amount,
                 id: item.id,
-                movement: item.typicalBalance,
+                movement: item.shortEntryType,
                 accountName: item.accountName,
                 debit:  item.debit,
                 credit: item.credit
@@ -194,8 +194,8 @@ export class CreditNotesComponent {
                   } as AccountModel));
               }
             });
-
-            this.dataSource = transaccion
+             this.dataSource = transaccion;
+             this.updateAmounts();
           }
         });
       }
