@@ -1,6 +1,6 @@
 <div class="w-full flex flex-col mt-5 gap-2">
     <h2 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-        Configurar saldos
+        Configurar Saldos
     </h2>
     <dx-data-grid id="account-list-grid" [dataSource]="accountList$ | async" [repaintChangesOnly]="true"
         [loadPanel]="{ enabled: true }" [width]="'100%'" [allowColumnReordering]="true" [allowColumnResizing]="true"
@@ -13,10 +13,10 @@
         <dxo-paging [pageSize]="15"> </dxo-paging>
         <dxo-pager [visible]="true"> </dxo-pager>
 
-        <dxi-column caption="Código" dataField="accountCode" width="90"></dxi-column>
+        <dxi-column caption="Código" dataField="accountCode"></dxi-column>
         <dxi-column caption="Nombre" dataField="name"></dxi-column>
         <dxi-column caption="Cuenta Padre" dataField="parentName"></dxi-column>
-        <dxi-column caption="Categoría" dataField="categoryName" width="150"></dxi-column>
+        <dxi-column caption="Categoría" dataField="categoryName" width="200"></dxi-column>
         <dxi-column caption="Estado" dataField="status" alignment="center" width="110"></dxi-column>
         <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
             <div *dxTemplate="let account of 'cellButtonTemplate'">
