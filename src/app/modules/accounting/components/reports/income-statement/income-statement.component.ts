@@ -142,7 +142,7 @@ export class IncomeStatementComponent implements OnInit {
       this.pivotDataSource = {
         fields: [
           {
-            caption: 'Ingresos',
+            caption: 'Ingresos/Gastos',
             dataField: 'category',
             area: 'row',
             expanded: true,
@@ -172,19 +172,45 @@ export class IncomeStatementComponent implements OnInit {
             groupName: 'date',
             groupInterval: 'quarter',
             visible: false,
-  
             customizeText: function (cellInfo: any) {
-              console.log({ cellInfo });
               return cellInfo.valueText?.toUpperCase();
             },
           },
           {
             caption: 'Total',
-            dataField: 'amount',
             dataType: 'number',
-            summaryType: 'sum',
+            summaryType: 'custom',
             format: 'currency',
             area: 'data',
+            calculateCustomSummary: function (options: any) {
+              if (options.summaryProcess === 'start') {
+                options.totalValue = { ingresos: 0, gastos: 0 }; // Inicializamos los totales
+              }
+              if (options.summaryProcess === 'calculate') {
+                // Sumar ingresos y gastos tal como vienen en la API
+                if (options.value.category === 'Ingresos') {
+                  options.totalValue.ingresos += options.value.amount; // Sumar ingresos
+                } else if (options.value.category === 'Gastos') {
+                  options.totalValue.gastos += options.value.amount; // Sumar gastos tal como vienen
+                }
+              }
+              if (options.summaryProcess === 'finalize') {
+                // Total final
+                options.totalValue = options.totalValue.ingresos - options.totalValue.gastos; // Resultado final
+              }
+            },
+            customizeText: function (cellInfo: any) {
+              const formatter = new Intl.NumberFormat('es-HN', {
+                style: 'currency',
+                currency: 'HNL',
+                minimumFractionDigits: 2,
+              });
+              if (cellInfo.value < 0) {
+                return formatter.format(Math.abs(cellInfo.value)); // Display negative values as positive
+              } else {
+                return formatter.format(cellInfo.value); // Display positive values as is
+              }
+            }
           },
           {
             dataField: 'id',
@@ -193,15 +219,22 @@ export class IncomeStatementComponent implements OnInit {
           },
         ],
         store: this.incomnetStatment,
-        // store:DATA
       };
-
-     
     });
-    
-    
   }
+  
+  
+  
+  
+  
+  
+  
   
 
 
 }
+
+  
+
+
+
