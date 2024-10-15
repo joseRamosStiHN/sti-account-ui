@@ -1,6 +1,6 @@
 <div class="w-100 mt-5">
     <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-        Diarios
+        Diarios Contables
     </h2>
 
     <dx-data-grid id="account-list-grid" [dataSource]="journalList$ | async" [repaintChangesOnly]="true"
@@ -17,7 +17,7 @@
         <dxi-column caption="Orden" dataField="id" width="90"></dxi-column>
         <dxi-column caption="Nombre del Diario" dataField="diaryName"></dxi-column>
         <dxi-column caption="Tipo" dataField="accountTypeName" width="100" alignment="center"></dxi-column>
-        <dxi-column caption="Codigo" dataField="code"  alignment="center"  width="150"></dxi-column>
+        <dxi-column caption="Código" dataField="code"  alignment="center"  width="150"></dxi-column>
         <dxi-column caption="Cuenta Predeterminada" dataField="defaultAccountName" alignment="center"></dxi-column>
         <dxi-column caption="Estado" dataField="status" alignment="center" width="150" cellTemplate="cellTemplate"></dxi-column>
         <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">

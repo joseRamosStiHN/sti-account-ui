@@ -91,7 +91,6 @@ export class JournalPageComponent {
       });
 
     const NoActive = ['Bancos', 'Efectivo'];
-    console.log(NoActive.includes('Efectivo'));
     this.journalTypes = this.journalService.getAllAccountType().pipe(
       map((results: AccountTypeResponse[]): LocalAccountType[] =>
         results.map((result: AccountTypeResponse) => {
@@ -201,6 +200,8 @@ export class JournalPageComponent {
   }
   loadAccountsOnEdit(journal: JournalModel) {
     this.journalForm = journal;
+    this.showDefaultAccountName(this.journalForm.accountType.toString());
+
 
     if (journal.accountType == JournalTypes.Ventas) {
       this.accountsFilter = this.accounts.filter(
