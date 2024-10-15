@@ -11,7 +11,7 @@ import { NgForm } from '@angular/forms';
 import { AdjustmentRequest } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 
@@ -108,6 +108,7 @@ export class DebitNotesComponent {
   private readonly adjustemntService = inject(AdjusmentService);
   private readonly journalService = inject(JournalService);
   private readonly activeRouter = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   selectRow: LocalData = {
     id: 0,
@@ -407,7 +408,6 @@ export class DebitNotesComponent {
         }),
       };
 
-      console.log(request);
       
 
       let dialogo = await confirm(
@@ -427,6 +427,10 @@ export class DebitNotesComponent {
           this.toastType = typeToast.Success;
           this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
+
+          setTimeout(() => {
+            this.router.navigate(['/accounting/debitnotes-list']);
+          }, 2000);
         },
         error: (err) => {
           console.error('Error creating transaction:', err);
@@ -661,7 +665,9 @@ export class DebitNotesComponent {
         const transId = Number(this.id);
         this.transService.putStatusDebitNotes(transId).subscribe({
           next: (data) => {
-            // this.router.navigate(['/accounting/creditnotes-list']);
+            setTimeout(() => {
+              this.router.navigate(['/accounting/debitnotes-list']);
+            }, 2000);
           },
           error: (err) => {
             this.toastType = typeToast.Error;

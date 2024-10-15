@@ -389,8 +389,7 @@ export class CreditNotesComponent {
 
     if (this.selectRow.referenceNumber != '' && this.validate() && e.valid) {
 
-      console.log(e.form);
-      
+
 
       const request: any = {
 
@@ -424,6 +423,10 @@ export class CreditNotesComponent {
           this.toastType = typeToast.Success;
           this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
+
+          setTimeout(() => {
+            this.router.navigate(['/accounting/creditnotes-list']);
+          }, 2000);
         },
         error: (err) => {
           console.error('Error creating transaction:', err);
@@ -662,7 +665,9 @@ export class CreditNotesComponent {
         const transId = Number(this.id);
         this.transService.putStatusCreditNotes(transId).subscribe({
           next: (data) => {
-            // this.router.navigate(['/accounting/creditnotes-list']);
+            setTimeout(() => {
+              this.router.navigate(['/accounting/creditnotes-list']);
+            }, 2000);
           },
           error: (err) => {
             this.toastType = typeToast.Error;
