@@ -28,7 +28,7 @@
         <Label for="parent-account" class="block mb-2 text-sm text-gray-900">Cuenta Padre</Label>
         <dx-select-box [(value)]="accountForm.parentId" [dataSource]="accounts"  name="parentId" 
         [searchEnabled]="true" valueExpr="id"
-          displayExpr="code"  [searchExpr]="['name', 'code']" 
+          displayExpr="name"  [searchExpr]="['name', 'code']" 
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
            focus:ring-blue-500 focus:border-blue-500 block w-full p-2 h-12"
            (valueChange)="onValueChange($event)">
@@ -109,7 +109,10 @@
         </select>
 
       </div>
-      <div>
+     
+      }
+      @if(accountFatherIsRequired === true){
+        <div>
         <Label for="select-accountType" class="block mb-2 text-sm text-gray-900">Tipo</Label>
         <select id="select-accountType" [(ngModel)]="accountForm.accountType"
           name="accountType" required
@@ -125,11 +128,12 @@
         </div>
       </div>
       }
+      
       <div class="clear-both"></div>
     </div>
     @if(id){
 
-    <div class="flex items-center border border-gray-200 rounded">
+    <div class="mt-3 flex items-center border border-gray-200 rounded">
       <label class="inline-flex items-center p-2 cursor-pointer">
         <input type="checkbox" name="isActive" [(ngModel)]="accountForm.isActive" [checked]="accountForm.isActive"
           class="sr-only peer" />
@@ -145,7 +149,9 @@
       <h3 class="font-semibold text-slate-700">Historial de Saldos</h3>
       <dx-data-grid id="account-history" [dataSource]="accountForm.balances" [showBorders]="true" [width]="'100%'"
         height="350">
-        <dxi-column caption="Saldo" dataField="initialBalance" dataType="number" [alignment]="'center'"></dxi-column>
+        <dxi-column caption="Saldo" dataField="initialBalance" dataType="number" [alignment]="'center'"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        ></dxi-column>
         <dxi-column caption="Fecha" dataField="createAtDate" dataType="date" [alignment]="'center'"></dxi-column>
         <dxi-column caption="Periodo Actual?" dataField="isActual" [alignment]="'center'" width="120">
           <div *dxTemplate="let data of 'data'">

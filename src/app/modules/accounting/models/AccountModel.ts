@@ -1,7 +1,7 @@
 export interface AccountModel {
   id?: number;
   code?: string;
-  accountType?:string
+  accountType?:number
   description?: string;
   parentId?: number | null;
   category?: number;

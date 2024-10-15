@@ -30,7 +30,7 @@ export class AccountComponent implements OnInit {
   accountForm: AccountModel = {
     description: '',
     code: '',
-    accountType: '',
+    accountType: 0,
     status: 'ACTIVO',
     balances: [{
       typicalBalance: "",
@@ -79,6 +79,13 @@ export class AccountComponent implements OnInit {
           next: (data) => this.fillForm(data),
           error: (err) => console.error('error: we got ', err),
         });
+
+        this.accountService.getAllAccountType().subscribe({
+          next: (data) => {
+            this.accountTypes = data;
+          }
+        });
+
       }
     });
   }
@@ -142,6 +149,9 @@ export class AccountComponent implements OnInit {
     this.accountForm.isActive =
       data.status.toUpperCase() === 'ACTIVA' ? true : false;
     this.accountForm.balances = data.balances;
+    this.accountForm.accountType = data.accountType;
+
+   this.accountFatherIsRequired = data.supportEntry;
    
 
   }
