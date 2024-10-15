@@ -10,7 +10,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-2">
                     <div class="form-group">
-                        <label for="closureType" class="block mb-2 text-sm text-gray-900">Tipo de Periodo</label>
+                        <label for="closureType" class="block mb-2 text-sm text-gray-900">Tipo de Período</label>
                         <select [(ngModel)]="periodForm.closureType"
                         required="true" name="closureType" id="closureType"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
@@ -20,7 +20,7 @@
                             </option>
                         </select>
                         <div *ngIf="itemForm.submitted && itemForm.form.controls['closureType'].getError('required')">
-                            <small class="text-xs text-red-900">Tipo de periodo es requerido.</small>
+                            <small class="text-xs text-red-900">Tipo de Período es requerido.</small>
                         </div>
                     </div>
     

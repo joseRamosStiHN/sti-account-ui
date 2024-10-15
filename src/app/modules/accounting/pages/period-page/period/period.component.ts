@@ -58,13 +58,12 @@ export class PeriodComponent {
 
 
   async save(e: NgForm) {
-    if (e.valid) {
+    if (e.valid && this.validationDate(e)) {
       let dialogo = await confirm(`¿Está seguro de que desea realizar esta acción?`, 'Advertencia');
       if (!dialogo) {
         return;
       }
 
-      this.validationDate(e);
     
       if (this.id) {
           this.updatePerido();
@@ -133,7 +132,7 @@ export class PeriodComponent {
         this.toastType = typeToast.Warning;
         this.messageToast = 'La fecha incial no puede ser menor ala final';
         this.showToast = true;
-        return;
+        return false;
       }
 
       let differenceInTime = end.getTime() - init.getTime();
@@ -142,6 +141,7 @@ export class PeriodComponent {
       this.periodForm.endPeriod = end;
 
     }
+    return true
   }
 
   validateDays(initial: Date, final: Date): boolean {
