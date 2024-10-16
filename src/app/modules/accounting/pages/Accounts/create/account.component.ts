@@ -109,7 +109,9 @@ export class AccountComponent implements OnInit {
     if (!this.accountFatherIsRequired) {
       this.accountForm.balances = [];
     }
-    this.accountService.createAccount(this.accountForm).subscribe({
+    const { accountType, ...accountFormWithoutType } = this.accountForm;
+
+    this.accountService.createAccount(accountFormWithoutType).subscribe({
       next: (result) => {
         this.router.navigate(['accounting/configuration']);
       },
