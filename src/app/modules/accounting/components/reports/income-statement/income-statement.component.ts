@@ -184,19 +184,19 @@ export class IncomeStatementComponent implements OnInit {
             area: 'data',
             calculateCustomSummary: function (options: any) {
               if (options.summaryProcess === 'start') {
-                options.totalValue = { ingresos: 0, gastos: 0 }; // Inicializamos los totales
+                options.totalValue = { debit: 0, credit: 0 }; // Inicializamos los totales
               }
               if (options.summaryProcess === 'calculate') {
-                // Sumar ingresos y gastos tal como vienen en la API
-                if (options.value.category === 'Ingresos') {
-                  options.totalValue.ingresos += options.value.amount; // Sumar ingresos
-                } else if (options.value.category === 'Gastos') {
-                  options.totalValue.gastos += options.value.amount; // Sumar gastos tal como vienen
+                // Sumar valores según typicalBalance
+                if (options.value.typicalBalance === 'D') {
+                  options.totalValue.debit += options.value.amount; // Sumar débitos
+                } else if (options.value.typicalBalance === 'C') {
+                  options.totalValue.credit += options.value.amount; // Sumar créditos
                 }
               }
               if (options.summaryProcess === 'finalize') {
                 // Total final
-                options.totalValue = options.totalValue.ingresos - options.totalValue.gastos; // Resultado final
+                options.totalValue = options.totalValue.credit - options.totalValue.debit; // Resultado final
               }
             },
             customizeText: function (cellInfo: any) {
@@ -222,6 +222,7 @@ export class IncomeStatementComponent implements OnInit {
       };
     });
   }
+  
   
   
   
