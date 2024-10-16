@@ -50,10 +50,16 @@
       dataField="journalEntry"
     ></dxi-column>
     <dxi-column
-      alignment="center"
+      alignment="right"
       caption="Total"
       dataType="currency"
       dataField="total"
+      [format]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
     ></dxi-column>
     <dxi-column
       alignment="center"
@@ -71,7 +77,7 @@
       minimumFractionDigits: 2, 
       useGrouping: true 
     }"
-  displayFormat="Total L. {0}"
+  displayFormat="Total {0}"
 ></dxi-total-item>
     </dxo-summary>
   </dx-data-grid>

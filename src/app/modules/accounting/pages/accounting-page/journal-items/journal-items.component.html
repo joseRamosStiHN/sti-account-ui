@@ -56,7 +56,7 @@
       dataField="reference"
     ></dxi-column>
     <dxi-column
-    alignment="center"
+    alignment="right"
     caption="Debe"
     dataField="debit"
     dataType="number"
@@ -68,7 +68,7 @@
     }"
   ></dxi-column>
     <dxi-column
-      alignment="center"
+      alignment="right"
       caption="Haber"
       dataType="currency"
       dataField="credit"
@@ -80,7 +80,7 @@
       }"
     ></dxi-column>
     <dxi-column
-      alignment="center"
+      alignment="right"
       caption="Balance"
       dataField="balance"
     ></dxi-column>
@@ -96,9 +96,10 @@
       minimumFractionDigits: 2, 
       useGrouping: true 
     }"
-  displayFormat="Total L. {0}"
+  displayFormat="Total {0}"
       ></dxi-total-item>
       <dxi-total-item
+      alignment="right"
         column="credit"
         summaryType="sum"
         valueFormat="currency"
@@ -108,7 +109,7 @@
       minimumFractionDigits: 2, 
       useGrouping: true 
     }"
-  displayFormat="Total L. {0}"
+  displayFormat="Total {0}"
       ></dxi-total-item>
 
       <dxi-total-item
@@ -121,7 +122,7 @@
       minimumFractionDigits: 2, 
       useGrouping: true 
     }"
-  displayFormat="Total L. {0}"
+  displayFormat="Total {0}"
       ></dxi-total-item>
     </dxo-summary>
   </dx-data-grid>

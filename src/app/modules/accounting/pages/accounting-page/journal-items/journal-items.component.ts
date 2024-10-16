@@ -49,7 +49,7 @@ export class JournalItemsComponent implements OnInit {
         const credito = transaction.entryType === 'Debito' ? 0 : transaction.amount;
         const localJournalItem: LocalJournalItem = {
           id: item.id,
-          reference: "",
+          reference: "Transaccion Contable",
           date: item.creationDate,
           journalEntry:item.diaryName,
           defaultAccount: `${transaction.accountName} ${transaction.accountCode}`,

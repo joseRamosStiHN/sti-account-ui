@@ -64,15 +64,12 @@ export class JournalEntriesComponent implements OnInit {
               return Math.max(max, detail.amount);
             }, 0);
 
-
-    
-
       return {
         id: item.id,
         date: isAdjustment ? item.creationDate : item.date,
         referenceNumber: isAdjustment || isDebitNotes || isCreditNotes ? item.invoiceNo : item.reference,
         reference: (item.documentType === JournalTypes.Ventas || item.documentType === JournalTypes.Compras)
-          ? "" : isAdjustment || isDebitNotes || isCreditNotes ? item.reference : item.description,
+          ? "Transacion Contable" : isAdjustment || isDebitNotes || isCreditNotes ? item.reference : item.description,
         journalEntry: item.diaryName,
         total: totalDetail,
         status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
