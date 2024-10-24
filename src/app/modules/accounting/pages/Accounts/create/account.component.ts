@@ -111,7 +111,14 @@ export class AccountComponent implements OnInit {
     }
     const { accountType, ...accountFormWithoutType } = this.accountForm;
 
-    this.accountService.createAccount(accountFormWithoutType).subscribe({
+    let request;
+    if (accountType == 0) {
+      request = accountFormWithoutType;
+    }else{
+      request = this.accountForm
+    }
+
+    this.accountService.createAccount(request).subscribe({
       next: (result) => {
         this.router.navigate(['accounting/configuration']);
       },

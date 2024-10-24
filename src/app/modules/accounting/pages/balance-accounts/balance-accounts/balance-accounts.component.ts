@@ -96,9 +96,12 @@ export class BalanceAccountsComponent {
 
     this.balanceService.saveBalance(balanceSave).subscribe({
       next: (data) => {
+        
+        this.activeAdd= false
         this.toastType = typeToast.Success;
         this.messageToast = 'Registros inicialisados exitosamente';
         this.showToast = true;
+
       },
       error: (err) => {
         console.error('Error creating transaction:', err);
@@ -108,11 +111,11 @@ export class BalanceAccountsComponent {
       },
     });
 
-    setTimeout(() => {
+    // setTimeout(() => {
       
-    this.ngOnInit();
+    // this.ngOnInit();
  
-    }, 100);
+    // }, 1000);
 
   }
 
@@ -147,9 +150,9 @@ export class BalanceAccountsComponent {
       },
     });
 
-    setTimeout(() => {
-      this.ngOnInit();
-    }, 1000);
+    // setTimeout(() => {
+    //   this.ngOnInit();
+    // }, 1000);
 
    
   }

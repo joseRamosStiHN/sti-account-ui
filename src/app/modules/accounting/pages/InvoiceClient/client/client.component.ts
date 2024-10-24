@@ -26,7 +26,7 @@ import { Observable } from 'rxjs';
   templateUrl: './client.component.html',
   styleUrl: './client.component.css',
 })
-export class ClientComponent  {
+export class ClientComponent {
 
   allowAddEntry: boolean = true;
   id: string | null = null;
@@ -108,8 +108,8 @@ export class ClientComponent  {
         this.journalList = data
           .filter(item => item.accountType == JournalTypes.Ventas && item.status);
 
-          // console.log(this.journalList);
-          
+        // console.log(this.journalList);
+
       },
     })
 
@@ -144,7 +144,7 @@ export class ClientComponent  {
         exchangeRate: this.clientBilling.exchangeRate,
         descriptionPda: this.clientBilling.description,
         currency: this.clientBilling.currency,
-        diaryType:this.clientBilling.diaryType,
+        diaryType: this.clientBilling.diaryType,
         detail: this.dataSource.map((detail) => {
           return {
             id: detail.id,
@@ -191,7 +191,7 @@ export class ClientComponent  {
       }
 
 
-      
+
 
 
       this.transactionService.createTransaction(transactionData).subscribe({
@@ -309,23 +309,23 @@ export class ClientComponent  {
     // this.totalCredit = totalCredit;
 
     const rows = document.querySelectorAll('.dx-data-row');
-    rows.forEach(row => {
-      const tds = row.querySelectorAll("td");
-      tds.forEach(td => {
-        const codeAccount = td.textContent
-        if (codeAccount == 'Haber') {
-          const editButtons = row.querySelectorAll(".dx-link-edit");
-          const deleteButtons = row.querySelectorAll(".dx-link-delete");
-          editButtons.forEach(button => {
-            (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-          });
+    // rows.forEach(row => {
+    //   const tds = row.querySelectorAll("td");
+    //   tds.forEach(td => {
+    //     const codeAccount = td.textContent
+    //     if (codeAccount == 'Haber') {
+    //       const editButtons = row.querySelectorAll(".dx-link-edit");
+    //       const deleteButtons = row.querySelectorAll(".dx-link-delete");
+    //       editButtons.forEach(button => {
+    //         (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+    //       });
 
-          deleteButtons.forEach(button => {
-            (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-          });
-        }
-      })
-    });
+    //       deleteButtons.forEach(button => {
+    //         (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
+    //       });
+    //     }
+    //   })
+    // });
 
   }
 
@@ -385,7 +385,7 @@ export class ClientComponent  {
     this.clientBilling.exchangeRate = data.exchangeRate;
     this.clientBilling.date = data.date;
     this.clientBilling.description = data.description;
-    this.clientBilling.diaryType= data.diaryType
+    this.clientBilling.diaryType = data.diaryType
     //
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
 
@@ -401,6 +401,8 @@ export class ClientComponent  {
 
     if (e.target.value) {
       this.dataSource = [];
+
+
       this.loadAccounts();
     }
   }
@@ -422,93 +424,212 @@ export class ClientComponent  {
   save(e: any) {
 
 
-    e.data.movement = "D";
-    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    if (foundItems.length > 0) {
-      // Si se encuentran, modificamos los datos de todos los objetos encontrados
-      foundItems.forEach((item) => {
-        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+    const credit = this.dataSource.filter((data) => data.movement === 'C');
+    const debit = this.dataSource.filter((data) => data.movement === 'D');
 
-        this.totalCredit = sum;
-        this.totalDebit = sum;
-        item.amount = sum
-      });
-    } else {
+    if (e.data.movement == 'C' && debit.length <= 1) {
+      if (debit.length == 1) {
+        debit.forEach((item) => {
+          const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
 
-      this.totalCredit = e.data.amount;
-      this.totalDebit = e.data.amount;
+          const roundedSum = parseFloat(sum.toFixed(2));
 
-      this.dataSource.push({
-        id: this.selectedJournal?.id ?? 0,
-        accountId: this.selectedJournal?.defaultAccount ?? 0,
-        amount: e.data.amount,
-        movement: 'C',
-
-      });
-
-
-      setTimeout(() => {
-        const rows = document.querySelectorAll('.dx-data-row');
-
-        rows.forEach(row => {
-          const tds = row.querySelectorAll("td");
-          tds.forEach(td => {
-            const codeAccount = td.textContent
-            if (codeAccount == 'Haber') {
-              const editButtons = row.querySelectorAll(".dx-link-edit");
-              const deleteButtons = row.querySelectorAll(".dx-link-delete");
-              editButtons.forEach(button => {
-                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-              });
-
-              deleteButtons.forEach(button => {
-                (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-              });
-            }
-          })
+         item.amount = roundedSum;
         });
-      }, 2);
+
+      } else {
+
+        this.dataSource.push({
+          id: this.selectedJournal?.id ?? 0,
+          accountId: this.selectedJournal?.defaultAccount ?? 0,
+          amount: parseFloat(e.data.amount.toFixed(2)),
+          movement: 'D',
+
+        });
+      }
+
+    }
+
+    if (e.data.movement == 'D' && credit.length <= 1) {
+
+      if (credit.length == 1) {
+        credit.forEach((item) => {
+          const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
+  
+          // Redondear la suma a dos decimales para asegurar precisión
+          const roundedSum = parseFloat(sum.toFixed(2));
+
+          item.amount = roundedSum
+        });
+
+      } else {
+
+        this.dataSource.push({
+          id: this.selectedJournal?.id ?? 0,
+          accountId: this.selectedJournal?.defaultAccount ?? 0,
+          amount: parseFloat(e.data.amount.toFixed(2)),
+          movement: 'C',
+
+        });
+      }
+
+    }
+
+    this.updateAmounts();
+
+
+
+
+
+    // let foundItems = this.dataSource.filter((data) => data.movement === 'D');
+    // console.log(foundItems.length);
+
+    // console.log("afuera");
+    // if (foundItems.length = 0) {
+    //   console.log("aqui entro");
+
+    //   foundItems.forEach((item) => {
+    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+    //     item.amount = sum
+    //   });
+    // } else {
+
+    //   this.totalCredit = e.data.amount;
+    //   this.totalDebit = e.data.amount;
+
+    //   this.dataSource.push({
+    //     id: this.selectedJournal?.id ?? 0,
+    //     accountId: this.selectedJournal?.defaultAccount ?? 0,
+    //     amount: e.data.amount,
+    //     movement: 'C',
+
+    //   });
+    // }
+  }
+
+  private updateAmounts(): void {
+
+
+    if (this.dataSource.length > 0) {
+      // Calcular el total de los movimientos 'D' (debe)
+      const debe = this.dataSource
+        .filter((data) => data.movement === 'D')
+        .reduce((sum, item) => sum + item.amount, 0);
+    
+      // Calcular el total de los movimientos 'C' (haber)
+      const haber = this.dataSource
+        .filter((data) => data.movement === 'C')
+        .reduce((sum, item) => sum + item.amount, 0);
+    
+      // Redondear los totales a dos decimales
+      this.totalCredit = parseFloat(haber.toFixed(2));
+      this.totalDebit = parseFloat(debe.toFixed(2));
+    
+      // Mostrar en la consola para verificar
+      // console.log('Total Debit:', this.totalDebit);
+      // console.log('Total Credit:', this.totalCredit);
     }
   }
 
   update(e: any) {
-    let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    if (foundItems.length > 0) {
-      foundItems.forEach((item) => {
-        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-        this.totalCredit = sum;
-        this.totalDebit = sum;
-        item.amount = sum
+    const credit = this.dataSource.filter((data) => data.movement === 'C');
+    const debit = this.dataSource.filter((data) => data.movement === 'D');
+
+    if (e.data.movement == 'D' && credit.length == 1) {
+      credit.forEach((item) => {
+        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2));
       });
     }
+    if (e.data.movement == 'C' && debit.length == 1) {
+      debit.forEach((item) => {
+        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2));
+      });
+    }
+
+
+
+    this.updateAmounts();
+
+    // let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    // if (foundItems.length > 0) {
+    //   foundItems.forEach((item) => {
+    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+    //     this.totalCredit = sum;
+    //     this.totalDebit = sum;
+    //     item.amount = sum
+    //   });
+    // }
+
+
   }
 
   removed(e: any) {
 
-    let debitos = this.dataSource.filter((data) => data.movement === 'D');
-    if (debitos.length > 0) {
-      let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-      foundItems.forEach((item) => {
-        const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-        this.totalCredit = sum;
-        this.totalDebit = sum;
-        item.amount = sum
-      });
-    } else {
+    const credit = this.dataSource.filter((data) => data.movement === 'C');
+    const debit = this.dataSource.filter((data) => data.movement === 'D');
+
+    if (e.data.movement == 'D' && credit.length == 1 && debit.length == 0) {
       this.dataSource = [];
-      this.totalCredit = 0;
-      this.totalDebit = 0;
-
-
+      return;
     }
+    if (e.data.movement == 'C' && debit.length == 1 && credit.length == 0) {
+      this.dataSource = [];
+      return
+    }
+
+    if (e.data.movement == 'D' && credit.length == 1) {
+      credit.forEach((item) => {
+        const sum = debit.reduce((sum, item) => sum + item.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2)); 
+      });
+    }
+    if (e.data.movement == 'C' && debit.length == 1) {
+      debit.forEach((item) => {
+        const sum = credit.reduce((sum, item) => sum + item.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2)); 
+      });
+    }
+
+    this.updateAmounts();
+
+
+    // let debitos = this.dataSource.filter((data) => data.movement === 'D');
+    // if (debitos.length > 0) {
+    //   let foundItems = this.dataSource.filter((data) => data.movement === 'C');
+    //   foundItems.forEach((item) => {
+    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+    //     this.totalCredit = sum;
+    //     this.totalDebit = sum;
+    //     item.amount = sum
+    //   });
+    // } else {
+    //   this.dataSource = [];
+    //   this.totalCredit = 0;
+    //   this.totalDebit = 0;
+    // }
   }
 
-  loadAccounts(){
+  loadAccounts() {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry 
-            && item.accountType == JournalTypes.Ventas)
+          .filter(item => {
+
+          if (item.supportEntry && item.balances.length == 0) {
+            console.log(item.balances.length == 0);
+            console.log(item.id);
+            console.log(item.name);
+            console.log(item.accountCode);
+            
+          }
+            
+            
+  
+            
+            
+            return item.supportEntry && item.balances.length > 0})
           .map(item => ({
             id: item.id,
             description: item.name,

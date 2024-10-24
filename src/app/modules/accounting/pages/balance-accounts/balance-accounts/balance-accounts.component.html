@@ -10,7 +10,7 @@
         (onRowInserted)="save($event)">
         <dxo-paging [enabled]="false"></dxo-paging>
         <dxo-editing mode="popup" [allowUpdating]="activeEdit" [allowAdding]="activeAdd" [allowDeleting]="false">
-          <dxo-popup title="Employee Info" [showTitle]="true" [width]="700" [height]="525">
+          <dxo-popup title="Nuevo Saldo" [showTitle]="true" [width]="700" [height]="525">
           </dxo-popup>
           <dxo-form>
             <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
@@ -18,7 +18,7 @@
               <dxi-item caption="Saldo inicial" dataField="initialBalance" [editorType]="'dxNumberBox'" [editorOptions]="{
             format: { type: 'currency', precision: 2, currency: 'HNL' },
             showSpinButtons: true,
-            min: 1,       
+            min: 0,       
             max: null,      
             useGrouping: true
           }" [validationRules]="[
