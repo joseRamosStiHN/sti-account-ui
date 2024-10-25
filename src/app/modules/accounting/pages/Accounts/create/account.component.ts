@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +9,6 @@ import {
   AccountCategories,
   AccountTypeResponse,
 } from '../../../models/APIModels';
-import { error } from 'console';
 import { ToastType } from 'devextreme/ui/toast';
 import { typeToast } from 'src/app/modules/accounting/models/models';
 
@@ -25,12 +24,15 @@ interface Account {
   styleUrl: './account.component.css',
 })
 export class AccountComponent implements OnInit {
+  // input para obtener el id del path param.
+  @Input("id") id?: string;
+
   accountPrefix: string = '';
-  id: string | null = null;
+
   accountForm: AccountModel = {
     description: '',
     code: '',
-    accountType: 0,
+    accountType: null,
     status: 'ACTIVO',
     balances: [{
       typicalBalance: "",
@@ -39,19 +41,16 @@ export class AccountComponent implements OnInit {
     }
     ],
   };
+
   accounts: Account[] = [];
   categories!: AccountCategories[];
   accountTypes!: AccountTypeResponse[];
-
-
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
-
   accountFatherIsRequired: boolean = false;
 
-  private readonly activeRouter = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
 
@@ -59,35 +58,53 @@ export class AccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.accountService.getCategories().subscribe({
-      next: (data) => (this.categories = data),
-      error: (err) => console.error('Error al obtener datos', err),
+      next: (data) => (
+        this.categories = data),
+      error: (err) => {
+
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Ups error al obtener categorias';
+        this.showToast = true;
+        console.error('Error al obtener datos categorias', err)
+        this.redirectTo();
+
+      },
     });
 
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         data = data.filter(account => account.supportEntry == false);
-
         this.fillAccounts(data)
+      },
+      error: (err) => {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Ups error al obtener las cuentas';
+        this.showToast = true;
+        console.error('Error al obtener datos de cuentas', err)
+        this.redirectTo();
       }
+      ,
     });
 
-    this.activeRouter.paramMap.subscribe((params) => {
-      this.id = params.get('id');
-      const findId = Number(this.id);
-      if (findId) {
-        this.accountService.findAccountById(findId).subscribe({
-          next: (data) => this.fillForm(data),
-          error: (err) => console.error('error: we got ', err),
-        });
+    const findId = Number(this.id);
+    if (findId) {
+      this.accountService.findAccountById(findId).subscribe({
+        next: (data) => this.fillForm(data),
+        error: (err) => {
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Ups error no se pude obtener para editar.';
+          this.showToast = true;
+          console.error('Error al obtener datos para editar', err)
+          this.redirectTo();
+        },
+      });
+      this.accountService.getAllAccountType().subscribe({
+        next: (data) => {
+          this.accountTypes = data;
+        }
+      });
 
-        this.accountService.getAllAccountType().subscribe({
-          next: (data) => {
-            this.accountTypes = data;
-          }
-        });
-
-      }
-    });
+    }
   }
 
   onSubmit(e: NgForm) {
@@ -103,49 +120,100 @@ export class AccountComponent implements OnInit {
 
   private createAccount(): void {
 
+    let code: string = "";
+
     if (this.accountForm.parentId) {
-      this.accountForm.code = this.accountPrefix + '-' + this.accountForm.code;
+      code = this.accountPrefix + '-' + this.accountForm.code;
+      this.accountForm.code = code;
     }
     if (!this.accountFatherIsRequired) {
       this.accountForm.balances = [];
     }
     const { accountType, ...accountFormWithoutType } = this.accountForm;
-
     let request;
     if (accountType == 0) {
       request = accountFormWithoutType;
-    }else{
+    } else {
       request = this.accountForm
     }
 
     this.accountService.createAccount(request).subscribe({
       next: (result) => {
-        this.router.navigate(['accounting/configuration']);
+        this.toastType = typeToast.Success;
+        this.messageToast = 'Cuenta Creada Con exito';
+        this.showToast = true;
+        this.redirectTo();
+
       },
       error: (err) => {
-        this.toastType = typeToast.Error;
-        this.messageToast = 'No se pudo crear la cuenta';
+
         if (err.error[0].message == 'The account code already exists.') {
-          this.toastType = typeToast.Warning
+          this.toastType = typeToast.Warning;
+          const codeArray = code.split("-");
+          this.accountForm.code = codeArray[0] == "" ? this.accountForm.code : codeArray.at(-1);
           this.messageToast = 'El codigo de la cuenta ya existe.';
+          this.showToast = true;
+          return
+        } else {
+          this.toastType = typeToast.Error;
+          this.messageToast = 'No se pudo crear la cuenta';
+          this.showToast = true;
+          this.redirectTo();
         }
-        this.showToast = true;
+
+
       }
     });
   }
 
   private updateAccount(): void {
+
+    let code: string = "";
+    if (this.accountForm.parentId) {
+      code = this.accountPrefix + '-' + this.accountForm.code;
+      this.accountForm.code = code;
+    }
+    this.accountForm.status = this.accountForm.isActive ? "ACTIVO": "INACTIVO";
     this.accountService
       .updateAccount(Number(this.id), this.accountForm)
-      .subscribe(() => {
-        this.router.navigate(['accounting/configuration']);
+      .subscribe({
+        next: () => {
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Cambios realizados exitosamente.';
+          this.showToast = true;
+
+          this.redirectTo();
+        },
+        error: (err) => {
+
+          if (err == 'Account with code 1-102 already exists.') {
+            this.toastType = typeToast.Warning;
+            const codeArray = code.split("-");
+            this.accountForm.code = codeArray[0] == "" ? this.accountForm.code : codeArray.at(-1);
+            this.messageToast = 'El codigo de la cuenta ya existe.';
+            this.showToast = true;
+
+          } else {
+
+            this.toastType = typeToast.Error;
+            this.messageToast = 'No se pudo crear la cuenta';
+            this.showToast = true;
+            this.redirectTo();
+          }
+        }
+
       });
   }
 
   private fillForm(data: AccountAPIResponse): void {
     this.accountForm.id = data.id;
     this.accountForm.category = data.categoryId;
-    this.accountForm.code = data.accountCode;
+    if (this.id) {
+      const codeArray = data.accountCode.split("-");
+      this.accountForm.code = codeArray.at(-1);
+    } else {
+      this.accountForm.code = data.accountCode;
+    }
     this.accountForm.description = data.name;
     if (data.typicallyBalance.toUpperCase() === 'CREDITO') {
       this.accountForm.typicalBalance = 'C';
@@ -157,11 +225,17 @@ export class AccountComponent implements OnInit {
     this.accountPrefix = data.parentCode ?? '';
     this.accountForm.isActive =
       data.status.toUpperCase() === 'ACTIVA' ? true : false;
-    this.accountForm.balances = data.balances;
-    this.accountForm.accountType = data.accountType;
 
-   this.accountFatherIsRequired = data.supportEntry;
-   
+    if (data.balances.length == 0) {
+      const balances = [{ typicalBalance: "", initialBalance: 0, isCurrent: true }
+      ];
+      this.accountForm.balances = balances;
+    } else {
+      this.accountForm.balances = data.balances;
+    }
+
+    this.accountForm.accountType = data.accountType;
+    this.accountFatherIsRequired = data.supportEntry;
 
   }
 
@@ -169,15 +243,12 @@ export class AccountComponent implements OnInit {
     const result = data.map((v) => {
       return { id: v.id, code: v.accountCode, name: v.name } as Account;
     });
-
     if (this.id) {
       const findId = Number(this.id);
       this.accounts = result.filter((account) => account.id !== findId);
       return;
     }
     this.accounts = result;
-
-
   }
 
   onValueChange(id: number): void {
@@ -189,7 +260,6 @@ export class AccountComponent implements OnInit {
 
   onValueStatus(event: any) {
     this.accountFatherIsRequired = event.target.value === 'true' ? true : false;
-
     if (this.accountFatherIsRequired) {
       this.accountService.getAllAccountType().subscribe({
         next: (data) => {
@@ -203,12 +273,10 @@ export class AccountComponent implements OnInit {
   validateDecimal(event: KeyboardEvent): void {
     const inputChar = String.fromCharCode(event.charCode);
     const currentValue = (event.target as HTMLInputElement).value;
-
     if (!/^\d*\.?\d*$/.test(inputChar)) {
       event.preventDefault();
       return;
     }
-
     if (inputChar === '.' && currentValue.includes('.')) {
       event.preventDefault();
       return;
@@ -216,6 +284,12 @@ export class AccountComponent implements OnInit {
     if (currentValue.includes('.') && currentValue.split('.')[1].length >= 2) {
       event.preventDefault();
     }
+  }
+
+  redirectTo() {
+    setTimeout(() => {
+      this.router.navigate(['accounting/configuration']);
+    }, 2000);
   }
 
 

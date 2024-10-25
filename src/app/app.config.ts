@@ -3,7 +3,7 @@ import {
   ErrorHandler,
   importProvidersFrom,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
 
@@ -20,7 +20,7 @@ import { GlobalHttpErrorHandler } from 'src/app/shared/handlers/httpInterceptors
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     // provideClientHydration(),
     provideAnimations(),
     provideHttpClient(withFetch()),

@@ -90,11 +90,17 @@ export class AccountService {
    */
   errorHandler(error: any) {
     let errorMessage = '';
+
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message;
-    } else {
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }else {
+      if (error.status == 400) {
+        errorMessage = error.error.length > 0 ? error.error[0].message: error.message;
+      }else{
+        errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+      }
     }
+    
     return throwError(errorMessage);
   }
 
