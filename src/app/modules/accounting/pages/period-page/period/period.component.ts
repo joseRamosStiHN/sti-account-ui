@@ -24,12 +24,11 @@ export class PeriodComponent {
   toastType: ToastType = typeToast.Info;
   periodForm: PeriodModel;
   typePeriodList: string[] = ['Mensual', 'Trimestral', 'Semestral', 'Personalizado', 'Anual'];
-  public activatePeriodo:boolean = false;
 
+  public activatePeriodo:boolean = true;
 
 
   private readonly router = inject(Router);
-  private readonly activeRouter = inject(ActivatedRoute);
   private readonly periodService = inject(PeriodService);
 
 
