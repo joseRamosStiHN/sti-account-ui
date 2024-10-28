@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { confirm } from 'devextreme/ui/dialog';
@@ -17,16 +17,16 @@ import { PeriodService } from 'src/app/modules/accounting/services/period.servic
 })
 export class PeriodComponent {
 
+  @Input('id') id?: string;
 
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-
-
   periodForm: PeriodModel;
   typePeriodList: string[] = ['Mensual', 'Trimestral', 'Semestral', 'Personalizado', 'Anual'];
+  public activatePeriodo:boolean = false;
 
-  id: string | null = null;
+
 
   private readonly router = inject(Router);
   private readonly activeRouter = inject(ActivatedRoute);
@@ -42,17 +42,26 @@ export class PeriodComponent {
   }
 
   ngOnInit(): void {
-    this.activeRouter.paramMap.subscribe((params) => {
-      this.id = params.get('id');
-      const findId = Number(this.id);
-      if (findId) {
-        this.periodService.getPeriodById(findId).subscribe(periods => {
-          this.periodForm = periods
-        }
-        );
-      }
-    });
 
+    const findId = Number(this.id);
+    if (findId) {
+      this.periodService.getPeriodById(findId).subscribe({   
+        next:(periods)=>{
+          this.periodForm = periods
+
+          this.activatePeriodo = this.periodForm.status;
+
+        },
+        error:(err)=>{
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Ups error al obtener datos del period';
+          this.showToast = true;
+          console.error('Error al obtener datos categorias', err)
+          this.redirectTo();
+        }
+      }
+      );
+    }
 
   }
 
@@ -64,9 +73,9 @@ export class PeriodComponent {
         return;
       }
 
-    
+
       if (this.id) {
-          this.updatePerido();
+        this.updatePerido();
       } else {
         this.createPeriod();
       }
@@ -75,7 +84,7 @@ export class PeriodComponent {
   }
 
 
-  updatePerido(){
+  updatePerido() {
     this.periodService.updatePeriod(Number(this.id), this.periodForm).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;
@@ -94,7 +103,7 @@ export class PeriodComponent {
     });
   }
 
-  createPeriod(){
+  createPeriod() {
     this.periodService.createPeriod(this.periodForm).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;
@@ -118,7 +127,7 @@ export class PeriodComponent {
     this.router.navigate(['/accounting/configuration/period']);
   }
 
-  validationDate(e: NgForm){
+  validationDate(e: NgForm) {
 
     let initDateFormat = e.value.startPeriod.split('-');
     let init = new Date(Number(initDateFormat[0]), Number(initDateFormat[1]) - 1, Number(initDateFormat[2]));
@@ -151,6 +160,12 @@ export class PeriodComponent {
     return true;
   }
 
- 
+  redirectTo() {
+    setTimeout(() => {
+      this.router.navigate(['/accounting/configuration/period']);
+    }, 2000);
+  }
+
+
 
 }

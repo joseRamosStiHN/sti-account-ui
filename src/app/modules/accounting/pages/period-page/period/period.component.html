@@ -89,43 +89,34 @@
               </div>
             </div>
 
-            @if(id){
-  
+            @if(!activatePeriodo){
               <div class="flex items-center border border-gray-200 rounded w-6/12 mt-4">
                 <label class="inline-flex items-center p-2 cursor-pointer w-full">
+                    <span class="mr-2.5 ms-3 text-sm font-medium text-gray-900 w-5/6" >Activar Periodo </span>
+                        <input
+                        type="checkbox"
+                        name="isActive"
+                        [(ngModel)]="periodForm.status"
+                        [checked]="periodForm.status"
+                        [disabled]="periodForm.status"
+                        class="sr-only peer absolute right-0"
+                      />
 
-                  <span class="mr-2.5 ms-3 text-sm font-medium text-gray-900 w-5/6"
-                  >@if(periodForm.status){Desactivar Perido}@else{
-                      Activar Periodo}  </span>
-                      <input
-                      type="checkbox"
-                      name="isActive"
-                      [(ngModel)]="periodForm.status"
-                      [checked]="periodForm.status"
-                      [disabled]="periodForm.status"
-                      class="sr-only peer absolute right-0"
-                    />
                   <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-blue-600">
                   </div>
-                 
-                </label>
-                
+                </label>       
               </div>
           }
           
 
             <div class="justify-end mt-10 absolute right-4 bottom-10">
                 <button type="button" (click)="goBack()"
-                    class=" h-10 :outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2">
+                    class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
                     Cancelar
                 </button>
                 <button type="submit"
-                    class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 
-                    focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 h-10"
-                    [disabled]="periodForm.status"
-                    [ngClass]="{
-                      'opacity-50 cursor-not-allowed': periodForm.status
-                    }">
+                    class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600"
+                   >
                     Guardar
                 </button>
             </div>
