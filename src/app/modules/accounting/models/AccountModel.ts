@@ -9,6 +9,7 @@ export interface AccountModel {
   supportsRegistration?: boolean | null;
   status: string;
   isActive?: boolean;
+  asTransaction?:boolean;
   balances: BalancesModel[];
 }
 

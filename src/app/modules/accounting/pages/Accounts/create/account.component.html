@@ -74,7 +74,7 @@
         <select id="select-hasEntry" [(ngModel)]="accountForm.supportsRegistration" (change)="onValueStatus($event)"
           name="supportsRegistration" required
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-          <option value="true">Si</option>
+          <option value="true" [disabled]="hasChildAccounts">Si</option>
           <option value="false">No</option>
         </select>
         <div *ngIf="itemForm.submitted && itemForm.form.controls['supportsRegistration'].getError('required')">
@@ -144,8 +144,9 @@
         <dxi-column caption="Saldo" dataField="initialBalance" dataType="number" [alignment]="'center'"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
         <dxi-column caption="Fecha" dataField="createAtDate" dataType="date" [alignment]="'center'"></dxi-column>
-        <dxi-column caption="Periodo Actual?" dataField="isActual" [alignment]="'center'" width="120">
+        <dxi-column caption="Periodo Actual?" dataField="isCurrent" [alignment]="'center'" width="120">
           <div *dxTemplate="let data of 'data'">
+            {{data.value}}
             <i class="fa-solid fa-check text-green-500" *ngIf="data.value"></i>
             <i class="fa-solid fa-xmark text-red-500" *ngIf="!data.value"></i>
           </div>
@@ -162,9 +163,10 @@
         class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
         Cancelar
       </a>
-      <button type="submit" class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600">
-        Guardar
-      </button>
+      <button type="submit"
+        class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50"
+        [disabled]="hasTransaction">
+        Guardar</button>
     </div>
   </form>
 </div>

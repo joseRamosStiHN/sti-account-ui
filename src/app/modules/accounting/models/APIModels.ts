@@ -62,6 +62,8 @@ export interface AccountAPIResponse {
   typicallyBalance: string;
   status: string;
   supportEntry: boolean;
+  asTransaction:boolean;
+  hasChildAccounts:boolean;
 }
 
 export interface APIGeneralBalanceReportResponse {

@@ -48,8 +48,11 @@ export class AccountComponent implements OnInit {
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-
   accountFatherIsRequired: boolean = false;
+
+  hasTransaction:boolean= false;
+  hasChildAccounts:boolean= false;
+
 
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
@@ -236,6 +239,10 @@ export class AccountComponent implements OnInit {
 
     this.accountForm.accountType = data.accountType;
     this.accountFatherIsRequired = data.supportEntry;
+    this.accountForm.asTransaction= data.asTransaction;
+
+    this.hasTransaction = data.asTransaction;
+    this.hasChildAccounts = data.hasChildAccounts;
 
   }
 
