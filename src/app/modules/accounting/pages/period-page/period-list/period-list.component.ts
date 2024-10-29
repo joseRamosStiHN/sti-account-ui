@@ -53,12 +53,26 @@ export class PeriodListComponent {
   }
 
   onSearch(): void {
-   let [dateInit, dateEnd] = this.currentValue;
 
+    let [dateInitStr, dateEndStr] = this.currentValue;
+    const dateInit = new Date(dateInitStr);
+    const dateEnd = new Date(dateEndStr);
+  
     if (dateEnd < dateInit) {
       return;
     }
+  
+    const formatDate = (date: Date) => {
+      const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return offsetDate.toISOString().slice(0, 19);
+    };
+  
+    const formattedDateInit = formatDate(dateInit);
+    const formattedDateEnd = formatDate(dateEnd);
+    this.periodList$=this.periodoService.getPeridoBydate(formattedDateInit, formattedDateEnd)
+
   }
+  
 
   fillData(period: PeriodModel[]) {
 

@@ -48,7 +48,17 @@ export class PeriodService {
     return this.httpClient.get<PeriodModel>(url);
   }
 
-
+  getPeridoBydate(inicio:string, final:string) :Observable<PeriodModel[]> {
+    const url = `${this.apiURL}/api/v1/accounting-periods/date-range?start=${inicio}&end=${final}`;
+    return this.httpClient.get<PeriodModel[]>(url).pipe(
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
    /**
    * Method to create a period
    *
