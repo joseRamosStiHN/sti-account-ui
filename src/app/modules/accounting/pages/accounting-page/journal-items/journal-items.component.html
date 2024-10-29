@@ -124,6 +124,85 @@
     }"
   displayFormat="Total {0}"
       ></dxi-total-item>
+
+       <dxi-group-item
+        column="credit"
+        summaryType="sum"
+        displayFormat="Total: {0}"
+        [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }"
+        [showInGroupFooter]="true"
+        [alignByColumn]="true"
+      ></dxi-group-item>
+
+      <dxi-group-item
+        column="debit"
+        summaryType="sum"
+        displayFormat="Total: {0}"
+        [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }"
+        [showInGroupFooter]="true"
+        [alignByColumn]="true"
+      ></dxi-group-item>
+
+      <dxi-group-item
+        column="balance"
+        summaryType="sum"
+        displayFormat="Total: {0}"
+        [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }"
+        [showInGroupFooter]="true"
+        [alignByColumn]="true"
+      ></dxi-group-item>
+      <dxi-group-item
+      column="debit"
+      summaryType="sum"
+      [showInGroupFooter]="false"
+      [valueFormat]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
+      displayFormat="Total {1}:{0}" 
+    ></dxi-group-item>
+        <dxi-group-item
+        column="credit"
+        summaryType="sum"
+        [showInGroupFooter]="false"
+        [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }"
+        displayFormat="Total {1}:{0}" 
+      ></dxi-group-item>
+     
+      <dxi-group-item
+      column="balance"
+      summaryType="sum"
+      [showInGroupFooter]="false"
+      [valueFormat]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
+      displayFormat="Total {1}:{0}" 
+    ></dxi-group-item>
     </dxo-summary>
   </dx-data-grid>
 </div>

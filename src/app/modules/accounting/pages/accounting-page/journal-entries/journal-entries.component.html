@@ -79,6 +79,33 @@
     }"
   displayFormat="Total {0}"
 ></dxi-total-item>
+
+<dxi-group-item
+        column="total"
+        summaryType="sum"
+        displayFormat="total: {0}"
+        [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }"
+        [showInGroupFooter]="true"
+        [alignByColumn]="true"
+      ></dxi-group-item>
+      <dxi-group-item
+      column="total"
+      summaryType="sum"
+      [showInGroupFooter]="false"
+      [valueFormat]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
+      displayFormat="Total {1}:{0}" 
+    ></dxi-group-item>
+       
     </dxo-summary>
   </dx-data-grid>
 </div>
