@@ -41,6 +41,7 @@ export interface TransactionResponse {
   transactionDetails: TransactionDetailResponse[];
   diaryType:number;
   numberPda?:string
+  documentType:number 
 }
 
 export interface AccountCategories {

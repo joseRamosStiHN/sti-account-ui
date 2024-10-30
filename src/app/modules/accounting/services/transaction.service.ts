@@ -67,11 +67,11 @@ export class TransactionService {
     );
   }
 
-  getTransactionByDate(documentId: number, dateInit: Date, dateEnd: Date): Observable<TransactionResponse[]> {
+  getTransactionByDate(dateInit: Date, dateEnd: Date): Observable<TransactionResponse[]> {
     let dateInitFormat: string = this.formateDate(dateInit);
     let dateEndFormat: string = this.formateDate(dateEnd);
-
-    const url = `https://ce9b321d-d740-4953-9b3d-bdea0a2a7011.mock.pstmn.io/api/v1/transaction/by-document/${documentId}?date-init=${dateInitFormat}&date-end=${dateEndFormat}`;
+    
+    const url = `${this.apiURL}/api/v1/transaction/date-range?start=${dateInitFormat}&end=${dateEndFormat}`;
     return this.httpClient.get<TransactionResponse[]>(url).pipe(
       catchError(() => {
         console.error('catch error in service');
@@ -252,6 +252,6 @@ export class TransactionService {
 
 
   formateDate(date: any): string {
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 }

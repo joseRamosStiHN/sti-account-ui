@@ -62,8 +62,10 @@ export class ClientListComponent implements OnInit {
     dateEnd = new Date(dateEnd);
 
     this.dataSource$ = this.transService
-    .getTransactionByDate(DocumentType.INVOICE_CLIENT,dateInit,dateEnd)
+    .getTransactionByDate(dateInit,dateEnd)
     .pipe(
+      map((data) => {        
+        return data.filter(item => item.documentType === 1)}),
       map((data) => this.fillDataSource(data)),
       tap({
         error: (err) => {
@@ -109,6 +111,8 @@ export class ClientListComponent implements OnInit {
     const date: [Date,Date] = event.value;
     this.currentValue = date;
   };
+
+  
 
  
 

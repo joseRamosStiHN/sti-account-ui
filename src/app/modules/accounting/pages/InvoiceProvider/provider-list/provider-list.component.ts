@@ -4,7 +4,7 @@ import { BillingListProvider, DocumentType } from '../../../models/models';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -20,24 +20,47 @@ const initialValue: [Date, Date] = [
 export class ProviderListComponent {
   dataSource$: Observable<BillingListProvider[]> | undefined;
 
-  currentValue!: [Date, Date];
+  currentValue!: (string | number | Date)[];
   private readonly router = inject(Router);
   private readonly service = inject(TransactionService);
 
   constructor() {}
   ngOnInit(): void {
-    this.currentValue = [new Date(), new Date()];
+    this.currentValue = initialValue;
     this.dataSource$ = this.service
       .getAllTransactionByDocumentType(DocumentType.INVOICE_PROVIDER)
       .pipe(map((trans) => this.fillDataSource(trans)));
   }
 
   onSearch(): void {
-    const [dateIni, dateEnd] = this.currentValue;
-    //TODO: aqui Laurent
-    /*
-      se debe hacer un llamadas al un api que retiren los registros en las fechas especificadas
-    */
+
+    let [dateInit, dateEnd] = this.currentValue;
+
+  
+    if (dateEnd < dateInit) {  
+      return;
+    }
+
+    dateInit = new Date(dateInit);
+    dateEnd = new Date(dateEnd);
+
+    this.dataSource$ = this.service
+    .getTransactionByDate(dateInit,dateEnd)
+    .pipe(
+      map((data) => {      
+        return data.filter(item => item.documentType === 2)}),
+      map((data) => this.fillDataSource(data)),
+      tap({
+        error: (err) => {
+          console.log(err);
+          
+        },
+      }),
+      catchError((err) => {
+        console.log('handler error in component');
+        return of([]);
+      })
+    );
   }
 
   goToClient = () => {
@@ -61,4 +84,9 @@ export class ProviderListComponent {
       } as BillingListProvider;
     });
   }
+
+  currentValueChanged(event: any): void {
+    const date: [Date,Date] = event.value;
+    this.currentValue = date;
+  };
 }
