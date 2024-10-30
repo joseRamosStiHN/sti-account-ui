@@ -529,7 +529,7 @@ export class SeniorAccountantsComponent {
       tap(data => {
         data.forEach(accounts => {
           accounts.transaction.forEach(transaction => {
-            transaction.balance = transaction.debe > transaction.haber ? transaction.balance : transaction.balance * -1;
+            transaction.balance = transaction.debitAmount > transaction.creditAmount ? transaction.balance : transaction.balance * -1;
           });
         });
       })

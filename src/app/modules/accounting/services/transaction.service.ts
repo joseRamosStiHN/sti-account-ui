@@ -135,7 +135,7 @@ export class TransactionService {
    */
   getAllJournalEntries(): Observable<any> {
     return this.httpClient
-      .get(this.apiURL + '/api/v1/senior-accountants')
+      .get(this.apiURL + '/api/v1/accounting-entries-notes')
 
       .pipe(catchError(this.errorHandler));
   }
