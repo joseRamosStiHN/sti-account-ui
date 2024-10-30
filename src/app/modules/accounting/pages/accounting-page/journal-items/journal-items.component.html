@@ -36,22 +36,23 @@
       width="90"
     ></dxi-column>
     <dxi-column
-      alignment="center"
+    alignment="left"
+    caption="Cuenta"
+    dataField="defaultAccount"
+  ></dxi-column>
+    <dxi-column
+      alignment="left"
       caption="Asiento Contable"
       dataField="journalEntry"
     ></dxi-column>
+   
     <dxi-column
-      alignment="center"
-      caption="Cuenta"
-      dataField="defaultAccount"
-    ></dxi-column>
-    <dxi-column
-    alignment="center"
+    alignment="left"
     caption="Numero de partida"
     dataField="numberPad"
   ></dxi-column>
     <dxi-column
-      alignment="center"
+      alignment="left"
       caption="Referencia"
       dataField="reference"
     ></dxi-column>
@@ -83,6 +84,12 @@
       alignment="right"
       caption="Balance"
       dataField="balance"
+      [format]="{ 
+        style: 'currency', 
+        currency: 'HNL', 
+        minimumFractionDigits: 2, 
+        useGrouping: true 
+      }"
     ></dxi-column>
 
     <dxo-summary>
