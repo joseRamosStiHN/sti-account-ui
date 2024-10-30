@@ -191,3 +191,27 @@ export interface AdjustmentDetailById {
   typicalBalance: string
   initialBalance: number
 }
+
+
+
+
+export interface SeniorAccounts {
+  name: string
+  code: string
+  cuentaPadre: string
+  tipoCuenta: string
+  totalDebe: number
+  totalHaber: number
+  balance: number
+  transaction: Transaction[]
+}
+
+export interface Transaction {
+  name: string
+  movimiento: string
+  debe: number
+  haber: number
+  balance: number
+  numberPda: number
+  date: string
+}

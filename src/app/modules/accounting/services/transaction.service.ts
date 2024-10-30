@@ -1,7 +1,7 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { AdjustmentResponseById, TransactionResponse } from '../models/APIModels';
+import { AdjustmentResponseById, SeniorAccounts, TransactionResponse } from '../models/APIModels';
 import { TransactionModel } from '../models/TransactionModel';
 import { environment } from '@environment/environment';
 import { LeaderAccounts } from 'src/app/modules/accounting/models/LeederAccountsDetail';
@@ -110,7 +110,19 @@ export class TransactionService {
  *
  * @return response()
  */
-  getAllLedgerAcounts(): Observable<any[]> {
+  getAllLedgerAcounts(): Observable<SeniorAccounts[]> {
+    return this.httpClient.get<any[]>(
+      this.apiURL + '/api/v1/senior-accountants'
+    );
+  }
+
+
+   /**
+ * Method that brings a list with all seniorsAccounts
+ *
+ * @return response()
+ */
+   getAllSeniorAccounts(): Observable<any[]> {
     return this.httpClient.get<any[]>(
       this.apiURL + '/api/v1/senior-accountants'
     );
