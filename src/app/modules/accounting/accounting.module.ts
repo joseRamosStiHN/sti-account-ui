@@ -50,6 +50,7 @@ import { CreditNotesComponent } from 'src/app/modules/accounting/pages/accountin
 import { DebitNotesComponent } from 'src/app/modules/accounting/pages/accounting-page/debit-notes/debit-notes.component';
 import { CreditNoteListComponent } from 'src/app/modules/accounting/pages/accounting-page/credit-notes/credit-note-list/credit-note-list.component';
 import { DebitNoteListComponent } from 'src/app/modules/accounting/pages/accounting-page/debit-notes/debit-note-list/debit-note-list.component';
+import { AccountingClosingComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-closing/accounting-closing.component';
 
 @NgModule({
   declarations: [
@@ -82,7 +83,8 @@ import { DebitNoteListComponent } from 'src/app/modules/accounting/pages/account
     CreditNotesComponent,
     DebitNotesComponent,
     CreditNoteListComponent,
-    DebitNoteListComponent
+    DebitNoteListComponent,
+    AccountingClosingComponent
   ],
   providers: [ReportServiceService, JournalService],
   exports: [AccountingPageComponent, HttpClientModule],

@@ -24,6 +24,7 @@ export class AccountingPageComponent implements OnInit {
           { label: 'Ajustes Contables', path: '/accounting/adjustment-list' },
           { label: 'Notas de Credito', path: '/accounting/creditnotes-list' },
           { label: 'Notas de Debito', path: '/accounting/debitnotes-list' },
+          { label: 'Cierre Contable', path: '/accounting/accounting-closing' },
        
         ],
       },
