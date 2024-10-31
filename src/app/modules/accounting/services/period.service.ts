@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
-import { catchError, Observable, throwError } from 'rxjs';
-import { PeriodsRequest, PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
+import { catchError, map, Observable, throwError } from 'rxjs';
+import { PeriodClosing, PeriodsRequest, PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 
 @Injectable({
@@ -103,6 +103,36 @@ export class PeriodService {
         });
       })
     );
+  }
+
+  getInfoClosingPeriod(): Observable<PeriodClosing> {
+    const url = `${this.apiURL}/api/v1/accounting-closing`;
+    return this.httpClient.get<PeriodClosing>(url).pipe(
+
+      map( periodClosing=>{
+        periodClosing.startPeriod = this.formateDate(periodClosing.startPeriod);
+        periodClosing.endPeriod = this.formateDate(periodClosing.endPeriod);
+        return periodClosing;
+      }),
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
+
+
+
+  private formateDate(dateStr: string): string {
+    const date = new Date(dateStr); 
+
+    if (isNaN(date.getTime())) {
+        return ''; 
+    }
+    
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
   /**

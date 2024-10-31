@@ -216,3 +216,17 @@ export interface Transaction {
   balance: number
   date: string
 }
+
+
+export interface PeriodClosing {
+  periodName: any
+  typePeriod: string
+  startPeriod: string
+  endPeriod: string
+  totalAssets: number
+  totalLiabilities: number
+  totalCapital: number
+  totalIncome: number
+  totalExpenses: number
+  netIncome: number
+}

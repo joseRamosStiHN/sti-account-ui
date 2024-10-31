@@ -9,15 +9,15 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white p-5 rounded-lg shadow-sm">
           <p class="text-gray-500 text-sm">Fecha de Inicio</p>
-          <p class="font-semibold text-gray-800">01/01/2023</p>
+          <p class="font-semibold text-gray-800">{{ (infoClosing | async)?.startPeriod }}</p>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm">
           <p class="text-gray-500 text-sm">Fecha de Fin</p>
-          <p class="font-semibold text-gray-800">31/12/2023</p>
+          <p class="font-semibold text-gray-800">{{ (infoClosing | async)?.endPeriod }}</p>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm">
           <p class="text-gray-500 text-sm">Tipo de Periodo</p>
-          <p class="font-semibold text-gray-800">Anual</p>
+          <p class="font-semibold text-gray-800">{{ (infoClosing | async)?.typePeriod }}</p>
         </div>
       </div>
     </div>
@@ -25,21 +25,25 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-white p-5 rounded-lg shadow-md">
         <h3 class="text-lg font-semibold text-gray-700 mb-3">Saldos Finales</h3>
-        <p class="text-gray-600">Activos Totales: <span class="font-semibold text-gray-800">L 2,000,000.00</span></p>
-        <p class="text-gray-600">Pasivos Totales: <span class="font-semibold text-gray-800">L 1,200,000.00</span></p>
-        <p class="text-gray-600">Capital: <span class="font-semibold text-gray-800">L 800,000.00</span></p>
+        <p class="text-gray-600">Activos Totales: <span class="font-semibold text-gray-800">{{ (infoClosing | async)?.totalAssets }}</span></p>
+        <p class="text-gray-600">Pasivos Totales: <span class="font-semibold text-gray-800">{{ (infoClosing | async)?.totalLiabilities }}</span></p>
+        <p class="text-gray-600">Capital: <span class="font-semibold text-gray-800">{{ (infoClosing | async)?.totalCapital }}</span></p>
       </div>
       <div class="bg-white p-5 rounded-lg shadow-md">
         <h3 class="text-lg font-semibold text-gray-700 mb-3">Utilidades</h3>
-        <p class="text-gray-600">Ingresos Totales: <span class="font-semibold text-gray-800">L 3,000,000.00</span></p>
-        <p class="text-gray-600">Gastos Totales: <span class="font-semibold text-gray-800">L 1,500,000.00</span></p>
-        <p class="text-gray-600">Utilidad Neta: <span class="font-semibold text-gray-800">L 1,500,000.00</span></p>
+        <p class="text-gray-600">Ingresos Totales: <span class="font-semibold text-gray-800">{{ (infoClosing | async)?.totalIncome }}</span></p>
+        <p class="text-gray-600">Gastos Totales: <span class="font-semibold text-gray-800">{{ (infoClosing | async)?.totalExpenses }}</span></p>
+        <p class="text-gray-600">Utilidad Neta: <span class="font-semibold text-gray-800">{{ (infoClosing | async)?.netIncome }}</span></p>
       </div>
     </div>
     <div class="flex justify-end">
       <button
+        class="bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition ease-in-out duration-150 mr-2">
+        Cerrar Periodo {{ (infoClosing | async)?.typePeriod }}
+      </button>
+      <button
         class="bg-red-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-red-700 transition ease-in-out duration-150">
-        Cerrar Periodo
+        Cerrar Periodo Anual
       </button>
     </div>
   </div>
