@@ -4,6 +4,7 @@ import { BillingListClient, DocumentType } from '../../../models/models';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
 import { catchError, filter, map, Observable, of, tap } from 'rxjs';
+import themes from 'devextreme/ui/themes';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -23,10 +24,25 @@ export class ClientListComponent implements OnInit {
   roles: string[] = ['admin', 'teller'];
 
   currentValue!: (string | number | Date)[];
+  
+
+  // seleccion por paginacion
+  allMode: string;
+  checkBoxesMode: string;  
+  selectOptions: { id: string, name: string }[] = [
+    { id: 'allPages', name: 'Todos' },
+    { id: 'page', name: 'Página' }
+  ];
 
   private readonly router = inject(Router);
   private readonly transService = inject(TransactionService);
-  constructor() { }
+  
+  constructor() { 
+
+    this.allMode = 'allPages';
+    this.checkBoxesMode = themes.current().startsWith('material') ? 'always' : 'onClick';
+  }
+
   ngOnInit(): void {
 
     this.currentValue = initialValue;
@@ -114,6 +130,9 @@ export class ClientListComponent implements OnInit {
 
   
 
+  onRowSelected(event: any): void {
+    console.log(event.selectedRowsData);
+  }
  
 
 }

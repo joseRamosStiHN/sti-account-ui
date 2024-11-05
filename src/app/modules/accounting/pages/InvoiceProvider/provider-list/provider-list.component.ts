@@ -5,6 +5,7 @@ import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { catchError, map, Observable, of, tap } from 'rxjs';
+import themes from 'devextreme/ui/themes';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -21,10 +22,26 @@ export class ProviderListComponent {
   dataSource$: Observable<BillingListProvider[]> | undefined;
 
   currentValue!: (string | number | Date)[];
+
+
+  // seleccion por paginacion
+  allMode: string;
+  checkBoxesMode: string;  
+  selectOptions: { id: string, name: string }[] = [
+    { id: 'allPages', name: 'Todos' },
+    { id: 'page', name: 'Página' }
+  ];
+
+
   private readonly router = inject(Router);
   private readonly service = inject(TransactionService);
 
-  constructor() {}
+  constructor() {
+
+    this.allMode = 'allPages';
+    this.checkBoxesMode = themes.current().startsWith('material') ? 'always' : 'onClick';
+  }
+
   ngOnInit(): void {
     this.currentValue = initialValue;
     this.dataSource$ = this.service
@@ -89,4 +106,9 @@ export class ProviderListComponent {
     const date: [Date,Date] = event.value;
     this.currentValue = date;
   };
+
+  onRowSelected(event: any): void {
+    console.log(event.selectedRowsData);
+  }
+ 
 }
