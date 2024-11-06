@@ -104,6 +104,11 @@ export class TransactionService {
     return this.httpClient.put(url, null, this.httpOptions);
   }
 
+  putAllTransaction(transacctions: number []): Observable<any> {
+    const url = `${this.apiURL}/api/v1/transaction/confirm-transactions`;
+    return this.httpClient.put(url,transacctions, this.httpOptions);
+  }
+
 
   /**
  * Method that brings a list with all seniorsAccounts
