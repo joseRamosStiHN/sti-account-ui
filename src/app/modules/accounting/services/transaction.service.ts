@@ -109,6 +109,16 @@ export class TransactionService {
     return this.httpClient.put(url,transacctions, this.httpOptions);
   }
 
+  putAllDebitNotes(debitNotes: number []): Observable<any> {
+    const url = `${this.apiURL}/api/v1/debit-notes/confirm-debit-notes`;
+    return this.httpClient.put(url,debitNotes, this.httpOptions);
+  }
+
+  putAllCreditNotes(creditNotes: number []): Observable<any> {
+    const url = `${this.apiURL}/api/v1/credit-notes/confirm-credit-notes`;
+    return this.httpClient.put(url,creditNotes, this.httpOptions);
+  }
+
 
   /**
  * Method that brings a list with all seniorsAccounts
