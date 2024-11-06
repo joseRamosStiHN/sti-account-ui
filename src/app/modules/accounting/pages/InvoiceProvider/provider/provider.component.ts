@@ -42,6 +42,10 @@ export class ProviderComponent {
     currency: '',
     exchangeRate: 0,
     description: '',
+    methodPayment:'',
+    typePayment:'',
+    rtn:'',
+    supplierName:''
   };
 
   selectedJournal?: JournalModel | null = null;
@@ -144,6 +148,10 @@ export class ProviderComponent {
         descriptionPda: this.providerBilling.description,
         currency: this.providerBilling.currency,
         diaryType:this.providerBilling.diaryType,
+        typeSale:this.providerBilling.typePayment,
+        typePayment:this.providerBilling.methodPayment,
+        rtn:this.providerBilling.rtn,
+        supplierName:this.providerBilling.supplierName,
         detail: this.dataSource.map((detail) => {
           return {
             accountId: detail.accountId,
@@ -403,7 +411,12 @@ export class ProviderComponent {
     this.providerBilling.exchangeRate = data.exchangeRate;
     this.providerBilling.date = data.date;
     this.providerBilling.description = data.description;
-    this.providerBilling.diaryType= data.diaryType
+    this.providerBilling.diaryType= data.diaryType;
+
+    this.providerBilling.typePayment= data.typeSale;
+    this.providerBilling.methodPayment= data.typePayment
+    this.providerBilling.rtn= data.rtn
+    this.providerBilling.supplierName= data.supplierName
 
     this.loadAccounts();
     const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);

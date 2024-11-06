@@ -25,6 +25,10 @@ export interface ClientBilling {
   description: string;
   status?: string;
   diaryType?:number;
+  typePayment:string;
+  methodPayment:string;
+  rtn:string;
+  supplierName:string
 }
 
 export interface BillingListClient {

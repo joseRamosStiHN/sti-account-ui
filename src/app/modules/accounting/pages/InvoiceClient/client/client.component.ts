@@ -92,6 +92,10 @@ export class ClientComponent {
       currency: '',
       exchangeRate: 0,
       description: '',
+      typePayment:'',
+      methodPayment:'',
+      rtn:'',
+      supplierName:''
     };
 
     config({
@@ -145,6 +149,10 @@ export class ClientComponent {
         descriptionPda: this.clientBilling.description,
         currency: this.clientBilling.currency,
         diaryType: this.clientBilling.diaryType,
+        typeSale:this.clientBilling.typePayment,
+        typePayment:this.clientBilling.methodPayment,
+        rtn:this.clientBilling.rtn,
+        supplierName:this.clientBilling.supplierName,
         detail: this.dataSource.map((detail) => {
           return {
             id: detail.id,
@@ -155,6 +163,9 @@ export class ClientComponent {
         }),
       };
 
+
+      console.log(transactionData);
+
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
         'Advertencia'
@@ -163,6 +174,8 @@ export class ClientComponent {
       if (!dialogo) {
         return;
       }
+
+      
 
 
       //is an update
@@ -189,10 +202,6 @@ export class ClientComponent {
           });
         return;
       }
-
-
-
-
 
       this.transactionService.createTransaction(transactionData).subscribe({
         next: (data) => {
@@ -386,6 +395,11 @@ export class ClientComponent {
     this.clientBilling.date = data.date;
     this.clientBilling.description = data.description;
     this.clientBilling.diaryType = data.diaryType
+
+    this.clientBilling.typePayment= data.typeSale;
+    this.clientBilling.methodPayment= data.typePayment
+    this.clientBilling.rtn= data.rtn
+    this.clientBilling.supplierName= data.supplierName
     //
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
 
@@ -615,20 +629,7 @@ export class ClientComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => {
-
-          if (item.supportEntry && item.balances.length == 0) {
-            console.log(item.balances.length == 0);
-            console.log(item.id);
-            console.log(item.name);
-            console.log(item.accountCode);
-            
-          }
-            
-            
-  
-            
-            
+          .filter(item => {   
             return item.supportEntry && item.balances.length > 0})
           .map(item => ({
             id: item.id,

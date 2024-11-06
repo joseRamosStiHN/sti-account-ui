@@ -42,6 +42,12 @@ export interface TransactionResponse {
   diaryType:number;
   numberPda?:string
   documentType:number 
+  typeSale:string;
+  cashValue?:number;
+  creditValue?:number;
+  typePayment:string;
+  rtn:string;
+  supplierName:string;
 }
 
 export interface AccountCategories {
