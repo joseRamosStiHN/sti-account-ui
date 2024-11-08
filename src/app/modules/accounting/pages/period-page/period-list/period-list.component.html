@@ -54,9 +54,10 @@
             <span>{{ d.rowIndex + 1 }}</span>
           </div>
         <div *dxTemplate="let data of 'cellTemplate'">
+
             <label class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" value="" class="sr-only peer" 
-                [disabled]="data.value"
+                [disabled]="data.value "
                 [(ngModel)]="data.data.status" 
                 (change)="updatePeriod(data)">
                 <div

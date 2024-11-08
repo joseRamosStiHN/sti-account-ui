@@ -46,6 +46,11 @@ export class PeriodComponent {
     if (findId) {
       this.periodService.getPeriodById(findId).subscribe({   
         next:(periods)=>{
+
+          if (periods.closureType.toLocaleUpperCase() == "ANUAL") {
+            periods.status = true;
+          }
+
           this.periodForm = periods
 
           this.activatePeriodo = this.periodForm.status;

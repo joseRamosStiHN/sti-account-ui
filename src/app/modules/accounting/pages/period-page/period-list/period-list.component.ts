@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import {Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { confirm } from 'devextreme/ui/dialog';
@@ -34,7 +34,7 @@ export class PeriodListComponent {
   toastType: ToastType = typeToast.Info;
 
 
-  
+
 
   periodList$: Observable<PeriodModel[]> | undefined;
 
@@ -48,7 +48,7 @@ export class PeriodListComponent {
   ngOnInit(): void {
     this.currentValue = initialValue;
 
-    this.periodList$ = this.periodoService.getAllPeriods();
+    this.periodList$ = this.getListPeriods();
 
   }
 
@@ -57,27 +57,24 @@ export class PeriodListComponent {
     let [dateInitStr, dateEndStr] = this.currentValue;
     const dateInit = new Date(dateInitStr);
     const dateEnd = new Date(dateEndStr);
-  
+
     if (dateEnd < dateInit) {
       return;
     }
-  
+
     const formatDate = (date: Date) => {
       const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
       return offsetDate.toISOString().slice(0, 19);
     };
-  
+
     const formattedDateInit = formatDate(dateInit);
     const formattedDateEnd = formatDate(dateEnd);
-    this.periodList$=this.periodoService.getPeridoBydate(formattedDateInit, formattedDateEnd)
+    this.periodList$ = this.periodoService.getPeridoBydate(formattedDateInit, formattedDateEnd)
 
   }
-  
-
-  fillData(period: PeriodModel[]) {
 
 
-  }
+
 
   onEditPeriod(e: any) {
 
@@ -97,7 +94,7 @@ export class PeriodListComponent {
   formatDateEnd(rowData: any): string {
     const date = new Date(rowData.endPeriod);
     const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }
@@ -105,16 +102,16 @@ export class PeriodListComponent {
   formatDateInit(rowData: any): string {
     const date = new Date(rowData.startPeriod);
     const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }
 
 
-  async updatePeriod(data:any){
+  async updatePeriod(data: any) {
     let dialogo = await confirm(`¿Está seguro de que desea activar este periodo?`, 'Advertencia');
     if (!dialogo) {
-      data.data.status = false;      
+      data.data.status = false;
       return;
     }
 
@@ -123,7 +120,7 @@ export class PeriodListComponent {
         this.toastType = typeToast.Success;
         this.messageToast = 'Registros actualizados exitosamente';
         this.showToast = true;
-        
+
       },
       error: (err) => {
         console.error('Error creating transaction:', err);
@@ -135,9 +132,19 @@ export class PeriodListComponent {
     this.periodList$ = undefined;
 
     setTimeout(() => {
-      this.periodList$ = this.periodoService.getAllPeriods();
+      this.periodList$ = this.getListPeriods();
     }, 1000);
 
- 
-   }
+
+  }
+
+  getListPeriods(): Observable<PeriodModel[]> {
+
+    return this.periodoService.getAllPeriods().pipe(
+      map(data => {
+        data.map(nuevo => (nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status))
+        return data
+      })
+    );
+  }
 }
