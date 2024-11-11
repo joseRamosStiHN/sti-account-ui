@@ -192,20 +192,7 @@ export class TrialBalanceComponent {
         };
       });
 
-
       this.trialBalanceData= lista;
-
-
-      for (let index = 0; index < lista.length; index++) {
-        const element = lista[index];
-
-        if (element.name =="CAJA") {
-          console.log(JSON.stringify(element));
-          
-          
-        }
-        
-      }
     
     });
     
@@ -222,49 +209,6 @@ export class TrialBalanceComponent {
     return `${dia}/${mes}/${anio}`;
   }
 
-  processBalances(dataArray: { accountBalances: any[] }[], key: keyof any, mergedData: any) {
-    dataArray.forEach(item => {
-      item.accountBalances.forEach(balance => {
-        if (!mergedData[balance.name]) {
-          mergedData[balance.name] = {
-            name: balance.name,
-            accountCode: balance.accountCode,
-            parentName: balance.parentName,
-            parentId: balance.parentId,
-            initialBalance: null,
-            transaction: null,
-            finalBalance: null
-          };
-        }
-        
-        // Asignar los valores correspondientes
-        if (key === "initialBalances" && balance.initialBalance) {
-          mergedData[balance.name].initialBalance = balance.initialBalance;
-        }
-        if (key === "transactions" && balance.transaction) {
-          mergedData[balance.name].transaction = balance.transaction;
-        }
-        if (key === "lastPeriod" && balance.finalBalance) {
-          mergedData[balance.name].finalBalance = balance.finalBalance;
-        }
-      });
-    });
-  }
-
-  // Función principal para combinar todos los datos
-  mergeData(data: any): any {
-    const mergedData: any = {};
-
-    this.processBalances(data.initialBalances, "initialBalances", mergedData);
-    this.processBalances(data.transactions, "transactions", mergedData);
-    this.processBalances(data.lastPeriod, "lastPeriod", mergedData);
-
-    return mergedData;
-  }
-
-  see(data:any){
-    console.log(data);
-    
-  }
+ 
 
 }
