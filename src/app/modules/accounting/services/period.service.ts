@@ -135,6 +135,25 @@ export class PeriodService {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
+
+     /**
+   * Method to closing a period
+   *
+   * @return response()
+   */
+     closingPeriod(): Observable<any> {
+      return this.httpClient
+        .post<any>(
+          `${this.apiURL}/api/v1/accounting-closing/close`,
+          null,
+          { 
+            responseType: 'text' as 'json'
+          }
+        )
+        .pipe(catchError(this.errorHandler));
+    }
+  
+
   /**
    * Error Handler Method
    *
