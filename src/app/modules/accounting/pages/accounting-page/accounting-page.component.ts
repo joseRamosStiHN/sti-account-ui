@@ -67,6 +67,10 @@ export class AccountingPageComponent implements OnInit {
             label: 'Configuración Diarios',
             path: '/accounting/configuration/journal-list',
           },
+          {
+            label: 'Configuración Impuestos',
+            path: '/accounting/configuration/tax-settings',
+          },
         ],
       },
     ]);

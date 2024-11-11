@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { PeriodClosing, PeriodsRequest, PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
+import { PeriodClosing, PeriodsRequest, PeriodsResponse, TaxSettings } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 
 @Injectable({
@@ -152,6 +152,63 @@ export class PeriodService {
         )
         .pipe(catchError(this.errorHandler));
     }
+
+
+   /**
+   * Method that brings a list with all the accounting journal
+   *
+   * @return response()
+   */
+   getAllTaxSettings(): Observable<TaxSettings[]> {
+    const url = `${this.apiURL}/api/v1/tax-settings`;
+    return this.httpClient.get<TaxSettings[]>(url).pipe(
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
+
+
+  getTaxById(id: number): Observable<TaxSettings> {
+    const url = `${this.apiURL}/api/v1/tax-settings/${id}`;
+    return this.httpClient.get<TaxSettings>(url);
+  }
+
+
+  updateTax(
+    id: number,
+    data: TaxSettings
+  ): Observable<TaxSettings> {
+    const url = `${this.apiURL}/api/v1/tax-settings/${id}`;
+    return this.httpClient.put<TaxSettings>(
+      url,
+      JSON.stringify(data),
+      this.httpOptions
+    );
+  }
+
+
+
+   /**
+   * Method to create a period
+   *
+   * @return response()
+   */
+   createTaxSettings(data: TaxSettings): Observable<PeriodModel> {
+    return this.httpClient
+      .post<PeriodModel>(
+        this.apiURL + '/api/v1/tax-settings',
+        JSON.stringify(data),
+        this.httpOptions
+      )
+      .pipe(catchError(this.errorHandler));
+  }
+
+
+
   
 
   /**

@@ -29,6 +29,8 @@ import { DebitNotesComponent } from 'src/app/modules/accounting/pages/accounting
 import { CreditNoteListComponent } from 'src/app/modules/accounting/pages/accounting-page/credit-notes/credit-note-list/credit-note-list.component';
 import { DebitNoteListComponent } from 'src/app/modules/accounting/pages/accounting-page/debit-notes/debit-note-list/debit-note-list.component';
 import { AccountingClosingComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-closing/accounting-closing.component';
+import { TaxSettingsComponent } from 'src/app/modules/accounting/pages/tax-settings/tax-settings/tax-settings.component';
+import { TaxSettingsListComponent } from 'src/app/modules/accounting/pages/tax-settings/tax-settings-list/tax-settings-list.component';
 
 const routes: Routes = [
   {
@@ -92,6 +94,10 @@ const routes: Routes = [
       { path: 'debitnotes-list', component: DebitNoteListComponent },
       { path: 'debit-notes', component: DebitNotesComponent },
       { path: 'debit-notes/:id', component: DebitNotesComponent },
+
+      { path: 'configuration/tax-settings', component: TaxSettingsListComponent },
+      { path: 'configuration/tax-settings/create', component: TaxSettingsComponent },
+      { path: 'configuration/tax-settings/:id', component: TaxSettingsComponent },
     ],
   },
 ];

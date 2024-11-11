@@ -276,3 +276,16 @@ export interface FinalBalance {
   debit: number
   credit: number
 }
+
+
+
+export interface TaxSettings {
+  id?:number
+  taxRate: string
+  type: string
+  fromValue: number | null
+  toValue: number | null
+  percent: number | null
+  isCurrent: boolean
+  creationDate?:string
+}
