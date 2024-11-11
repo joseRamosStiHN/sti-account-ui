@@ -134,21 +134,21 @@ export interface AdjustmentDetail {
 }
 
 
-export interface TrialBalaceResponse {
-  id: number
-  periodName: string
-  closureType: string
-  startPeriod: string
-  endPeriod: string
-  balanceDiaries: BalanceDiary[]
-}
+// export interface TrialBalaceResponse {
+//   id: number
+//   periodName: string
+//   closureType: string
+//   startPeriod: string
+//   endPeriod: string
+//   balanceDiaries: BalanceDiary[]
+// }
 
-export interface BalanceDiary {
-  diaryName: string
-  initialBalance: InitialBalance[]
-  balancePeriod: BalancePeriod[]
-  finalBalance: FinalBalance[]
-}
+// export interface BalanceDiary {
+//   diaryName: string
+//   initialBalance: InitialBalance[]
+//   balancePeriod: BalancePeriod[]
+//   finalBalance: FinalBalance[]
+// }
 
 export interface InitialBalance {
   debit: number
@@ -235,4 +235,44 @@ export interface PeriodClosing {
   totalIncome: number
   totalExpenses: number
   netIncome: number
+}
+
+
+
+export interface TrialBalaceResponse {
+  periods: Period[]
+}
+
+export interface Period {
+  id: number
+  periodName?: string
+  closureType: string
+  startPeriod: string
+  endPeriod: string
+  accountBalances: AccountBalance[]
+}
+
+export interface AccountBalance {
+  name: string
+  accountCode: string
+  parentName: string
+  parentId: number
+  initialBalance: InitialBalance[]
+  balancePeriod: BalancePeriod[]
+  finalBalance: FinalBalance[]
+}
+
+export interface InitialBalance {
+  debit: number
+  credit: number
+}
+
+export interface BalancePeriod {
+  debit: number
+  credit: number
+}
+
+export interface FinalBalance {
+  debit: number
+  credit: number
 }

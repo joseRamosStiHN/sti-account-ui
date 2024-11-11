@@ -121,33 +121,96 @@ const DATA: Incomes[] = [
 export class TrialBalanceComponent {
   trialBalanceData: any[] = [];
 
-  periodName:string= "Periodo";
-  periodDate:string="";
+  periodName: string = "Periodo";
+  periodDate: string = "";
 
   private readonly reportService = inject(ReportServiceService, {
     optional: true,
   });
 
-  constructor() {}
-
+  constructor() { }
   ngOnInit(): void {
-
     this.reportService?.getTrialBalance().subscribe((data: TrialBalaceResponse) => {
-      this.periodName = `${data.closureType}`;
-      this.periodDate = `${this.convertDates(data.startPeriod)} - ${this.convertDates(data.endPeriod)}`;
 
+      data.periods.sort((a, b) => new Date(a.startPeriod).getTime() - new Date(b.startPeriod).getTime());
+      
 
-      this.trialBalanceData = data.balanceDiaries.map(diary => ({
-        accountName: diary.diaryName,
-        initialDebit: diary.initialBalance[0]?.debit || 0,
-        initialCredit: diary.initialBalance[0]?.credit || 0,
-        periodDebit: diary.balancePeriod[0]?.debit || 0, 
-        periodCredit: diary.balancePeriod[0]?.credit || 0,
-        finalDebit: diary.finalBalance[0]?.debit || 0,
-        finalCredit: diary.finalBalance[0]?.credit || 0
+      const filteredPeriods = data.periods.filter(period => period.closureType !== "Anual");
+    
+      const initialBalances = filteredPeriods[0].accountBalances.map(diary => ({
+        periodName: filteredPeriods[0].closureType,
+        periodDate: `${this.convertDates(filteredPeriods[0].startPeriod)} - ${this.convertDates(filteredPeriods[0].endPeriod)}`,
+        accountName: diary.name,
+        debit: diary.initialBalance[0].debit,
+        credit: diary.initialBalance[0].credit
       }));
+    
+      const transactions = filteredPeriods.map(period => {
+        return period.accountBalances.map(diary => ({
+          periodName: period.closureType,
+          periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
+          accountName: diary.name,
+          debit: diary.balancePeriod[0].debit,
+          credit: diary.balancePeriod[0].credit
+        }));
+      });
+    
+
+      const lastPeriod = filteredPeriods[filteredPeriods.length - 1].accountBalances.map(diary => ({
+        periodName: filteredPeriods[filteredPeriods.length - 1].closureType,
+        periodDate: `${this.convertDates(filteredPeriods[filteredPeriods.length - 1].startPeriod)} - ${this.convertDates(filteredPeriods[filteredPeriods.length - 1].endPeriod)}`,
+        accountName: diary.name,
+        debit: diary.initialBalance[0].debit,
+        credit: diary.initialBalance[0].credit
+      }));
+    
+      const dataCualquiera = { initialBalances, transactions, lastPeriod };
+    
+      const lista = initialBalances.map(initialBalance => {
+        const correspondingTransactions = filteredPeriods.map(period => {
+          return period.accountBalances
+            .filter(diary => diary.name === initialBalance.accountName) 
+            .map(diary => ({
+              periodName: period.closureType,
+              periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
+              accountName: diary.name,
+              debit: diary.balancePeriod[0].debit,
+              credit: diary.balancePeriod[0].credit
+            }));
+        });
+    
+        const correspondingLastPeriod = lastPeriod.find(lp => lp.accountName === initialBalance.accountName);
+  
+        return {
+          name: initialBalance.accountName,
+          initialBalance: {
+            debit: initialBalance.debit,
+            credit: initialBalance.credit
+          },
+          transactions: correspondingTransactions, // Las transacciones se mantienen por periodo
+          lastPeriod: correspondingLastPeriod
+        };
+      });
+
+
+      this.trialBalanceData= lista;
+
+
+      for (let index = 0; index < lista.length; index++) {
+        const element = lista[index];
+
+        if (element.name =="CAJA") {
+          console.log(JSON.stringify(element));
+          
+          
+        }
+        
+      }
+    
     });
+    
   }
+
 
 
   convertDates(fecha: string): string {
@@ -155,8 +218,53 @@ export class TrialBalanceComponent {
     const dia = ('0' + fechaObj.getDate()).slice(-2);
     const mes = ('0' + (fechaObj.getMonth() + 1)).slice(-2);
     const anio = fechaObj.getFullYear();
-  
+
     return `${dia}/${mes}/${anio}`;
+  }
+
+  processBalances(dataArray: { accountBalances: any[] }[], key: keyof any, mergedData: any) {
+    dataArray.forEach(item => {
+      item.accountBalances.forEach(balance => {
+        if (!mergedData[balance.name]) {
+          mergedData[balance.name] = {
+            name: balance.name,
+            accountCode: balance.accountCode,
+            parentName: balance.parentName,
+            parentId: balance.parentId,
+            initialBalance: null,
+            transaction: null,
+            finalBalance: null
+          };
+        }
+        
+        // Asignar los valores correspondientes
+        if (key === "initialBalances" && balance.initialBalance) {
+          mergedData[balance.name].initialBalance = balance.initialBalance;
+        }
+        if (key === "transactions" && balance.transaction) {
+          mergedData[balance.name].transaction = balance.transaction;
+        }
+        if (key === "lastPeriod" && balance.finalBalance) {
+          mergedData[balance.name].finalBalance = balance.finalBalance;
+        }
+      });
+    });
+  }
+
+  // Función principal para combinar todos los datos
+  mergeData(data: any): any {
+    const mergedData: any = {};
+
+    this.processBalances(data.initialBalances, "initialBalances", mergedData);
+    this.processBalances(data.transactions, "transactions", mergedData);
+    this.processBalances(data.lastPeriod, "lastPeriod", mergedData);
+
+    return mergedData;
+  }
+
+  see(data:any){
+    console.log(data);
+    
   }
 
 }

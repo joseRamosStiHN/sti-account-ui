@@ -106,7 +106,7 @@ export class PeriodService {
   }
 
   getInfoClosingPeriod(): Observable<PeriodClosing> {
-    const url = `${this.apiURL}/api/v1/accounting-closing`;
+    const url = `${this.apiURL}/api/v1/accounting-closing/detail`;
     return this.httpClient.get<PeriodClosing>(url).pipe(
 
       map( periodClosing=>{
