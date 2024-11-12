@@ -285,7 +285,7 @@ export interface TaxSettings {
   type: string
   fromValue: number | null
   toValue: number | null
-  percent: number | null
+  percent?: number | null
   isCurrent: boolean
   creationDate?:string
 }

@@ -162,6 +162,17 @@ export class PeriodService {
    getAllTaxSettings(): Observable<TaxSettings[]> {
     const url = `${this.apiURL}/api/v1/tax-settings`;
     return this.httpClient.get<TaxSettings[]>(url).pipe(
+
+      map(data=> {
+
+        data.map((tax)=>{
+
+          tax.percent = tax.taxRate == "Excentos" ? 0 : Number(tax.taxRate) || 0
+        })
+        
+        return data;
+      }),
+
       catchError(() => {
         console.error('catch error in service');
         return throwError(() => {

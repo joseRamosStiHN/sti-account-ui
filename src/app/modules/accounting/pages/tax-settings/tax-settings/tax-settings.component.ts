@@ -45,9 +45,10 @@ export class TaxSettingsComponent {
     if (findId) {
       this.periodService.getTaxById(findId).subscribe({   
         next:(tax)=>{
+      
+          tax.percent= tax.taxRate =="Excentos"?null: Number(tax.taxRate);
+          tax.taxRate= tax.taxRate !="Excentos"? "Gravado": tax.taxRate;
           this.taxSetings = tax;
-          console.log(this.taxSetings);
-          
 
         },
         error:(err)=>{
@@ -71,25 +72,36 @@ export class TaxSettingsComponent {
 
 
   async save(e: NgForm) {
+    console.log(e.valid);
+    
     if (e.valid ) {
       let dialogo = await confirm(`¿Está seguro de que desea realizar esta acción?`, 'Advertencia');
       if (!dialogo) {
         return;
       }
 
+      const { taxRate, percent, ...otherSettings } = this.taxSetings;
+
+      const request = {
+        taxRate: taxRate === "Excentos" ? "Excentos" : percent?.toString() || "",
+        ...otherSettings
+      };
+  
+  
 
       if (this.id) {
-        this.updateTax();
+        this.updateTax(request);
       } else {
-        this.createTax();
+        this.createTax(request);
       }
     };
 
   }
 
 
-  updateTax() {
-    this.periodService.updateTax(Number(this.id), this.taxSetings).subscribe({
+  updateTax(request:TaxSettings) {
+   
+    this.periodService.updateTax(Number(this.id), request).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;
         this.messageToast = 'Registros actualizados exitosamente';
@@ -107,8 +119,10 @@ export class TaxSettingsComponent {
     });
   }
 
-  createTax() {
-    this.periodService.createTaxSettings(this.taxSetings).subscribe({
+  createTax(request:TaxSettings) {
+    console.log(request);
+    
+    this.periodService.createTaxSettings(request).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;
         this.messageToast = 'Registros insertados exitosamente';
