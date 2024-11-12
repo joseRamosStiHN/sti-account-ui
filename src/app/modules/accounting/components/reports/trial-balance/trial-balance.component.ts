@@ -136,7 +136,7 @@ export class TrialBalanceComponent {
       
 
       const filteredPeriods = data.periods.filter(period => period.closureType !== "Anual");
-    
+      
       const initialBalances = filteredPeriods[0].accountBalances.map(diary => ({
         periodName: filteredPeriods[0].closureType,
         periodDate: `${this.convertDates(filteredPeriods[0].startPeriod)} - ${this.convertDates(filteredPeriods[0].endPeriod)}`,
@@ -145,26 +145,15 @@ export class TrialBalanceComponent {
         credit: diary.initialBalance[0].credit
       }));
     
-      const transactions = filteredPeriods.map(period => {
-        return period.accountBalances.map(diary => ({
-          periodName: period.closureType,
-          periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
-          accountName: diary.name,
-          debit: diary.balancePeriod[0].debit,
-          credit: diary.balancePeriod[0].credit
-        }));
-      });
-    
-
+  
       const lastPeriod = filteredPeriods[filteredPeriods.length - 1].accountBalances.map(diary => ({
         periodName: filteredPeriods[filteredPeriods.length - 1].closureType,
         periodDate: `${this.convertDates(filteredPeriods[filteredPeriods.length - 1].startPeriod)} - ${this.convertDates(filteredPeriods[filteredPeriods.length - 1].endPeriod)}`,
         accountName: diary.name,
-        debit: diary.initialBalance[0].debit,
-        credit: diary.initialBalance[0].credit
+        debit: diary.finalBalance[0].debit,
+        credit: diary.finalBalance[0].credit
       }));
     
-      const dataCualquiera = { initialBalances, transactions, lastPeriod };
     
       const lista = initialBalances.map(initialBalance => {
         const correspondingTransactions = filteredPeriods.map(period => {
