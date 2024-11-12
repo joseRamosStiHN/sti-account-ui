@@ -162,7 +162,7 @@ export class ClientListComponent implements OnInit {
             this.showToast = true;
 
             setTimeout(() => {
-              this.router.navigate(['/accounting']); 
+              this.ngOnInit();
             }, 3000);
           },
           error: (err) => {

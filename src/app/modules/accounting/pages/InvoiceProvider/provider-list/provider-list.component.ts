@@ -136,7 +136,7 @@ export class ProviderListComponent {
             this.showToast = true;
 
             setTimeout(() => {
-              this.router.navigate(['/accounting']); 
+              this.ngOnInit();
             }, 3000);
           },
           error: (err) => {
