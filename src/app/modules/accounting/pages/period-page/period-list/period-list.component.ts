@@ -142,7 +142,15 @@ export class PeriodListComponent {
 
     return this.periodoService.getAllPeriods().pipe(
       map(data => {
-        data.map(nuevo => (nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status))
+        data.map(nuevo => {
+        
+        const status = nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status;
+         const isClosed=  nuevo.isClosed == null ? false : true;
+
+         return { ...nuevo,status, isClosed}
+
+        
+        })
         return data
       })
     );

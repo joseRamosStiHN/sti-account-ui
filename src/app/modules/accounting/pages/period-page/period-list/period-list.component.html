@@ -38,12 +38,18 @@
         <dxi-column caption="Fecha Fin" width="200" [calculateDisplayValue]="formatDateEnd"
             alignment="center"></dxi-column>
 
+
+            <dxi-column
+            caption="Cerrado"dataField="isClosed"[width]="100"></dxi-column>
+  
             <dxi-column
             caption="Estado"
             dataField="status"
             [width]="100"
             cellTemplate="cellTemplate"
           ></dxi-column>
+
+         
 
         <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
             <div *dxTemplate="let account of 'cellButtonTemplate'">
@@ -57,7 +63,7 @@
 
             <label class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" value="" class="sr-only peer" 
-                [disabled]="data.value "
+                [disabled]="data.value || data.data.isClosed"
                 [(ngModel)]="data.data.status" 
                 (change)="updatePeriod(data)">
                 <div

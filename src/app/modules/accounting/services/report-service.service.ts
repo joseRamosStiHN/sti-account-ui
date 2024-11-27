@@ -10,9 +10,16 @@ export class ReportServiceService {
   private readonly http = inject(HttpClient);
   constructor() { }
 
-  getGeneralBalanceReport(): Observable<GeneralBalanceResponse[]> {
+  getGeneralBalanceReport(id:number): Observable<GeneralBalanceResponse[]> {
+    if (id != 0) {
+      const url = `${this.BASE_URL}/api/v1/balance/general?periodId=${id}`;
+      return this.http.get<GeneralBalanceResponse[]>(url);
+    }
+
     const url = `${this.BASE_URL}/api/v1/balance/general`;
     return this.http.get<GeneralBalanceResponse[]>(url);
+    
+   
   }
 
   getTrialBalance(): Observable<TrialBalaceResponse> {
@@ -20,16 +27,29 @@ export class ReportServiceService {
     return this.http.get<TrialBalaceResponse>(url);
   }
 
-  getIncomeStatement(): Observable<IncomeStatement[]> {
-    const url = `${this.BASE_URL}/api/v1/income-statement`;
+  getIncomeStatement(id:number): Observable<IncomeStatement[]> {
+    if (id == 0) {
+       const url = `${this.BASE_URL}/api/v1/income-statement`;
+       return this.http.get<IncomeStatement[]>(url).pipe(
+        // Convertir el campo 'date' en un objeto Date
+        map(data => data.map(statement => ({
+          ...statement,
+          date: new Date(statement.date)
+        })))
+      );
+    }
 
+    const url = `${this.BASE_URL}/api/v1/income-statement?periodId=${id}`;
     return this.http.get<IncomeStatement[]>(url).pipe(
-      // Convertir el campo 'date' en un objeto Date
-      map(data => data.map(statement => ({
-        ...statement,
-        date: new Date(statement.date)
-      })))
-    );
+     // Convertir el campo 'date' en un objeto Date
+     map(data => data.map(statement => ({
+       ...statement,
+       date: new Date(statement.date)
+     })))
+   );
+   
+
+   
   }
 
   private formatDate(dateString: string): string {

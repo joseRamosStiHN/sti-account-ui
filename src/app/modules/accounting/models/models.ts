@@ -75,3 +75,17 @@ export interface Notes {
 
 }
 
+
+export interface ClosingPeriodsAll {
+  accountingPeriodId: number
+  periodName: any
+  typePeriod: any
+  startPeriod: string
+  endPeriod: string
+  totalAssets: number
+  totalLiabilities: number
+  totalCapital: number
+  totalIncome: number
+  totalExpenses: number
+  netIncome: number
+}

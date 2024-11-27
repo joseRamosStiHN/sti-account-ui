@@ -3,6 +3,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
 import { GeneralBalance, GeneralBalanceResponse } from '../../../models/APIModels';
 import { ReportServiceService } from '../../../services/report-service.service';
+import { PeriodService } from 'src/app/modules/accounting/services/period.service';
+import { map, Observable } from 'rxjs';
+import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
+import { NgForm } from '@angular/forms';
 
 interface GeneralBalance2 {
   accountName: string;
@@ -318,6 +322,11 @@ export class GeneralBalanceComponent implements OnInit {
   values: any = [];
   summaryTotal: number = 0;
   totalActivoSumary: number = 0;
+  selectedPeriod: number = 0;
+
+  periodList$: Observable<PeriodModel[]> | undefined;
+
+  private readonly periodoService = inject(PeriodService);
 
   private readonly reportService = inject(ReportServiceService, {
     optional: true,
@@ -325,9 +334,20 @@ export class GeneralBalanceComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.setInitValues();
+    this.setInitValues(0);
 
-   
+    this.periodList$ = this.periodoService.getAllPeriods().pipe(
+      map(data => {
+        data.map(nuevo => {
+          const status = nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status;
+          const isClosed = nuevo.isClosed == null ? false : true;
+          return { ...nuevo, status, isClosed }
+        })
+        return data
+      })
+    );
+
+
   }
 
   onContentReady(e: any): void {
@@ -340,7 +360,8 @@ export class GeneralBalanceComponent implements OnInit {
     // console.log(e.component.getRootNode());
   }
 
-  buildTree(data: GeneralBalance[]): void {    
+  buildTree(data: GeneralBalance[]): void {
+
     const tree = new Map<number, GeneralBalance2>();
     data.forEach((item) => {
       tree.set(item.id, {
@@ -350,7 +371,7 @@ export class GeneralBalanceComponent implements OnInit {
         children: [],
       });
     });
- 
+
 
     data.forEach((item) => {
       if (item.parentId !== null) {
@@ -395,9 +416,9 @@ export class GeneralBalanceComponent implements OnInit {
       //2500.01
     });
 
-   this.totalActivoSumary = this.treeData
-    .filter(node => node.category === 'ACTIVO')  // Filtra solo los nodos de la categoría 'ACTIVO'
-    .reduce((total, node) => total + (node.total ?? 0), 0);
+    this.totalActivoSumary = this.treeData
+      .filter(node => node.category === 'ACTIVO')  // Filtra solo los nodos de la categoría 'ACTIVO'
+      .reduce((total, node) => total + (node.total ?? 0), 0);
   }
 
   createTotalNodes(node: GeneralBalance2): void {
@@ -449,16 +470,23 @@ export class GeneralBalanceComponent implements OnInit {
     return childrenTotal;
   }
 
-  private setInitValues() {
+  private setInitValues(id: number) {
     this.reportService
-      ?.getGeneralBalanceReport()
+      ?.getGeneralBalanceReport(id)
       .subscribe((response: GeneralBalanceResponse[]) => {
 
-        
+
+        this.dataSource = [];
+        this.treeData = [];
+        this.values = [];
+        this.summaryTotal = 0;
+        this.totalActivoSumary = 0;
+
+
         // Convertir el JSON a la estructura de GeneralBalance[]
         const dataBalance: GeneralBalance[] = this.convertToGeneralBalance(response);
 
-    
+
 
         // const indexActive = data.findIndex(
         //   (item) => item.accountName.toUpperCase() === 'ACTIVO'
@@ -482,16 +510,28 @@ export class GeneralBalanceComponent implements OnInit {
   convertToGeneralBalance(response: GeneralBalanceResponse[]): GeneralBalance[] {
     return [
       ...response.map((item: any) => ({
-        id: item.accountId,                     
-        parentId: item.parentId,                        
-        accountName: item.accountName,          
-        category: item.category,                  
-        amount: item.balance,                  
-        total: null,                            
-        root: true                              
+        id: item.accountId,
+        parentId: item.parentId,
+        accountName: item.accountName,
+        category: item.category,
+        amount: item.balance,
+        total: null,
+        root: true
       })),
     ];
   }
-  
+
+  async onSubmit(e: NgForm) {
+
+    console.log(e.form.value.period);
+    
+    if (e.valid) {
+
+      this.setInitValues(e.form.value.period)
+    }
+
+
+  }
+
 
 }

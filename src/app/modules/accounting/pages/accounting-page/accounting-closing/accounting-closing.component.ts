@@ -4,7 +4,7 @@ import { PeriodClosing } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
-import { typeToast } from 'src/app/modules/accounting/models/models';
+import { ClosingPeriodsAll, typeToast } from 'src/app/modules/accounting/models/models';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,6 +23,7 @@ export class AccountingClosingComponent {
   private readonly periodService = inject(PeriodService);
   private readonly router = inject(Router);
   infoClosing?:PeriodClosing;
+  periodsClosing:ClosingPeriodsAll[]=[];
 
   constructor(){
     this.periodService.getInfoClosingPeriod().subscribe({
@@ -39,6 +40,19 @@ export class AccountingClosingComponent {
         setTimeout(() => {
           this.router.navigate(['/accounting/configuration/period']);
         }, 3000);
+      }
+    });
+    
+    this.periodService.getAllClosing().subscribe({
+      next: (info) => {
+        this.periodsClosing = info;
+      },
+      error: (err) => {
+        console.error('Error al obtener la información de los periodos cerrados anteriormente', err);
+
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Error al consultar datos de periodos cerrados anteriormente';
+        this.showToast = true;
       }
     });
     

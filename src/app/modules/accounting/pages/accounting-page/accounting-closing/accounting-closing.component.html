@@ -41,6 +41,7 @@
       <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
         <thead>
           <tr class="text-left bg-gray-200">
+            <th class="px-3 py-2 text-xs font-semibold text-gray-600">#</th>
             <th class="px-3 py-2 text-xs font-semibold text-gray-600">Periodo</th>
             <th class="px-3 py-2 text-xs font-semibold text-gray-600">Fecha de Cierre</th>
             <th class="px-3 py-2 text-xs font-semibold text-gray-600">Estado</th>
@@ -48,23 +49,15 @@
         </thead>
         <tbody>
     
-          <tr>
-            <td class="px-3 py-2 text-xs text-gray-800">Enero - 2024</td>
-            <td class="px-3 py-2 text-xs text-gray-800">31/01/2024</td>
-            <td class="px-3 py-2 text-xs text-gray-800">Cerrado</td>
-          </tr>
-
-          <tr>
-            <td class="px-3 py-2 text-xs text-gray-800">Febrero - 2024</td>
-            <td class="px-3 py-2 text-xs text-gray-800">28/02/2024</td>
-            <td class="px-3 py-2 text-xs text-gray-800">Cerrado</td>
-          </tr>
-
-          <tr>
-            <td class="px-3 py-2 text-xs text-gray-800">Marzo - 2024</td>
-            <td class="px-3 py-2 text-xs text-gray-800">31/03/2024</td>
-            <td class="px-3 py-2 text-xs text-gray-800">Cerrado</td>
-          </tr>
+          @for (item of periodsClosing; track $index) {
+            <tr>
+              <td class="px-3 py-2 text-xs text-gray-800">{{$index + 1}}</td>
+              <td class="px-3 py-2 text-xs text-gray-800">{{item.startPeriod | date: 'dd/MM/yyyy'}}</td>
+              <td class="px-3 py-2 text-xs text-gray-800">{{item.endPeriod | date: 'dd/MM/yyyy'}} </td>
+              <td class="px-3 py-2 text-xs text-gray-800">Cerrado</td>
+            </tr>
+          }
+        
         </tbody>
       </table>
     </div>
