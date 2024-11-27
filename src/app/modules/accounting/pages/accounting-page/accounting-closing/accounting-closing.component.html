@@ -86,7 +86,7 @@
       </button>
     
       <button *ngIf="nextYear"
-        (click)="closingYear()" 
+        (click)="openModalYear()" 
         class="bg-red-500 text-white font-semibold py-1 px-4 rounded-lg hover:bg-red-700 transition ease-in-out duration-150 text-sm">
         Cerrar Periodo Anual
       </button>
@@ -99,11 +99,11 @@
   
 </div>
 
-<dx-popup [visible]="isPopupVisiblePeriod" [width]="600" [height]="400" [title]="'Configuracion Periodo'"
+<dx-popup [visible]="isPopupVisiblePeriod" [width]="600" [height]="400" [title]="'Proximo Periodo'"
   [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPopupHiding()">
   <div *dxTemplate="let data of 'content'">
     <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="closing()">
-      <div class="grid grid-cols-2 gap-2">
+      <div *ngIf="!nextYearPeriod"   class="grid grid-cols-2 gap-2">
         <div>
           <label for="closureType" class="block mb-2 text-sm text-gray-900"
             >Periodo</label
@@ -114,8 +114,7 @@
             name="closureType"
             id="closureType"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            (change)="onChange()"
-            [disabled]="!nextYearPeriod"
+            disabled
           >
             <option value="Mensual">Mensual</option>
             <option value="Trimestral">Trimestral</option>
@@ -138,13 +137,21 @@
         </div>
 
       </div>
+      <div  *ngIf="nextYearPeriod" class="grid grid-cols-2 gap-2 p-4 bg-blue-100 border-l-4 border-blue-500 rounded-lg shadow-md">
+        <div class="col-span-2 text-center">
+          <h2 class="text-lg font-semibold text-blue-700">✨ Último Periodo del Año ✨</h2>
+          <p class="mt-2 text-gray-600">Este es el mes de <span class="font-medium text-blue-700">diciembre</span>. Estamos por cerrar el último periodo.</p>
+          <p class="text-gray-500 mt-1">La nueva configuración será definida al finalizar el año.</p>
+        </div>
+      </div>
+      
 
       <div class="mt-32 flex justify-end">
          <button
         type="submit"
         class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50"
       >
-        Guardar
+        Confirmar
       </button>
       </div>
       
@@ -155,7 +162,7 @@
 </dx-popup>
 
 
-<dx-popup [visible]="isPopupVisibleYear" [width]="600" [height]="400" [title]="'Configuracion periodos nuevo Año'"
+<dx-popup [visible]="isPopupVisibleYear" [width]="600" [height]="400" [title]="'Configuracion Periodo'"
   [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPopupHidingYear()">
   <div *dxTemplate="let data of 'content'">
     <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="closingYear()">
@@ -170,7 +177,7 @@
             name="closureType"
             id="closureType"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            (change)="onChange()"
+            (change)="onChange(nextPeriod.closureType)"
           >
             <option value="Mensual">Mensual</option>
             <option value="Trimestral">Trimestral</option>
@@ -199,7 +206,7 @@
         type="submit"
         class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50"
       >
-        Guardar
+      Confirmar
       </button>
       </div>
       

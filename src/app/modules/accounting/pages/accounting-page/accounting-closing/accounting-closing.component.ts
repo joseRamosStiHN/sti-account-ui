@@ -6,6 +6,7 @@ import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
 import { ClosingPeriodsAll, NextPeridModel, typeToast } from 'src/app/modules/accounting/models/models';
 import { Router } from '@angular/router';
+import { log } from 'node:console';
 
 @Component({
   selector: 'app-accounting-closing',
@@ -30,8 +31,9 @@ export class AccountingClosingComponent {
   ];
 
 
-  nextYear:boolean= false;
-  nextYearPeriod:boolean= false
+  nextYear: boolean = false;
+  nextYearPeriod: boolean = false
+  nextYearDate!:Date;
 
 
   private readonly periodService = inject(PeriodService);
@@ -57,9 +59,9 @@ export class AccountingClosingComponent {
         this.messageToast = 'Error al consultar datos del periodo actual';
         this.showToast = true;
 
-        setTimeout(() => {
-          this.router.navigate(['/accounting/configuration/period']);
-        }, 3000);
+        // setTimeout(() => {
+        //   this.router.navigate(['/accounting/configuration/period']);
+        // }, 3000);
       }
     });
 
@@ -68,15 +70,24 @@ export class AccountingClosingComponent {
         this.periodsClosing = info;
         this.periodsClosing.map((period) => {
           const fecha = new Date(period.endPeriod);
-          if (fecha.getMonth() + 1 == 12) {
-            this.nextYear = true
+          console.log(period.accountingPeriodId, fecha.getMonth()+1);
+          
+          if (fecha.getMonth() + 1 == 12  && period.accountingPeriodId != 1) {          
+            this.nextYear = true;
+            this.nextYearPeriod = true;
+            this.nextYearDate = fecha;
           }
 
-          console.log(fecha.getMonth()+ 1);
-          
+          if (fecha.getMonth() + 1 == 11 && period.accountingPeriodId != 1) {            
+            this.nextYear = false;  
+            this.nextYearPeriod = true;
+          }
 
-          if (fecha.getMonth() + 1 == 11) {
-            this.nextYearPeriod = true
+          if (fecha.getMonth() + 1 == 12 && period.accountingPeriodId == 1) {            
+            this.nextYear = false;  
+            this.nextYearPeriod = false;
+            this.nextYearDate = fecha;
+           
           }
         })
       },
@@ -87,7 +98,7 @@ export class AccountingClosingComponent {
         this.messageToast = 'Error al consultar datos de periodos cerrados anteriormente';
         this.showToast = true;
       }
-      
+
     });
 
     this.periodService.getNextPeriod().subscribe({
@@ -104,9 +115,6 @@ export class AccountingClosingComponent {
         this.showToast = true;
       }
     });
-
-    console.log(this.nextYearPeriod);
-    
 
   }
 
@@ -137,20 +145,20 @@ export class AccountingClosingComponent {
             this.toastType = typeToast.Success;
             this.messageToast = 'Periodo Cerrdado Correctamente';
             this.showToast = true;
-  
+
             setTimeout(() => {
               this.router.navigate(['/accounting/configuration/period']);
             }, 3000);
           },
           error: (err) => {
             console.log(err);
-  
+
             this.toastType = typeToast.Error;
             this.messageToast = 'Error al intentar cerrar periodo';
             this.showToast = true;
           },
         });
-      }     
+      }
     }
     );
   }
@@ -166,19 +174,20 @@ export class AccountingClosingComponent {
     dialogo.then(async (d) => {
 
       if (d) {
-        this.periodService.closingYear().subscribe({
+        
+        this.periodService.closingYear(this.nextPeriod.closureType).subscribe({
           next: () => {
             this.toastType = typeToast.Success;
             this.messageToast = 'Año Cerrdado Correctamente';
             this.showToast = true;
-  
+
             setTimeout(() => {
               this.router.navigate(['/accounting/configuration/period']);
             }, 3000);
           },
           error: (err) => {
             console.log(err);
-  
+
             this.toastType = typeToast.Error;
             this.messageToast = 'Error al intentar cerrar Año';
             this.showToast = true;
@@ -186,7 +195,7 @@ export class AccountingClosingComponent {
         });
       }
 
-  
+
     }
     );
   }
@@ -204,72 +213,33 @@ export class AccountingClosingComponent {
     this.isPopupVisibleYear = false;
   }
 
-  onChange() {
-    console.log(this.nextPeriod);
+  onChange(period: string) {
 
-    this.calculateEndDate(this.nextPeriod)
-  }
+    period = period.toUpperCase();
 
-  calculateEndDate(object: any) {
+    const year = this.nextYearDate.getFullYear() + 1;
 
+    switch (period) {
+      case "MENSUAL":
 
-    const { closureType, startPeriod } = object;
+        this.nextPeriod.startPeriod = `${year}-01-01`;
+        this.nextPeriod.endPeriod = `${year}-01-31`;
 
-    const startDate = new Date(`${startPeriod}T00:00:00-06:00`);
-
-    const startMonth = startDate.getMonth();
-    const startYear = startDate.getFullYear();
-
-    let endMonth = startMonth;
-    let endYear = startYear;
-
-
-    switch (closureType) {
-      case 'Mensual':
-        endMonth += 0;
         break;
-      case 'Trimestral':
-        endMonth += 2;
+      case "TRIMESTRAL":
+
+      this.nextPeriod.startPeriod = `${year}-01-01`;
+      this.nextPeriod.endPeriod = `${year}-03-31`;
+
         break;
-      case 'Semestral':
-        endMonth += 5;
+      case "SEMESTRAL":
+        this.nextPeriod.startPeriod = `${year}-01-01`;
+        this.nextPeriod.endPeriod = `${year}-06-30`;
+        break;
+
+      default:
         break;
     }
-
-    if (closureType === 'Trimestral' && endMonth == 12) {
-      endMonth = 11;
-      endYear = startYear;
-
-    }
-
-    if (closureType === 'Semestral' && endMonth > 6) {
-
-      endMonth = 11;
-      endYear = startYear;
-
-    }
-
-    if (endMonth > 11) {
-      endYear += Math.floor(endMonth / 12);
-      endMonth %= 12;
-    }
-
-
-    const lastDay = this.getLastDayOfMonth(endYear, endMonth);
-
-
-    const endDate = new Date(endYear, endMonth, lastDay);
-
-
-    const oneDay = 24 * 60 * 60 * 1000;
-    const diffDays = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
-
-
-    object.endPeriod = endDate.toISOString().substring(0, 10);
-    object.startPeriod = startDate.toISOString().substring(0, 10);
-    object.daysPeriod = diffDays;
-
-    return object;
   }
 
   getLastDayOfMonth(year: number, month: number): number {

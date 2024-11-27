@@ -195,10 +195,10 @@ export class PeriodService {
    *
    * @return response()
    */
-      closingYear(): Observable<any> {
+      closingYear(nextPeriod:string): Observable<any> {
         return this.httpClient
           .post<any>(
-            `${this.apiURL}/api/v1/accounting-closing/annual-close`,
+            `${this.apiURL}/api/v1/accounting-closing/annual-close?newClosureType=${nextPeriod}`,
             null,
             { 
               responseType: 'text' as 'json'
