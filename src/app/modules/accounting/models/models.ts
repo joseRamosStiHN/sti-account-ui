@@ -47,6 +47,21 @@ export interface BillingListClient {
 export interface ProviderClient extends ClientBilling {}
 export interface BillingListProvider extends BillingListClient {}
 
+
+export enum bulkTypeData{
+
+}
+
+export enum BulkDetailType {
+  ACC="ACC",    // account
+  DT="DT",     // DateTime
+  N="N",      // number
+  S="S",      // string
+  D="D",      // Decimal
+  B="B",      // Boolean
+}
+
+
 export enum typeToast {
   Info = 'info',
   Error = 'error',
@@ -74,4 +89,25 @@ export interface Notes {
   description: string;
 
 }
+
+
+export interface UploadBulkSettingsModel {
+  id?: number
+  name: string 
+  type: number | null
+  rowInit: number | null
+  configDetails:ConfigDetailModel[]
+}
+
+export interface ConfigDetailModel {
+  colum: number | null
+  title: string
+  account: number | null
+  operation: string | null
+  bulkTypeData: BulkDetailType,
+  field:string
+  
+}
+
+
 

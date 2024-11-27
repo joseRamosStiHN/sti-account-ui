@@ -253,6 +253,7 @@ export interface Period {
 }
 
 export interface AccountBalance {
+  id:number
   name: string
   accountCode: string
   parentName: string
@@ -289,3 +290,58 @@ export interface TaxSettings {
   isCurrent: boolean
   creationDate?:string
 }
+
+
+export interface UploadBulkSettings {
+  id: number
+  name: string
+  activate: boolean
+  type: number
+  rowInit: number
+  tenantId: string
+  configDetails: ConfigDetail[]
+}
+
+export interface ConfigDetail {
+  colum: number
+  title: string
+  account?: number
+  operation?: string
+  bulkTypeData: string
+}
+
+
+export interface TransactionUpload {
+  typetransaction:number
+  data: Daum[]
+  errors: any[]
+}
+
+export interface Daum {
+  id:string
+  row:number
+  date: string
+  currency: any
+  description: string
+  errors: any
+  reference: string
+  status: string
+  exchangeRate: any
+  typeSale: string
+  cashValue: number
+  creditValue: number
+  typePayment: string
+  rtn: string
+  supplierName: any
+  accounts: Account[]
+  otherFields: any
+}
+
+export interface Account {
+  title: string
+  account: number
+  debit: number
+  credit: number
+}
+
+

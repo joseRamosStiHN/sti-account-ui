@@ -31,6 +31,9 @@ import { DebitNoteListComponent } from 'src/app/modules/accounting/pages/account
 import { AccountingClosingComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-closing/accounting-closing.component';
 import { TaxSettingsComponent } from 'src/app/modules/accounting/pages/tax-settings/tax-settings/tax-settings.component';
 import { TaxSettingsListComponent } from 'src/app/modules/accounting/pages/tax-settings/tax-settings-list/tax-settings-list.component';
+import { BulkConfigurationListComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-configuration/bulk-configuration-list/bulk-configuration-list.component';
+import { BulkConfigurationComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-configuration/bulk-configuration/bulk-configuration.component';
+import { UploadBulkFileComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-file/upload-bulk-file.component';
 
 const routes: Routes = [
   {
@@ -98,6 +101,11 @@ const routes: Routes = [
       { path: 'configuration/tax-settings', component: TaxSettingsListComponent },
       { path: 'configuration/tax-settings/create', component: TaxSettingsComponent },
       { path: 'configuration/tax-settings/:id', component: TaxSettingsComponent },
+
+      { path: 'configuration/bulk-configuration', component: BulkConfigurationListComponent },
+      { path: 'configuration/bulk-configuration/create', component: BulkConfigurationComponent },
+      { path: 'configuration/bulk-configuration/:id', component: BulkConfigurationComponent },
+      { path: 'bulk-upload-file', component: UploadBulkFileComponent },
     ],
   },
 ];

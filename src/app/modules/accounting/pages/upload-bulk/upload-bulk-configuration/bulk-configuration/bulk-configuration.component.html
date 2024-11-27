@@ -1,0 +1,113 @@
+<div class="w-100 mt-5">
+    <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+        Configuracion Archivo Subida Excel
+    </h2>
+
+    <form id="bulkConfiguration" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+        <div class="container">
+            <div class="grid grid-cols-3 gap-2">
+                <div class="form-group">
+                    <label for="nameSettings" class="block mb-2 text-sm text-gray-900">Nombre Configuracion</label>
+                    <input [(ngModel)]="BulkConfiguration.name" id="nameSettings"
+                     name="nameSettings" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+             focus:ring-blue-500 focus:border-blue-500 block w-full p-2" required />
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['nameSettings'].getError('required')
+            ">
+                        <small class="text-xs text-red-900">Nombre de Configuracion es requerido.</small>
+                    </div>
+                </div>
+                <div>
+                    <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
+                    <select    (change)="onChangeJournal($event)"
+                    [(ngModel)]="BulkConfiguration.type" required name="type" id="type"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                        <option value="1">Venta</option>
+                        <option value="2">Compra</option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')
+              ">
+                        <small class="text-xs text-red-900">Tipo de archivo es requerido.</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rowInit" class="block mb-2 text-sm text-gray-900">Fila Inicio</label>
+                    <input [(ngModel)]="BulkConfiguration.rowInit" id="rowInit" name="rowInit" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+             focus:ring-blue-500 focus:border-blue-500 block w-full p-2" required />
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['rowInit'].getError('required')
+            ">
+                        <small class="text-xs text-red-900">Fila de inicio es requerida.</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
+
+        </div>
+
+        <dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full"
+            [dataSource]="BulkConfiguration.configDetails" [showBorders]="true" [height]="500"
+            [repaintChangesOnly]="true" [showRowLines]="true" [allowColumnResizing]="true" noDataText="">
+            <dxo-load-panel [enabled]="true"></dxo-load-panel>
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+            <dxo-editing mode="cell" [useIcons]="true" [allowAdding]="true" [allowDeleting]="true"
+                [allowUpdating]="true">
+            </dxo-editing>
+
+            <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
+                [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
+            </dxi-column>
+
+            <dxi-column dataField="colum" caption="Columna" alignment="left" [width]="100" [allowEditing]="true"
+                [formItem]="{ visible: true }">
+                <dxo-lookup [dataSource]="colums" valueExpr="value" displayExpr="colum">
+                </dxo-lookup>
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column caption="Titulo" dataField="title" alignment="left" [width]="170"></dxi-column>
+            <dxi-column caption="Cuenta" dataField="account" alignment="left">
+                <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">
+                </dxo-lookup>
+            </dxi-column>
+            <dxi-column caption="Operacion" dataField="operation" alignment="left" [width]="100">
+                <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name">
+                </dxo-lookup>
+            </dxi-column>
+            <dxi-column caption="Campo" dataField="field" alignment="left" [width]="300">
+                <dxo-lookup [dataSource]="tableFields" valueExpr="key" displayExpr="value">
+                </dxo-lookup>
+            </dxi-column>
+            <dxi-column caption="Tipo de Dato" dataField="bulkTypeData" alignment="left" [width]="100">
+                <dxo-lookup [dataSource]="typeData" valueExpr="key" displayExpr="value">
+                </dxo-lookup>
+            </dxi-column>
+
+            <div *dxTemplate="let d of 'indexTemplate'">
+                <span>{{ d.rowIndex + 1 }}</span>
+            </div>
+
+            <dxi-column type="buttons" [width]="110">
+                <dxi-button name="edit"></dxi-button>
+                <dxi-button name="delete"></dxi-button>
+            </dxi-column>
+
+        </dx-data-grid>
+        <div class="mt-4 flex justify-end">
+            <button type="button" (click)="goBack()"
+                class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
+                Regresar
+            </button>
+
+            <button type="submit"
+                class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50">
+                Guardar
+            </button>
+
+        </div>
+    </form>
+</div>
+
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+    <dxo-position my="top" at="top" of="#bulkConfiguration"> </dxo-position>
+  </dx-toast>

@@ -53,6 +53,9 @@ import { DebitNoteListComponent } from 'src/app/modules/accounting/pages/account
 import { AccountingClosingComponent } from 'src/app/modules/accounting/pages/accounting-page/accounting-closing/accounting-closing.component';
 import { TaxSettingsComponent } from 'src/app/modules/accounting/pages/tax-settings/tax-settings/tax-settings.component';
 import { TaxSettingsListComponent } from 'src/app/modules/accounting/pages/tax-settings/tax-settings-list/tax-settings-list.component';
+import { BulkConfigurationListComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-configuration/bulk-configuration-list/bulk-configuration-list.component';
+import { BulkConfigurationComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-configuration/bulk-configuration/bulk-configuration.component';
+import { UploadBulkFileComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-file/upload-bulk-file.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +90,10 @@ import { TaxSettingsListComponent } from 'src/app/modules/accounting/pages/tax-s
     DebitNoteListComponent,
     AccountingClosingComponent,
     TaxSettingsComponent,
-    TaxSettingsListComponent
+    TaxSettingsListComponent,
+    BulkConfigurationListComponent,
+    BulkConfigurationComponent,
+    UploadBulkFileComponent
   ],
   providers: [ReportServiceService, JournalService],
   exports: [AccountingPageComponent, HttpClientModule],

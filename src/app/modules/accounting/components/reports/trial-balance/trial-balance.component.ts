@@ -14,105 +14,6 @@ interface Incomes {
   date: Date;
 }
 
-const DATA: Incomes[] = [
-  {
-    id: 1,
-    category: 'Ingresos',
-    accountParent: 'Ingresos y otras ganancias',
-    account: 'Ventas y ganancias',
-    amount: 5200,
-    date: new Date('2023-01-02'),
-  },
-  {
-    id: 2,
-    category: 'Ingresos',
-    accountParent: 'Ingresos y otras ganancias',
-    account: 'Ingresos por afiliación',
-    amount: 1020,
-    date: new Date('2023-01-02'),
-  },
-  {
-    id: 3,
-    category: 'Costos',
-    accountParent: 'Costos y otras deducciones',
-    account: 'Gasolina y otras compras',
-    amount: -500,
-    date: new Date('2023-01-02'),
-  },
-  {
-    id: 4,
-    category: 'Costos',
-    accountParent: 'Costos y otras deducciones',
-    account: 'Producción y Manufactura',
-    amount: -1120,
-    date: new Date('2023-01-02'),
-  },
-  {
-    id: 5,
-    category: 'Costos',
-    accountParent: 'Costos y otras deducciones',
-    account: 'Ventas y administración',
-    amount: -1455,
-    date: new Date('2023-01-02'),
-  },
-  {
-    id: 6,
-    category: 'Costos',
-    accountParent: 'Deudas',
-    account: 'Deudas varias',
-    amount: -560,
-    date: new Date('2023-01-02'),
-  },
-  {
-    id: 7,
-    category: 'Costos',
-    accountParent: 'Deudas',
-    account: 'Deudas Por compras',
-    amount: -560,
-    date: new Date('2023-01-21'),
-  },
-  {
-    id: 8,
-    category: 'Costos',
-    accountParent: 'Deudas',
-    account: 'Deudas Por compras',
-    amount: -560,
-    date: new Date('2023-02-21'),
-  },
-  /*{
-    id: 0,
-    category: '',
-    accountParent: '',
-    account: '',
-    amount: 0,
-    date: undefined,
-  },
-  {
-    id: 0,
-    category: '',
-    accountParent: '',
-    account: '',
-    amount: 0,
-    date: undefined,
-  },
-  {
-    id: 0,
-    category: '',
-    accountParent: '',
-    account: '',
-    amount: 0,
-    date: undefined,
-  },
-  {
-    id: 0,
-    category: '',
-    accountParent: '',
-    account: '',
-    amount: 0,
-    date: undefined,
-  }, */
-];
-
 @Component({
   selector: 'app-trial-balance',
   templateUrl: './trial-balance.component.html',
@@ -141,6 +42,7 @@ export class TrialBalanceComponent {
         periodName: filteredPeriods[0].closureType,
         periodDate: `${this.convertDates(filteredPeriods[0].startPeriod)} - ${this.convertDates(filteredPeriods[0].endPeriod)}`,
         accountName: diary.name,
+        id:diary.id,
         debit: diary.initialBalance[0].debit,
         credit: diary.initialBalance[0].credit
       }));
@@ -150,6 +52,7 @@ export class TrialBalanceComponent {
         periodName: filteredPeriods[filteredPeriods.length - 1].closureType,
         periodDate: `${this.convertDates(filteredPeriods[filteredPeriods.length - 1].startPeriod)} - ${this.convertDates(filteredPeriods[filteredPeriods.length - 1].endPeriod)}`,
         accountName: diary.name,
+        id:diary.id,
         debit: diary.finalBalance[0].debit,
         credit: diary.finalBalance[0].credit
       }));
@@ -158,7 +61,7 @@ export class TrialBalanceComponent {
       const lista = initialBalances.map(initialBalance => {
         const correspondingTransactions = filteredPeriods.map(period => {
           return period.accountBalances
-            .filter(diary => diary.name === initialBalance.accountName) 
+            .filter(diary => diary.id === initialBalance.id) 
             .map(diary => ({
               periodName: period.closureType,
               periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
@@ -168,7 +71,7 @@ export class TrialBalanceComponent {
             }));
         });
     
-        const correspondingLastPeriod = lastPeriod.find(lp => lp.accountName === initialBalance.accountName);
+        const correspondingLastPeriod = lastPeriod.find(lp => lp.id === initialBalance.id);
   
         return {
           name: initialBalance.accountName,
