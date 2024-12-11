@@ -141,11 +141,14 @@ export class UploadBulkFileComponent {
     );
 
 
+    console.log(this.TransactionUpload$);
+    
+
     const groupedById = this.TransactionUpload$.reduce((acc: Map<string, Daum[]>, item: Daum) => {
-      if (!acc.has(item.id)) {
-        acc.set(item.id, []);
+      if (!acc.has(item.reference)) {
+        acc.set(item.reference, []);
       }
-      acc.get(item.id)!.push(item);
+      acc.get(item.reference)!.push(item);
       return acc;
     }, new Map<string, Daum[]>());
 
@@ -195,6 +198,7 @@ export class UploadBulkFileComponent {
         transactionsToSave.data.push(transactionData);
       }
     }
+    
 
     this.bulkSettingsService.saveTransacionsBulk(transactionsToSave).subscribe({
       next: (data) => {

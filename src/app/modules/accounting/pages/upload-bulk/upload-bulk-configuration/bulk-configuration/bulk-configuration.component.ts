@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastType } from 'devextreme/ui/toast';
 import { AccountModel } from 'src/app/modules/accounting/models/AccountModel';
-import { BulkDetailType, ClientBilling, IMovement, typeToast, UploadBulkSettingsModel } from 'src/app/modules/accounting/models/models';
+import { BulkDetailType, ClientBilling, ConfigDetailModel, IMovement, typeToast, UploadBulkSettingsModel } from 'src/app/modules/accounting/models/models';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { UploadBulkService } from 'src/app/modules/accounting/services/upload-bulk.service';
 
@@ -15,6 +15,7 @@ import { UploadBulkService } from 'src/app/modules/accounting/services/upload-bu
 export class BulkConfigurationComponent {
 
   BulkConfiguration: UploadBulkSettingsModel;
+  // configDetailModel:ConfigDetailModel;
   colums: any = [
     { colum: "A", value: 0 },
     { colum: "B", value: 1 },
@@ -50,159 +51,66 @@ export class BulkConfigurationComponent {
   ];
 
 
-  tableFields = [
-    { key: "CASH", value: 'CONTADO' },
-    { key: "CREDIT_VALUE", value: 'CREDITO' },
-    { key: "CURRENCY", value: 'MONEDA' },
-    { key: "DATE", value: 'FECHA' },
-    { key: "DESCRIPTION", value: 'DESCRIPCION' },
-    { key: "TIPO_CAMBIO", value: 'TIPO CAMBIO' },
-    { key: "REFERENCE", value: 'FACTURA' },
-    { key: "RTN", value: 'RTN' },
-    { key: "SUPPLIER_value", value: 'NOMBRE COMPRADOR/VENDEDOR' },
-    { key: "TYPE_PAYMENT", value: 'TIPO PAGO TARJETA/EFECTIVO' },
-    { key: "TYPE_SALE", value: 'TYPO VENTA CONTADO/CREDITO' },
-  ];
-
-  configDefaultSales = [
+  configDefault:any = [
     {
-      colum: 1,
+      colum: null,
+      title: "VALOR-CREDITO",
+      bulkTypeData: BulkDetailType.ACC,
+      account: null,
+      operation: null,
+
+    },
+    {
+      colum: null,
+      title: "VALOR-CONTADO",
+      bulkTypeData: BulkDetailType.ACC,
+      account: null,
+      operation: null,
+
+    },
+    
+    {
+      colum: null,
       title: "FACTURA",
       bulkTypeData: BulkDetailType.S,
       account: null,
       operation: null,
-      field: "REFERENCE"
+
     },
     {
-      colum: 2,
-      title: "DETALLE",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "DESCRIPTION"
-    },
-    {
-      colum: 0,
+      colum: null,
       title: "FECHA",
       bulkTypeData: BulkDetailType.DT,
       account: null,
       operation: null,
-      field: "DATE"
-    },
-    {
-      colum: 7,
-      title: "TIPO-VENTA",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "TYPE_SALE"
-    },
-    {
-      colum: 10,
-      title: "TIPO-PAGO",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "TYPE_PAYMENT"
-    },
-    {
-      colum: 8,
-      title: "VALOR-CONTADO",
-      bulkTypeData: BulkDetailType.N,
-      account: null,
-      operation: null,
-      field: "CASH"
-    },
-    {
-      colum: 9,
-      title: "VALOR-CREDITO",
-      bulkTypeData: BulkDetailType.N,
-      account: null,
-      operation: null,
-      field: "CREDIT_VALUE"
-    },
-    {
-      colum: 11,
-      title: "CON-RTN",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "RTN"
-    }
-  ]
 
-  configDefaultBuys = [
-    {
-      colum: 1,
-      title: "FACTURA",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "REFERENCE"
     },
     {
-      colum: 3,
+      colum: null,
       title: "DETALLE",
       bulkTypeData: BulkDetailType.S,
       account: null,
       operation: null,
-      field: "DESCRIPTION"
+
     },
     {
-      colum: 0,
-      title: "FECHA",
-      bulkTypeData: BulkDetailType.DT,
-      account: null,
-      operation: null,
-      field: "DATE"
-    },
-    {
-      colum: 8,
-      title: "TIPO-COMPRA",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "TYPE_SALE"
-    },
-    {
-      colum: 11,
-      title: "TIPO-PAGO",
-      bulkTypeData: BulkDetailType.S,
-      account: null,
-      operation: null,
-      field: "TYPE_PAYMENT"
-    },
-    {
-      colum: 9,
-      title: "VALOR-CONTADO",
-      bulkTypeData: BulkDetailType.N,
-      account: null,
-      operation: null,
-      field: "CASH"
-    },
-    {
-      colum: 10,
-      title: "VALOR-CREDITO",
-      bulkTypeData: BulkDetailType.N,
-      account: null,
-      operation: null,
-      field: "CREDIT_VALUE"
-    },
-    {
-      colum: 12,
+      colum: null,
       title: "CON-RTN",
       bulkTypeData: BulkDetailType.S,
       account: null,
       operation: null,
-      field: "RTN"
-    }
-  ]
+    },
+    {
+      colum: null,
+      title: "TIPO-PAGO",
+      bulkTypeData: BulkDetailType.S,
+      account: null,
+      operation: null,
 
-  typeData = [
-    { key: "S", value: 'TEXTO' },
-    { key: "N", value: 'NUMERICO' },
-    { key: "DT", value: 'FECHA' },
-  ];
+    },
+    
+    
+  ]
 
   @Input('id') id?:number;
 
@@ -229,8 +137,15 @@ export class BulkConfigurationComponent {
   ngOnInit(): void {
 
     if (this.id) {
-       this.bulkSettingsService.getBulkConfigurationById(this.id).subscribe(data=>
-        this.BulkConfiguration = data
+       this.bulkSettingsService.getBulkConfigurationById(this.id).subscribe(data=>{
+        this.configDefault = data.configDetails.slice(0,7);
+        
+        this.BulkConfiguration = {
+          ...data,  
+          configDetails: data.configDetails.slice(7) 
+        };
+       }
+        
        );
     }
 
@@ -253,8 +168,32 @@ export class BulkConfigurationComponent {
 
   async onSubmit(e: NgForm) {
 
+    console.log(e);
+    console.log(this.configDefault);
+    console.log(this.BulkConfiguration);
+    
+
     if (e.valid) {
-      const validationErrors = this.validateUniqueFields(this.BulkConfiguration.configDetails);
+
+
+      this.BulkConfiguration.configDetails.forEach((data)=>{
+        if (data.account != null || data.account != undefined) {
+          data.bulkTypeData = BulkDetailType.ACC
+        }else{
+          data.bulkTypeData = BulkDetailType.S
+        }
+     
+      })
+
+      const request: UploadBulkSettingsModel = {
+        name: this.BulkConfiguration.name,
+        type: this.BulkConfiguration.type,
+        rowInit: this.BulkConfiguration.rowInit, 
+        configDetails: [...this.configDefault, ...this.BulkConfiguration.configDetails] 
+      };
+      
+      
+      const validationErrors = this.validateUniqueFields(request.configDetails);
 
       if (validationErrors.length > 0) {
         for (let index = 0; index < 1; index++) {
@@ -266,11 +205,10 @@ export class BulkConfigurationComponent {
            
         }
 
-      } else {
+      } else{
 
         if (this.id) {
-
-          this.bulkSettingsService.updateUBulkSettings(this.id,this.BulkConfiguration).subscribe({
+          this.bulkSettingsService.updateUBulkSettings(this.id,request).subscribe({
             next: (data) => {
        
               this.toastType = typeToast.Success;
@@ -289,7 +227,7 @@ export class BulkConfigurationComponent {
           });
           
         }else{
-          this.bulkSettingsService.createUBulkSettings(this.BulkConfiguration).subscribe({
+          this.bulkSettingsService.createUBulkSettings(request).subscribe({
             next: (data) => {
        
               this.toastType = typeToast.Success;
@@ -320,12 +258,12 @@ export class BulkConfigurationComponent {
   onChangeJournal(e: any) {
 
     if (e.target.value == 1) {
-      this.BulkConfiguration.configDetails = this.configDefaultSales;
+      // this.BulkConfiguration.configDetails = this.configDefaultSales;
     } else {
-      this.BulkConfiguration.configDetails = this.configDefaultBuys;
+      // this.BulkConfiguration.configDetails = this.configDefaultBuys;
     }
 
-    console.log(e.target.value);
+    // console.log(e.target.value);
 
   }
 
@@ -370,23 +308,8 @@ export class BulkConfigurationComponent {
         }
       }
   
-      if (!item.bulkTypeData) {
-        errors.push('El Tipo de dato es obligatorio.');
-      } 
-      
   
-      if (item.field != null || item.field != undefined) {
-        if (fieldSet.has(item.field)) {
-
-          const field = this.tableFields.find(field=> field.key== item.field);
-          errors.push(`El campo "${field?.value}" ya existe en la lista. Por favor, asegúrese de que todos los campos sean únicos.`);
-        } else {
-          fieldSet.add(item.field);
-
-          
-        }
-      }
-      
+    
       if (item.account !== null && item.account !== undefined) {
         if (accountSet.has(item.account)) {
           const account = this.accountList.find(account => account.id == item.account);
@@ -397,18 +320,11 @@ export class BulkConfigurationComponent {
             errors.push('La operacion es obligatoria cuando existe cuenta.');
           }
 
-          if (item.bulkTypeData !=  BulkDetailType.N) {
-            errors.push('tipo de dato de cuenta debe ser numerico');
-          }
-
 
           accountSet.add(item.account);
         }
-      }else{
-        if (item.field ==  null || item.field == undefined) {
-          errors.push('El campo es obligatorio cuando no existe cuenta.');
-        }
       }
+
     });
   
     return errors;

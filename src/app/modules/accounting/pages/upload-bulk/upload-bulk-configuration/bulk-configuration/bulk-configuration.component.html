@@ -8,8 +8,7 @@
             <div class="grid grid-cols-3 gap-2">
                 <div class="form-group">
                     <label for="nameSettings" class="block mb-2 text-sm text-gray-900">Nombre Configuracion</label>
-                    <input [(ngModel)]="BulkConfiguration.name" id="nameSettings"
-                     name="nameSettings" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                    <input [(ngModel)]="BulkConfiguration.name" id="nameSettings" name="nameSettings" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
              focus:ring-blue-500 focus:border-blue-500 block w-full p-2" required />
                     <div *ngIf="itemForm.submitted && itemForm.form.controls['nameSettings'].getError('required')
             ">
@@ -18,8 +17,7 @@
                 </div>
                 <div>
                     <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
-                    <select    (change)="onChangeJournal($event)"
-                    [(ngModel)]="BulkConfiguration.type" required name="type" id="type"
+                    <select [(ngModel)]="BulkConfiguration.type" required name="type" id="type"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option value="1">Venta</option>
                         <option value="2">Compra</option>
@@ -39,9 +37,169 @@
                     </div>
                 </div>
 
+                
+
             </div>
 
             <div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
+            
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label for="credito" class="block mb-2 text-sm text-gray-900">Credito</label>
+                        <select required name="credito" id="credito" [(ngModel)]="configDefault[0].colum"
+    
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                            <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                                {{ colum.colum }}
+                            </option>
+                        </select>
+                        <div *ngIf="itemForm.submitted && itemForm.form.controls['credito'].getError('required')
+                  ">
+                            <small class="text-xs text-red-900">Credito es requerido.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="cuenta-credito" class="block mb-2 text-sm text-gray-900">Cuenta Credito</label>
+                        <select required name="cuenta-credito" id="cuenta-credito" [(ngModel)]="configDefault[0].account"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                            <option *ngFor="let colum of accountList" [ngValue]="colum.id">
+                                {{colum.description}} {{ colum.code }}
+                            </option>
+                        </select>
+                        <div *ngIf="itemForm.submitted && itemForm.form.controls['cuenta-credito'].getError('required')
+                  ">
+                            <small class="text-xs text-red-900">Cuenta Credito es requerido.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="movimiento-credito" class="block mb-2 text-sm text-gray-900">Movimiento Credito</label>
+                        <select required name="movimiento-credito" id="movimiento-credito" [(ngModel)]="configDefault[0].operation"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                            <option *ngFor="let colum of listMovement" [ngValue]="colum.code">
+                                {{colum.name}}
+                            </option>
+                        </select>
+                        <div *ngIf="itemForm.submitted && itemForm.form.controls['movimiento-credito'].getError('required')
+                  ">
+                            <small class="text-xs text-red-900">Movimiento Credito es requerido.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label for="contado" class="block mb-2 text-sm text-gray-900">Contado</label>
+                        <select required name="contado" id="contado" [(ngModel)]="configDefault[1].colum"
+    
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                            <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                                {{ colum.colum }}
+                            </option>
+                        </select>
+                        <div *ngIf="itemForm.submitted && itemForm.form.controls['contado'].getError('required')
+                  ">
+                            <small class="text-xs text-red-900">Contado es requerido.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="cuenta-contado" class="block mb-2 text-sm text-gray-900">Cuenta Contado</label>
+                        <select required name="cuenta-contado" id="cuenta-contado" [(ngModel)]="configDefault[1].account"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                            <option *ngFor="let colum of accountList" [ngValue]="colum.id">
+                                {{colum.description}} {{ colum.code }}
+                            </option>
+                        </select>
+                        <div *ngIf="itemForm.submitted && itemForm.form.controls['cuenta-contado'].getError('required')
+                  ">
+                            <small class="text-xs text-red-900">Cuenta Contado es requerido.</small>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="movimiento-contado" class="block mb-2 text-sm text-gray-900">Movimiento Contado</label>
+                        <select required name="movimiento-contado" id="movimiento-contado" [(ngModel)]="configDefault[1].operation"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                            <option *ngFor="let colum of listMovement" [ngValue]="colum.code">
+                                {{colum.name}}
+                            </option>
+                        </select>
+                        <div *ngIf="itemForm.submitted && itemForm.form.controls['movimiento-contado'].getError('required')
+                  ">
+                            <small class="text-xs text-red-900">Movimiento Contado es requerido.</small>
+                        </div>
+                    </div>
+                </div>
+               
+
+            <div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
+
+            <div class="grid grid-cols-5 gap-2">
+                <div>
+                    <label for="factura" class="block mb-2 text-sm text-gray-900">Factura</label>
+                    <select required name="factura" id="factura" [(ngModel)]="configDefault[2].colum"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                        <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                            {{ colum.colum }}
+                        </option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['factura'].getError('required')
+              ">
+                        <small class="text-xs text-red-900">Factura es requerida.</small>
+                    </div>
+                </div>
+                <div>
+                    <label for="fecha" class="block mb-2 text-sm text-gray-900">Fecha</label>
+                    <select required name="fecha" id="fecha" [(ngModel)]="configDefault[3].colum"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                        <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                            {{ colum.colum }}
+                        </option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['fecha'].getError('required')
+              ">
+                        <small class="text-xs text-red-900">Fecha es requerida.</small>
+                    </div>
+                </div>
+                <div>
+                    <label for="descripcion" class="block mb-2 text-sm text-gray-900">Detalle</label>
+                    <select required name="descripcion" id="descripcion" [(ngModel)]="configDefault[4].colum"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                        <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                            {{ colum.colum }}
+                        </option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['descripcion'].getError('required')
+              ">
+                        <small class="text-xs text-red-900">Descripcion es requerido.</small>
+                    </div>
+                </div>
+                <div>
+                    <label for="rtn" class="block mb-2 text-sm text-gray-900">RTN</label>
+                    <select required name="rtn" id="rtn" [(ngModel)]="configDefault[5].colum"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                        <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                            {{ colum.colum }}
+                        </option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')
+              ">
+                        <small class="text-xs text-red-900">Rtn es requerido.</small>
+                    </div>
+                </div>
+                <div>
+                    <label for="type-pago" class="block mb-2 text-sm text-gray-900">Tipo Pago</label>
+                    <select required name="type-pago" id="type-pago" 
+                    [(ngModel)]="configDefault[6].colum"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                        <option *ngFor="let colum of colums" [ngValue]="colum.value">
+                            {{ colum.colum }}
+                        </option>
+                    </select>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['type-pago'].getError('required')
+              ">
+                        <small class="text-xs text-red-900">Tipo de pago es requerido.</small>
+                    </div>
+                </div>
+
+            </div>
 
         </div>
 
@@ -65,21 +223,13 @@
                 </dxo-lookup>
                 <dxi-validation-rule type="required"></dxi-validation-rule>
             </dxi-column>
-            <dxi-column caption="Titulo" dataField="title" alignment="left" [width]="170"></dxi-column>
+            <dxi-column caption="Titulo" dataField="title" alignment="left" [width]="350"></dxi-column>
             <dxi-column caption="Cuenta" dataField="account" alignment="left">
                 <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">
                 </dxo-lookup>
             </dxi-column>
             <dxi-column caption="Operacion" dataField="operation" alignment="left" [width]="100">
                 <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name">
-                </dxo-lookup>
-            </dxi-column>
-            <dxi-column caption="Campo" dataField="field" alignment="left" [width]="300">
-                <dxo-lookup [dataSource]="tableFields" valueExpr="key" displayExpr="value">
-                </dxo-lookup>
-            </dxi-column>
-            <dxi-column caption="Tipo de Dato" dataField="bulkTypeData" alignment="left" [width]="100">
-                <dxo-lookup [dataSource]="typeData" valueExpr="key" displayExpr="value">
                 </dxo-lookup>
             </dxi-column>
 
@@ -110,4 +260,4 @@
 
 <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
     <dxo-position my="top" at="top" of="#bulkConfiguration"> </dxo-position>
-  </dx-toast>
+</dx-toast>

@@ -105,16 +105,14 @@
         <dxi-column caption="Fecha" dataField="date" alignment="left" [width]="170" ></dxi-column>
 
 
-        <dxi-column caption="Factura" dataField="reference" alignment="left" [width]="170" [groupIndex]="0"></dxi-column>
-        <dxi-column caption="Detalle" dataField="description" alignment="left" [width]="170"></dxi-column>
+        <dxi-column caption="Factura" dataField="reference" alignment="left" [width]="170"></dxi-column>
+        <dxi-column caption="Detalle" dataField="description" alignment="left" [width]="250"></dxi-column>
         <dxi-column caption="Cuenta" dataField="account" alignment="left">
             <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">
             </dxo-lookup>
         </dxi-column>
         <dxi-column caption="Debe" dataField="debit" alignment="left" [width]="170"></dxi-column>
         <dxi-column caption="Haber" dataField="credit" alignment="left" [width]="170"></dxi-column>
-        <dxi-column caption="Estado" dataField="status" alignment="left" [width]="170"></dxi-column>
-        <dxi-column caption="Errores" dataField="errors" alignment="left" [width]="170"></dxi-column>
 
         <div *dxTemplate="let d of 'indexTemplate'">
             <span>{{ d.rowIndex + 1 }}</span>
@@ -169,7 +167,7 @@
     
     
     
-        <dxi-column caption="Fila" dataField="row" alignment="left" [width]="170" [groupIndex]="0"></dxi-column>
+        <dxi-column caption="Fila" dataField="row" alignment="left" [width]="170"></dxi-column>
         <dxi-column caption="Descripcion Error" dataField="mensaje" alignment="left"></dxi-column>
         <div *dxTemplate="let d of 'indexTemplate'">
             <span>{{ d.rowIndex + 1 }}</span>

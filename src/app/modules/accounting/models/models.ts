@@ -95,7 +95,7 @@ export interface UploadBulkSettingsModel {
   id?: number
   name: string 
   type: number | null
-  rowInit: number | null
+  rowInit: number | null,
   configDetails:ConfigDetailModel[]
 }
 
@@ -104,8 +104,7 @@ export interface ConfigDetailModel {
   title: string
   account: number | null
   operation: string | null
-  bulkTypeData: BulkDetailType,
-  field:string
+  bulkTypeData: BulkDetailType
   
 }
 
