@@ -129,6 +129,7 @@ export class TrialBalanceComponent {
   });
 
   constructor() { }
+
   ngOnInit(): void {
     this.reportService?.getTrialBalance().subscribe((data: TrialBalaceResponse) => {
 
@@ -141,6 +142,7 @@ export class TrialBalanceComponent {
         periodName: filteredPeriods[0].closureType,
         periodDate: `${this.convertDates(filteredPeriods[0].startPeriod)} - ${this.convertDates(filteredPeriods[0].endPeriod)}`,
         accountName: diary.name,
+        id:diary.id,
         debit: diary.initialBalance[0].debit,
         credit: diary.initialBalance[0].credit
       }));
@@ -150,6 +152,7 @@ export class TrialBalanceComponent {
         periodName: filteredPeriods[filteredPeriods.length - 1].closureType,
         periodDate: `${this.convertDates(filteredPeriods[filteredPeriods.length - 1].startPeriod)} - ${this.convertDates(filteredPeriods[filteredPeriods.length - 1].endPeriod)}`,
         accountName: diary.name,
+        id:diary.id,
         debit: diary.finalBalance[0].debit,
         credit: diary.finalBalance[0].credit
       }));
@@ -158,7 +161,7 @@ export class TrialBalanceComponent {
       const lista = initialBalances.map(initialBalance => {
         const correspondingTransactions = filteredPeriods.map(period => {
           return period.accountBalances
-            .filter(diary => diary.name === initialBalance.accountName) 
+            .filter(diary => diary.id === initialBalance.id) 
             .map(diary => ({
               periodName: period.closureType,
               periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
@@ -168,7 +171,7 @@ export class TrialBalanceComponent {
             }));
         });
     
-        const correspondingLastPeriod = lastPeriod.find(lp => lp.accountName === initialBalance.accountName);
+        const correspondingLastPeriod = lastPeriod.find(lp => lp.id === initialBalance.id);
   
         return {
           name: initialBalance.accountName,

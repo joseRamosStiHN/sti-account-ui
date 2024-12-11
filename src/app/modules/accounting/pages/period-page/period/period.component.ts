@@ -36,7 +36,9 @@ export class PeriodComponent {
     this.periodForm = {
       startPeriod: null as Date | null,
       closureType: "",
-      status: false
+      status: false,
+      periodStatus:"INACTIVE",
+      isAnnual:false
     };
   }
 
@@ -50,11 +52,8 @@ export class PeriodComponent {
           if (periods.closureType.toLocaleUpperCase() == "ANUAL") {
             periods.status = true;
           }
-
           this.periodForm = periods
-
-          this.activatePeriodo = this.periodForm.status;
-
+          this.activatePeriodo = this.periodForm.status
         },
         error:(err)=>{
           this.toastType = typeToast.Error;

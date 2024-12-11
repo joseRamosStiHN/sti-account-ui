@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { PeriodClosing, PeriodsRequest, PeriodsResponse, TaxSettings } from 'src/app/modules/accounting/models/APIModels';
-import { ClosingPeriodsAll } from 'src/app/modules/accounting/models/models';
+import { ClosingPeriodsAll, NextPeridModel } from 'src/app/modules/accounting/models/models';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 
 @Injectable({
@@ -132,6 +132,24 @@ export class PeriodService {
     getAllClosing(): Observable<ClosingPeriodsAll[]> {
       const url = `${this.apiURL}/api/v1/accounting-closing`;
       return this.httpClient.get<ClosingPeriodsAll[]>(url).pipe(
+        catchError(() => {
+
+          return throwError(() => {
+            return new Error('No se puedo obtener la data.');
+          });
+        })
+      );
+    }
+
+
+     /**
+   * Method that brings data next period 
+   *
+   * @return response()
+   */
+     getNextPeriod(): Observable<NextPeridModel> {
+      const url = `${this.apiURL}/api/v1/accounting-periods/next-period`;
+      return this.httpClient.get<NextPeridModel>(url).pipe(
         catchError(() => {
 
           return throwError(() => {

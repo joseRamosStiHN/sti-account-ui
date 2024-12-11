@@ -5,7 +5,9 @@ export interface PeriodModel {
   startPeriod: Date | null
   endPeriod?: Date
   daysPeriod?: number
-  status: boolean
-  isClosed?:boolean
+  status: boolean,
+  periodStatus:string,
+  isClosed?:boolean,
+  isAnnual:boolean
   }
   

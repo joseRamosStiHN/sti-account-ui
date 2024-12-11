@@ -89,3 +89,16 @@ export interface ClosingPeriodsAll {
   totalExpenses: number
   netIncome: number
 }
+
+
+export interface NextPeridModel {
+  id?: number
+  periodName?: string
+  closureType: string
+  startPeriod: string
+  endPeriod: string
+  daysPeriod: number
+  periodStatus?: string
+  periodOrder?: number
+  isAnnual?: boolean
+}

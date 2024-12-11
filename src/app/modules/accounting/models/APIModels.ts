@@ -253,6 +253,7 @@ export interface Period {
 }
 
 export interface AccountBalance {
+  id:number
   name: string
   accountCode: string
   parentName: string
