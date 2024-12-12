@@ -167,7 +167,7 @@ export class PeriodListComponent {
       map(data => {
 
         const transformedData = data.map(nuevo => {
-          const status = nuevo.closureType?.toUpperCase() === "ANUAL" ? true : nuevo.status;
+          const status = nuevo.closureType?.toUpperCase() === "ANUAL" || nuevo.periodStatus.toUpperCase() == "ACTIVE" ? true :false;
           const isClosed = nuevo.periodStatus == "CLOSED" ? true : false;
           return { ...nuevo, status, isClosed };
         });

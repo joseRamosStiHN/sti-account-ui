@@ -74,6 +74,8 @@ export class AccountingClosingComponent {
 
     this.periodService.getNextPeriod().subscribe({
       next: (data) => {
+        data.startPeriod = data.startPeriod.substring(0,10);
+        data.endPeriod = data.endPeriod.substring(0,10)
         this.nextPeriod = data;
       },
       error: (err) => {
@@ -87,39 +89,42 @@ export class AccountingClosingComponent {
     
   }
 
-
-  closing() {
-
-
+  openModal(){
     this.isPopupVisible = true;
+  }
 
-    // let dialogo = confirm(
-    //   `¿Está seguro de que desea realizar esta acción?`,
-    //   'Advertencia'
-    // );
 
-    // dialogo.then(async (d) => {
+  closing() {   
     
-    //     this.periodService.closingPeriod().subscribe({
-    //       next: () => {
-    //         this.toastType = typeToast.Success;
-    //         this.messageToast = 'Periodo Cerrdado Correctamente';
-    //         this.showToast = true;
+    console.log(this.nextPeriod);
+    
+    let dialogo = confirm(
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Advertencia'
+    );
 
-    //         setTimeout(() => {
-    //           this.router.navigate(['/accounting/configuration/period']); 
-    //         }, 3000);
-    //       },
-    //       error: (err) => {
-    //         console.log(err);
+    dialogo.then(async (d) => {
+    
+        this.periodService.closingPeriod(this.nextPeriod.closureType).subscribe({
+          next: () => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Periodo Cerrdado Correctamente';
+            this.showToast = true;
+
+            setTimeout(() => {
+              this.router.navigate(['/accounting/configuration/period']); 
+            }, 3000);
+          },
+          error: (err) => {
+            console.log(err);
             
-    //         this.toastType = typeToast.Error;
-    //         this.messageToast = 'Error al intentar cerrar periodo';
-    //         this.showToast = true;
-    //       },
-    //     });
-    //   }
-    // );
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar cerrar periodo';
+            this.showToast = true;
+          },
+        });
+      }
+    );
   }
 
 
@@ -131,5 +136,61 @@ export class AccountingClosingComponent {
     this.isPopupVisible = false;
   }
 
+  onChange() {
+      this.calculateEndDate(this.nextPeriod)
+  }
 
+  getLastDayOfMonth(year:any, month:any) {
+    return new Date(year, month + 1, 0).getDate();
+  }
+  
+   calculateEndDate(object:any) {
+    const { closureType, startPeriod } = object;
+    const startDate:any = new Date(startPeriod);
+    const startMonth = startDate.getMonth();
+    const startYear = startDate.getFullYear();
+  
+    const endDate:any = new Date(startDate);
+  
+    let endMonth = startMonth;
+    switch (closureType) {
+      case 'Mensual':
+        endMonth = startMonth + 1;
+        break;
+      case 'Trimestral':
+        endMonth = startMonth + 3;
+        break;
+      case 'Semestral':
+        endMonth = startMonth + 6;
+        break;
+  
+    }
+  
+    const endYear = startYear;
+  
+
+    const lastDay = this.getLastDayOfMonth(endYear, endMonth - 1);
+  
+
+    endDate.setFullYear(endYear);
+    endDate.setMonth(endMonth - 1); 
+    endDate.setDate(lastDay);
+
+    const oneDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round(Math.abs((endDate - startDate) / oneDay));
+  
+    
+    object.endPeriod = endDate.toISOString();
+    object.endPeriod = object.endPeriod.substring(0,10)
+    object.startPeriod = object.startPeriod.substring(0,10)
+    object.daysPeriod = diffDays;
+  
+    return object;
+  }
+
+ 
+  
 }
+
+
+
