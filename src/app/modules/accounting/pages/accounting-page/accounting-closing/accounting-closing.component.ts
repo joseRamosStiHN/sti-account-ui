@@ -140,54 +140,63 @@ export class AccountingClosingComponent {
       this.calculateEndDate(this.nextPeriod)
   }
 
-  getLastDayOfMonth(year:any, month:any) {
-    return new Date(year, month + 1, 0).getDate();
-  }
-  
-   calculateEndDate(object:any) {
+  calculateEndDate(object: any) {
     const { closureType, startPeriod } = object;
-    const startDate:any = new Date(startPeriod);
+    const startDate = new Date(startPeriod);
     const startMonth = startDate.getMonth();
     const startYear = startDate.getFullYear();
   
-    const endDate:any = new Date(startDate);
-  
     let endMonth = startMonth;
+    let endYear = startYear;
+  
+    // Determinar el mes y año final basado en el closureType
     switch (closureType) {
       case 'Mensual':
-        endMonth = startMonth + 1;
+        endMonth += 1;
         break;
       case 'Trimestral':
-        endMonth = startMonth + 3;
+        endMonth += 3;
         break;
       case 'Semestral':
-        endMonth = startMonth + 6;
+        endMonth += 6;
         break;
-  
     }
   
-    const endYear = startYear;
+
+    if (endMonth > 11) {
+      endYear += Math.floor(endMonth / 12);
+      endMonth %= 12;
+    }
   
 
-    const lastDay = this.getLastDayOfMonth(endYear, endMonth - 1);
+    if (closureType === 'Trimestral' || closureType === 'Semestral') {
+      if (endYear > startYear || endMonth > 11) {
+        endMonth = 11; 
+        endYear = startYear; 
+      }
+    }
   
 
-    endDate.setFullYear(endYear);
-    endDate.setMonth(endMonth - 1); 
-    endDate.setDate(lastDay);
+    const lastDay = this.getLastDayOfMonth(endYear, endMonth);
+  
+
+    const endDate = new Date(endYear, endMonth, lastDay);
+  
 
     const oneDay = 24 * 60 * 60 * 1000;
-    const diffDays = Math.round(Math.abs((endDate - startDate) / oneDay));
+    const diffDays = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
   
-    
-    object.endPeriod = endDate.toISOString();
-    object.endPeriod = object.endPeriod.substring(0,10)
-    object.startPeriod = object.startPeriod.substring(0,10)
+
+    object.endPeriod = endDate.toISOString().substring(0, 10);
+    object.startPeriod = startDate.toISOString().substring(0, 10);
     object.daysPeriod = diffDays;
   
     return object;
   }
-
+  
+  getLastDayOfMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+  }
  
   
 }
