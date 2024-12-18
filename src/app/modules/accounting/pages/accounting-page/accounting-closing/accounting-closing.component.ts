@@ -197,6 +197,29 @@ export class AccountingClosingComponent {
   getLastDayOfMonth(year: number, month: number): number {
     return new Date(year, month + 1, 0).getDate();
   }
+
+  dowloadPdf(periodsClosing:any){
+
+   const base64Data = periodsClosing.closureReportPdf;
+   if (!base64Data) {
+     console.error("No se encontró el contenido Base64 del PDF.");
+     return;
+   }
+
+   const byteCharacters = atob(base64Data); 
+   const byteNumbers = Array.from(byteCharacters, char => char.charCodeAt(0));
+   const byteArray = new Uint8Array(byteNumbers);
+   const blob = new Blob([byteArray], { type: 'application/pdf' });
+ 
+   const link = document.createElement('a');
+   const url = URL.createObjectURL(blob);
+   link.href = url;
+   link.download = periodsClosing.startPeriod + '-'+periodsClosing.endPeriod; 
+   link.click();
+
+   URL.revokeObjectURL(url);
+      
+  }
  
   
 }
