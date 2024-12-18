@@ -65,7 +65,7 @@ export class PeriodService {
    *
    * @return response()
    */
-   createPeriod(data: PeriodModel): Observable<PeriodModel> {
+   createPeriod(data: any): Observable<PeriodModel> {
     return this.httpClient
       .post<PeriodModel>(
         this.apiURL + '/api/v1/accounting-periods',
@@ -78,7 +78,7 @@ export class PeriodService {
 
   updatePeriod(
     id: number,
-    data: PeriodModel
+    data: any
   ): Observable<PeriodModel> {
     const url = `${this.apiURL}/api/v1/accounting-periods/${id}`;
     return this.httpClient.put<PeriodModel>(
