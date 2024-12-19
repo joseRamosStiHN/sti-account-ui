@@ -1,0 +1,35 @@
+<div class="container">
+  <h2 class="font-medium text-2xl mt-2 mb-5">Usuarios</h2>
+
+  <dx-data-grid id="companiesGrid" [showBorders]="true">
+    <dxi-column caption="Usuario" dataField="userName"></dxi-column>
+    <dxi-column caption="Nombres" dataField="firstName"></dxi-column>
+    <dxi-column caption="Apellidos" dataField="lastName"></dxi-column>
+
+    <dxi-column caption="Correo" dataField="email"></dxi-column>
+    <dxi-column caption="Estado" dataField="isActive"></dxi-column>
+
+    <dxi-column caption="Roles" dataField="roles"></dxi-column>
+
+    <dxi-column
+      caption="Creado"
+      dataField="createdAt"
+      dataType="date"
+    ></dxi-column>
+    <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
+
+    <!--Toolbar-->
+    <dxo-toolbar>
+      <dxi-item location="before" name="groupPanel"></dxi-item>
+      <dxi-item location="after" name="searchPanel"></dxi-item>
+      <dxi-item location="after">
+        <div *dxTemplate>
+          <dx-button icon="add" title="Crear" (onClick)="addUser()">
+          </dx-button>
+        </div>
+      </dxi-item>
+    </dxo-toolbar>
+    <dxo-search-panel [visible]="true"></dxo-search-panel>
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
+  </dx-data-grid>
+</div>

@@ -1,0 +1,171 @@
+<div class="container">
+  <h2 class="font-medium text-2xl mt-2 mb-5">Nueva Empresa</h2>
+  <div class="flex flex-row">
+    <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
+      <legend class="text-sm font-thin mb-2">Información General</legend>
+      <div class="w-auto">
+        <img
+          class="h-auto w-60 rounded-lg"
+          src="assets/image-1@2x.jpg"
+          alt="image description"
+        />
+      </div>
+      <div class="w-full grid grid-cols-3 gap-3">
+        <div class="form">
+          <label for="companyName" class="block mb-2 text-sm text-gray-900"
+            >Nombre</label
+          >
+          <input
+            id="companyName"
+            name="companyName"
+            type="text"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            placeholder="Empresa XYZ"
+            required
+          />
+        </div>
+
+        <div class="form">
+          <label for="companyAddress" class="block mb-2 text-sm text-gray-900"
+            >Dirección</label
+          >
+          <input
+            id="companyAddress"
+            name="companyAddress"
+            type="text"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            placeholder="Colonia las Colinas, Tegucigalpa, Honduras"
+            required
+          />
+        </div>
+
+        <div class="form">
+          <label for="companyRtn" class="block mb-2 text-sm text-gray-900"
+            >Rtn</label
+          >
+          <input
+            id="companyRtn"
+            name="companyRtn"
+            type="text"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            placeholder=""
+            required
+          />
+        </div>
+
+        <div class="form">
+          <label for="companyType" class="block mb-2 text-sm text-gray-900"
+            >Razón</label
+          >
+          <select
+            required="true"
+            name="companyType"
+            id="companyType"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          >
+            <option>Empresa</option>
+            <option>Natural</option>
+          </select>
+        </div>
+
+        <div class="form">
+          <label for="companyEmail" class="block mb-2 text-sm text-gray-900"
+            >Correo</label
+          >
+          <input
+            id="companyEmail"
+            name="companyEmail"
+            type="email"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            placeholder=""
+            required
+          />
+        </div>
+
+        <div class="form">
+          <label for="companyWeb" class="block mb-2 text-sm text-gray-900"
+            >Sitio Web</label
+          >
+          <input
+            id="companyWeb"
+            name="companyWeb"
+            type="url"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+            placeholder=""
+            required
+          />
+        </div>
+
+        <div class="form col-span-3">
+          <label
+            for="companyDescription"
+            class="block mb-2 text-sm text-gray-900"
+            >Descripción</label
+          >
+          <textarea
+            name="companyDescription"
+            id="companyDescription"
+            rows="2"
+            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          >
+          </textarea>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+  <div class="grid grid-cols-3 gap-2 mt-2">
+    <fieldset class="flex border rounded-sm w-full gap-2 p-2">
+      <legend class="text-sm font-thin mb-2">Información Contable</legend>
+      <div class="form w-full">
+        <label for="accountConfig" class="block mb-2 text-sm text-gray-900"
+          >Configuración de cuentas</label
+        >
+        <select
+          required="true"
+          name="accountConfig"
+          id="accountConfig"
+          (change)="onAccountConfig($event)"
+          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+        >
+          <option selected value="1">Usar cuentas del Sistema</option>
+          <option value="0">Copiar de Empresa</option>
+        </select>
+        @if(!accountsFromSystem) {
+        <div class="form w-full">
+          <label
+            for="copyFromSelect"
+            class="block mb-2 text-sm text-gray-900"
+          ></label>
+          <select
+            required="true"
+            name="copyFromSelect"
+            id="copyFromSelect"
+            class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          >
+            <option>Empresa ABC</option>
+            <option>Empresa XYZ</option>
+          </select>
+        </div>
+        }
+      </div>
+    </fieldset>
+    <!--USERS-->
+    <fieldset
+      class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2"
+    >
+      <legend class="text-sm font-thin mb-2">Usuarios</legend>
+      <dx-data-grid id="companyUserGrid" [showBorders]="true">
+        <dxo-paging [enabled]="false"></dxo-paging>
+        <dxo-editing
+          mode="form"
+          [allowUpdating]="true"
+          [allowAdding]="true"
+          [allowDeleting]="true"
+        >
+        </dxo-editing>
+        <dxi-column caption="Nombre" dataField="name"></dxi-column>
+        <dxi-column caption="Permiso" dataField="permiso"></dxi-column>
+      </dx-data-grid>
+    </fieldset>
+  </div>
+</div>

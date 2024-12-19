@@ -1,0 +1,148 @@
+<div class="container">
+  <h2 class="font-medium text-2xl mt-2 mb-5">Nuevo Usuario</h2>
+  <div class="grid grid-cols-3 gap-2">
+    <div class="form w-full">
+      <label for="txtName" class="block mb-2 text-sm text-gray-900"
+        >Nombre</label
+      >
+      <input
+        placeholder="Luis"
+        required="true"
+        name="txtName"
+        id="txtName"
+        type="text"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+    <div class="form w-full">
+      <label for="txtLastName" class="block mb-2 text-sm text-gray-900"
+        >Apellidos</label
+      >
+      <input
+        placeholder="Martinez"
+        required="true"
+        name="txtLastName"
+        id="txtLastName"
+        type="text"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+    <div class="form w-full">
+      <label for="txtPhone" class="block mb-2 text-sm text-gray-900"
+        >Teléfono</label
+      >
+      <input
+        required="true"
+        name="txtPhone"
+        id="txtPhone"
+        type="text"
+        placeholder="96xxxxxx, 34xxxxxx"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <div class="form w-full">
+      <label for="txtUserName" class="block mb-2 text-sm text-gray-900"
+        >Nombre de Usuario</label
+      >
+      <input
+        placeholder="jmartinez"
+        required="true"
+        name="txtUserName"
+        id="txtUserName"
+        type="text"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <div class="form">
+      <label for="txtPassword" class="block mb-2 text-sm text-gray-900"
+        >Contraseña</label
+      >
+      <div class="relative">
+        <input
+          [(ngModel)]="txtPassword"
+          type="password"
+          maxlength="20"
+          name="txtPassword"
+          id="txtPassword"
+          class="block w-full p-1.5 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          required
+        />
+        <button
+          tabindex="-1"
+          type="submit"
+          class="text-white absolute end-1 bottom-1 bg-blue-700 rounded-lg text-sm px-2 py-0.5 hover:bg-blue-800 focus:outline-none focus:ring-blue-300 active:shadow-md"
+        >
+          Generar
+        </button>
+      </div>
+      @if(txtPassword !== undefined && txtPassword !== "" && txtPassword ===
+      txtConfirmPassword) {
+      <button
+        class="text-gray-600 border rounded-md text-sm px-1 py-0 bg-gray-200"
+      >
+        copiar
+      </button>
+      }
+    </div>
+
+    <div class="form">
+      <label for="txtRepeatPassword" class="block mb-2 text-sm text-gray-900"
+        >Repetir Contraseña</label
+      >
+      <input
+        [(ngModel)]="txtConfirmPassword"
+        required="true"
+        name="txtRepeatPassword"
+        id="txtRepeatPassword"
+        type="password"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <div class="form">
+      <label for="txtEmail" class="block mb-2 text-sm text-gray-900"
+        >Correo Electrónico</label
+      >
+      <input
+        required="true"
+        name="txtEmail"
+        id="txtEmail"
+        type="email"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+    <div class="form col-span-2">
+      <label for="txtAddress" class="block mb-2 text-sm text-gray-900"
+        >Dirección</label
+      >
+      <input
+        required="true"
+        name="txtAddress"
+        id="txtAddress"
+        type="text"
+        class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <fieldset
+      class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3"
+    >
+      <legend class="text-sm font-thin mb-2">Empresas</legend>
+      <dx-data-grid id="companyUserGrid" [showBorders]="true">
+        <dxo-paging [enabled]="false"></dxo-paging>
+        <dxo-group-panel [visible]="false"></dxo-group-panel>
+        <dxo-editing
+          mode="row"
+          [allowUpdating]="true"
+          [allowAdding]="true"
+          [allowDeleting]="true"
+        >
+        </dxo-editing>
+        <dxi-column caption="Nombre" dataField="name"></dxi-column>
+        <dxi-column caption="Permiso" dataField="permiso"></dxi-column>
+      </dx-data-grid>
+    </fieldset>
+  </div>
+</div>
