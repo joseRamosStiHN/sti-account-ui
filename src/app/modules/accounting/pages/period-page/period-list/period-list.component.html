@@ -10,7 +10,7 @@
             Consultar
         </button>
     </div>
-
+    <!-- 
     <dx-data-grid id="account-list-grid" [dataSource]="periodList$ | async" [repaintChangesOnly]="true"
         [loadPanel]="{ enabled: true }" [width]="'100%'" [allowColumnReordering]="true" [allowColumnResizing]="true"
         [remoteOperations]="false" [rowAlternationEnabled]="true" [showBorders]="true">
@@ -38,12 +38,18 @@
         <dxi-column caption="Fecha Fin" width="200" [calculateDisplayValue]="formatDateEnd"
             alignment="center"></dxi-column>
 
+
+            <dxi-column
+            caption="Cerrado"dataField="isClosed"[width]="100"></dxi-column>
+  
             <dxi-column
             caption="Estado"
             dataField="status"
             [width]="100"
             cellTemplate="cellTemplate"
           ></dxi-column>
+
+         
 
         <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
             <div *dxTemplate="let account of 'cellButtonTemplate'">
@@ -57,7 +63,7 @@
 
             <label class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" value="" class="sr-only peer" 
-                [disabled]="data.value "
+                [disabled]="data.value || data.data.isClosed"
                 [(ngModel)]="data.data.status" 
                 (change)="updatePeriod(data)">
                 <div
@@ -81,6 +87,54 @@
                 </dx-button>
             </dxi-item>
         </dxo-toolbar>
+    </dx-data-grid> -->
+
+    <dx-data-grid id="gridJournalEntry" [dataSource]="periodList$ | async" class="mt-5 shadow-lg overflow-hidden mb-10"
+        [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
+        [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'">
+
+        <dxo-sorting mode="multiple"></dxo-sorting>
+        <dxo-header-filter [visible]="true"></dxo-header-filter>
+        <dxo-paging [pageSize]="10"></dxo-paging>
+        <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
+        <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+        <dxo-group-panel [visible]="true"></dxo-group-panel>
+        <dxi-column alignment="left" caption="Periodo" dataField="name" class="p-2 text-center bg-gray-100">
+
+        </dxi-column>
+        <dxo-master-detail [enabled]="true" template="periods"></dxo-master-detail>
+        <div *dxTemplate="let period of 'periods'">
+            <dx-data-grid id="gridJournalEntryDetail" [dataSource]="period.data.periods" class="bg-transparent"
+                [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
+                [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'"
+                style="margin-left: 0; margin-right: 0;">
+
+
+                <dxo-paging [pageSize]="5"></dxo-paging>
+                <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
+        
+
+        
+                <dxi-column caption="Tipo de Período" dataField="closureType" alignment="center"></dxi-column>
+                <dxi-column caption="Fecha Inicio" width="200" [calculateDisplayValue]="formatDateInit"
+                    alignment="center"></dxi-column>
+                <dxi-column caption="Fecha Fin" width="200" [calculateDisplayValue]="formatDateEnd"
+                    alignment="center"></dxi-column>
+                <dxi-column caption="Activo" dataField="status" [width]="100"></dxi-column>
+                <dxi-column caption="Cerrado" dataField="isClosed" [width]="100"></dxi-column>
+            </dx-data-grid>
+        </div>
+
+        <dxo-toolbar>
+            <dxi-item name="groupPanel"></dxi-item>
+            <dxi-item name="searchPanel"></dxi-item>
+            <dxi-item location="after">
+                <dx-button icon="add" hint="Agregar Periodo" aria-placeholder="Agregar Periodo"
+                    (onClick)="goToNewJournal()">
+                </dx-button>
+            </dxi-item>
+        </dxo-toolbar>
+
     </dx-data-grid>
 </div>
 <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">

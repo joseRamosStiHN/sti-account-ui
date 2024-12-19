@@ -25,7 +25,7 @@ export class PeriodComponent {
   periodForm: PeriodModel;
   typePeriodList: string[] = ['Mensual', 'Trimestral', 'Semestral', 'Personalizado', 'Anual'];
 
-  public activatePeriodo:boolean = true;
+  public activatePeriodo: boolean = true;
 
 
   private readonly router = inject(Router);
@@ -36,7 +36,9 @@ export class PeriodComponent {
     this.periodForm = {
       startPeriod: null as Date | null,
       closureType: "",
-      status: false
+      status: false,
+      periodStatus: "INACTIVE",
+      isAnnual: false
     };
   }
 
@@ -44,19 +46,16 @@ export class PeriodComponent {
 
     const findId = Number(this.id);
     if (findId) {
-      this.periodService.getPeriodById(findId).subscribe({   
-        next:(periods)=>{
+      this.periodService.getPeriodById(findId).subscribe({
+        next: (periods) => {
 
           if (periods.closureType.toLocaleUpperCase() == "ANUAL") {
             periods.status = true;
           }
-
           this.periodForm = periods
-
-          this.activatePeriodo = this.periodForm.status;
-
+          this.activatePeriodo = this.periodForm.status
         },
-        error:(err)=>{
+        error: (err) => {
           this.toastType = typeToast.Error;
           this.messageToast = 'Ups error al obtener datos del period';
           this.showToast = true;
@@ -89,7 +88,14 @@ export class PeriodComponent {
 
 
   updatePerido() {
-    this.periodService.updatePeriod(Number(this.id), this.periodForm).subscribe({
+
+    const startPeriod = this.toLocalDateTime(this.periodForm.startPeriod);
+
+    const request = { ...this.periodForm , startPeriod };
+
+
+
+    this.periodService.updatePeriod(Number(this.id), request).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;
         this.messageToast = 'Registros actualizados exitosamente';
@@ -108,7 +114,13 @@ export class PeriodComponent {
   }
 
   createPeriod() {
-    this.periodService.createPeriod(this.periodForm).subscribe({
+
+    const startPeriod = this.toLocalDateTime(this.periodForm.startPeriod);
+
+    const request = { ...this.periodForm , startPeriod };
+
+  
+    this.periodService.createPeriod(request).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;
         this.messageToast = 'Registros insertados exitosamente';
@@ -169,6 +181,20 @@ export class PeriodComponent {
       this.router.navigate(['/accounting/configuration/period']);
     }, 2000);
   }
+
+
+  toLocalDateTime(date: Date | null): string | null {
+    if (!date) return null;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  };
 
 
 

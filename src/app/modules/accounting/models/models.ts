@@ -110,3 +110,30 @@ export interface ConfigDetailModel {
 
 
 
+
+export interface ClosingPeriodsAll {
+  accountingPeriodId: number
+  periodName: any
+  typePeriod: any
+  startPeriod: string
+  endPeriod: string
+  totalAssets: number
+  totalLiabilities: number
+  totalCapital: number
+  totalIncome: number
+  totalExpenses: number
+  netIncome: number
+}
+
+
+export interface NextPeridModel {
+  id?: number
+  periodName?: string
+  closureType: string
+  startPeriod: string
+  endPeriod: string
+  daysPeriod: number
+  periodStatus?: string
+  periodOrder?: number
+  isAnnual?: boolean
+}

@@ -38,6 +38,12 @@ export class PeriodListComponent {
 
   periodList$: Observable<PeriodModel[]> | undefined;
 
+  typePeriods= [
+    {id:0, name:"Mensual"},
+    {id:1, name:"Trimestral"},
+    {id:2, name:"Semestral"}
+  ]
+
   private readonly router = inject(Router);
   private readonly periodoService = inject(PeriodService);
 
@@ -138,13 +144,58 @@ export class PeriodListComponent {
 
   }
 
-  getListPeriods(): Observable<PeriodModel[]> {
+  getListPeriods(): Observable<any[]> {
+
+    // return this.periodoService.getAllPeriods().pipe(
+    //   map(data => {
+    //     data.map(nuevo => {
+        
+    //     const status = nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status;
+    //      const isClosed=  nuevo.isClosed == null ? false : true;
+
+    //      return { ...nuevo,status, isClosed}
+
+        
+    //     })
+        
+    //     return data
+    //   })
+      
+    // );
 
     return this.periodoService.getAllPeriods().pipe(
       map(data => {
-        data.map(nuevo => (nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status))
-        return data
+
+        const transformedData = data.map(nuevo => {
+          const status = nuevo.closureType?.toUpperCase() === "ANUAL" || nuevo.periodStatus.toUpperCase() == "ACTIVE" ? true :false;
+          const isClosed = nuevo.periodStatus == "CLOSED" ? true : false;
+          return { ...nuevo, status, isClosed };
+        });
+    
+
+        const groupedByClosureType = transformedData.reduce((acc, period) => {
+          const closureType = period.closureType || 'Otros';
+          if (!acc[closureType]) {
+            acc[closureType] = [];
+          }
+          acc[closureType].push(period);
+          return acc;
+        }, {} as { [key: string]: any[] });
+    
+
+        const result = Object.entries(groupedByClosureType).map(([key, periods], index) => ({
+          id: index + 1,
+          name: key,   
+          periods  
+        }));
+
+
+        console.log(result);
+        
+    
+        return result;
       })
     );
+    
   }
 }

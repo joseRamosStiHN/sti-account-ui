@@ -30,6 +30,7 @@ export class TrialBalanceComponent {
   });
 
   constructor() { }
+
   ngOnInit(): void {
     this.reportService?.getTrialBalance().subscribe((data: TrialBalaceResponse) => {
 
