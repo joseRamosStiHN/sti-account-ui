@@ -37,7 +37,7 @@ export class PeriodComponent {
       startPeriod: null as Date | null,
       closureType: "",
       status: false,
-      periodStatus: "INACTIVE",
+      periodStatus: "ACTIVE",
       isAnnual: false
     };
   }
