@@ -20,7 +20,8 @@ export class AccountingClosingComponent {
   toastType: ToastType = typeToast.Info;
 
 
-  isPopupVisible = false;
+  isPopupVisiblePeriod = false;
+  isPopupVisibleYear = false;
 
   closureTypeOptions = [
     { value: 'ANNUAL', text: 'Anual' },
@@ -28,6 +29,9 @@ export class AccountingClosingComponent {
     { value: 'WEEKLY', text: 'Semanal' }
   ];
 
+
+  nextYear:boolean= false;
+  nextYearPeriod:boolean= false
 
 
   private readonly periodService = inject(PeriodService);
@@ -62,6 +66,19 @@ export class AccountingClosingComponent {
     this.periodService.getAllClosing().subscribe({
       next: (info) => {
         this.periodsClosing = info;
+        this.periodsClosing.map((period) => {
+          const fecha = new Date(period.endPeriod);
+          if (fecha.getMonth() + 1 == 12) {
+            this.nextYear = true
+          }
+
+          console.log(fecha.getMonth()+ 1);
+          
+
+          if (fecha.getMonth() + 1 == 11) {
+            this.nextYearPeriod = true
+          }
+        })
       },
       error: (err) => {
         console.error('Error al obtener la información de los periodos cerrados anteriormente', err);
@@ -70,6 +87,7 @@ export class AccountingClosingComponent {
         this.messageToast = 'Error al consultar datos de periodos cerrados anteriormente';
         this.showToast = true;
       }
+      
     });
 
     this.periodService.getNextPeriod().subscribe({
@@ -87,16 +105,58 @@ export class AccountingClosingComponent {
       }
     });
 
+    console.log(this.nextYearPeriod);
+    
+
   }
 
   openModal() {
-    this.isPopupVisible = true;
+    this.isPopupVisiblePeriod = true;
+  }
+
+  openModalYear() {
+    this.isPopupVisibleYear = true;
+  }
+
+  openPopupYear(): void {
+    this.isPopupVisibleYear = true;
   }
 
 
   closing() {
 
-    console.log(this.nextPeriod);
+    let dialogo = confirm(
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Advertencia'
+    );
+
+    dialogo.then(async (d) => {
+      if (d) {
+        this.periodService.closingPeriod(this.nextPeriod.closureType).subscribe({
+          next: () => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Periodo Cerrdado Correctamente';
+            this.showToast = true;
+  
+            setTimeout(() => {
+              this.router.navigate(['/accounting/configuration/period']);
+            }, 3000);
+          },
+          error: (err) => {
+            console.log(err);
+  
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar cerrar periodo';
+            this.showToast = true;
+          },
+        });
+      }     
+    }
+    );
+  }
+
+
+  closingYear() {
 
     let dialogo = confirm(
       `¿Está seguro de que desea realizar esta acción?`,
@@ -105,35 +165,43 @@ export class AccountingClosingComponent {
 
     dialogo.then(async (d) => {
 
-      this.periodService.closingPeriod(this.nextPeriod.closureType).subscribe({
-        next: () => {
-          this.toastType = typeToast.Success;
-          this.messageToast = 'Periodo Cerrdado Correctamente';
-          this.showToast = true;
+      if (d) {
+        this.periodService.closingYear().subscribe({
+          next: () => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Año Cerrdado Correctamente';
+            this.showToast = true;
+  
+            setTimeout(() => {
+              this.router.navigate(['/accounting/configuration/period']);
+            }, 3000);
+          },
+          error: (err) => {
+            console.log(err);
+  
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar cerrar Año';
+            this.showToast = true;
+          },
+        });
+      }
 
-          setTimeout(() => {
-            this.router.navigate(['/accounting/configuration/period']);
-          }, 3000);
-        },
-        error: (err) => {
-          console.log(err);
-
-          this.toastType = typeToast.Error;
-          this.messageToast = 'Error al intentar cerrar periodo';
-          this.showToast = true;
-        },
-      });
+  
     }
     );
   }
 
 
   openPopup(): void {
-    this.isPopupVisible = true;
+    this.isPopupVisiblePeriod = true;
   }
 
   onPopupHiding(): void {
-    this.isPopupVisible = false;
+    this.isPopupVisiblePeriod = false;
+  }
+
+  onPopupHidingYear(): void {
+    this.isPopupVisibleYear = false;
   }
 
   onChange() {

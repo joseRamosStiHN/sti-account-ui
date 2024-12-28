@@ -190,6 +190,24 @@ export class PeriodService {
     }
 
 
+      /**
+   * Method to closing a period
+   *
+   * @return response()
+   */
+      closingYear(): Observable<any> {
+        return this.httpClient
+          .post<any>(
+            `${this.apiURL}/api/v1/accounting-closing/annual-close`,
+            null,
+            { 
+              responseType: 'text' as 'json'
+            }
+          )
+          .pipe(catchError(this.errorHandler));
+      }
+  
+
    /**
    * Method that brings a list with all the accounting journal
    *
