@@ -17,26 +17,26 @@ export class BulkConfigurationComponent {
   BulkConfiguration: UploadBulkSettingsModel;
   // configDetailModel:ConfigDetailModel;
   colums: any = [
-    { colum: "A", value: 0 },
-    { colum: "B", value: 1 },
-    { colum: "C", value: 2 },
-    { colum: "D", value: 3 },
-    { colum: "E", value: 4 },
-    { colum: "F", value: 5 },
-    { colum: "G", value: 6 },
-    { colum: "H", value: 7 },
-    { colum: "I", value: 8 },
-    { colum: "J", value: 9 },
-    { colum: "K", value: 10 },
-    { colum: "L", value: 11 },
-    { colum: "M", value: 12 },
-    { colum: "N", value: 13 },
-    { colum: "O", value: 14 },
-    { colum: "P", value: 15 },
-    { colum: "Q", value: 16 },
-    { colum: "R", value: 17 },
-    { colum: "S", value: 18 },
-    { colum: "T", value: 19 }
+    { colum: "A", value: 0 ,status:false},
+    { colum: "B", value: 1 ,status:false},
+    { colum: "C", value: 2 ,status:false},
+    { colum: "D", value: 3 ,status:false},
+    { colum: "E", value: 4 ,status:false},
+    { colum: "F", value: 5 ,status:false},
+    { colum: "G", value: 6 ,status:false},
+    { colum: "H", value: 7 ,status:false},
+    { colum: "I", value: 8 ,status:false},
+    { colum: "J", value: 9 ,status:false},
+    { colum: "K", value: 10 ,status:false},
+    { colum: "L", value: 11 ,status:false},
+    { colum: "M", value: 12 ,status:false},
+    { colum: "N", value: 13 ,status:false},
+    { colum: "O", value: 14 ,status:false},
+    { colum: "P", value: 15 ,status:false},
+    { colum: "Q", value: 16 ,status:false},
+    { colum: "R", value: 17 ,status:false},
+    { colum: "S", value: 18 ,status:false},
+    { colum: "T", value: 19 ,status:false}
   ];
 
   listMovement: IMovement[] = [
@@ -111,6 +111,17 @@ export class BulkConfigurationComponent {
     
     
   ]
+
+  editorOptions = {
+    onValueChanged: (event: any) => {
+      const selectedValue = event.value;
+    },
+    showClearButton: true
+    , setCellValue: (rowData: any, value: any) => {
+    rowData.colum = value;  // Actualiza el valor del campo 'colum' en la fila
+    console.log('Valor actualizado: ', value);
+  }
+  };
 
   @Input('id') id?:number;
 
@@ -245,27 +256,76 @@ export class BulkConfigurationComponent {
             },
           });
         }
-
-        
       }
-      
     }
 
    
 
   }
 
-  onChangeJournal(e: any) {
+  async onChange(e: any) {
 
-    if (e.target.value == 1) {
-      // this.BulkConfiguration.configDetails = this.configDefaultSales;
-    } else {
-      // this.BulkConfiguration.configDetails = this.configDefaultBuys;
-    }
+    console.log(e);
+    
 
-    // console.log(e.target.value);
+    this.colums.forEach((colum: any) => {
+      if (colum.value === e) {
+        console.log("aqui 2");
+        
+        colum.status = true;  
+      }
+    });
 
+    console.log(this.BulkConfiguration.configDetails);
+    
+  
+    const configDetails = await [...this.configDefault, ...this.BulkConfiguration.configDetails];
+  
+    const columnFilter = this.colums.filter((column: any) => {
+      return configDetails.some((config: any) => column.value === config.colum);
+    });
+
+    console.log(columnFilter);
+    
+  
+    this.colums.forEach((columna: any) => {
+      const encontrado = columnFilter.find((x: any) => x.value === columna.value);
+      if (!encontrado) {
+        columna.status = false; 
+      }
+    });
   }
+  
+
+   onChangeTable(e: any) {
+
+    console.log();
+    
+
+    const selectedValue = e.value;  
+
+
+    this.colums.forEach((colum: any) => {
+      if (colum.value === selectedValue) {
+        colum.status = true;  
+      }
+    });
+  
+    const configDetails =  [...this.configDefault, ...this.BulkConfiguration.configDetails];
+  
+    const columnFilter = this.colums.filter((column: any) => {
+      return configDetails.some((config: any) => column.value === config.colum);
+    });
+  
+    this.colums.forEach((columna: any) => {
+      const encontrado = columnFilter.find((x: any) => x.value === columna.value);
+      if (!encontrado) {
+        columna.status = false; 
+      }
+    });
+  }
+  
+
 
   combineCodeAndDescription = (item: any) => {
     return item ? `${item.description} ${item.code}` : '';
@@ -330,6 +390,30 @@ export class BulkConfigurationComponent {
     return errors;
   }
   
+
+  get filteredColumns() {
+    return this.colums.filter((colum:any) => !colum.status);
+  }
+
+  see(data:any){
+    console.log(data);
+    
+  }
+
+  handlePropertyChange(event:any){
+
+        console.log("ejecuntado el metodo",event);
+//         const changes = event.changes;  
+//         console.log('Cambios:', changes);
+
+//         console.log(changes[0].data.colum);
+        
+// console.log("Aquii");
+          
+          
+          // this.onChange(changes[0].data.colum);
+        }
+    
 }
 
 
