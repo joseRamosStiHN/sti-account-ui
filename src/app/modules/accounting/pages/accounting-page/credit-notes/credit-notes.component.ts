@@ -186,7 +186,7 @@ export class CreditNotesComponent {
             this.accountService.getAllAccount().subscribe({
               next: (data) => {
                 this.accountList = data
-                  .filter(item => item.supportEntry && item.balances.length > 0 )
+                  .filter(item => item.supportEntry )
                   .map(item => ({
                     id: item.id,
                     description: item.name,
@@ -206,24 +206,87 @@ export class CreditNotesComponent {
 
   async saveRow(e: any): Promise<void> {
 
-    e.data.movement = "C";
-    let foundItems = this.dataSource.filter((data) => data.movement === 'D');
-    if (foundItems.length > 0) {
+    const credit = this.dataSource.filter((data) => data.movement === 'C');
+    const debit = this.dataSource.filter((data) => data.movement === 'D');
 
-      foundItems.forEach((item) => {
-        const sum = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
+    if (e.data.movement == 'C' && debit.length <= 1) {
+      if (debit.length == 1) {
+        debit.forEach((item) => {
+          const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
 
-        this.totalCredit = sum;
-        this.totalDebit = sum;
-        item.amount = sum
-      });
+          const roundedSum = parseFloat(sum.toFixed(2));
+
+         item.amount = roundedSum;
+        });
+
+      } else {
+
+        this.dataSource.push({
+          id: this.journalForm?.id ?? 0,
+          accountId: this.journalForm?.defaultAccount ?? 0,
+          amount: parseFloat(e.data.amount.toFixed(2)),
+          movement: 'D',
+
+        });
+      }
+
+    }
+
+    if (e.data.movement == 'D' && credit.length <= 1) {
+
+      if (credit.length == 1) {
+        credit.forEach((item) => {
+          const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
+  
+          // Redondear la suma a dos decimales para asegurar precisión
+          const roundedSum = parseFloat(sum.toFixed(2));
+
+          item.amount = roundedSum
+        });
+
+      } else {
+
+        this.dataSource.push({
+          id:  this.journalForm?.id ?? 0,
+          accountId: this.journalForm?.defaultAccount ?? 0,
+          amount: parseFloat(e.data.amount.toFixed(2)),
+          movement: 'C',
+
+        });
+      }
+
     }
 
     this.updateAmounts();
   }
 
 
-  removedRow(): void {
+  removedRow(e:any): void {
+
+    const credit = this.dataSource.filter((data) => data.movement === 'C');
+    const debit = this.dataSource.filter((data) => data.movement === 'D');
+
+    if (e.data.movement == 'D' && credit.length == 1 && debit.length == 0) {
+      this.dataSource = [];
+      return;
+    }
+    if (e.data.movement == 'C' && debit.length == 1 && credit.length == 0) {
+      this.dataSource = [];
+      return
+    }
+
+    if (e.data.movement == 'D' && credit.length == 1) {
+      credit.forEach((item) => {
+        const sum = debit.reduce((sum, item) => sum + item.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2)); 
+      });
+    }
+    if (e.data.movement == 'C' && debit.length == 1) {
+      debit.forEach((item) => {
+        const sum = credit.reduce((sum, item) => sum + item.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2)); 
+      });
+    }
 
     this.updateAmounts();
 
@@ -232,15 +295,22 @@ export class CreditNotesComponent {
 
   updateRow(e: any): void {
 
-    let foundItems = this.dataSource.filter((data) => data.movement === 'D');
-    if (foundItems.length > 0) {
-      foundItems.forEach((item) => {
-        const sum = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
-        this.totalCredit = sum;
-        this.totalDebit = sum;
-        item.amount = sum
+    const credit = this.dataSource.filter((data) => data.movement === 'C');
+    const debit = this.dataSource.filter((data) => data.movement === 'D');
+
+    if (e.data.movement == 'D' && credit.length == 1) {
+      credit.forEach((item) => {
+        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2));
       });
     }
+    if (e.data.movement == 'C' && debit.length == 1) {
+      debit.forEach((item) => {
+        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
+        item.amount = parseFloat(sum.toFixed(2));
+      });
+    }
+
 
     this.updateAmounts();
 
@@ -248,22 +318,25 @@ export class CreditNotesComponent {
 
 
   private updateAmounts(): void {
-    if (this.dataSource.length === 0) return;
-
-
-    const debitList = this.dataSource.filter(data => data.movement === 'D');
-    const creditList = this.dataSource.filter(data => data.movement === 'C');
-
-
-    const totalCredit = creditList.reduce((sum, item) => sum + item.amount, 0);
-
-
-    debitList.forEach(item => {
-      item.amount = totalCredit;
-    });
-
-    this.totalDebit = totalCredit;
-    this.totalCredit = totalCredit;
+    if (this.dataSource.length > 0) {
+      // Calcular el total de los movimientos 'D' (debe)
+      const debe = this.dataSource
+        .filter((data) => data.movement === 'D')
+        .reduce((sum, item) => sum + item.amount, 0);
+    
+      // Calcular el total de los movimientos 'C' (haber)
+      const haber = this.dataSource
+        .filter((data) => data.movement === 'C')
+        .reduce((sum, item) => sum + item.amount, 0);
+    
+      // Redondear los totales a dos decimales
+      this.totalCredit = parseFloat(haber.toFixed(2));
+      this.totalDebit = parseFloat(debe.toFixed(2));
+    
+      // Mostrar en la consola para verificar
+      // console.log('Total Debit:', this.totalDebit);
+      // console.log('Total Credit:', this.totalCredit);
+    }
   }
 
 
@@ -535,7 +608,7 @@ export class CreditNotesComponent {
       this.accountService.getAllAccount().subscribe({
         next: (data) => {
           this.accountList = data
-            .filter(item => item.supportEntry && item.balances.length > 0 && item.accountType === JournalTypes.Ventas
+            .filter(item => item.supportEntry 
               || item.id == this.journalForm?.defaultAccount
             )
             .map(item => ({
@@ -576,7 +649,7 @@ export class CreditNotesComponent {
   
 
         this.dataSource = transaccion?.details ?? [];
-        setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
+        // setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
 
         this.updateAmounts();
 
@@ -588,27 +661,27 @@ export class CreditNotesComponent {
 
   }
 
-  private hideEditDeleteButtons(accountToCheck: string): void {
-    const rows = document.querySelectorAll('.dx-data-row');
-    rows.forEach(row => {
-      const tds = row.querySelectorAll("td");
-      tds.forEach(td => {
-        const codeAccount = td.textContent;
-        if (codeAccount === accountToCheck) {
-          const editButtons = row.querySelectorAll(".dx-link-edit");
-          const deleteButtons = row.querySelectorAll(".dx-link-delete");
+  // private hideEditDeleteButtons(accountToCheck: string): void {
+  //   const rows = document.querySelectorAll('.dx-data-row');
+  //   rows.forEach(row => {
+  //     const tds = row.querySelectorAll("td");
+  //     tds.forEach(td => {
+  //       const codeAccount = td.textContent;
+  //       if (codeAccount === accountToCheck) {
+  //         const editButtons = row.querySelectorAll(".dx-link-edit");
+  //         const deleteButtons = row.querySelectorAll(".dx-link-delete");
 
-          editButtons.forEach(button => {
-            (button as HTMLElement).style.display = 'none';
-          });
+  //         editButtons.forEach(button => {
+  //           (button as HTMLElement).style.display = 'none';
+  //         });
 
-          deleteButtons.forEach(button => {
-            (button as HTMLElement).style.display = 'none';
-          });
-        }
-      });
-    });
-  }
+  //         deleteButtons.forEach(button => {
+  //           (button as HTMLElement).style.display = 'none';
+  //         });
+  //       }
+  //     });
+  //   });
+  // }
 
   showDetails: boolean = false;
 
