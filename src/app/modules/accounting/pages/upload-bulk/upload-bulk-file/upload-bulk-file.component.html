@@ -105,7 +105,7 @@
         <dxi-column caption="Fecha" dataField="date" alignment="left" [width]="170" ></dxi-column>
 
 
-        <dxi-column caption="Factura" dataField="reference" alignment="left" [width]="170"></dxi-column>
+        <dxi-column caption="Factura" dataField="reference" alignment="left" [width]="170" [groupIndex]="0"></dxi-column>
         <dxi-column caption="Detalle" dataField="description" alignment="left" [width]="250"></dxi-column>
         <dxi-column caption="Cuenta" dataField="account" alignment="left">
             <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">

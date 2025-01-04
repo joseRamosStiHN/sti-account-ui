@@ -5,6 +5,8 @@ import { ToastType } from 'devextreme/ui/toast';
 import { AccountModel } from 'src/app/modules/accounting/models/AccountModel';
 import { BulkDetailType, ClientBilling, ConfigDetailModel, IMovement, typeToast, UploadBulkSettingsModel } from 'src/app/modules/accounting/models/models';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
+import { JournalService } from 'src/app/modules/accounting/services/journal.service';
+import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 import { UploadBulkService } from 'src/app/modules/accounting/services/upload-bulk.service';
 
 @Component({
@@ -17,26 +19,26 @@ export class BulkConfigurationComponent {
   BulkConfiguration: UploadBulkSettingsModel;
   // configDetailModel:ConfigDetailModel;
   colums: any = [
-    { colum: "A", value: 0 ,status:false},
-    { colum: "B", value: 1 ,status:false},
-    { colum: "C", value: 2 ,status:false},
-    { colum: "D", value: 3 ,status:false},
-    { colum: "E", value: 4 ,status:false},
-    { colum: "F", value: 5 ,status:false},
-    { colum: "G", value: 6 ,status:false},
-    { colum: "H", value: 7 ,status:false},
-    { colum: "I", value: 8 ,status:false},
-    { colum: "J", value: 9 ,status:false},
-    { colum: "K", value: 10 ,status:false},
-    { colum: "L", value: 11 ,status:false},
-    { colum: "M", value: 12 ,status:false},
-    { colum: "N", value: 13 ,status:false},
-    { colum: "O", value: 14 ,status:false},
-    { colum: "P", value: 15 ,status:false},
-    { colum: "Q", value: 16 ,status:false},
-    { colum: "R", value: 17 ,status:false},
-    { colum: "S", value: 18 ,status:false},
-    { colum: "T", value: 19 ,status:false}
+    { colum: "A", value: 0, status: false },
+    { colum: "B", value: 1, status: false },
+    { colum: "C", value: 2, status: false },
+    { colum: "D", value: 3, status: false },
+    { colum: "E", value: 4, status: false },
+    { colum: "F", value: 5, status: false },
+    { colum: "G", value: 6, status: false },
+    { colum: "H", value: 7, status: false },
+    { colum: "I", value: 8, status: false },
+    { colum: "J", value: 9, status: false },
+    { colum: "K", value: 10, status: false },
+    { colum: "L", value: 11, status: false },
+    { colum: "M", value: 12, status: false },
+    { colum: "N", value: 13, status: false },
+    { colum: "O", value: 14, status: false },
+    { colum: "P", value: 15, status: false },
+    { colum: "Q", value: 16, status: false },
+    { colum: "R", value: 17, status: false },
+    { colum: "S", value: 18, status: false },
+    { colum: "T", value: 19, status: false }
   ];
 
   listMovement: IMovement[] = [
@@ -51,7 +53,7 @@ export class BulkConfigurationComponent {
   ];
 
 
-  configDefault:any = [
+  configDefault: any = [
     {
       colum: null,
       title: "VALOR-CREDITO",
@@ -68,7 +70,7 @@ export class BulkConfigurationComponent {
       operation: null,
 
     },
-    
+
     {
       colum: null,
       title: "FACTURA",
@@ -108,8 +110,8 @@ export class BulkConfigurationComponent {
       operation: null,
 
     },
-    
-    
+
+
   ]
 
   editorOptions = {
@@ -118,21 +120,26 @@ export class BulkConfigurationComponent {
     },
     showClearButton: true
     , setCellValue: (rowData: any, value: any) => {
-    rowData.colum = value;  // Actualiza el valor del campo 'colum' en la fila
-    console.log('Valor actualizado: ', value);
-  }
+      rowData.colum = value; 
+
+    }
   };
 
-  @Input('id') id?:number;
+  @Input('id') id?: number;
 
   accountList: AccountModel[] = [];
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
+
+  journalList: any;
+
   private readonly accountService = inject(AccountService);
   private readonly bulkSettingsService = inject(UploadBulkService);
   private readonly router = inject(Router);
+  private readonly journalService = inject(JournalService);
+
 
   constructor() {
     this.BulkConfiguration = {
@@ -148,16 +155,16 @@ export class BulkConfigurationComponent {
   ngOnInit(): void {
 
     if (this.id) {
-       this.bulkSettingsService.getBulkConfigurationById(this.id).subscribe(data=>{
-        this.configDefault = data.configDetails.slice(0,7);
-        
+      this.bulkSettingsService.getBulkConfigurationById(this.id).subscribe(data => {
+        this.configDefault = data.configDetails.slice(0, 7);
+
         this.BulkConfiguration = {
-          ...data,  
-          configDetails: data.configDetails.slice(7) 
+          ...data,
+          configDetails: data.configDetails.slice(7)
         };
-       }
-        
-       );
+      }
+
+      );
     }
 
     this.accountService.getAllAccount().subscribe({
@@ -174,54 +181,53 @@ export class BulkConfigurationComponent {
       },
     });
 
+    this.journalService.getAllAccountingJournal().subscribe({
+      next: (data) => {
+        this.journalList = data;
+      },
+    });
+
   }
 
 
   async onSubmit(e: NgForm) {
 
-    console.log(e);
-    console.log(this.configDefault);
-    console.log(this.BulkConfiguration);
-    
-
     if (e.valid) {
-
-
-      this.BulkConfiguration.configDetails.forEach((data)=>{
+      this.BulkConfiguration.configDetails.forEach((data) => {
         if (data.account != null || data.account != undefined) {
           data.bulkTypeData = BulkDetailType.ACC
-        }else{
+        } else {
           data.bulkTypeData = BulkDetailType.S
         }
-     
+
       })
 
       const request: UploadBulkSettingsModel = {
         name: this.BulkConfiguration.name,
         type: this.BulkConfiguration.type,
-        rowInit: this.BulkConfiguration.rowInit, 
-        configDetails: [...this.configDefault, ...this.BulkConfiguration.configDetails] 
+        rowInit: this.BulkConfiguration.rowInit,
+        configDetails: [...this.configDefault, ...this.BulkConfiguration.configDetails]
       };
-      
-      
+
+
       const validationErrors = this.validateUniqueFields(request.configDetails);
 
       if (validationErrors.length > 0) {
         for (let index = 0; index < 1; index++) {
           const element = validationErrors[index];
-  
+
           this.toastType = typeToast.Error;
           this.messageToast = element;
           this.showToast = true;
-           
+
         }
 
-      } else{
+      } else {
 
         if (this.id) {
-          this.bulkSettingsService.updateUBulkSettings(this.id,request).subscribe({
+          this.bulkSettingsService.updateUBulkSettings(this.id, request).subscribe({
             next: (data) => {
-       
+
               this.toastType = typeToast.Success;
               this.messageToast = 'Registros actualizados exitosamente';
               this.showToast = true;
@@ -236,11 +242,11 @@ export class BulkConfigurationComponent {
               this.showToast = true;
             },
           });
-          
-        }else{
+
+        } else {
           this.bulkSettingsService.createUBulkSettings(request).subscribe({
             next: (data) => {
-       
+
               this.toastType = typeToast.Success;
               this.messageToast = 'Registros insertados exitosamente';
               this.showToast = true;
@@ -259,72 +265,55 @@ export class BulkConfigurationComponent {
       }
     }
 
-   
+
 
   }
 
   async onChange(e: any) {
-
-    console.log(e);
-    
-
     this.colums.forEach((colum: any) => {
       if (colum.value === e) {
-        console.log("aqui 2");
-        
-        colum.status = true;  
+        colum.status = true;
       }
     });
 
-    console.log(this.BulkConfiguration.configDetails);
-    
-  
     const configDetails = await [...this.configDefault, ...this.BulkConfiguration.configDetails];
-  
+
     const columnFilter = this.colums.filter((column: any) => {
       return configDetails.some((config: any) => column.value === config.colum);
     });
 
-    console.log(columnFilter);
-    
-  
     this.colums.forEach((columna: any) => {
       const encontrado = columnFilter.find((x: any) => x.value === columna.value);
       if (!encontrado) {
-        columna.status = false; 
+        columna.status = false;
       }
     });
   }
-  
 
-   onChangeTable(e: any) {
 
-    console.log();
-    
-
-    const selectedValue = e.value;  
-
+  onChangeTable(e: any) {
+    const selectedValue = e.value;
 
     this.colums.forEach((colum: any) => {
       if (colum.value === selectedValue) {
-        colum.status = true;  
+        colum.status = true;
       }
     });
-  
-    const configDetails =  [...this.configDefault, ...this.BulkConfiguration.configDetails];
-  
+
+    const configDetails = [...this.configDefault, ...this.BulkConfiguration.configDetails];
+
     const columnFilter = this.colums.filter((column: any) => {
       return configDetails.some((config: any) => column.value === config.colum);
     });
-  
+
     this.colums.forEach((columna: any) => {
       const encontrado = columnFilter.find((x: any) => x.value === columna.value);
       if (!encontrado) {
-        columna.status = false; 
+        columna.status = false;
       }
     });
   }
-  
+
 
 
   combineCodeAndDescription = (item: any) => {
@@ -343,9 +332,9 @@ export class BulkConfigurationComponent {
     const accountSet = new Set<string>();
     const columSet = new Set<number>();
     const bulkTypeDataSet = new Set<any>();
-  
+
     const errors: string[] = [];
-  
+
     config.forEach((item: any) => {
       if (!item.title) {
         errors.push('El título es obligatorio. Por favor, asegúrese de que todos los títulos estén completos.');
@@ -356,7 +345,7 @@ export class BulkConfigurationComponent {
           titleSet.add(item.title);
         }
       }
-  
+
       if (item.colum == null || item.colum == undefined) {
         errors.push('La columna es obligatoria. Por favor, asegúrese de que todos los valores de columna estén completos.');
       } else {
@@ -367,16 +356,16 @@ export class BulkConfigurationComponent {
           columSet.add(item.colum);
         }
       }
-  
-  
-    
+
+
+
       if (item.account !== null && item.account !== undefined) {
         if (accountSet.has(item.account)) {
           const account = this.accountList.find(account => account.id == item.account);
           errors.push(`La cuenta "${account?.description} ${account?.code}" ya existe en la lista. Por favor, asegúrese de que todas las cuentas sean únicas.`);
         } else {
 
-          if (item.operation ==  null || item.operation == undefined) {
+          if (item.operation == null || item.operation == undefined) {
             errors.push('La operacion es obligatoria cuando existe cuenta.');
           }
 
@@ -386,34 +375,18 @@ export class BulkConfigurationComponent {
       }
 
     });
-  
+
     return errors;
   }
-  
+
 
   get filteredColumns() {
-    return this.colums.filter((colum:any) => !colum.status);
+    return this.colums.filter((colum: any) => !colum.status);
   }
 
-  see(data:any){
-    console.log(data);
-    
-  }
 
-  handlePropertyChange(event:any){
+ 
 
-        console.log("ejecuntado el metodo",event);
-//         const changes = event.changes;  
-//         console.log('Cambios:', changes);
-
-//         console.log(changes[0].data.colum);
-        
-// console.log("Aquii");
-          
-          
-          // this.onChange(changes[0].data.colum);
-        }
-    
 }
 
 

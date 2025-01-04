@@ -19,8 +19,9 @@
                     <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
                     <select [(ngModel)]="BulkConfiguration.type" required name="type" id="type"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                        <option value="1">Venta</option>
-                        <option value="2">Compra</option>
+                        <option *ngFor="let journal of journalList" [ngValue]="journal.id">
+                            {{ journal.diaryName }}
+                        </option>
                     </select>
                     <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')
               ">
@@ -47,8 +48,7 @@
                 <div>
                     <label for="credito" class="block mb-2 text-sm text-gray-900">Credito</label>
                     <select required name="credito" id="credito" (ngModelChange)="onChange($event)"
-                        [(ngModel)]="configDefault[0].colum"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 
+                        [(ngModel)]="configDefault[0].colum" class="bg-gray-50 border border-gray-300 text-gray-900 
                         text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -92,7 +92,7 @@
                 <div>
                     <label for="contado" class="block mb-2 text-sm text-gray-900">Contado</label>
                     <select required name="contado" id="contado" [(ngModel)]="configDefault[1].colum"
-                    (ngModelChange)="onChange($event)"
+                        (ngModelChange)="onChange($event)"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -140,7 +140,7 @@
                 <div>
                     <label for="factura" class="block mb-2 text-sm text-gray-900">Factura</label>
                     <select required name="factura" id="factura" [(ngModel)]="configDefault[2].colum"
-                    (ngModelChange)="onChange($event)"
+                        (ngModelChange)="onChange($event)"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -155,7 +155,7 @@
                 <div>
                     <label for="fecha" class="block mb-2 text-sm text-gray-900">Fecha</label>
                     <select required name="fecha" id="fecha" [(ngModel)]="configDefault[3].colum"
-                    (ngModelChange)="onChange($event)"
+                        (ngModelChange)="onChange($event)"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -170,7 +170,7 @@
                 <div>
                     <label for="descripcion" class="block mb-2 text-sm text-gray-900">Detalle</label>
                     <select required name="descripcion" id="descripcion" [(ngModel)]="configDefault[4].colum"
-                    (ngModelChange)="onChange($event)"
+                        (ngModelChange)="onChange($event)"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -185,7 +185,7 @@
                 <div>
                     <label for="rtn" class="block mb-2 text-sm text-gray-900">RTN</label>
                     <select required name="rtn" id="rtn" [(ngModel)]="configDefault[5].colum"
-                    (ngModelChange)="onChange($event)"
+                        (ngModelChange)="onChange($event)"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -200,7 +200,7 @@
                 <div>
                     <label for="type-pago" class="block mb-2 text-sm text-gray-900">Tipo Pago</label>
                     <select required name="type-pago" id="type-pago" [(ngModel)]="configDefault[6].colum"
-                    (ngModelChange)="onChange($event)"
+                        (ngModelChange)="onChange($event)"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of colums" [ngValue]="colum.value"
                             [ngClass]="{'hidden': colum.status}">
@@ -217,8 +217,7 @@
 
         <dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full"
             [dataSource]="BulkConfiguration.configDetails" [showBorders]="true" [height]="500"
-            [repaintChangesOnly]="true" [showRowLines]="true" [allowColumnResizing]="true" noDataText=""
-            >
+            [repaintChangesOnly]="true" [showRowLines]="true" [allowColumnResizing]="true" noDataText="">
             <dxo-load-panel [enabled]="true"></dxo-load-panel>
             <dxo-scrolling mode="virtual"></dxo-scrolling>
 
@@ -231,7 +230,7 @@
             </dxi-column>
 
             <dxi-column dataField="colum" caption="Columna" alignment="left" [width]="100" [allowEditing]="true"
-               [formItem]="{ visible: true }">
+                [formItem]="{ visible: true }">
                 <dxo-lookup [dataSource]="filteredColumns" valueExpr="value" displayExpr="colum">
                 </dxo-lookup>
                 <dxi-validation-rule type="required"></dxi-validation-rule>
