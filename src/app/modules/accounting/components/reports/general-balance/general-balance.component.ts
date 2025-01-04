@@ -7,6 +7,8 @@ import { PeriodService } from 'src/app/modules/accounting/services/period.servic
 import { map, Observable } from 'rxjs';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { NgForm } from '@angular/forms';
+// import * as XLSX from 'xlsx';
+import XLSX from "xlsx-js-style";
 
 interface GeneralBalance2 {
   accountName: string;
@@ -524,7 +526,7 @@ export class GeneralBalanceComponent implements OnInit {
   async onSubmit(e: NgForm) {
 
     console.log(e.form.value.period);
-    
+
     if (e.valid) {
 
       this.setInitValues(e.form.value.period)
@@ -534,4 +536,156 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
 
-}
+
+
+  exportToExcel() {
+
+    const table1 = document.querySelector('.table-activos') as HTMLTableElement;
+    const table2 = document.querySelector('.table-pasivos') as HTMLTableElement;
+
+
+    if (table1 && table2) {
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      let ws1: XLSX.WorkSheet = XLSX.utils.table_to_sheet(table1);
+      let ws2: XLSX.WorkSheet = XLSX.utils.table_to_sheet(table2);
+
+      ws1 =  this.getFilterRows(ws1);
+      ws2 = this.getFilterRows(ws2);
+
+      const combinedSheet: XLSX.WorkSheet = {};
+      combinedSheet['C1'] = {
+        v: "Balance General",
+        s: {
+          font: { bold: true, font: 48 }, 
+          alignment: { horizontal: "center", vertical: "center" },
+          fill: { fgColor: { rgb: "FFFFFF" } }, 
+        }
+      };
+
+      combinedSheet['A2'] = { v: "", s: { fill: { fgColor: { rgb: "FFFFFF" } } } };
+      combinedSheet['A3'] = { v: "", s: { fill: { fgColor: { rgb: "FFFFFF" } } } };
+
+      this.applyStyles(ws1, 0); 
+
+
+      Object.keys(ws1).forEach(cell => {
+        const row = parseInt(cell.replace(/\D/g, ""));
+        const col = cell.replace(/\d/g, "");
+        const newRow = row + 3; 
+        const newCell = col + newRow;
+
+        combinedSheet[newCell] = ws1[cell];
+      });
+
+
+      this.applyStyles(ws2, 3); 
+
+      Object.keys(ws2).forEach(cell => {
+        const row = parseInt(cell.replace(/\D/g, ""));
+        const col = cell.replace(/\d/g, "");
+        const newCol = String.fromCharCode(col.charCodeAt(0) + 3); 
+        const newCell = newCol + (row + 3);
+
+        combinedSheet[newCell] = ws2[cell];
+      });
+
+
+      combinedSheet['!cols'] = [
+        { wpx: 300 }, 
+        { wpx: 150 }, 
+        {},          
+        { wpx: 300 }, 
+        { wpx: 150 }, 
+        {},          
+        {}    
+      ];
+
+
+      const lastRowCombined = Math.max(this.getLastRow(ws1), this.getLastRow(ws2) + 1);
+      combinedSheet['!ref'] = `A1:G${lastRowCombined + 3}`;  
+
+
+      XLSX.utils.book_append_sheet(wb, combinedSheet, 'Balance General');
+      XLSX.writeFile(wb, 'Balance_General.xlsx');
+    } else {
+      // console.error('No se encontraron las tablas en el DOM');
+    }
+  }
+
+  applyStyles(sheet: XLSX.WorkSheet, offset: number = 0) {
+    const range = XLSX.utils.decode_range(sheet['!ref'] ?? 'A1:G1');
+    for (let row = range.s.r; row <= range.e.r; row++) {
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+        const cell = sheet[cellRef];
+        if (cell) {
+          if (row === 0) {
+            cell.s = {
+              fill: {
+                fgColor: { rgb: "FFFF00" }
+              },
+              font: {
+                bold: true,
+                color: { rgb: "000000" }
+              },
+              alignment: {
+                horizontal: "center",
+                vertical: "center"
+              }
+            };
+          } else {
+
+            cell.s = {
+              fill: {
+                fgColor: { rgb: "FFFFFF" }
+              },
+              font: {
+                color: { rgb: "000000" }
+              },
+              alignment: {
+                horizontal: "left",
+                vertical: "center"
+              }
+            };
+          }
+        }
+      }
+    }
+  }
+
+  getLastRow(sheet: XLSX.WorkSheet): number {
+    const range = XLSX.utils.decode_range(sheet['!ref'] ?? 'A1:G1');
+    return range.e.r + 1;
+  }
+
+
+  getFilterRows(obj:XLSX.WorkSheet){
+    const newObjA: any = {};
+    Object.keys(obj).forEach(key => {
+      if (key.startsWith('A')) {
+        newObjA[key] = obj[key];
+        delete obj[key];
+      }
+    });
+
+    const newObjB: any = {};
+    Object.keys(obj).forEach(key => {
+      if (key.startsWith('B')) {
+        newObjB[key] = obj[key];
+        delete obj[key];
+      }
+    });
+
+    const resultObj: any = {};
+    Object.keys(newObjA).forEach(key => {
+      const matchingKey = key.replace('A', 'B');  
+      if (newObjB[matchingKey]) {
+        resultObj[key] = newObjA[key];            
+        resultObj[matchingKey] = newObjB[matchingKey]; 
+      }
+    });
+
+    return {...obj,...resultObj};
+
+  }
+}  

@@ -7,6 +7,11 @@ import { IncomeStatement } from 'src/app/modules/accounting/models/APIModels';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { ReportServiceService } from 'src/app/modules/accounting/services/report-service.service';
+import { exportDataGrid, exportPivotGrid } from 'devextreme/excel_exporter';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver';
+import { DxPivotGridTypes } from 'devextreme-angular/ui/pivot-grid';
 
 interface Incomes {
   id: number;
@@ -339,14 +344,19 @@ export class IncomeStatementComponent implements OnInit {
   
   
   
-  
-  
-  
-  
-  
-  
+  onExporting(e: DxPivotGridTypes.ExportingEvent) {
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Estado de Resultados');
 
-
+    exportPivotGrid({
+      component: e.component,
+      worksheet,
+    }).then(() => {
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Estado de Resultados.xlsx');
+      });
+    });
+  }
 }
 
   

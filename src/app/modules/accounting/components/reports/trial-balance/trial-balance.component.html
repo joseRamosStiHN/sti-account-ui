@@ -2,7 +2,10 @@
     <h2 class="text-2xl font-semibold text-center mb-5">Balanza de Comprobación</h2>
     <dx-data-grid [dataSource]="trialBalanceData" [showBorders]="true" [columnAutoWidth]="true"
         [searchPanel]="{ visible: false }" [paging]="{ pageSize: 15 }"
-        [pager]="{ showPageSizeSelector: true, allowedPageSizes: [15, 25, 50, 100] }">
+        [pager]="{ showPageSizeSelector: true, allowedPageSizes: [15, 25, 50, 100] }"
+        (onExporting)="onExporting($event)">
+
+        <dxo-export [enabled]="true"></dxo-export>
 
         <dxo-editing mode="cell"></dxo-editing>
 

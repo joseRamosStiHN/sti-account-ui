@@ -3,6 +3,10 @@ import { Options as DataSourceConfig } from 'devextreme/ui/pivot_grid/data_sourc
 import config from 'devextreme/core/config';
 import { ReportServiceService } from 'src/app/modules/accounting/services/report-service.service';
 import { TrialBalaceResponse } from 'src/app/modules/accounting/models/APIModels';
+import { exportDataGrid } from 'devextreme/excel_exporter';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver';
 
 
 interface Incomes {
@@ -102,6 +106,20 @@ export class TrialBalanceComponent {
     return `${dia}/${mes}/${anio}`;
   }
 
+  onExporting(e: DxDataGridTypes.ExportingEvent) {
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Balanza de Comprobacion');
+
+    exportDataGrid({
+      component: e.component,
+      worksheet,
+      autoFilterEnabled: true,
+    }).then(() => {
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Balanza Comprobacion.xlsx');
+      });
+    });
+  }
  
 
 }
