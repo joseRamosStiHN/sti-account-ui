@@ -33,7 +33,7 @@ export class AccountingClosingComponent {
 
   nextYear: boolean = false;
   nextYearPeriod: boolean = false
-  nextYearDate!:Date;
+  nextYearDate!: Date;
 
 
   private readonly periodService = inject(PeriodService);
@@ -59,9 +59,9 @@ export class AccountingClosingComponent {
         this.messageToast = 'Error al consultar datos del periodo actual';
         this.showToast = true;
 
-        // setTimeout(() => {
-        //   this.router.navigate(['/accounting/configuration/period']);
-        // }, 3000);
+        setTimeout(() => {
+          this.router.navigate(['/accounting/accounting-closing']);
+        }, 3000);
       }
     });
 
@@ -70,24 +70,24 @@ export class AccountingClosingComponent {
         this.periodsClosing = info;
         this.periodsClosing.map((period) => {
           const fecha = new Date(period.endPeriod);
-          console.log(period.accountingPeriodId, fecha.getMonth()+1);
-          
-          if (fecha.getMonth() + 1 == 12  && period.accountingPeriodId != 1) {          
+          console.log(period.accountingPeriodId, fecha.getMonth() + 1);
+
+          if (fecha.getMonth() + 1 == 12 && period.typePeriod.toUpperCase() != "ANUAL") {
             this.nextYear = true;
             this.nextYearPeriod = true;
             this.nextYearDate = fecha;
           }
 
-          if (fecha.getMonth() + 1 == 11 && period.accountingPeriodId != 1) {            
-            this.nextYear = false;  
+          if (fecha.getMonth() + 1 == 11 && period.typePeriod.toUpperCase() != "ANUAL") {
+            this.nextYear = false;
             this.nextYearPeriod = true;
           }
 
-          if (fecha.getMonth() + 1 == 12 && period.accountingPeriodId == 1) {            
-            this.nextYear = false;  
+          if (fecha.getMonth() + 1 == 12 && period.typePeriod.toUpperCase() == "ANUAL") {
+            this.nextYear = false;
             this.nextYearPeriod = false;
             this.nextYearDate = fecha;
-           
+
           }
         })
       },
@@ -147,7 +147,12 @@ export class AccountingClosingComponent {
             this.showToast = true;
 
             setTimeout(() => {
-              this.router.navigate(['/accounting/configuration/period']);
+              if (this.nextYearPeriod) {
+                window.location.reload();
+              } else {
+                this.router.navigate(['/accounting/configuration/period']);
+              }
+
             }, 3000);
           },
           error: (err) => {
@@ -174,7 +179,7 @@ export class AccountingClosingComponent {
     dialogo.then(async (d) => {
 
       if (d) {
-        
+
         this.periodService.closingYear(this.nextPeriod.closureType).subscribe({
           next: () => {
             this.toastType = typeToast.Success;
@@ -228,8 +233,8 @@ export class AccountingClosingComponent {
         break;
       case "TRIMESTRAL":
 
-      this.nextPeriod.startPeriod = `${year}-01-01`;
-      this.nextPeriod.endPeriod = `${year}-03-31`;
+        this.nextPeriod.startPeriod = `${year}-01-01`;
+        this.nextPeriod.endPeriod = `${year}-03-31`;
 
         break;
       case "SEMESTRAL":
