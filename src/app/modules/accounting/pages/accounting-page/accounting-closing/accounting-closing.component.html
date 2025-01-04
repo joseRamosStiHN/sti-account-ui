@@ -99,9 +99,10 @@
   
 </div>
 
-<dx-popup [visible]="isPopupVisiblePeriod" [width]="600" [height]="400" [title]="'Proximo Periodo'"
+<dx-popup [visible]="isPopupVisiblePeriod" [width]="600" [height]="400" [title]="titleNextPeriod"
   [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPopupHiding()">
   <div *dxTemplate="let data of 'content'">
+    <p class="font-bold text-base">Siguiente Periodo</p>
     <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="closing()">
       <div *ngIf="!nextYearPeriod"   class="grid grid-cols-2 gap-2">
         <div>
@@ -162,7 +163,7 @@
 </dx-popup>
 
 
-<dx-popup [visible]="isPopupVisibleYear" [width]="600" [height]="400" [title]="'Configuracion Periodo'"
+<dx-popup [visible]="isPopupVisibleYear" [width]="600" [height]="400" [title]="'Configuracion Siguiente Periodo Contable'"
   [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPopupHidingYear()">
   <div *dxTemplate="let data of 'content'">
     <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="closingYear()">

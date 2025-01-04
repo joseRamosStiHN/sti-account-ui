@@ -23,6 +23,7 @@ export class AccountingClosingComponent {
 
   isPopupVisiblePeriod = false;
   isPopupVisibleYear = false;
+  titleNextPeriod:string='Proximo Periodo'
 
   closureTypeOptions = [
     { value: 'ANNUAL', text: 'Anual' },
@@ -51,6 +52,9 @@ export class AccountingClosingComponent {
     this.periodService.getInfoClosingPeriod().subscribe({
       next: (info) => {
         this.infoClosing = info;
+        const monthDate= new Date(info.endPeriod) ;
+        const monthName = monthDate.toLocaleString('es-ES', { month: 'long' });
+        this.titleNextPeriod = `Cierre de periodo ${info.typePeriod} ${monthName}`
       },
       error: (err) => {
         console.error('Error al obtener la información del periodo de cierre', err);
