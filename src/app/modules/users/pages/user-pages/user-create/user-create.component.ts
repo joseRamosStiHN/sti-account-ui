@@ -16,8 +16,8 @@ import { UsersService } from 'src/app/modules/users/users.service';
 export class UserCreateComponent implements OnInit {
   txtPassword!: string;
   txtConfirmPassword!: string;
-  companyList$: CompanyResponse[] =[];
-  rolesList$: RolesResponse[] =[];
+  companyList$: CompanyResponse[] = [];
+  rolesList$: RolesResponse[] = [];
 
   userForm: UsersRequest;
 
@@ -45,22 +45,22 @@ export class UserCreateComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.txtPassword);
     this.companyService.getAllCompanies().subscribe(
-       data => {
+      data => {
         this.companyList$ = data.map(company => {
           company.active = false;
-          company.permissions=[1]
-          company.roles =[{"id":1,"name":"ADMIN","description":"Administrador del sistema","active":true}]
+          company.permissions = [1]
+          company.roles = [{ "id": 1, "name": "ADMIN", "description": "Administrador del sistema", "active": true }]
           return company
         })
       });
 
-      this.userService.getAllRoles().subscribe(
-        data => {
-         this.rolesList$ = data.map(roles => {
-           roles.active = false;
-           return roles
-         })
-       });;
+    this.userService.getAllRoles().subscribe(
+      data => {
+        this.rolesList$ = data.map(roles => {
+          roles.active = false;
+          return roles
+        })
+      });;
 
   }
 
@@ -70,15 +70,42 @@ export class UserCreateComponent implements OnInit {
 
     if (e.valid) {
 
-      const companys = this.companyList$.filter(company=> company.active== true);
+
+
+      const companys = this.companyList$.filter(company => company.active == true);
       this.userForm.companies = companys;
 
-      const roles = this.rolesList$.filter(roles=> roles.active== true);
+      const roles = this.rolesList$.filter(roles => roles.active == true);
       this.userForm.roles = roles;
-    
+
       const request = {
         ...this.userForm, password: e.value.password
-      }      
+      }
+
+      if (request.companies.length ==0) {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Seleccione al menos una Empresa';
+        this.showToast = true;
+        return
+      }
+
+
+      if (request.roles.length ==0) {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Seleccione al menos un Rol';
+        this.showToast = true;
+        return
+      }
+
+
+      if (this.txtPassword != this.txtConfirmPassword) {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Contraseñas no coinciden';
+        this.showToast = true;
+        return
+      }
+
+
       await this.userService.createUser(request).subscribe({
         next: (data) => {
           this.toastType = typeToast.Success;
@@ -105,6 +132,6 @@ export class UserCreateComponent implements OnInit {
     window.history.back();
   }
 
- 
+
 
 }

@@ -32,10 +32,15 @@
             <label for="rtn" class="block mb-2 text-sm text-gray-900">Rtn</label>
             <input id="rtn" name="rtn" type="text" [(ngModel)]="companyForm.rtn"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder="" required />
+              placeholder="" required pattern="[0-9]*" />
               <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')">
                 <small class="text-xs text-red-900">Rtn es requerido.</small>
               </div>
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].hasError('pattern')">
+
+                <small class="text-xs text-red-900">Solo se permiten números.</small>
+            
+            </div>
           </div>
 
           <div class="form">
@@ -54,19 +59,25 @@
             <label for="email" class="block mb-2 text-sm text-gray-900">Correo</label>
             <input id="email" name="email" type="email" [(ngModel)]="companyForm.email"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder=""  />
+              placeholder="" email required />
               <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
                 <small class="text-xs text-red-900">Correo es requerido.</small>
+              </div>
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
+                <small class="text-xs text-red-900">Formato de correo invalido.</small>
               </div>
           </div>
           <div class="form">
             <label for="phone" class="block mb-2 text-sm text-gray-900">Telefono</label>
             <input id="phone" name="phone" type="url" [(ngModel)]="companyForm.phone"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder="" required />
+              placeholder="" required pattern="[0-9]*"/>
               <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].getError('required')">
                 <small class="text-xs text-red-900">Telefono es requerido.</small>
               </div>
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].hasError('pattern')">
+                <small class="text-xs text-red-900">Solo se permiten números.</small>
+            </div>
           </div>
 
           <div class="form">
@@ -174,3 +185,7 @@
   </form>
 
 </div>
+
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+  <dxo-position my="top" at="top" of="#companyForm"> </dxo-position>
+</dx-toast>

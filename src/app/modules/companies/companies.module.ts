@@ -8,6 +8,7 @@ import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxButtonModule } from 'devextreme-angular/ui/button';
 import { CompanyCreateComponent } from './pages/company-pages/company-create/company-create.component';
 import { FormsModule } from '@angular/forms';
+import { DxToastModule } from 'devextreme-angular';
 
 @NgModule({
   declarations: [CompanyPagesComponent, CompanyEditComponent, CompanyCreateComponent],
@@ -18,7 +19,8 @@ import { FormsModule } from '@angular/forms';
     DxDataGridModule,
     DxButtonModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    DxToastModule
   ],
 })
 export class CompaniesModule {}

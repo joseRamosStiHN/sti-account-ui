@@ -75,6 +75,13 @@ export class CompanyCreateComponent implements OnInit {
       }
       const roles = this.rolesList$.filter(roles=> roles.active== true);
       this.companyForm.roles = roles;
+
+      if (this.companyForm.roles.length ==0) {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Seleccione al menos un Rol';
+        this.showToast = true;
+        return
+      }
     
       this.companyService.createCompany(this.companyForm).subscribe({
         next: (data) => {

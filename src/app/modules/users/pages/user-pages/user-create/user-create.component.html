@@ -27,10 +27,15 @@
         <input required="true" name="phoneNumber" id="phoneNumber" type="text" placeholder="96xxxxxx, 34xxxxxx"
           [(ngModel)]="userForm.phoneNumber"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required />
+          required pattern="[0-9]*"/>
 
-        <div *ngIf="itemForm.submitted && itemForm.form.controls['lastName'].getError('required')">
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['phoneNumber'].getError('required')">
           <small class="text-xs text-red-900">Telefono es requerido.</small>
+        </div>
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['phoneNumber'].hasError('pattern')">
+
+          <small class="text-xs text-red-900">Solo se permiten números.</small>
+
         </div>
       </div>
 
@@ -82,9 +87,12 @@
         <label for="email" class="block mb-2 text-sm text-gray-900">Correo Electrónico</label>
         <input required="true" name="email" id="email" type="email" [(ngModel)]="userForm.email"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required />
+          required email required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
           <small class="text-xs text-red-900">Correo es requerido.</small>
+        </div>
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
+          <small class="text-xs text-red-900">Formato de correo invalido.</small>
         </div>
       </div>
       <div class="form col-span-2">
@@ -106,7 +114,8 @@
           </dxi-column>
           <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active" [ngModelOptions]="{standalone: true}">
+              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active"
+                [ngModelOptions]="{standalone: true}">
               <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
                      peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
                      peer dark:bg-gray-700 peer-checked:after:translate-x-full 
@@ -133,7 +142,8 @@
           </dxi-column>
           <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active" [ngModelOptions]="{standalone: true}">
+              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active"
+                [ngModelOptions]="{standalone: true}">
               <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
                      peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
                      peer dark:bg-gray-700 peer-checked:after:translate-x-full 
@@ -159,3 +169,6 @@
     </div>
   </form>
 </div>
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+  <dxo-position my="top" at="top" of="#userForm"> </dxo-position>
+</dx-toast>

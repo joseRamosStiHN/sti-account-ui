@@ -8,6 +8,7 @@ import { UserPagesComponent } from './pages/user-pages/user-pages.component';
 import { UserEditComponent } from './pages/user-pages/user-edit/user-edit.component';
 import { UserCreateComponent } from './pages/user-pages/user-create/user-create.component';
 import { FormsModule } from '@angular/forms';
+import { DxToastModule } from 'devextreme-angular';
 
 @NgModule({
   declarations: [UserPagesComponent, UserEditComponent, UserCreateComponent],
@@ -18,6 +19,7 @@ import { FormsModule } from '@angular/forms';
     DxDataGridModule,
     DxButtonModule,
     HttpClientModule,
+        DxToastModule,
   ],
 })
 export class UsersModule {}
