@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { CompaniesService } from 'src/app/modules/companies/companies.service';
+import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { Login } from 'src/app/shared/models/LoginResponseModel';
 import { UserInfoService } from 'src/app/shared/userInfo.service';
 
@@ -15,14 +17,46 @@ import { UserInfoService } from 'src/app/shared/userInfo.service';
 export class ListCompaniesComponent implements OnInit {
   user$: Observable<Login | null> | undefined;
   infoService = inject(UserInfoService);
+  companyList$: Observable<CompanyResponse[]> | undefined;
+  
   private readonly router = inject(Router);
-  constructor() {}
+  private readonly companyService = inject(CompaniesService);
+
+  constructor() { }
 
   ngOnInit(): void {
-    this.user$ = this.infoService.userDetail$;
+
+
+
+    const savedUser = localStorage.getItem('userData');
+    if (savedUser) {
+      this.user$ = of(JSON.parse(savedUser));
+    } else {
+      this.user$ = this.infoService.userDetail$;
+      this.user$.subscribe((data) => {
+        if (data) {
+          localStorage.setItem('userData', JSON.stringify(data));
+        }
+      });
+    }
+
+    console.log(savedUser);
+    
   }
 
-  goTo = () => {
+
+
+  goTo(tenandId:string){
+    localStorage.setItem('company', JSON.stringify(tenandId));
     this.router.navigate(['/accounting']);
+
+  };
+
+  goToCompany(){
+    this.router.navigate(['/dashboard/companies']);
+  };
+
+  goToUser = () => {
+    this.router.navigate(['/dashboard/user']);
   };
 }

@@ -56,7 +56,7 @@ export class TransactionService {
   getAllTransactionByDocumentType(
     documentId: number
   ): Observable<TransactionResponse[]> {
-    const url = `${this.apiURL}/api/v1/transaction/by-document/${documentId}`;
+    const url = `/api/v1/transaction/by-document/${documentId}`;
     return this.httpClient.get<TransactionResponse[]>(url).pipe(
       catchError(() => {
         console.error('catch error in service');

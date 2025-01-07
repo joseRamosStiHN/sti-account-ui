@@ -11,8 +11,8 @@ import { UserInfoService } from 'src/app/shared/userInfo.service';
 })
 export class LoginPageComponent implements OnInit {
   loginForm = new FormGroup({
-    userName: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+    userName: new FormControl('laurent.caceres', [Validators.required]),
+    password: new FormControl('Lcaceres97', [Validators.required]),
   });
 
   private authService = inject(AuthServiceService);
@@ -24,12 +24,18 @@ export class LoginPageComponent implements OnInit {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe((n) => {
-        if (n.active) {
-          this.userInfoService.setUserInfo(n);
-          this.router.navigate(['/dashboard']);
+      this.authService.login(this.loginForm.value).subscribe({
+        next: (n: any) => {
+          if (n.active) {
+            this.userInfoService.setUserInfo(n);
+            this.router.navigate(['/dashboard']);
+          }
+        },
+        error: (err: any) => {
+          console.log(err);
         }
       });
+      
     }
   }
 }

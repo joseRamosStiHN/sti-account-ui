@@ -7,6 +7,7 @@ import { CompanyEditComponent } from './pages/company-pages/company-edit/company
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxButtonModule } from 'devextreme-angular/ui/button';
 import { CompanyCreateComponent } from './pages/company-pages/company-create/company-create.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [CompanyPagesComponent, CompanyEditComponent, CompanyCreateComponent],
@@ -17,6 +18,7 @@ import { CompanyCreateComponent } from './pages/company-pages/company-create/com
     DxDataGridModule,
     DxButtonModule,
     HttpClientModule,
+    FormsModule
   ],
 })
 export class CompaniesModule {}

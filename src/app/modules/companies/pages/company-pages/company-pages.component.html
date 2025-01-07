@@ -1,17 +1,39 @@
 <div class="container">
   <h2 class="font-medium text-2xl mt-2 mb-5">Empresas</h2>
 
-  <dx-data-grid id="companiesGrid" [showBorders]="true">
+  <dx-data-grid id="companiesGrid" [showBorders]="true" [dataSource]="companyList$ | async">
     <dxi-column caption="Nombre" dataField="name"></dxi-column>
     <dxi-column caption="Tipo" dataField="type"></dxi-column>
     <dxi-column caption="Rtn" dataField="rtn"></dxi-column>
-    <dxi-column caption="Estado" dataField="isActive"></dxi-column>
+    <dxi-column caption="Estado" dataField="active"></dxi-column>
     <dxi-column
       caption="Creado"
       dataField="createdAt"
       dataType="date"
     ></dxi-column>
     <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
+
+    <div *dxTemplate="let company of 'detail'">
+      <div>
+        <div class="max-w-full p-4 bg-white shadow-sm rounded-lg mx-2 ">
+            <h1 class="text-xl font-semibold text-gray-800 mb-3">{{company.data.name}}</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
+                <div><span class="font-medium">Descripción:</span> {{company.data.description}}</div>
+                <div><span class="font-medium">Dirección:</span> {{company.data.address}}</div>
+                <div><span class="font-medium">Teléfono:</span> {{company.data.phone}}</div>
+                <div><span class="font-medium">Correo Electrónico:</span> <a 
+                   class="text-blue-600 hover:underline">{{company.data.email}}</a></div>
+                <div><span class="font-medium">RTN:</span> {{company.data.rtn}}</div>
+                <div><span class="font-medium">Tipo:</span> {{company.data.type}}</div>
+                <div><span class="font-medium">Sitio Web:</span>{{company.data.website}}</div>
+                <div><span class="font-medium">Estado:</span> <span class="text-red-500">{{company.data.active ?'activa':'inactiva' }}</span></div>
+            </div>
+        </div>
+    
+    </div>
+
+    </div>
 
     <!--Toolbar-->
     <dxo-toolbar>

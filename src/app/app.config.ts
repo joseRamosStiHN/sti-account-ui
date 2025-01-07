@@ -12,18 +12,20 @@ import {
   HTTP_INTERCEPTORS,
   provideHttpClient,
   withFetch,
+  withInterceptors,
 } from '@angular/common/http';
 import { GlobalErrorHandler } from './shared/handlers/errors/GlobalErrorHandler';
 import { BrowserModule } from '@angular/platform-browser';
 import { showControlDirective } from 'src/app/shared/directives/showControlDirective';
 import { GlobalHttpErrorHandler } from 'src/app/shared/handlers/httpInterceptors/GlobalHttpErrorHandler';
+import { authInterceptor } from 'src/app/shared/handlers/httpInterceptors/interceptorcompany';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withComponentInputBinding()),
     // provideClientHydration(),
     provideAnimations(),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(),withInterceptors([authInterceptor])),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     {
       provide: HTTP_INTERCEPTORS,

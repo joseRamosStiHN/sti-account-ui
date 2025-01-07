@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { CompanyPagesComponent } from 'src/app/modules/companies/pages/company-pages/company-pages.component';
 import { ListCompaniesComponent } from 'src/app/shared/components/companies/list-companies.component';
 import { AuthLayoutComponent } from 'src/app/shared/layouts/auth-layout/auth-layout.component';
 import { DashboardLayoutComponent } from 'src/app/shared/layouts/dashboard-layout/dashboard-layout.component';

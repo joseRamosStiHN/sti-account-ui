@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService, NavStiLink } from '../navigation.service';
 import { DropdownComponent } from '../components/dropdown/dropdown.component';
@@ -25,6 +25,8 @@ import { DropdownComponent } from '../components/dropdown/dropdown.component';
 export class HeaderComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   nav: NavStiLink[] = [];
+  dropdownOpen = false;
+    private readonly navigationService = inject(NavigationService);
 
   // nombreUsuario: string = 'Josue Rodriguez';
 
@@ -32,7 +34,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // iniciales?: string;
 
-  constructor(private navigate: NavigationService) {}
+  constructor(private navigate: NavigationService, private router: Router) {}
 
   ngOnInit(): void {
     /*     // Calcular iniciales
@@ -51,5 +53,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  goBack() {
+    this.navigationService.setNavLinks([]);
+    localStorage.removeItem('company'); 
+    this.router.navigate(['/dashboard']);      
+    this.dropdownOpen = false;        
+  }
+
+  logout() {
+
+    localStorage.removeItem('userData'); 
+    this.dropdownOpen = false;        
+    this.router.navigate(['/login']);      
+ 
   }
 }

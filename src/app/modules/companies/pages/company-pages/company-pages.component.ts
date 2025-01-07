@@ -1,5 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { CompaniesService } from 'src/app/modules/companies/companies.service';
+import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 
 @Component({
   selector: 'app-company-pages',
@@ -7,11 +10,22 @@ import { Router } from '@angular/router';
   styleUrl: './company-pages.component.css',
 })
 export class CompanyPagesComponent implements OnInit {
+  
+  
+  companyList$: Observable<CompanyResponse[]> | undefined;
   private readonly router = inject(Router);
+  private readonly companyService = inject(CompaniesService);
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+   this.companyList$ = this.companyService.getAllCompanies();
+  }
 
   addCompany(): void {
-    this.router.navigate(['/company/create']);
+    this.router.navigate(['/dashboard/companies/create']);
   }
+
+  goBack() {
+    window.history.back();
+  }
+
 }

@@ -1,21 +1,30 @@
+<div class="flex justify-end gap-4 mt-4">
+  <button (click)="goToUser()" 
+    class="px-6 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+    Agregar Usuario
+  </button>
+
+  <button (click)="goToCompany()"  
+  class="px-6 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+    Agregar Compañía
+  </button>
+</div>
+
 <div class="mt-5">
-  @if( user$ | async; as info ){ @for (item of info.companies; track $index) {
+    @if( user$ | async; as info ){ @for (item of info.companies; track $index) {
   <div class="w-full border rounded-md p-2 mb-2">
     <div class="grid grid-cols-3 gap-2">
       <div class="">
         <h2 class="text-gray-500 sm:text-2xl">{{ item.name }}</h2>
       </div>
       <div class="col-span-2 flex flex-row justify-end gap-2">
-        <button class="text-sm border rounded-md p-2">Agregar Usuario</button>
-        <button
-          (click)="goTo()"
-          type="button"
-          class="text-sm border rounded-md p-2 z-50 hover:shadow-md"
-        >
+        <!-- <button class="text-sm border rounded-md p-2">Agregar Usuario</button> -->
+        <button (click)="goTo(item.tenantId)" type="button" class="text-sm border rounded-md p-2 z-50 hover:shadow-md">
           Conectar
         </button>
       </div>
     </div>
   </div>
-  } }
+  } 
+}
 </div>

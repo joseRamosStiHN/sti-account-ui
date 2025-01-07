@@ -13,15 +13,22 @@ export class AuthServiceService {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
     }),
+    withCredentials:true
+
   };
 
   private httpClient = inject(HttpClient);
 
-  constructor() {}
+  constructor() { }
 
   login(login: any): Observable<Login> {
+
+   const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+
     return this.httpClient.post<Login>(
-      `${this.securityApi}/api/v1/login`,
+      `/security/login`,
       login,
       this.httpOptions
     );

@@ -1,171 +1,176 @@
 <div class="container">
   <h2 class="font-medium text-2xl mt-2 mb-5">Nueva Empresa</h2>
-  <div class="flex flex-row">
-    <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
-      <legend class="text-sm font-thin mb-2">Información General</legend>
-      <div class="w-auto">
-        <img
-          class="h-auto w-60 rounded-lg"
-          src="assets/image-1@2x.jpg"
-          alt="image description"
-        />
-      </div>
-      <div class="w-full grid grid-cols-3 gap-3">
-        <div class="form">
-          <label for="companyName" class="block mb-2 text-sm text-gray-900"
-            >Nombre</label
-          >
-          <input
-            id="companyName"
-            name="companyName"
-            type="text"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder="Empresa XYZ"
-            required
-          />
+  <form id="companyForm" class="w-100" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
+    <div class="flex flex-row">
+      <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
+        <legend class="text-sm font-thin mb-2">Información General</legend>
+        <div class="w-auto">
+          <img class="h-auto w-60 rounded-lg" src="assets/image-1@2x.jpg" alt="image description" />
         </div>
+        <div class="w-full grid grid-cols-3 gap-3">
+          <div class="form">
+            <label for="name" class="block mb-2 text-sm text-gray-900">Nombre</label>
+            <input id="name" name="name" type="text" [(ngModel)]="companyForm.name"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder="Empresa XYZ" required />
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['name'].getError('required')">
+              <small class="text-xs text-red-900">Nombre es requerido.</small>
+            </div>
+          </div>
 
-        <div class="form">
-          <label for="companyAddress" class="block mb-2 text-sm text-gray-900"
-            >Dirección</label
-          >
-          <input
-            id="companyAddress"
-            name="companyAddress"
-            type="text"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder="Colonia las Colinas, Tegucigalpa, Honduras"
-            required
-          />
-        </div>
+          <div class="form">
+            <label for="address" class="block mb-2 text-sm text-gray-900">Dirección</label>
+            <input id="address" name="address" type="text"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              [(ngModel)]="companyForm.address" placeholder="Colonia las Colinas, Tegucigalpa, Honduras" required />
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['address'].getError('required')">
+                <small class="text-xs text-red-900">Direccion es requerida.</small>
+              </div>
+          </div>
 
-        <div class="form">
-          <label for="companyRtn" class="block mb-2 text-sm text-gray-900"
-            >Rtn</label
-          >
-          <input
-            id="companyRtn"
-            name="companyRtn"
-            type="text"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder=""
-            required
-          />
-        </div>
+          <div class="form">
+            <label for="rtn" class="block mb-2 text-sm text-gray-900">Rtn</label>
+            <input id="rtn" name="rtn" type="text" [(ngModel)]="companyForm.rtn"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder="" required />
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')">
+                <small class="text-xs text-red-900">Rtn es requerido.</small>
+              </div>
+          </div>
 
-        <div class="form">
-          <label for="companyType" class="block mb-2 text-sm text-gray-900"
-            >Razón</label
-          >
-          <select
-            required="true"
-            name="companyType"
-            id="companyType"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          >
-            <option>Empresa</option>
-            <option>Natural</option>
-          </select>
-        </div>
+          <div class="form">
+            <label for="type" class="block mb-2 text-sm text-gray-900">Razón</label>
+            <select required="true" name="type" id="type" [(ngModel)]="companyForm.type"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+              <option value="EMPRESA">Empresa</option>
+              <option value="NATURAL">Natural</option>
+            </select>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')">
+              <small class="text-xs text-red-900">Razon es requerida.</small>
+            </div>
+          </div>
 
-        <div class="form">
-          <label for="companyEmail" class="block mb-2 text-sm text-gray-900"
-            >Correo</label
-          >
-          <input
-            id="companyEmail"
-            name="companyEmail"
-            type="email"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder=""
-            required
-          />
-        </div>
+          <div class="form">
+            <label for="email" class="block mb-2 text-sm text-gray-900">Correo</label>
+            <input id="email" name="email" type="email" [(ngModel)]="companyForm.email"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder=""  />
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
+                <small class="text-xs text-red-900">Correo es requerido.</small>
+              </div>
+          </div>
+          <div class="form">
+            <label for="phone" class="block mb-2 text-sm text-gray-900">Telefono</label>
+            <input id="phone" name="phone" type="url" [(ngModel)]="companyForm.phone"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder="" required />
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].getError('required')">
+                <small class="text-xs text-red-900">Telefono es requerido.</small>
+              </div>
+          </div>
 
-        <div class="form">
-          <label for="companyWeb" class="block mb-2 text-sm text-gray-900"
-            >Sitio Web</label
-          >
-          <input
-            id="companyWeb"
-            name="companyWeb"
-            type="url"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder=""
-            required
-          />
-        </div>
+          <div class="form">
+            <label for="website" class="block mb-2 text-sm text-gray-900">Sitio Web</label>
+            <input id="website" name="website" type="url" [(ngModel)]="companyForm.website"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder=""  />
+              <div *ngIf="itemForm.submitted && itemForm.form.controls['website'].getError('required')">
+                <small class="text-xs text-red-900">Sitio Web es requerido.</small>
+              </div>
+          </div>
 
-        <div class="form col-span-3">
-          <label
-            for="companyDescription"
-            class="block mb-2 text-sm text-gray-900"
-            >Descripción</label
-          >
-          <textarea
-            name="companyDescription"
-            id="companyDescription"
-            rows="2"
-            class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          >
+          <div class="form col-span-3">
+            <label for="description" class="block mb-2 text-sm text-gray-900">Descripción</label>
+            <textarea name="description" id="description" rows="2" [(ngModel)]="companyForm.description"
+              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500
+               focus:border-blue-500 focus:outline-none" >
           </textarea>
+          <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
+            <small class="text-xs text-red-900">Descripcion es requerida.</small>
+          </div>
+          </div>
         </div>
-      </div>
-    </fieldset>
-  </div>
-  <div class="grid grid-cols-3 gap-2 mt-2">
-    <fieldset class="flex border rounded-sm w-full gap-2 p-2">
-      <legend class="text-sm font-thin mb-2">Información Contable</legend>
-      <div class="form w-full">
-        <label for="accountConfig" class="block mb-2 text-sm text-gray-900"
-          >Configuración de cuentas</label
-        >
-        <select
-          required="true"
-          name="accountConfig"
-          id="accountConfig"
-          (change)="onAccountConfig($event)"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-        >
-          <option selected value="1">Usar cuentas del Sistema</option>
-          <option value="0">Copiar de Empresa</option>
-        </select>
-        @if(!accountsFromSystem) {
+      </fieldset>
+    </div>
+    <div class="grid grid-cols-3 gap-2 mt-2">
+      <fieldset class="flex border rounded-sm w-full gap-2 p-2">
+        <legend class="text-sm font-thin mb-2">Información Contable</legend>
         <div class="form w-full">
-          <label
-            for="copyFromSelect"
-            class="block mb-2 text-sm text-gray-900"
-          ></label>
-          <select
-            required="true"
-            name="copyFromSelect"
-            id="copyFromSelect"
-            class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          >
-            <option>Empresa ABC</option>
-            <option>Empresa XYZ</option>
+          <label for="accountConfig" class="block mb-2 text-sm text-gray-900">Configuración de cuentas</label>
+          <select required="true" name="accountConfig" id="accountConfig" (change)="onAccountConfig($event)"
+            class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+            <option selected value="1">Usar cuentas del Sistema</option>
+            <option value="0">Copiar de Empresa</option>
           </select>
+          @if(!accountsFromSystem) {
+          <div class="form w-full">
+            <label for="copyFromSelect" class="block mb-2 text-sm text-gray-900"></label>
+            <select required name="tenantId" id="tenantId" class="bg-gray-50 border
+           border-gray-300 text-gray-900 
+                        text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+              [(ngModel)]="companyForm.tenantId" required>
+              <option *ngFor="let company of companyList$ | async" [ngValue]="company.id">
+                {{ company.name }}
+              </option>
+            </select>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['tenantId'].getError('required')">
+              <small class="text-xs text-red-900">Empresa es requerida.</small>
+            </div>
+          </div>
+          }
         </div>
-        }
-      </div>
-    </fieldset>
-    <!--USERS-->
-    <fieldset
-      class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2"
-    >
-      <legend class="text-sm font-thin mb-2">Usuarios</legend>
-      <dx-data-grid id="companyUserGrid" [showBorders]="true">
-        <dxo-paging [enabled]="false"></dxo-paging>
-        <dxo-editing
-          mode="form"
-          [allowUpdating]="true"
-          [allowAdding]="true"
-          [allowDeleting]="true"
-        >
-        </dxo-editing>
-        <dxi-column caption="Nombre" dataField="name"></dxi-column>
-        <dxi-column caption="Permiso" dataField="permiso"></dxi-column>
-      </dx-data-grid>
-    </fieldset>
-  </div>
+      </fieldset>
+
+      <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2">
+        <legend class="text-sm font-thin mb-2">Usuarios</legend>
+        <dx-data-grid id="companyUserGrid" [dataSource]="userList$ | async" [showBorders]="true">
+          <dxo-paging [enabled]="false"></dxo-paging>
+          <dxo-editing mode="form" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true">
+          </dxo-editing>
+          <dxi-column caption="Nombre" dataField="firstName"></dxi-column>
+          <dxi-column caption="Permiso" dataField="isActive"></dxi-column>
+        </dx-data-grid>
+      </fieldset>
+
+      <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
+        <legend class="text-sm font-thin mb-2">Roles</legend>
+        <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="rolesList$">
+          <dxo-paging [enabled]="false"></dxo-paging>
+          <dxo-group-panel [visible]="false"></dxo-group-panel>
+          <dxo-editing mode="row" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true">
+          </dxo-editing>
+          <dxi-column caption="Nombre" dataField="name"></dxi-column>
+          <dxi-column caption="Permiso" dataField="active" [width]="100" cellTemplate="cellTemplate">
+          </dxi-column>
+          <div *dxTemplate="let data of 'cellTemplate'">
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active" [ngModelOptions]="{standalone: true}">
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
+                     peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
+                     peer dark:bg-gray-700 peer-checked:after:translate-x-full 
+                     rtl:peer-checked:after:-translate-x-full
+                      peer-checked:after:border-white after:content-[''] 
+                      after:absolute after:top-[2px] after:start-[2px] after:bg-white
+                       after:border-gray-300 after:border after:rounded-full after:h-5 
+                       after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+              </div>
+            </label>
+          </div>
+        </dx-data-grid>
+      </fieldset>
+
+     
+    </div>
+    
+    <div class="flex justify-end mt-10">
+      <button type="button" (click)="goBack()"
+        class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
+        Cancelar
+      </button>
+      <button type="submit" class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600">
+        Guardar
+      </button>
+    </div>
+  </form>
+
 </div>

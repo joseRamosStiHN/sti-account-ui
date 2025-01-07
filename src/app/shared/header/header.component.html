@@ -2,7 +2,7 @@
 <header class="w-[100%] z-auto">
   <nav class="border-b-2 h-14">
     <div class="flex justify-between gap-1 items-center p-2">
-      <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+      <a  (click)="goBack()" class="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer">
         <img [src]="'assets/logoSti.jpeg'" class="h-8" alt="Logo" />
         <span
           class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
@@ -32,22 +32,45 @@
         </ul>
       </div>
 
-      <div class="mb-2">
-        <button
-          type="button"
-          class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-          id="user-menu-button"
-          aria-expanded="false"
-          data-dropdown-toggle="user-dropdown"
-          data-dropdown-placement="bottom"
+      <div class="relative inline-block text-left">
+        <div class="mb-2">
+          <button
+            type="button"
+            class="flex items-center text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+            (click)="toggleDropdown()"
+            id="user-menu-button"
+            aria-expanded="false"
+          >
+            <span class="sr-only">Open user menu</span>
+            <small
+              class="w-8 h-8 rounded-full text-gray-400 flex items-center justify-center bg-gray-700"
+              alt="user photo"
+            >
+              U
+            </small>
+          </button>
+        </div>
+      
+        <div
+          *ngIf="dropdownOpen"
+          class="cursor-pointer absolute right-0 z-50 mt-2 w-48 origin-top-right bg-gray-200 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="user-menu-button"
+          tabindex="-1"
         >
-          <span class="sr-only">Open user menu</span>
-          <small
-            class="w-8 h-8 rounded-full text-gray-400"
-            alt="user photo"
-          ></small>
-        </button>
+          <div class="py-1" role="none">
+            <a
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              role="menuitem"
+              (click)="logout()"
+            >
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
       </div>
+      
     </div>
   </nav>
 </header>
