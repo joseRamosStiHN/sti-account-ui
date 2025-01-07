@@ -135,9 +135,9 @@ export class BalanceAccountsComponent {
 
     let balance: BalancesModel = {
       createAtDate: e.data.createAtDate,
-      isActual: true,
+      isCurrent: true,
       initialBalance: e.data.initialBalance,
-      typicalBalance: e.data.typicalBalance,
+      typicalBalance: e.data.typicalBalance == "Debito" ? "D" : "C",
       accountId: Number(this.id)
     }
 

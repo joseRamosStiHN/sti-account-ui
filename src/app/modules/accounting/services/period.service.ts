@@ -2,7 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { PeriodClosing, PeriodsRequest, PeriodsResponse } from 'src/app/modules/accounting/models/APIModels';
+import { PeriodClosing, PeriodsRequest, PeriodsResponse, TaxSettings } from 'src/app/modules/accounting/models/APIModels';
+import { ClosingPeriodsAll, NextPeridModel } from 'src/app/modules/accounting/models/models';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 
 @Injectable({
@@ -64,7 +65,7 @@ export class PeriodService {
    *
    * @return response()
    */
-   createPeriod(data: PeriodModel): Observable<PeriodModel> {
+   createPeriod(data: any): Observable<PeriodModel> {
     return this.httpClient
       .post<PeriodModel>(
         this.apiURL + '/api/v1/accounting-periods',
@@ -77,7 +78,7 @@ export class PeriodService {
 
   updatePeriod(
     id: number,
-    data: PeriodModel
+    data: any
   ): Observable<PeriodModel> {
     const url = `${this.apiURL}/api/v1/accounting-periods/${id}`;
     return this.httpClient.put<PeriodModel>(
@@ -106,7 +107,7 @@ export class PeriodService {
   }
 
   getInfoClosingPeriod(): Observable<PeriodClosing> {
-    const url = `${this.apiURL}/api/v1/accounting-closing`;
+    const url = `${this.apiURL}/api/v1/accounting-closing/detail`;
     return this.httpClient.get<PeriodClosing>(url).pipe(
 
       map( periodClosing=>{
@@ -123,6 +124,41 @@ export class PeriodService {
     );
   }
 
+    /**
+   * Method that brings a list period Closing 
+   *
+   * @return response()
+   */
+    getAllClosing(): Observable<ClosingPeriodsAll[]> {
+      const url = `${this.apiURL}/api/v1/accounting-closing`;
+      return this.httpClient.get<ClosingPeriodsAll[]>(url).pipe(
+        catchError(() => {
+
+          return throwError(() => {
+            return new Error('No se puedo obtener la data.');
+          });
+        })
+      );
+    }
+
+
+     /**
+   * Method that brings data next period 
+   *
+   * @return response()
+   */
+     getNextPeriod(): Observable<NextPeridModel> {
+      const url = `${this.apiURL}/api/v1/accounting-periods/next-period`;
+      return this.httpClient.get<NextPeridModel>(url).pipe(
+        catchError(() => {
+
+          return throwError(() => {
+            return new Error('No se puedo obtener la data.');
+          });
+        })
+      );
+    }
+
 
 
   private formateDate(dateStr: string): string {
@@ -134,6 +170,111 @@ export class PeriodService {
     
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
+
+
+     /**
+   * Method to closing a period
+   *
+   * @return response()
+   */
+     closingPeriod(nextPeriod:string): Observable<any> {
+      return this.httpClient
+        .post<any>(
+          `${this.apiURL}/api/v1/accounting-closing/close?newClosureType=${nextPeriod}`,
+          null,
+          { 
+            responseType: 'text' as 'json'
+          }
+        )
+        .pipe(catchError(this.errorHandler));
+    }
+
+
+      /**
+   * Method to closing a period
+   *
+   * @return response()
+   */
+      closingYear(nextPeriod:string): Observable<any> {
+        return this.httpClient
+          .post<any>(
+            `${this.apiURL}/api/v1/accounting-closing/annual-close?newClosureType=${nextPeriod}`,
+            null,
+            { 
+              responseType: 'text' as 'json'
+            }
+          )
+          .pipe(catchError(this.errorHandler));
+      }
+  
+
+   /**
+   * Method that brings a list with all the accounting journal
+   *
+   * @return response()
+   */
+   getAllTaxSettings(): Observable<TaxSettings[]> {
+    const url = `${this.apiURL}/api/v1/tax-settings`;
+    return this.httpClient.get<TaxSettings[]>(url).pipe(
+
+      map(data=> {
+
+        data.map((tax)=>{
+
+          tax.percent = tax.taxRate == "Excentos" ? 0 : Number(tax.taxRate) || 0
+        })
+        
+        return data;
+      }),
+
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
+
+
+  getTaxById(id: number): Observable<TaxSettings> {
+    const url = `${this.apiURL}/api/v1/tax-settings/${id}`;
+    return this.httpClient.get<TaxSettings>(url);
+  }
+
+
+  updateTax(
+    id: number,
+    data: TaxSettings
+  ): Observable<TaxSettings> {
+    const url = `${this.apiURL}/api/v1/tax-settings/${id}`;
+    return this.httpClient.put<TaxSettings>(
+      url,
+      JSON.stringify(data),
+      this.httpOptions
+    );
+  }
+
+
+
+   /**
+   * Method to create a period
+   *
+   * @return response()
+   */
+   createTaxSettings(data: TaxSettings): Observable<PeriodModel> {
+    return this.httpClient
+      .post<PeriodModel>(
+        this.apiURL + '/api/v1/tax-settings',
+        JSON.stringify(data),
+        this.httpOptions
+      )
+      .pipe(catchError(this.errorHandler));
+  }
+
+
+
+  
 
   /**
    * Error Handler Method

@@ -130,6 +130,134 @@
             >
           </div>
         </div>
+        <div class="basis-1/2">
+          <label
+            for="select_journey"
+            class="block mt-1 mb-2 text-sm text-gray-900"
+            >Diario</label
+          >
+          <!-- <select
+            [(ngModel)]="clientBilling.currency"
+            required
+            name="select_journey"
+            id="select_journy"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
+          > -->
+          <select
+            [(ngModel)]="clientBilling.diaryType"
+            (change)="onChangeJournal($event)"
+            required
+            name="select_journey"
+            id="select_journy"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
+          >
+            <option value="" disabled selected></option>
+            <option *ngFor="let journal of journalList" [ngValue]="journal.id">
+              {{ journal.diaryName }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label for="typePayment" class="block mb-2 text-sm text-gray-900"
+            >Tipo de Pago</label
+          >
+          <select
+            [(ngModel)]="clientBilling.typePayment"
+            required="true"
+            name="typePayment"
+            id="typePayment"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+          >
+            <option value="CONTADO">Contado</option>
+            <option value="CREDITO">Credito</option>
+          </select>
+          <div
+            *ngIf="
+              itemForm.submitted &&
+              itemForm.form.controls['typePayment'].errors &&
+              itemForm.form.controls['typePayment'].errors['required']
+            "
+          >
+            <small class="text-xs text-red-900"
+              >tipo de Pago es requerido.</small
+            >
+          </div>
+        </div>
+        <div>
+          <label for="methodPayment" class="block mb-2 text-sm text-gray-900"
+            >Metodo de Pago</label
+          >
+          <select
+            [(ngModel)]="clientBilling.methodPayment"
+            required="true"
+            name="methodPayment"
+            id="methodPayment"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+          >
+            <option value="TARJETA">Tarjeta</option>
+            <option value="EFECTIVO">Efectivo</option>
+          </select>
+          <div
+            *ngIf="
+              itemForm.submitted &&
+              itemForm.form.controls['methodPayment'].errors &&
+              itemForm.form.controls['methodPayment'].errors['required']
+            "
+          >
+            <small class="text-xs text-red-900"
+              >Medod de Pago requerido.</small
+            >
+          </div>
+        </div>
+        <div>
+          <label for="rtn" class="block mb-2 text-sm text-gray-900"
+            >Rtn</label
+          >
+          <select
+            [(ngModel)]="clientBilling.rtn"
+            required="true"
+            name="rtn"
+            id="rtn"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+          >
+            <option value="SI">Si</option>
+            <option value="NO">No</option>
+          </select>
+          <div
+            *ngIf="
+              itemForm.submitted &&
+              itemForm.form.controls['rtn'].errors &&
+              itemForm.form.controls['rtn'].errors['required']
+            "
+          >
+            <small class="text-xs text-red-900"
+              >Rtn es requerido.</small
+            >
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="supplierName" class="block mb-2 text-sm text-gray-900"
+            >Nombre de Comprador</label
+          >
+          <input
+            [(ngModel)]="clientBilling.supplierName"
+            id="supplierName"
+            name="supplierName"
+            type="text"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+            required
+          />
+          <div
+            *ngIf="
+              itemForm.submitted &&
+              itemForm.form.controls['supplierName'].getError('required')
+            "
+          >
+            <small class="text-xs text-red-900"
+              >Nombre de Comprador es requerido.</small
+            >
+          </div>
+        </div>
       </div>
 
       <div class="w-full flex flex-row gap-2">
@@ -163,33 +291,7 @@
             </div>
           </div>
         </div>
-        <div class="basis-1/2">
-          <label
-            for="select_journey"
-            class="block mt-1 mb-2 text-sm text-gray-900"
-            >Diario</label
-          >
-          <!-- <select
-            [(ngModel)]="clientBilling.currency"
-            required
-            name="select_journey"
-            id="select_journy"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
-          > -->
-          <select
-            [(ngModel)]="clientBilling.diaryType"
-            (change)="onChangeJournal($event)"
-            required
-            name="select_journey"
-            id="select_journy"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
-          >
-            <option value="" disabled selected></option>
-            <option *ngFor="let journal of journalList" [ngValue]="journal.id">
-              {{ journal.diaryName }}
-            </option>
-          </select>
-        </div>
+        
       </div>
       <dx-data-grid
         id="grid-billing-client"

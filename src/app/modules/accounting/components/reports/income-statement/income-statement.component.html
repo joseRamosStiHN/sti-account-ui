@@ -3,7 +3,27 @@
   <h2 class="font-semibold mb-2 text-center">Estado de resultado</h2>
   <h3 class="font-semibold text-center mb-2">Del 1 de Enero al 31 de Diciembre de 2024</h3>
   <br>
+  <form class="flex justify-start items-center m-5 gap-4"  #itemForm="ngForm"
+  (ngSubmit)="onSubmit(itemForm)"
+>
+    <select  [(ngModel)]="selectedPeriod"
+      class="border border-gray-300 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      name="period"
+      aria-label="Seleccionar período" required>
+      <option value="" disabled selected>Seleccione un período</option>
+      <option *ngFor="let period of periodList$ | async" [ngValue]="period.id">
+        {{ period.closureType }} {{ period.startPeriod | date: 'dd-MM-yyyy' }}
+      </option>
+    </select>
+    
+    <button type="submit"
+      class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      Buscar
+    </button>
+  </form>
+  <br>
   <dx-pivot-grid
+  (onExporting)="onExporting($event)"
     id="incomes"
     [dataSource]="pivotDataSource"
     [showBorders]="true"
@@ -13,7 +33,8 @@
     [texts]="{ grandTotal: 'Total del Ejercicio' }"
     height="600"
     [scrolling]="{ useNative: true }"
-    class="capitalize"
-  >
+    class="capitalize">
+
+    <dxo-export [enabled]="true"></dxo-export>
   </dx-pivot-grid>
 </div>

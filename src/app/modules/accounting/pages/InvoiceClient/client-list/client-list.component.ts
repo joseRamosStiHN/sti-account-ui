@@ -1,9 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BillingListClient, DocumentType } from '../../../models/models';
+import { BillingListClient, DocumentType, typeToast } from '../../../models/models';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
 import { catchError, filter, map, Observable, of, tap } from 'rxjs';
+import themes from 'devextreme/ui/themes';
+import { confirm } from 'devextreme/ui/dialog';
+import { ToastType } from 'devextreme/ui/toast';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -24,9 +27,33 @@ export class ClientListComponent implements OnInit {
 
   currentValue!: (string | number | Date)[];
 
+
+  messageToast: string = '';
+  showToast: boolean = false;
+  toastType: ToastType = typeToast.Info;
+  
+
+  // seleccion por paginacion
+  allMode: string;
+  checkBoxesMode: string;  
+  selectOptions: { id: string, name: string }[] = [
+    { id: 'allPages', name: 'Todos' },
+    { id: 'page', name: 'Página' }
+  ];
+
+  selectRows:number[]=[];
+
   private readonly router = inject(Router);
   private readonly transService = inject(TransactionService);
-  constructor() { }
+
+
+  
+  constructor() { 
+
+    this.allMode = 'allPages';
+    this.checkBoxesMode = themes.current().startsWith('material') ? 'always' : 'onClick';
+  }
+
   ngOnInit(): void {
 
     this.currentValue = initialValue;
@@ -114,6 +141,39 @@ export class ClientListComponent implements OnInit {
 
   
 
+  onRowSelected(event: any): void {
+
+    this.selectRows =  event.selectedRowsData.filter( (data:BillingListClient)=> data.status =="Borrador")
+                    .map((data:BillingListClient)=> data.id);                  
+  }
+
+  posting() {
+    let dialogo = confirm(
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Advertencia'
+    );
+
+    dialogo.then(async (d) => {
+    
+        this.transService.putAllTransaction(this.selectRows).subscribe({
+          next: (data) => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Transacciónes confirmadas con exito';
+            this.showToast = true;
+
+            setTimeout(() => {
+              this.ngOnInit();
+            }, 3000);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar confirmar Transacciónes';
+            this.showToast = true;
+          },
+        });
+      }
+    );
+  }
  
 
 }

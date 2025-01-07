@@ -1,7 +1,22 @@
 ::ng-deep .dx-pager {
-    border: thin solid #ddd;
+  border: thin solid #ddd;
 }
-  
+
 ::ng-deep .dx-pager .dx-page-sizes .dx-page-size:hover {
-    background-color: #ddd;
-  }
+  background-color: #ddd;
+}
+
+::ng-deep .dx-datagrid .dx-select-checkbox,
+::ng-deep .dx-datagrid .dx-command-select .dx-select-checkbox {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+::ng-deep .dx-selectbox input.dx-texteditor-input {
+  outline: none;
+}
+
+::ng-deep .dx-datagrid .dx-datagrid-group-panel {
+  display: none;
+}

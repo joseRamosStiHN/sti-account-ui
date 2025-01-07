@@ -1,8 +1,17 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import config from 'devextreme/core/config';
 import { Options as DataSourceConfig } from 'devextreme/ui/pivot_grid/data_source';
+import { map, Observable } from 'rxjs';
 import { IncomeStatement } from 'src/app/modules/accounting/models/APIModels';
+import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
+import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { ReportServiceService } from 'src/app/modules/accounting/services/report-service.service';
+import { exportDataGrid, exportPivotGrid } from 'devextreme/excel_exporter';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver';
+import { DxPivotGridTypes } from 'devextreme-angular/ui/pivot-grid';
 
 interface Incomes {
   id: number;
@@ -122,8 +131,12 @@ const DATA: Incomes[] = [
 export class IncomeStatementComponent implements OnInit {
   pivotDataSource!: DataSourceConfig;
   incomnetStatment:IncomeStatement[]= [];
+  selectedPeriod: number = 0;
   
 
+  periodList$: Observable<PeriodModel[]> | undefined;
+
+  private readonly periodoService = inject(PeriodService);
   private readonly reportService = inject(ReportServiceService);
 
 
@@ -137,7 +150,7 @@ export class IncomeStatementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.reportService.getIncomeStatement().subscribe((data: IncomeStatement[]) => {
+    this.reportService.getIncomeStatement(0).subscribe((data: IncomeStatement[]) => {
       this.incomnetStatment = data;
       this.pivotDataSource = {
         fields: [
@@ -221,18 +234,129 @@ export class IncomeStatementComponent implements OnInit {
         store: this.incomnetStatment,
       };
     });
+
+    this.periodList$ = this.periodoService.getAllPeriods().pipe(
+      map(data => {
+        data.map(nuevo => {
+          const status = nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status;
+          const isClosed = nuevo.isClosed == null ? false : true;
+          return { ...nuevo, status, isClosed }
+        })
+        return data
+      })
+    );
+  }
+
+  async onSubmit(e: NgForm) {
+
+    console.log(e.form.value.period);
+    
+    if (e.valid) {
+
+      this.reportService.getIncomeStatement(e.form.value.period).subscribe((data: IncomeStatement[]) => {
+        this.incomnetStatment = data;
+        this.pivotDataSource = {
+          fields: [
+            {
+              caption: 'Ingresos/Gastos',
+              dataField: 'category',
+              area: 'row',
+              expanded: true,
+              sortOrder: 'desc',
+              width: 200,
+            },
+            {
+              caption: 'Cuenta Padre',
+              dataField: 'accountParent',
+              width: 250,
+              area: 'row',
+              expanded: false,
+            },
+            {
+              caption: 'Cuenta',
+              dataField: 'account',
+              area: 'row',
+              width: 200,
+              expanded: false,
+            },
+            {
+              caption: 'Fecha',
+              dataField: 'date',
+              area: 'column',
+            },
+            {
+              groupName: 'date',
+              groupInterval: 'quarter',
+              visible: false,
+              customizeText: function (cellInfo: any) {
+                return cellInfo.valueText?.toUpperCase();
+              },
+            },
+            {
+              caption: 'Total',
+              dataType: 'number',
+              summaryType: 'custom',
+              format: 'currency',
+              area: 'data',
+              calculateCustomSummary: function (options: any) {
+                if (options.summaryProcess === 'start') {
+                  options.totalValue = { debit: 0, credit: 0 }; // Inicializamos los totales
+                }
+                if (options.summaryProcess === 'calculate') {
+                  // Sumar valores según typicalBalance
+                  if (options.value.typicalBalance === 'D') {
+                    options.totalValue.debit += options.value.amount; // Sumar débitos
+                  } else if (options.value.typicalBalance === 'C') {
+                    options.totalValue.credit += options.value.amount; // Sumar créditos
+                  }
+                }
+                if (options.summaryProcess === 'finalize') {
+                  // Total final
+                  options.totalValue = options.totalValue.credit - options.totalValue.debit; // Resultado final
+                }
+              },
+              customizeText: function (cellInfo: any) {
+                const formatter = new Intl.NumberFormat('es-HN', {
+                  style: 'currency',
+                  currency: 'HNL',
+                  minimumFractionDigits: 2,
+                });
+                if (cellInfo.value < 0) {
+                  return formatter.format(Math.abs(cellInfo.value)); // Display negative values as positive
+                } else {
+                  return formatter.format(cellInfo.value); // Display positive values as is
+                }
+              }
+            },
+            {
+              dataField: 'id',
+              area: 'filter',
+              visible: false,
+            },
+          ],
+          store: this.incomnetStatment,
+        };
+      });
+    }
+
+
   }
   
   
   
-  
-  
-  
-  
-  
-  
+  onExporting(e: DxPivotGridTypes.ExportingEvent) {
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Estado de Resultados');
 
-
+    exportPivotGrid({
+      component: e.component,
+      worksheet,
+    }).then(() => {
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Estado de Resultados.xlsx');
+      });
+    });
+  }
 }
 
   

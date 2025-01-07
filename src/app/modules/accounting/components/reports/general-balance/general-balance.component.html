@@ -5,10 +5,42 @@
   <h2 class="font-semibold mb-2 text-center">Balance General</h2>
   <h3 class="font-semibold text-center mb-2">Del 1 de Enero al 31 de Diciembre de 2024</h3>
   <br>
-  <div class="flex flex-wrap">
+  <form class="flex justify-start items-center m-5 gap-4"  #itemForm="ngForm"
+  (ngSubmit)="onSubmit(itemForm)"
+>
+    <select  [(ngModel)]="selectedPeriod"
+      class="border border-gray-300 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      name="period"
+      aria-label="Seleccionar período" required>
+      <option value="" disabled selected>Seleccione un período</option>
+      <option *ngFor="let period of periodList$ | async" [ngValue]="period.id">
+        {{ period.closureType }} {{ period.startPeriod | date: 'dd-MM-yyyy' }}
+      </option>
+    </select>
+    
+    <button type="submit"
+      class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      Buscar
+    </button>
+  </form>
 
-    <div class="w-full md:w-1/2 pr-2 mt-4 md:mt-0"> <!-- Agregado mt-4 para márgenes superiores en pantallas pequeñas -->
-      <table class="w-full border mx-2 text-sm text-gray-500">
+  <br>
+  <div class="flex justify-end mb-3">
+    <button
+      (click)="exportToExcel()"
+      class="bg-green-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+      Exportar a Excel
+    </button>
+  </div>
+  
+  <div class="flex flex-wrap">
+ 
+
+    <div class="w-full md:w-1/2 pr-2 mt-4 md:mt-0">
+
+
+
+      <table class="w-full border mx-2 text-sm text-gray-500 table-activos">
         <thead class="text-sm text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" class="px-4 py-2 border w-[75%]">Cuenta</th>
@@ -16,7 +48,7 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Mostrar solo ACTIVOs -->
+
           @for(node of treeData; track $index) {
           <tr *ngIf="node.category === 'ACTIVO'" class="cursor-pointer" (click)="toggleCollapse(node)">
             <td class="font-semibold pl-1 py-2 border-b-[1px] border-t-[1px]">
@@ -27,17 +59,15 @@
               {{ node.total | currency : 'L.' }}
             </td>
           </tr>
-          <!-- Expansión de hijos de ACTIVOs -->
+
           @if (node.children?.length && !node.isCollapsed) {
           <tr>
             <td colspan="2">
               <table class="w-full">
-                <ng-container
-                  *ngTemplateOutlet="
+                <ng-container *ngTemplateOutlet="
                     recursiveList;
                     context: { $implicit: node.children, depth: 1, category: 'ACTIVO' }
-                  "
-                ></ng-container>
+                  "></ng-container>
               </table>
             </td>
           </tr>
@@ -55,10 +85,11 @@
         </tbody>
       </table>
     </div>
-  
-  
-    <div class="w-full md:w-1/2 pl-2 mt-4 md:mt-0"> <!-- Agregado mt-4 para márgenes superiores en pantallas pequeñas -->
-      <table class="w-full border mx-2 text-sm text-gray-500">
+
+
+    <div class="w-full md:w-1/2 pl-2 mt-4 md:mt-0">
+
+      <table class="w-full border mx-2 text-sm text-gray-500 table-pasivos">
         <thead class="text-sm text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" class="px-4 py-2 border w-[75%]">Cuenta</th>
@@ -66,9 +97,10 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Mostrar solo PASIVOs y PATRIMONIO -->
+
           @for(node of treeData; track $index) {
-          <tr *ngIf="node.category === 'PASIVO' || node.category === 'PATRIMONIO'" class="cursor-pointer" (click)="toggleCollapse(node)">
+          <tr *ngIf="node.category === 'PASIVO' || node.category === 'PATRIMONIO'" class="cursor-pointer"
+            (click)="toggleCollapse(node)">
             <td class="font-semibold pl-1 py-2 border-b-[1px] border-t-[1px]">
               <span *ngIf="node.children?.length">{{ node.isCollapsed ? '+' : '-' }}</span>
               {{ node.accountName }}
@@ -77,23 +109,21 @@
               {{ node.total | currency : 'L.' }}
             </td>
           </tr>
-          <!-- Expansión de hijos de PASIVOs y PATRIMONIO -->
+
           @if (node.children?.length && !node.isCollapsed) {
           <tr>
             <td colspan="2">
               <table class="w-full">
-                <ng-container
-                  *ngTemplateOutlet="
+                <ng-container *ngTemplateOutlet="
                     recursiveList;
                     context: { $implicit: node.children, depth: 1, category: 'PASIVOPATRIMONIO' }
-                  "
-                ></ng-container>
+                  "></ng-container>
               </table>
             </td>
           </tr>
           } }
         </tbody>
-  
+
         <!-- Totales de PASIVO + PATRIMONIO Neto -->
         <tbody class="mt-4">
           <tr class="w-full border font-semibold">
@@ -108,13 +138,15 @@
       </table>
     </div>
   </div>
-  
-  
-  
-  <!-- Template Recursivo -->
+
+
+
+
   <ng-template #recursiveList let-children let-parentDepth="depth" let-category="category">
     @for (child of children; track $index) {
-    <tr *ngIf="category === 'ACTIVO' && child.category === 'ACTIVO' || category === 'PASIVOPATRIMONIO' && (child.category === 'PASIVO' || child.category === 'PATRIMONIO')" (click)="toggleCollapse(child)" class="cursor-pointer">
+    <tr
+      *ngIf="category === 'ACTIVO' && child.category === 'ACTIVO' || category === 'PASIVOPATRIMONIO' && (child.category === 'PASIVO' || child.category === 'PATRIMONIO')"
+      (click)="toggleCollapse(child)" class="cursor-pointer">
       <td class="py-3" [style.padding-left.px]="parentDepth * 10">
         <span *ngIf="child.children?.length">{{ child.isCollapsed ? '-' : '+' }}</span>
         {{ child.accountName }}
@@ -131,61 +163,15 @@
     <tr>
       <td colspan="2">
         <table class="w-full">
-          <ng-container
-            *ngTemplateOutlet="
+          <ng-container *ngTemplateOutlet="
               recursiveList;
               context: { $implicit: child.children, depth: parentDepth + 1, category: category }
-            "
-          ></ng-container>
+            "></ng-container>
         </table>
       </td>
     </tr>
     } }
   </ng-template>
-  
-  <!--  <dx-tree-list
-    id="generalBalance"
-    [dataSource]="dataSource"
-    keyExpr="id"
-    [repaintChangesOnly]="true"
-    (onContentReady)="onContentReady($event)"
-    (onRowPrepared)="onRowPrepared($event)"
-    [autoExpandAll]="true"
-    parentIdExpr="parentId"
-    [showBorders]="true"
-    [rowAlternationEnabled]="true"
-  >
-    <dxi-column dataField="accountName" caption="Cuenta"></dxi-column>
-    <dxi-column
-      caption="Saldos"
-      alignment="center"
-      [cellTemplate]="'amountTemplate'"
-    >
-      <div *dxTemplate="let data of 'amountTemplate'">
-        <tbody class="w-full flex flex-row">
-          <tr
-            class="w-1/2 border-b-2"
-            [ngClass]="{ 'border-b-2': !data.data.isRoot }"
-          >
-            {{
-              checkValue(data.component.getRootNode())
-            }}
-            @if(data.data.parentId !== null && data.data.total === null){
-            <span>{{ data.data.amount | currency : "L. " }}</span>
-            }
-          </tr>
-          <tr
-            class="w-1/2"
-            [ngClass]="{
-              'border-b-2': !data.data.isRoot && data.data.total !== null
-            }"
-          >
-            @if(!data.data.isRoot && data.data.total !== null){
-            <span>{{ data.data.total | currency : "L. " }}</span>
-            }
-          </tr>
-        </tbody>
-      </div>
-    </dxi-column>
-  </dx-tree-list> -->
+
+ 
 </div>

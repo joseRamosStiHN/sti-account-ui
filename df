@@ -1,0 +1,1030 @@
+[33mcommit b192fc94063524c492ccea2778df2c990a45c915[m[33m ([m[1;36mHEAD[m[33m)[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Dec 30 16:39:22 2024 -0600
+
+    agregando cambios
+
+[33mcommit a3ab0fea1b459d5f6d7f41658c406daf7959e3e4[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Dec 23 21:29:11 2024 -0600
+
+    cierre periodo anual
+
+[33mcommit 5c877a58cdbfa70985abb81efa26b332607d249f[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Dec 17 21:36:40 2024 -0600
+
+    subiendo cambio de visualizacion de fechas de nuevo periodo
+
+[33mcommit 243e62e929ade62d6fca5b896ac8f8086158cd30[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Dec 17 19:57:38 2024 -0600
+
+    modificacion de la variable de tipo datra local date time
+
+[33mcommit c545f2422336ed1210645edf9a8e963bfd3c5911[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Dec 17 19:34:14 2024 -0600
+
+    arreglando los meses
+
+[33mcommit f5f58e53f22523159fdd6d8f8a1064641627100e[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Dec 12 19:15:43 2024 -0600
+
+    cambio de fechas al cerrar periodo
+
+[33mcommit c861097b44ceaa9d23843e784f6dfb228d78a3b1[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Dec 11 20:41:52 2024 -0600
+
+    subiendo camvios de nombre de periodo
+
+[33mcommit 9ada1bb1853e3cb9fdd377387a49a69816d6ab34[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Dec 11 19:45:06 2024 -0600
+
+    modificando cambios del siguiente periodo
+
+[33mcommit 37ccf02ebdfa24c91548483695f3331751ee7b50[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Dec 11 06:30:21 2024 -0600
+
+    subiendo cambvios de periodo
+
+[33mcommit 54029091a2b3fcdd50a44b48b4061e47c4c1a819[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Nov 26 21:00:15 2024 -0600
+
+    subiendo cambios realizados por ultimas modificaciones de cierre
+
+[33mcommit 30c00a273eaf6813f442c6361c335c729d13573c[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Nov 11 20:40:37 2024 -0600
+
+    modificacion de solo actualizar la data y quedar en la misma pantalla
+
+[33mcommit 695acbbc25cc3d1763c37626241b78a6b3315a41[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Nov 11 20:34:57 2024 -0600
+
+    modificacion de tabla de impuesto
+
+[33mcommit b4645e136d5d2acb6b2a70bb22a02bdb152322b3[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Nov 11 19:49:34 2024 -0600
+
+    corrigiendo los balance finales
+
+[33mcommit ab0ad020a84597e690fb1c5d669a35f36f96ef9e[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Nov 11 01:20:22 2024 -0600
+
+    agregando configuracion de impuestos
+
+[33mcommit f7a0ddcd86802084d0a6ed2a2a7e76046666fd37[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sun Nov 10 23:54:21 2024 -0600
+
+    cierre contable del periodo
+
+[33mcommit e224c149401a3a14ffb4473b787e0f481a9e1c2d[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sun Nov 10 23:27:23 2024 -0600
+
+    modificacion de fecha de inicio en los periodos
+
+[33mcommit c98d835b7d72ed8a6756094be3c45ab2d7babc5e[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sun Nov 10 23:25:00 2024 -0600
+
+    quitando codigo no usado
+
+[33mcommit bab2341f4016f96298377f585e15668937017108[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sun Nov 10 23:22:47 2024 -0600
+
+    cambios en la balanza de comprobacion
+
+[33mcommit e0b916c2b28ad4bbc9f028c190fb95c8f93a066f[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Nov 7 21:00:55 2024 -0600
+
+    cuando sea anual no permitir actualizacion solo visualizacion
+
+[33mcommit 03f9ee0f5d4a932d4ccbc9c01af3fca8cb454376[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Nov 6 22:03:41 2024 -0600
+
+    modificando datos cuando es debito o credito
+
+[33mcommit bbd87b9a26b4273ada14d90bfdecd3c22801a153[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Nov 5 22:34:35 2024 -0600
+
+    anadiendo los comapos tipo de pago meodo de pago rtn y nombres de comprador y proveedor
+
+[33mcommit 317eab40cfdafe6fb71598e8237a4907b2ae10e2[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Nov 5 21:05:44 2024 -0600
+
+    confirmar todas las notas de credito por lote o todas
+
+[33mcommit 6d86ca85385b9559da93efd199c6dea9c82c1daf[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Nov 5 20:54:23 2024 -0600
+
+    confirmar todas las notas de debito  o por lote
+
+[33mcommit 0c853f3470849038df399c12ca38bbe17f98e894[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Nov 5 20:40:51 2024 -0600
+
+    confirmacion de todos los ajustes por lote
+
+[33mcommit 76dd036a32bed6503bf4b71b0c213945be392eff[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Nov 5 20:28:43 2024 -0600
+
+    confirmar transaciones por todos
+
+[33mcommit 9afada9f3a9b07fcda8af9753f130fc61b228fa1[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Nov 4 21:39:00 2024 -0600
+
+    modificacion para poder hacer la confirmacion por todos los elementos seleccionados
+
+[33mcommit f06244a2bdd4e485f3de919f922b6eec64917800[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Oct 31 11:06:07 2024 -0600
+
+    adpatacion de api que genera una visualizacion de un resumen del periodo a cerrar
+
+[33mcommit 41d35e04c0929abee23e48d9103318d9de65ea77[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 14:35:04 2024 -0600
+
+    modificacion en los nombres de los titulos de transacciones
+
+[33mcommit 87cdbab1360549a765ef9402ee6f9f17c0a8cb98[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 14:29:19 2024 -0600
+
+    buscador de fechas de transacciones
+
+[33mcommit 21651639119dc7a39f0307d7a1e1390756347943[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 11:29:51 2024 -0600
+
+    formato de los numeros
+
+[33mcommit 2e286c2116633167b5764fb3a00d49340a58d2e9[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 11:20:28 2024 -0600
+
+    modificacion en el api de senior accounts y de asientos
+
+[33mcommit 457e0689f02b0fa33fb52c155ff46673c5fd4f24[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 08:37:27 2024 -0600
+
+    cambio en el color de boton de cerrar periodo
+
+[33mcommit 1b40d81c3bf46354c7860b7adb41a3773387d08b[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 08:35:02 2024 -0600
+
+    creacion de mock cierre contable
+
+[33mcommit d8f0ce2598a65c7bf19f5d31c80b34d4c91fbc6b[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 30 08:34:08 2024 -0600
+
+    modificacion en senior accounts
+
+[33mcommit f18b2d2dd47c3f5e4c1017bb05284ab97cc8a151[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 29 09:27:00 2024 -0600
+
+    cambios en los diarios por sumarizacion de grupos
+
+[33mcommit 56a6788b44bf0c7d529fe5a14781bcabea1e6005[m
+Author: DAVID11 <93211987+David11A@users.noreply.github.com>
+Date:   Tue Oct 29 08:56:02 2024 -0600
+
+    commit fechas
+    
+    cambios en fecha inicio y final para traer  rangos correspondientes
+
+[33mcommit 4c51da9abca37eb8dabab2fa19703464f013fb5f[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Oct 28 17:24:34 2024 -0600
+
+    modificacion de botones en el journal
+
+[33mcommit d43ff46632ca85b6bdb150af1732bc01986855a7[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Oct 28 17:20:41 2024 -0600
+
+    modificacion en inicializacion de balance
+
+[33mcommit c853cdac29cd0976e8ad88f829c3d8cf11ec0d81[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Oct 28 15:35:48 2024 -0600
+
+    modificacion en la opcion de actualizar
+
+[33mcommit 706905ac111b1a09543996a98371e397081997b7[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Oct 28 11:38:01 2024 -0600
+
+    modificacion que solo se puede activar el periodo de la lista de periodos activos
+
+[33mcommit 399700990a15e1df05464849dfaa577abe3edd5b[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Oct 28 11:33:39 2024 -0600
+
+    modificacion en actualizacion de periodo
+
+[33mcommit c5d75a59392d175320a2bcea788a53ffcf0df35e[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Oct 25 10:03:32 2024 -0600
+
+    refactorizanod codigo de cuentas
+
+[33mcommit 940a4ac44f1e57c288b760aeff4b35cda5de87c1[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Oct 24 09:37:49 2024 -0600
+
+    cambios realizados por las reuniones
+
+[33mcommit df1aeee95d7bf5b1a91ecd0b9861ec49941798c4[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 16 15:11:43 2024 -0600
+
+    quitando el accountype
+
+[33mcommit 928319a394894ccef0f7272cd1d0a33e25846212[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 21:54:56 2024 -0600
+
+    cambio en el estado de resultado
+
+[33mcommit a8e5da2668dfd968e6bb6a4982e226bd9f045481[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 18:57:19 2024 -0600
+
+    modificacion de poner al lado los saldos
+
+[33mcommit c54c81edee0c223afc6c4a8beb033a21331364ce[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 17:36:31 2024 -0600
+
+    modificacion en el estado de resultado
+
+[33mcommit e5480dc52a2a2cef7b6685a05973d6380e69ad37[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 10:35:05 2024 -0600
+
+    modificando parte visual de notas de credito y debito
+
+[33mcommit ff2703cc05800db7bf414ad017807f4125b951fb[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 10:07:11 2024 -0600
+
+    subiendo cambios de mayor contable
+
+[33mcommit f766818b8e07dcf4e01b5ec2141b69377251a3ee[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 09:52:34 2024 -0600
+
+    modificacion en la visualizacion de las monedas
+
+[33mcommit c7846a8c6292d23a00291ec924ba7fc336488141[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 09:34:09 2024 -0600
+
+    modificacion en las patallas de clientes y proveedores
+
+[33mcommit 16abc2c17fbe5769fc510dcf4f36b400d6000af1[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 08:55:02 2024 -0600
+
+    modificaciones visuales de diarios
+
+[33mcommit 8a4f64174b43e79677e632c9f8c32fff10aae848[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 08:42:50 2024 -0600
+
+    modificando visual de pantalla visualizacion de saldos
+
+[33mcommit 3e7132705f4bb47aee8bb124e98ee948280ed04c[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 08:39:00 2024 -0600
+
+    modificar periodo
+
+[33mcommit 03adcb6ab431fadbb83ecf53757da523f1961f38[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 15 08:12:59 2024 -0600
+
+    modificacion en cuentas contables
+
+[33mcommit d6f182e3b4d7dd68b86349ce46fd584f750b3198[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Oct 14 21:39:11 2024 -0600
+
+    redirrecionamiento al dashbord cuando guarda
+
+[33mcommit a5a58fcda3c4078503b33c82281daec725f476dc[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Oct 12 15:06:55 2024 -0600
+
+    modificacion en tomar el valor mayor de las transaciones
+
+[33mcommit 5e84b8e6216bf6a11c7fcdd909dfc8e45014667f[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Oct 12 14:56:22 2024 -0600
+
+    modificacion de obtener el mayor de la transaccion
+
+[33mcommit df83bcd5a5665dcc1ab524757248225b16821c53[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Oct 12 13:37:21 2024 -0600
+
+    add confirmacion en notas de debitos
+
+[33mcommit 061e040575344c678e2f84781a6292e007cb3e77[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Oct 12 08:53:43 2024 -0600
+
+    agregando las notas de debito y credito
+
+[33mcommit a58fe2023d9caa466e4d13bcfc2aaa49d4228427[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Oct 12 08:46:12 2024 -0600
+
+    agregando notas de debito y credito
+
+[33mcommit 199a6c744e1e262fc19c01152e293bae99d75ff2[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Oct 11 18:12:59 2024 -0600
+
+    subiendo cambios de notas de credito y debito
+
+[33mcommit 985fb81584792755f917db2f5d228c22a0d9fdb9[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Oct 2 14:17:22 2024 -0600
+
+    modificando los ajustes contables
+
+[33mcommit 7c9b797adb4a00db4840fb3ed28ac871e8aa2234[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 16:02:00 2024 -0600
+
+    modificacion del ajuste para visualizacion
+
+[33mcommit ea65a8761a3e30101fdc638a323b30643904d4ae[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 15:43:50 2024 -0600
+
+    modificacion en la visualizacion de jpurnal entries por ajuste
+
+[33mcommit 47da5a669a38abda7278d630919e18eb93a0e14e[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 15:35:30 2024 -0600
+
+    estado de resultado consumo del api
+
+[33mcommit c8e72a47168a6011271330f9cc1b449b97365412[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 14:01:08 2024 -0600
+
+    cambio en notas de debito
+
+[33mcommit 1e9202b26a70d56c53144afa944b34afe4e0f172[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 11:42:00 2024 -0600
+
+    cambio en notas de credito
+
+[33mcommit dfcff779d1425ded1847f8644f7e04a6e6a30ba1[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 10:27:11 2024 -0600
+
+    creando compononete de notas de debito
+
+[33mcommit 2af46cccd09d0854c24ba4a2bd5f270b0134b0e5[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 10:22:31 2024 -0600
+
+    haciendo ajustes de reversion de cuenta ajustes comtables
+
+[33mcommit 7b8c283680479176aa450c1d14b3874ebd3731c0[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Oct 1 08:16:38 2024 -0600
+
+    mock de notas de credito
+
+[33mcommit 507f3dc1c6889ee5aae1a4df4754f56228c2583c[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 28 10:09:29 2024 -0600
+
+    Balance General camios en el consumo del api y el diseno
+
+[33mcommit e71365c2c136ef783a77410b6683264dfc352afd[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 28 09:19:10 2024 -0600
+
+    modificacion en cambio de ajustes
+
+[33mcommit 79a17b8bf8dbae57d777638af46d93dc045e3072[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 21 09:24:11 2024 -0600
+
+    balance general
+
+[33mcommit 24d34d301d2e35cc63d72c207640427aaba42cf2[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 21 09:23:01 2024 -0600
+
+    add change in balance comprobation
+
+[33mcommit 332de812fe965a98a173906bb4330145b15f700a[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 19 15:25:50 2024 -0600
+
+    fix de diarios en proveedores
+
+[33mcommit a55ae5d7a718c911bcf66208764cec0a5afececc[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 19 15:14:59 2024 -0600
+
+    solucion fix de diarios
+
+[33mcommit 98a3653f7539e6e4f62f8fd24cd6ff3b686356c5[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 19 14:42:11 2024 -0600
+
+    modificacon de la api de transaciones con sus ajustes
+
+[33mcommit 3851801b942fac679dc1c12203c9fba364a4a533[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Sep 18 09:53:28 2024 -0600
+
+    agregando balanza de comprabacion
+
+[33mcommit 2a547b38f3165435a51230bec70d2d88cbdc97e3[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Sep 18 09:52:55 2024 -0600
+
+    agregando numero de partida en la tabla
+
+[33mcommit 7ae777a706b93002265d6e55f22e6c29f977ad49[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Sep 17 09:28:28 2024 -0600
+
+    modificando que solo se pueda editar los registros que no sea la cuenta por defecto
+
+[33mcommit 73e1c90c3c5b5cf03a0b58195b1e3ceca8421c06[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Sep 17 09:26:27 2024 -0600
+
+    cambio en el ajustge contable dandole un mock de su partidad anterior solo que al reves para que el pueda editar su consumo
+
+[33mcommit 12984439ed017194568d388d15e1751a8f7907f8[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Sep 13 18:00:33 2024 -0600
+
+    modifcacion al balzan de comprobacion
+
+[33mcommit 7140fe9016a6d1b835287d1032cfac9a4036d349[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Sep 13 17:59:22 2024 -0600
+
+    modificando pantalla de  ajustes
+
+[33mcommit 19ec871f163df30da659b826f522d738ecae6a31[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Sep 13 17:58:46 2024 -0600
+
+    ajustes contables
+
+[33mcommit 2ad11b86fdca149439718d34a68fa88e078a8f99[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Sep 13 17:57:16 2024 -0600
+
+    cambios en los asientos contables
+
+[33mcommit a1a197c3e921eec48404c8d8e3849b7f59b09923[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 12 18:54:51 2024 -0600
+
+    eliminando los console.log
+
+[33mcommit 103a247b77011fecf3d437d24396f9dc2cfb3531[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 12 18:53:32 2024 -0600
+
+    agregando logica de su cuenta por default con sus validaciones de su journal
+
+[33mcommit 45ccc4f0a66bc6f31054ef41513b51c3a1162b51[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 12 18:18:38 2024 -0600
+
+    modificacion para mostrar la cuenta y el nombre
+
+[33mcommit aa29ac585f231fd8162a0e5636f7885b7fbec3ac[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Sep 12 08:26:51 2024 -0600
+
+    agregando Diarior a guardar y editar
+
+[33mcommit d4dcf38afc6259be9589f1cfc8664a0f87926778[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Sep 11 18:44:58 2024 -0600
+
+    cambios en la pantalla y logica de factura de clietnes
+
+[33mcommit 2cfcd5a15c559fa25734b905903905310c12806e[m
+Author: Jose Ramos <joseoxi@gmail.com>
+Date:   Sun Sep 8 21:21:31 2024 -0600
+
+    minor changes
+
+[33mcommit 6c9734ed18353a43ddfbd45c7ccae5af7216ea10[m
+Author: Jose Ramos <joseoxi@gmail.com>
+Date:   Sun Sep 8 21:21:20 2024 -0600
+
+    added journals to module
+
+[33mcommit 63754ec9430179be10e311463def158f8761cf58[m
+Author: Jose Ramos <joseoxi@gmail.com>
+Date:   Sun Sep 8 21:20:58 2024 -0600
+
+    added journals
+
+[33mcommit a879df7744fbbc27e2cef37b9da12137282649e9[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 7 12:45:48 2024 -0600
+
+    modificando ya que no se mostraba por encima de los elementos si no por debajo
+
+[33mcommit 83c559fec7961c0f197d35b3c6f6cb1fe45e054e[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 7 12:45:06 2024 -0600
+
+    agregando cuentas t
+
+[33mcommit c3e9c6295de34d0fee61f10a63767f2dab22006c[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 7 12:43:52 2024 -0600
+
+    modificando pantalla de proveedores
+
+[33mcommit 3834ec1e9d1f7eba9a97850ff2102364605e7149[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 7 12:43:01 2024 -0600
+
+    modificaciones en la pantalla de facturacion
+
+[33mcommit 9dc73441dece901a4072f870332add7747294f88[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Sep 7 12:41:18 2024 -0600
+
+    add Configuracion de diarios
+
+[33mcommit 9c006ab03367c103f2babe1de63d922284b0f4c6[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Wed Sep 4 14:37:32 2024 -0600
+
+    modificancio en el diseno como validacion de que no puede ingresar la misma cuenta
+
+[33mcommit 943eaf84ed207308d23ad41cf685c6117d10b54b[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Sep 3 18:30:14 2024 -0600
+
+    modificacion del periodo
+
+[33mcommit 03511ac9f30e36ab7d705cbe298bcd65b51b9894[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Sep 3 18:11:47 2024 -0600
+
+    modificando la pantalla de cuentas anadiendo el saldo inicial y que tipo de cuenta
+
+[33mcommit 3ef7a6e1e90fe65dbe51d1d24559f3e7b9a8204c[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Sep 3 10:48:08 2024 -0600
+
+    desabilitando boton de guardar cuando el perido esta activo
+
+[33mcommit 53db580541b69eeed8a8ab97df64752173963a7d[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Sep 3 08:50:41 2024 -0600
+
+    modificancion de pantalla de periodo validacion de que no se pueda desactivar periodo y que permita activar desde la tabla
+
+[33mcommit bbc82a4c0a221760da982a5c44d07e40e952bb55[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Sep 2 17:47:21 2024 -0600
+
+    modificando la busquedad de cuenta con una customizacion de por cuenta o codigo
+
+[33mcommit b8a904a3af31f37bf30b7f400751557c0e123bce[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 30 13:50:10 2024 -0600
+
+    add msg in case error
+
+[33mcommit 6d8e99680dfb116398e9d3a0f6cf935e2d841763[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 30 11:27:17 2024 -0600
+
+    modificando de filtro de cuentas, creando si un periido esta activo dejarlo acceder ala patalla
+
+[33mcommit a80b13fb9b473fcb43bc1ab36593779216df0fb8[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 30 11:25:21 2024 -0600
+
+    creadon validacion de que si el periodo no esta activo no dejarlo hacer ninguna transacion
+
+[33mcommit 20007607bda7dbe88779bddc8d09b8f0ab9870b3[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 30 07:48:00 2024 -0600
+
+    add the period active in balance
+
+[33mcommit 56106748fbb55ea52651cb3df7f4f463bfc04014[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 30 07:20:38 2024 -0600
+
+    modificando el consumo del periodo
+
+[33mcommit 99183b9a5f18aca9ff555d692adf064608b39e23[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 30 07:18:38 2024 -0600
+
+    add inicializacion de saldos
+
+[33mcommit 144b54a42385204566decc5fecb3541c67435406[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Aug 27 15:42:54 2024 -0600
+
+    modificando los periodos su diseno como su consumo
+
+[33mcommit 0afdabb9cf991294dcfcbf2d331d5199a5767fcd[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Sat Aug 24 12:12:31 2024 -0600
+
+    agregando filtro de solo cuenta padre y las validaciones obligaciones por cuentas
+
+[33mcommit fb5f62b1527804939e80bd3d1a38117bf7769316[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Fri Aug 23 07:24:22 2024 -0600
+
+    agregando apis para el periodo
+
+[33mcommit 2d788737db94743bb8574e75b0cde9bcbe04573f[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Thu Aug 22 08:39:29 2024 -0600
+
+    agregando filtrado por fecha en la lista de clientes
+
+[33mcommit 30725f7533e4f02771f03dcc19876d5d1c0ed8ee[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Tue Aug 20 17:43:28 2024 -0600
+
+    add accounting period
+
+[33mcommit 2c88933ffc22335b536c42a526e54ea29a23a3cd[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Aug 19 16:58:14 2024 -0600
+
+    cambiando de ruta journal page
+
+[33mcommit 17f8a5b87a52320b011709714180a88a2ab9b3ff[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Aug 19 16:56:58 2024 -0600
+
+    creacion de partidas diarias
+
+[33mcommit b4198a36ad10a4155f8f1bde979d8ff2c45efbcb[m
+Author: Josue Rodriguez <josue.rodriguez@baas.hn>
+Date:   Mon Aug 19 08:34:49 2024 -0600
+
+    client-list cambios en la busqueda por fecha, add estilos al footer de los botones de peaginazion de la tabla
+
+[33mcommit c05ecb8849cab87b5cb174e1a55e5936ead8ec44[m
+Author: Jose Ramos <joseoxi@gmail.com>
+Date:   Sat Aug 17 14:37:20 2024 -0600
+
+    remove bread component that cause errors
+
+[33mcommit c37d827de024b191e269544bb0f7e2b232906e6e[m
+Author: Jose Ramos <joseoxi@gmail.com>
+Date:   Sat Aug 17 14:36:49 2024 -0600
+
+    remove init variable
+
+[33mcommit 0792c03f62245aae6ec6361760eef099821410ee[m
+Author: Jose Ramos <joseoxi@gmail.com>
+Date:   Sat Aug 17 14:36:28 2024 -0600
+
+    remove initialization component
+
+[33mcommit 0e7d89e328e6d61aec39c1c67f6f9e2dbd3f7180[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 23:00:49 2024 -0600
+
+    modified configuration
+
+[33mcommit bf830fe6786b95c8944c72e8b852781eaa758feb[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 23:00:27 2024 -0600
+
+    update module
+
+[33mcommit 973d412076b4ce8ca13a83fc86906b8417e3d6ae[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 23:00:07 2024 -0600
+
+    minor fix in client list
+
+[33mcommit 3930dba0d9b8a59c504cf2212da7ff5689135680[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:59:49 2024 -0600
+
+    minor fix in provider
+
+[33mcommit 0a7866e9180270d984fcb21a6eee9088c12f7263[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:59:33 2024 -0600
+
+    add Card component
+
+[33mcommit d48b532aba683709301643775f3271a930cf7ba6[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:59:11 2024 -0600
+
+    add journal component
+
+[33mcommit de30c20a2e1395f64ab7cab5d92e8aee69560eef[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:58:23 2024 -0600
+
+    modified services:
+    +account
+    +report
+
+[33mcommit d251d77eee9a142ea7c22531cc4c86bff9420a2d[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:57:42 2024 -0600
+
+    modified transaction service
+
+[33mcommit ad917811385000beeb1362fca7e19c9f7aa98370[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:56:58 2024 -0600
+
+    Directive Skeleton
+
+[33mcommit 8732b7584ebeaddb1d5007ac9661692b2625bbda[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:56:27 2024 -0600
+
+    added
+    +interceptor
+    +Global Error Handler skeleton
+
+[33mcommit 32e294a4b2dfd729fb797ae97650269abbb44c84[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:55:42 2024 -0600
+
+    added navigation
+
+[33mcommit 88c1f24772fe60492b05e82e5456de636f3b0974[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Tue Aug 13 22:54:53 2024 -0600
+
+    add environments
+
+[33mcommit 39e3eac869d96de06e65b80d0788de84d8efde1b[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:25:11 2024 -0600
+
+    Global error handler added
+
+[33mcommit 6f60da563f5ad9845e396f55f86e3a035a238a85[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:25:01 2024 -0600
+
+    minor fix
+
+[33mcommit c5021c860cadb75dab63d452313764259025ef58[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:23:56 2024 -0600
+
+    config new routes added config to use fetch API
+
+[33mcommit 9b594f053b4edbe1c822a38870b58d61770a7136[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:23:03 2024 -0600
+
+    refactor models
+
+[33mcommit 85a958e060e3f06d535aa29f616c7eda413fe958[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:22:50 2024 -0600
+
+    refactor menu dropdown
+
+[33mcommit feaa516d609c3a8b6d4c0c57fd216309f27e436f[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:22:31 2024 -0600
+
+    added file to new folder
+
+[33mcommit 35577261c322aaca400eb40bbefaa978732af764[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Mon May 13 16:22:05 2024 -0600
+
+    moved files to page folder
+
+[33mcommit a64b884584eb500c1600e451ef8e1a21f87c4722[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:53:08 2024 -0600
+
+    other configurations
+
+[33mcommit e56ebc5f3cae54a0b9125f3677c1ba48ab18717a[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:52:53 2024 -0600
+
+    refactor dashboard
+
+[33mcommit 71328250ba52803be7cbe403641edb20cb333217[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:52:30 2024 -0600
+
+    refactor billing client
+
+[33mcommit 4830e8894100658e78e0ca6f68fbb317a4222e6a[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:52:06 2024 -0600
+
+    !merge
+
+[33mcommit b54fcc1163dac6f58dbe659d3603cf8a78a5c7df[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:51:47 2024 -0600
+
+    refactor config account
+
+[33mcommit ebbcef76e5d230028c5b920e10db3bd62b8ed019[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:51:25 2024 -0600
+
+    refactor providers
+
+[33mcommit ebf8f3ced31d6e2ec1b8ace548d7672ecf921a40[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:51:01 2024 -0600
+
+    refactor accounts
+
+[33mcommit 1ca95dd8f3a3070ed920c7117f2b6abe5f6a5f96[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:50:45 2024 -0600
+
+    added reports mocks
+
+[33mcommit e5a25db4e9a9417591633f6d0cce22d9c3f72ad1[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:49:59 2024 -0600
+
+    refactor
+
+[33mcommit 7849b91144508be5ed0cc852acfceb8f6e6219d7[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:49:32 2024 -0600
+
+    changed navigation service
+
+[33mcommit bf08597403ceb229c91cdda238233b54c50c16d6[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:49:03 2024 -0600
+
+    navigation refactor
+
+[33mcommit 4343dd6456ebb3818ae2698a05d30025e0a56da7[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:48:27 2024 -0600
+
+    moved dto to another folder
+
+[33mcommit bd272cc7b988d35014582095f3f6b2886700210d[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:47:25 2024 -0600
+
+    removed custom theme
+
+[33mcommit 48eb93dadfe630e76257d4ddaabc7bbbfc61e011[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Fri May 10 16:47:02 2024 -0600
+
+    ![CORE] restore libraries version and look and feel
+
+[33mcommit 3eb21edde3d0933a847231f77af81376854b9cad[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:26:31 2024 -0600
+
+    merge
+
+[33mcommit cc876849a64d41758c282daaa081c58389f5ffc6[m
+Merge: 1fb9841 15f7b6e
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:26:10 2024 -0600
+
+    Merge branch 'main' of github.com:jrodriguezSti/sti-account-ui
+
+[33mcommit 1fb9841e6eaaa0aa7c51dd128ecfdfe46d20c4ba[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:23:00 2024 -0600
+
+    .env added to ignore
+
+[33mcommit 74d67fdc06122491b01fb18daac45dd20aa0c14f[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:22:38 2024 -0600
+
+    package update
+
+[33mcommit 57f4bdedd66886f98be14c13fa9a155f7f293857[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:22:14 2024 -0600
+
+    end.d.ts added
+
+[33mcommit 2b71a044caf238f2957de518ddbe5e4109905c1f[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:21:52 2024 -0600
+
+    environment added
+
+[33mcommit 712fa1876755c6ab19a72b07e62e8701377bd4ba[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:21:26 2024 -0600
+
+    new routes
+
+[33mcommit 9909fbc89bf43c4c4b394e4d3fa4b454ff3b370c[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:20:58 2024 -0600
+
+    API model
+
+[33mcommit 7c2838e4dadfcd20082916f25bb6ffedc3d72e87[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:20:34 2024 -0600
+
+    general balance service
+
+[33mcommit 54ccb106cac862180841b39dc13a6e235b11206b[m
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:20:09 2024 -0600
+
+    general balance
+
+[33mcommit cc6585616643c253ca56b4a77f9a2295d5542a6f[m
+Merge: a55f3d3 5018c57
+Author: Jose Manuel Ramos Morel <jramos@stiglobals.com>
+Date:   Sat May 4 22:18:53 2024 -0600
+
+    minor changes
+
+[33mcommit 15f7b6ed01ba7035d86465862f7963979ea1098d[m
+Author: Lcaceressti97 <lcaceres@stiglobals.com>
+Date:   Sat May 4 12:59:45 2024 -0600
+
+    Integracion de servicios para crear, actualizar y obtener una cuenta
+
+[33mcommit 8f6e384c528e5fa0ce1ba293efae2405bed3cafb[m
+Author: Lcaceressti97 <lcaceres@stiglobals.com>
+Date:   Sat May 4 12:58:57 2024 -0600
+
+    Cambios en ngOnit y reestructuracion del componente
+
+[33mcommit bd9dd5bfd5875377e82781e8b91d9579b3d4f760[m
+Author: Lcaceressti97 <lcaceres@stiglobals.com>
+Date:   Sat May 4 12:57:40 2024 -0600
+
+    Diseño he implementacion de servicio para obtener las cuentas
+
+[33mcommit 6875a460136f59e3335018ffd471113de213d80b[m
+Author: Lcaceressti97 <lcaceres@stiglobals.com>
+Date:   Sat May 4 12:56:34 2024 -0600
+
+    Intregacion servicio que obtiene las cuentas
+
+[33mcommit c00b72fe4111223f6860932ec853418f9b0c075b[m
+Author: jrodriguezSti <jrodriguez@st

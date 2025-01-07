@@ -25,6 +25,10 @@ export interface ClientBilling {
   description: string;
   status?: string;
   diaryType?:number;
+  typePayment:string;
+  methodPayment:string;
+  rtn:string;
+  supplierName:string
 }
 
 export interface BillingListClient {
@@ -42,6 +46,21 @@ export interface BillingListClient {
 
 export interface ProviderClient extends ClientBilling {}
 export interface BillingListProvider extends BillingListClient {}
+
+
+export enum bulkTypeData{
+
+}
+
+export enum BulkDetailType {
+  ACC="ACC",    // account
+  DT="DT",     // DateTime
+  N="N",      // number
+  S="S",      // string
+  D="D",      // Decimal
+  B="B",      // Boolean
+}
+
 
 export enum typeToast {
   Info = 'info',
@@ -71,3 +90,50 @@ export interface Notes {
 
 }
 
+
+export interface UploadBulkSettingsModel {
+  id?: number
+  name: string 
+  type: number | null
+  rowInit: number | null,
+  configDetails:ConfigDetailModel[]
+}
+
+export interface ConfigDetailModel {
+  colum: number | null
+  title: string
+  account: number | null
+  operation: string | null
+  bulkTypeData: BulkDetailType
+  
+}
+
+
+
+
+export interface ClosingPeriodsAll {
+  accountingPeriodId: number
+  periodName: any
+  typePeriod: any
+  startPeriod: string
+  endPeriod: string
+  totalAssets: number
+  totalLiabilities: number
+  totalCapital: number
+  totalIncome: number
+  totalExpenses: number
+  netIncome: number
+}
+
+
+export interface NextPeridModel {
+  id?: number
+  periodName?: string
+  closureType: string
+  startPeriod: string
+  endPeriod: string
+  daysPeriod: number
+  periodStatus?: string
+  periodOrder?: number
+  isAnnual?: boolean
+}

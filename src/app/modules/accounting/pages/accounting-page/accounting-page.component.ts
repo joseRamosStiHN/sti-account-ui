@@ -25,6 +25,7 @@ export class AccountingPageComponent implements OnInit {
           { label: 'Notas de Credito', path: '/accounting/creditnotes-list' },
           { label: 'Notas de Debito', path: '/accounting/debitnotes-list' },
           { label: 'Cierre Contable', path: '/accounting/accounting-closing' },
+          { label: 'Subida de Facturas', path: '/accounting/bulk-upload-file' },
        
         ],
       },
@@ -66,6 +67,14 @@ export class AccountingPageComponent implements OnInit {
           {
             label: 'Configuración Diarios',
             path: '/accounting/configuration/journal-list',
+          },
+          {
+            label: 'Configuración Impuestos',
+            path: '/accounting/configuration/tax-settings',
+          },
+          {
+            label: 'Configuración Subida Archivos',
+            path: '/accounting/configuration/bulk-configuration',
           },
         ],
       },

@@ -42,6 +42,12 @@ export interface TransactionResponse {
   diaryType:number;
   numberPda?:string
   documentType:number 
+  typeSale:string;
+  cashValue?:number;
+  creditValue?:number;
+  typePayment:string;
+  rtn:string;
+  supplierName:string;
 }
 
 export interface AccountCategories {
@@ -128,21 +134,21 @@ export interface AdjustmentDetail {
 }
 
 
-export interface TrialBalaceResponse {
-  id: number
-  periodName: string
-  closureType: string
-  startPeriod: string
-  endPeriod: string
-  balanceDiaries: BalanceDiary[]
-}
+// export interface TrialBalaceResponse {
+//   id: number
+//   periodName: string
+//   closureType: string
+//   startPeriod: string
+//   endPeriod: string
+//   balanceDiaries: BalanceDiary[]
+// }
 
-export interface BalanceDiary {
-  diaryName: string
-  initialBalance: InitialBalance[]
-  balancePeriod: BalancePeriod[]
-  finalBalance: FinalBalance[]
-}
+// export interface BalanceDiary {
+//   diaryName: string
+//   initialBalance: InitialBalance[]
+//   balancePeriod: BalancePeriod[]
+//   finalBalance: FinalBalance[]
+// }
 
 export interface InitialBalance {
   debit: number
@@ -230,3 +236,112 @@ export interface PeriodClosing {
   totalExpenses: number
   netIncome: number
 }
+
+
+
+export interface TrialBalaceResponse {
+  periods: Period[]
+}
+
+export interface Period {
+  id: number
+  periodName?: string
+  closureType: string
+  startPeriod: string
+  endPeriod: string
+  accountBalances: AccountBalance[]
+}
+
+export interface AccountBalance {
+  id:number
+  name: string
+  accountCode: string
+  parentName: string
+  parentId: number
+  initialBalance: InitialBalance[]
+  balancePeriod: BalancePeriod[]
+  finalBalance: FinalBalance[]
+}
+
+export interface InitialBalance {
+  debit: number
+  credit: number
+}
+
+export interface BalancePeriod {
+  debit: number
+  credit: number
+}
+
+export interface FinalBalance {
+  debit: number
+  credit: number
+}
+
+
+
+export interface TaxSettings {
+  id?:number
+  taxRate: string
+  type: string
+  fromValue: number | null
+  toValue: number | null
+  percent?: number | null
+  isCurrent: boolean
+  creationDate?:string
+}
+
+
+export interface UploadBulkSettings {
+  id: number
+  name: string
+  activate: boolean
+  type: number
+  rowInit: number
+  tenantId: string
+  configDetails: ConfigDetail[]
+}
+
+export interface ConfigDetail {
+  colum: number
+  title: string
+  account?: number
+  operation?: string
+  bulkTypeData: string
+}
+
+
+export interface TransactionUpload {
+  typetransaction:number
+  data: Daum[]
+  errors: any[]
+}
+
+export interface Daum {
+  id:string
+  row:number
+  date: string
+  currency: any
+  description: string
+  errors: any
+  reference: string
+  status: string
+  exchangeRate: any
+  typeSale: string
+  cashValue: number
+  creditValue: number
+  typePayment: string
+  rtn: string
+  supplierName: any
+  accounts: Account[]
+  otherFields: any
+}
+
+export interface Account {
+  title: string
+  account: number
+  debit: number
+  credit: number
+}
+
+

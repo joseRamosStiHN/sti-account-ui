@@ -157,7 +157,10 @@
 <h2 class="text-2xl font-semibold mb-5 text-center mt-4">Mayores Contables</h2>
 <dx-data-grid id="gridJournalEntry" [dataSource]="tranactionList$ | async" class="mt-5 shadow-lg overflow-hidden mb-10"
   [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
-  [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'">
+  [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'"
+  (onExporting)="onExporting($event)">
+
+  <dxo-export [enabled]="true"></dxo-export>
 
   <dxo-sorting mode="multiple"></dxo-sorting>
   <dxo-header-filter [visible]="true"></dxo-header-filter>
@@ -219,8 +222,10 @@
 
     <dx-data-grid id="gridJournalEntryDetail" [dataSource]="transaction.data.transaction" class="bg-transparent"
       [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
-      [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'" style="margin-left: 0; margin-right: 0;">
+      [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'" style="margin-left: 0; margin-right: 0;"
+      (onExporting)="onExporting($event)">
 
+      <dxo-export [enabled]="true"></dxo-export>
 
       <dxo-paging [pageSize]="5"></dxo-paging>
       <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>

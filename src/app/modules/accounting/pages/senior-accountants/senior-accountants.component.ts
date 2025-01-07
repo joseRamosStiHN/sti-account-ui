@@ -1,11 +1,15 @@
 import { ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DxDataGridComponent } from 'devextreme-angular';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { exportDataGrid } from 'devextreme/excel_exporter';
+import { Workbook } from 'exceljs';
 import { map, Observable, tap } from 'rxjs';
 import { SeniorAccounts } from 'src/app/modules/accounting/models/APIModels';
 import { JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
 import { LeaderAccounts } from 'src/app/modules/accounting/models/LeederAccountsDetail';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
+import { saveAs } from 'file-saver';
 
 interface LocalSeniorAccount {
   id: number;
@@ -522,7 +526,7 @@ export class SeniorAccountantsComponent {
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
 
-  employees: Employee[]= employees
+  employees: Employee[] = employees
   constructor(private cdr: ChangeDetectorRef) { }
   ngOnInit(): void {
     this.tranactionList$ = this.transactionService.getAllLedgerAcounts().pipe(
@@ -534,11 +538,26 @@ export class SeniorAccountantsComponent {
         });
       })
     );
-    
+
   }
 
   goBack() {
     window.history.back();
+  }
+
+  onExporting(e: DxDataGridTypes.ExportingEvent) {
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Mayores Contables');
+
+    exportDataGrid({
+      component: e.component,
+      worksheet,
+      autoFilterEnabled: true,
+    }).then(() => {
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Mayores Contables.xlsx');
+      });
+    });
   }
 
 

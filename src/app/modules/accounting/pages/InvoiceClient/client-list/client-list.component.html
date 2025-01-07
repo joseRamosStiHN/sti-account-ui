@@ -1,9 +1,29 @@
 <div showControl [hasPermission]="1" class="w-full flex flex-col mt-5 gap-2">
-  <h2
-    class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl"
-  >
-  Facturación de Ingresos
-  </h2>
+  <div id="#transaction-buy" class="flex items-center justify-between mb-4">
+    <h2 class="text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+      Facturación de Ingresos
+    </h2>
+    <button [ngClass]="selectRows.length > 0 ? 'visible' : 'hidden'"
+      class="relative h-8 px-2 ml-4 overflow-hidden transition-all bg-orange-500 rounded-xl inline-flex items-center group"
+      (click)="posting()"
+    >
+      <span
+        class="absolute top-0 right-0 inline-block w-4 h-3 transition-all duration-500 ease-in-out bg-orange-700 rounded group-hover:-mr-2 group-hover:-mt-1"
+      >
+        <span
+          class="absolute top-0 right-0 w-4 h-3 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"
+        ></span>
+      </span>
+      <span
+        class="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-orange-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"
+      ></span>
+      <span
+        class="relative text-white transition-colors duration-200 ease-in-out group-hover:text-white"
+      >confirmar</span>
+    </button>
+  </div>
+  
+  
   <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
     <dx-date-range-box [(value)]="currentValue" (onValueChanged)="currentValueChanged($event)"></dx-date-range-box> 
     <button
@@ -31,13 +51,16 @@
       [showBorders]="true"
       [width]="'100%'"
       [height]="'600px'"
+      (onSelectionChanged)="onRowSelected($event)"
     >
+    <dxo-selection [selectAllMode]="allMode" [showCheckBoxesMode]="checkBoxesMode" mode="multiple" ></dxo-selection>
+    
       <dxo-sorting mode="multiple"></dxo-sorting>
-      <dxo-header-filter [visible]="true"></dxo-header-filter>
+      <dxo-header-filter [visible]="false"></dxo-header-filter>
       <dxo-paging [pageSize]="15"></dxo-paging>
       <dxo-pager
         [showPageSizeSelector]="true"
-        [allowedPageSizes]="[10, 25, 50, 100]"
+        [allowedPageSizes]="[15, 25, 50, 100]"
       ></dxo-pager>
       <dxo-search-panel
         [visible]="true"
@@ -98,6 +121,17 @@
       </dxi-column>
 
       <dxo-toolbar>
+        <dxi-item location="before">
+          <dx-select-box class="mt-2"
+        id="select-all-mode"
+        [dataSource]="selectOptions"
+        displayExpr="name"   
+        valueExpr="id" 
+        [inputAttr]="{ 'aria-label': 'Select All Mode' }"
+        [(value)]="allMode"
+        [disabled]="checkBoxesMode === 'none'"
+      ></dx-select-box>
+        </dxi-item>
         <dxi-item name="groupPanel"></dxi-item>
         <dxi-item name="searchPanel"></dxi-item>
         <dxi-item location="after">
@@ -113,3 +147,6 @@
     </dx-data-grid>
   </div>
 </div>
+<dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+  <dxo-position my="top" at="top" of="#transaction-buy"> </dxo-position>
+</dx-toast>
