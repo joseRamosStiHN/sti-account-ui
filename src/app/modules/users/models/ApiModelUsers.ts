@@ -9,6 +9,7 @@ export interface UsersResponse {
   roles: any
   companies: any
   active: boolean
+  activeRoles:boolean 
 }
 
 export interface UsersRequest {
@@ -30,5 +31,6 @@ export interface RolesResponse {
   id: number
   name: string
   active:boolean
+  activeRoles:boolean
 }
 

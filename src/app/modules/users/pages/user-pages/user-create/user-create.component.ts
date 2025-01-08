@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ToastType } from 'devextreme/ui/toast';
 import { map, Observable } from 'rxjs';
@@ -24,6 +24,8 @@ export class UserCreateComponent implements OnInit {
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
+
+  @Input('id') id?:number;
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -61,6 +63,22 @@ export class UserCreateComponent implements OnInit {
           return roles
         })
       });;
+
+    if (this.id) {
+      this.userService.getUSerById(Number(this.id)).subscribe(data=>{
+        this.userForm = {
+          active:data.active,
+          companies:data.companies,
+          email:data.email,
+          firstName:data.firstName,
+          lastName:data.lastName,
+          phoneNumber:data.phoneNumber,
+          roles:data.roles,
+          userName:data.userName
+        };
+      }
+      )
+    }
 
   }
 

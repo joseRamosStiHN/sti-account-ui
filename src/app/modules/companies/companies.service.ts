@@ -33,6 +33,19 @@ export class CompaniesService {
 
 
   /**
+    * Method that brings company by id
+    *
+    * @return response()
+    */
+    getCompanyById(id:number): Observable<CompanyResponse> {
+      return this.httpClient.get<CompanyResponse>(
+        `/security/company/${id}`
+      );
+    }
+  
+
+
+  /**
   * Method to create a company
   *
   * @return response()

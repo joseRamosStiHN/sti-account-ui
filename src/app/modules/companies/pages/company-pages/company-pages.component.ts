@@ -28,4 +28,8 @@ export class CompanyPagesComponent implements OnInit {
     window.history.back();
   }
 
+  onEditCompany(e: any) {
+    this.router.navigate(['/dashboard/companies/edit', e.id]);
+  }
+
 }

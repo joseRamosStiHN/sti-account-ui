@@ -32,6 +32,18 @@ export class UsersService {
     );
   }
 
+
+  /**
+  * Method that brings user by id
+  *
+  * @return response()
+  */
+  getUSerById(id:number): Observable<UsersResponse> {
+    return this.httpClient.get<UsersResponse>(
+      `/security/user/${id}`
+    );
+  }
+
   /**
    * Method to create a user
    *
@@ -48,16 +60,16 @@ export class UsersService {
   }
 
 
-   /**
-     * Method that brings a list with all the roles
-     *
-     * @return response()
-     */
-    getAllRoles(): Observable<RolesResponse[]> {
-      return this.httpClient.get<RolesResponse[]>(
-        '/security/lookup/roles'
-      );
-    }
+  /**
+    * Method that brings a list with all the roles
+    *
+    * @return response()
+    */
+  getAllRoles(): Observable<any[]> {
+    return this.httpClient.get<any[]>(
+      '/security/lookup/roles'
+    );
+  }
 
   /**
      * Error Handler Method

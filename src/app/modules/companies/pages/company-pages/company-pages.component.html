@@ -11,6 +11,11 @@
       dataField="createdAt"
       dataType="date"
     ></dxi-column>
+    <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
+      <div *dxTemplate="let user of 'cellButtonTemplate'">
+          <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditCompany(user.data)"></button>
+      </div>
+  </dxi-column>
     <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
 
     <div *dxTemplate="let company of 'detail'">

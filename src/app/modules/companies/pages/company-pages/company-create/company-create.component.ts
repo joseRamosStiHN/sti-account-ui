@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
@@ -25,6 +25,8 @@ export class CompanyCreateComponent implements OnInit {
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
   rolesList$: RolesResponse[] = [];
+
+  @Input('id') id?:number;
 
 
   private readonly companyService = inject(CompaniesService);
@@ -57,6 +59,27 @@ export class CompanyCreateComponent implements OnInit {
           return roles
         })
       });;
+
+      if (this.id) {
+        this.companyService.getCompanyById(Number(this.id)).subscribe(data=>{
+          this.companyForm={
+            address:data.address,
+            description:data.description,
+            email:data.email,
+            isActive:data.active,
+            name:data.name,
+            permissions:data.permissions,
+            phone:data.phone,
+            roles:data.roles,
+            rtn:data.rtn,
+            type:data.type,
+            createdAt:data.createdAt,
+            id:data.id,
+            tenantId:data.tenantId,
+            website:data.website
+          }
+        })
+      }
   }
   onAccountConfig(event: Event) {
     const data = event.target as HTMLInputElement;

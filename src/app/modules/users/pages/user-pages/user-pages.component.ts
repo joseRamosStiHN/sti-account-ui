@@ -30,6 +30,6 @@ export class UserPagesComponent implements OnInit {
   }
 
   onEditUser(e: any) {
-    this.router.navigate(['/dashboard/user/create', e.id]);
+    this.router.navigate(['/dashboard/user/edit', e.id]);
   }
 }

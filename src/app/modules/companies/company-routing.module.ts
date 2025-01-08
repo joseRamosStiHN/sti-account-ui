@@ -12,6 +12,10 @@ const routers: Routes = [
     path: 'create',
     component: CompanyCreateComponent,
   },
+  {
+    path: 'edit/:id',
+    component: CompanyCreateComponent,
+  },
 ];
 
 @NgModule({

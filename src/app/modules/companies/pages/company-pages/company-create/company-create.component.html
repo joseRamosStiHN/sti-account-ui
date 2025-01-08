@@ -23,9 +23,9 @@
             <input id="address" name="address" type="text"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               [(ngModel)]="companyForm.address" placeholder="Colonia las Colinas, Tegucigalpa, Honduras" required />
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['address'].getError('required')">
-                <small class="text-xs text-red-900">Direccion es requerida.</small>
-              </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['address'].getError('required')">
+              <small class="text-xs text-red-900">Direccion es requerida.</small>
+            </div>
           </div>
 
           <div class="form">
@@ -33,13 +33,13 @@
             <input id="rtn" name="rtn" type="text" [(ngModel)]="companyForm.rtn"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="" required pattern="[0-9]*" />
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')">
-                <small class="text-xs text-red-900">Rtn es requerido.</small>
-              </div>
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].hasError('pattern')">
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')">
+              <small class="text-xs text-red-900">Rtn es requerido.</small>
+            </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].hasError('pattern')">
 
-                <small class="text-xs text-red-900">Solo se permiten números.</small>
-            
+              <small class="text-xs text-red-900">Solo se permiten números.</small>
+
             </div>
           </div>
 
@@ -60,23 +60,23 @@
             <input id="email" name="email" type="email" [(ngModel)]="companyForm.email"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="" email required />
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
-                <small class="text-xs text-red-900">Correo es requerido.</small>
-              </div>
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
-                <small class="text-xs text-red-900">Formato de correo invalido.</small>
-              </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
+              <small class="text-xs text-red-900">Correo es requerido.</small>
+            </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
+              <small class="text-xs text-red-900">Formato de correo invalido.</small>
+            </div>
           </div>
           <div class="form">
             <label for="phone" class="block mb-2 text-sm text-gray-900">Telefono</label>
             <input id="phone" name="phone" type="url" [(ngModel)]="companyForm.phone"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder="" required pattern="[0-9]*"/>
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].getError('required')">
-                <small class="text-xs text-red-900">Telefono es requerido.</small>
-              </div>
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].hasError('pattern')">
-                <small class="text-xs text-red-900">Solo se permiten números.</small>
+              placeholder="" required pattern="[0-9]*" />
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].getError('required')">
+              <small class="text-xs text-red-900">Telefono es requerido.</small>
+            </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].hasError('pattern')">
+              <small class="text-xs text-red-900">Solo se permiten números.</small>
             </div>
           </div>
 
@@ -84,21 +84,20 @@
             <label for="website" class="block mb-2 text-sm text-gray-900">Sitio Web</label>
             <input id="website" name="website" type="url" [(ngModel)]="companyForm.website"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder=""  />
-              <div *ngIf="itemForm.submitted && itemForm.form.controls['website'].getError('required')">
-                <small class="text-xs text-red-900">Sitio Web es requerido.</small>
-              </div>
+              placeholder="" />
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['website'].getError('required')">
+              <small class="text-xs text-red-900">Sitio Web es requerido.</small>
+            </div>
           </div>
 
           <div class="form col-span-3">
             <label for="description" class="block mb-2 text-sm text-gray-900">Descripción</label>
-            <textarea name="description" id="description" rows="2" [(ngModel)]="companyForm.description"
-              class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500
-               focus:border-blue-500 focus:outline-none" >
+            <textarea name="description" id="description" rows="2" [(ngModel)]="companyForm.description" class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500
+               focus:border-blue-500 focus:outline-none">
           </textarea>
-          <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
-            <small class="text-xs text-red-900">Descripcion es requerida.</small>
-          </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
+              <small class="text-xs text-red-900">Descripcion es requerida.</small>
+            </div>
           </div>
         </div>
       </fieldset>
@@ -136,14 +135,27 @@
         <legend class="text-sm font-thin mb-2">Usuarios</legend>
         <dx-data-grid id="companyUserGrid" [dataSource]="userList$ | async" [showBorders]="true">
           <dxo-paging [enabled]="false"></dxo-paging>
-          <dxo-editing mode="form" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true">
+          <dxo-editing mode="form" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
-          <dxi-column caption="Nombre" dataField="firstName"></dxi-column>
-          <dxi-column caption="Permiso" dataField="isActive"></dxi-column>
+          <dxi-column caption="Nombre" dataField="firstName"  [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="role" caption="Role" alignment="center" [width]="90" 
+          [allowEditing]="true"
+            [formItem]="{ visible: true }">
+            <dxo-lookup [dataSource]="rolesList$" valueExpr="id" displayExpr="name"></dxo-lookup>
+            <dxi-validation-rule type="required"></dxi-validation-rule>
+          </dxi-column>
+          <dxi-column caption="Permiso" dataField="activeRoles" [width]="100">
+          </dxi-column>
+          <dxi-column type="buttons" [width]="110">
+            <dxi-button name="edit"></dxi-button>
+            <dxi-button name="delete"></dxi-button>
+          </dxi-column>
+  
+         
         </dx-data-grid>
       </fieldset>
 
-      <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
+      <!-- <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
         <legend class="text-sm font-thin mb-2">Roles</legend>
         <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="rolesList$">
           <dxo-paging [enabled]="false"></dxo-paging>
@@ -155,7 +167,8 @@
           </dxi-column>
           <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active" [ngModelOptions]="{standalone: true}">
+              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active"
+                [ngModelOptions]="{standalone: true}">
               <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
                      peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
                      peer dark:bg-gray-700 peer-checked:after:translate-x-full 
@@ -168,11 +181,11 @@
             </label>
           </div>
         </dx-data-grid>
-      </fieldset>
+      </fieldset> -->
 
-     
+
     </div>
-    
+
     <div class="flex justify-end mt-10">
       <button type="button" (click)="goBack()"
         class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
