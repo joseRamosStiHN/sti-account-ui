@@ -13,12 +13,6 @@ export class GlobalHttpErrorHandler implements HttpInterceptor {
   
   intercept(req: HttpRequest<any>,next: HttpHandler): Observable<HttpEvent<any>> {
 
-    console.log("Interceptores");
-    
-
-    console.log(req);
-    
-
     return next.handle(req).pipe(
       retry({
         count: 3,

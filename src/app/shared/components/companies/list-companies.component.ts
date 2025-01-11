@@ -20,7 +20,7 @@ export class ListCompaniesComponent implements OnInit {
   infoService = inject(UserInfoService);
   companyList$: Observable<CompanyResponse[]> | undefined;
 
-   isAdmind:boolean=false;
+  isAdmind: boolean = false;
 
   private readonly router = inject(Router);
   private readonly companyService = inject(CompaniesService);
@@ -29,37 +29,26 @@ export class ListCompaniesComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-
     this.navigationService.setNavLinks([]);
-
     const savedUser = localStorage.getItem('userData');
     if (savedUser) {
       this.user$ = of(JSON.parse(savedUser));
       const parsedUser = JSON.parse(savedUser);
-       this.isAdmind = parsedUser.roles.some((role: any) => role.name === 'ADMIN' && role.global);
+      this.isAdmind = parsedUser.roles.some((role: any) => role.name === 'ADMIN' && role.global);
 
-    
     } else {
       this.user$ = this.infoService.userDetail$;
       this.user$.subscribe((data) => {
         if (data) {
-            this.isAdmind  = data.roles.some((role: any) => role.name === 'ADMIN' && role.global);
-
+          this.isAdmind = data.roles.some((role: any) => role.name === 'ADMIN' && role.global);
           localStorage.setItem('userData', JSON.stringify(data));
         }
       });
     }
-
-
-
-
-
   }
 
-
-
   goTo(tenandId: string) {
-    localStorage.setItem('company', JSON.stringify(tenandId));
+    localStorage.setItem('company', tenandId);
     this.router.navigate(['/accounting']);
 
   };
