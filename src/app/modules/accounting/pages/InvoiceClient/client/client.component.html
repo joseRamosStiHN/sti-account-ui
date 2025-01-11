@@ -4,138 +4,78 @@
       <h2 class="text-2xl font-semibold">Factura de Ingresos</h2>
     </div>
     @if(clientBilling.id !==null && clientBilling.status === 'Draft'){
-    <button
-      (click)="posting()"
-      [disabled]="disablePosting"
-      class="relative h-8 mt-1 inline-flex items-center justify-start px-2 mr-2 overflow-hidden transition-all bg-orange-500 rounded-xl group"
-    >
+    <button (click)="posting()" [disabled]="disablePosting"
+      class="relative h-8 mt-1 inline-flex items-center justify-start px-2 mr-2 overflow-hidden transition-all bg-orange-500 rounded-xl group">
       <span
-        class="absolute top-0 right-0 inline-block w-4 h-3 transition-all duration-500 ease-in-out bg-orange-700 rounded group-hover:-mr-2 group-hover:-mt-1"
-      >
-        <span
-          class="absolute top-0 right-0 w-4 h-3 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"
-        ></span>
+        class="absolute top-0 right-0 inline-block w-4 h-3 transition-all duration-500 ease-in-out bg-orange-700 rounded group-hover:-mr-2 group-hover:-mt-1">
+        <span class="absolute top-0 right-0 w-4 h-3 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
       </span>
       <span
-        class="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-orange-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"
-      ></span>
-      <span
-        class="relative text-left text-white transition-colors duration-200 ease-in-out group-hover:text-white"
-        >{{ buttonTextPosting }}</span
-      >
+        class="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-orange-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"></span>
+      <span class="relative text-left text-white transition-colors duration-200 ease-in-out group-hover:text-white">{{
+        buttonTextPosting }}</span>
     </button>
     }
   </div>
-  <form
-    id="clientForm"
-    class="w-100"
-    #itemForm="ngForm"
-    (ngSubmit)="onSubmit(itemForm)"
-  >
+  <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
     <div class="container">
       <div class="grid grid-cols-2 gap-2">
         <div class="form-group">
-          <label for="billingNumber" class="block mb-2 text-sm text-gray-900"
-            >Número de Factura</label
-          >
-          <input
-            [(ngModel)]="clientBilling.billingNumber"
-            id="billingNumber"
-            name="billingNumber"
-            type="text"
+          <label for="billingNumber" class="block mb-2 text-sm text-gray-900">Número de Factura</label>
+          <input [(ngModel)]="clientBilling.billingNumber" id="billingNumber" name="billingNumber" type="text"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            placeholder="FACT00001"
-            required
-          />
-          <div
-            *ngIf="
+            placeholder="FACT00001" required />
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['billingNumber'].getError('required')
-            "
-          >
-            <small class="text-xs text-red-900"
-              >Número de Factura es requerido.</small
-            >
+            ">
+            <small class="text-xs text-red-900">Número de Factura es requerido.</small>
           </div>
         </div>
         <div>
-          <label for="date" class="block mb-2 text-sm text-gray-900"
-            >Fecha</label
-          >
-          <input
-            type="date"
-            [(ngModel)]="clientBilling.date"
-            id="date"
-            name="date"
+          <label for="date" class="block mb-2 text-sm text-gray-900">Fecha</label>
+          <input type="date" [(ngModel)]="clientBilling.date" id="date" name="date"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            placeholder=""
-            required
-          />
-          <div
-            *ngIf="
+            placeholder="" required />
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['date'].getError('required')
-            "
-          >
+            ">
             <small class="text-xs text-red-900">La fecha es requerida.</small>
           </div>
         </div>
 
         <div>
-          <label for="txt_moneda" class="block mb-2 text-sm text-gray-900"
-            >Moneda</label
-          >
-          <select
-            [(ngModel)]="clientBilling.currency"
-            required
-            name="currency"
-            id="txt_moneda"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
+          <label for="txt_moneda" class="block mb-2 text-sm text-gray-900">Moneda</label>
+          <select [(ngModel)]="clientBilling.currency" required name="currency" id="txt_moneda"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option selected>L</option>
             <option>USD</option>
           </select>
-          <div
-            *ngIf="
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['currency'].getError('required')
-            "
-          >
+            ">
             <small class="text-xs text-red-900">La moneda es requerida.</small>
           </div>
         </div>
         <div>
-          <label for="exchangeRate" class="block mb-2 text-sm text-gray-900"
-            >Tasa de Cambio</label
-          >
-          <select
-            [(ngModel)]="clientBilling.exchangeRate"
-            required="true"
-            name="exchangeRate"
-            id="exchangeRate"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
+          <label for="exchangeRate" class="block mb-2 text-sm text-gray-900">Tasa de Cambio</label>
+          <select [(ngModel)]="clientBilling.exchangeRate" required="true" name="exchangeRate" id="exchangeRate"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option value="24.7" selected>24.7012</option>
             <option value="24.50">24.50</option>
           </select>
-          <div
-            *ngIf="
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['exchangeRate'].errors &&
               itemForm.form.controls['exchangeRate'].errors['required']
-            "
-          >
-            <small class="text-xs text-red-900"
-              >La tasa de cambio es requerida.</small
-            >
+            ">
+            <small class="text-xs text-red-900">La tasa de cambio es requerida.</small>
           </div>
         </div>
         <div class="basis-1/2">
-          <label
-            for="select_journey"
-            class="block mt-1 mb-2 text-sm text-gray-900"
-            >Diario</label
-          >
+          <label for="select_journey" class="block mt-1 mb-2 text-sm text-gray-900">Diario</label>
           <!-- <select
             [(ngModel)]="clientBilling.currency"
             required
@@ -143,14 +83,9 @@
             id="select_journy"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
           > -->
-          <select
-            [(ngModel)]="clientBilling.diaryType"
-            (change)="onChangeJournal($event)"
-            required
-            name="select_journey"
-            id="select_journy"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none"
-          >
+          <select [(ngModel)]="clientBilling.diaryType" (change)="onChangeJournal($event)" required
+            name="select_journey" id="select_journy"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 focus:outline-none">
             <option value="" disabled selected></option>
             <option *ngFor="let journal of journalList" [ngValue]="journal.id">
               {{ journal.diaryName }}
@@ -158,104 +93,60 @@
           </select>
         </div>
         <div>
-          <label for="typePayment" class="block mb-2 text-sm text-gray-900"
-            >Tipo de Pago</label
-          >
-          <select
-            [(ngModel)]="clientBilling.typePayment"
-            required="true"
-            name="typePayment"
-            id="typePayment"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
+          <label for="typePayment" class="block mb-2 text-sm text-gray-900">Tipo de Pago</label>
+          <select [(ngModel)]="clientBilling.typePayment" required="true" name="typePayment" id="typePayment"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option value="CONTADO">Contado</option>
             <option value="CREDITO">Credito</option>
           </select>
-          <div
-            *ngIf="
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['typePayment'].errors &&
               itemForm.form.controls['typePayment'].errors['required']
-            "
-          >
-            <small class="text-xs text-red-900"
-              >tipo de Pago es requerido.</small
-            >
+            ">
+            <small class="text-xs text-red-900">tipo de Pago es requerido.</small>
           </div>
         </div>
         <div>
-          <label for="methodPayment" class="block mb-2 text-sm text-gray-900"
-            >Metodo de Pago</label
-          >
-          <select
-            [(ngModel)]="clientBilling.methodPayment"
-            required="true"
-            name="methodPayment"
-            id="methodPayment"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
+          <label for="methodPayment" class="block mb-2 text-sm text-gray-900">Metodo de Pago</label>
+          <select [(ngModel)]="clientBilling.methodPayment" required="true" name="methodPayment" id="methodPayment"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option value="TARJETA">Tarjeta</option>
             <option value="EFECTIVO">Efectivo</option>
           </select>
-          <div
-            *ngIf="
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['methodPayment'].errors &&
               itemForm.form.controls['methodPayment'].errors['required']
-            "
-          >
-            <small class="text-xs text-red-900"
-              >Medod de Pago requerido.</small
-            >
+            ">
+            <small class="text-xs text-red-900">Medod de Pago requerido.</small>
           </div>
         </div>
         <div>
-          <label for="rtn" class="block mb-2 text-sm text-gray-900"
-            >Rtn</label
-          >
-          <select
-            [(ngModel)]="clientBilling.rtn"
-            required="true"
-            name="rtn"
-            id="rtn"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-          >
+          <label for="rtn" class="block mb-2 text-sm text-gray-900">Rtn</label>
+          <select [(ngModel)]="clientBilling.rtn" required="true" name="rtn" id="rtn"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option value="SI">Si</option>
             <option value="NO">No</option>
           </select>
-          <div
-            *ngIf="
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['rtn'].errors &&
               itemForm.form.controls['rtn'].errors['required']
-            "
-          >
-            <small class="text-xs text-red-900"
-              >Rtn es requerido.</small
-            >
+            ">
+            <small class="text-xs text-red-900">Rtn es requerido.</small>
           </div>
         </div>
         <div class="form-group">
-          <label for="supplierName" class="block mb-2 text-sm text-gray-900"
-            >Nombre de Comprador</label
-          >
-          <input
-            [(ngModel)]="clientBilling.supplierName"
-            id="supplierName"
-            name="supplierName"
-            type="text"
+          <label for="supplierName" class="block mb-2 text-sm text-gray-900">Nombre de Comprador</label>
+          <input [(ngModel)]="clientBilling.supplierName" id="supplierName" name="supplierName" type="text"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            required
-          />
-          <div
-            *ngIf="
+            required />
+          <div *ngIf="
               itemForm.submitted &&
               itemForm.form.controls['supplierName'].getError('required')
-            "
-          >
-            <small class="text-xs text-red-900"
-              >Nombre de Comprador es requerido.</small
-            >
+            ">
+            <small class="text-xs text-red-900">Nombre de Comprador es requerido.</small>
           </div>
         </div>
       </div>
@@ -263,71 +154,72 @@
       <div class="w-full flex flex-row gap-2">
         <div class="basis-1/2">
           <div class="mb-2 mt-1">
-            <label
-              for="txt_description"
-              class="block mb-2 text-sm text-gray-900"
-              >Descripción de la partida</label
-            >
-            <input
-              [(ngModel)]="clientBilling.description"
-              type="text"
-              name="description"
-              id="txt_description"
+            <label for="txt_description" class="block mb-2 text-sm text-gray-900">Descripción de la partida</label>
+            <input [(ngModel)]="clientBilling.description" type="text" name="description" id="txt_description"
               maxlength="150"
               class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Ingresa una Descripción corta acerca de la partida contable"
-              required
-            />
+              placeholder="Ingresa una Descripción corta acerca de la partida contable" required />
 
-            <div
-              *ngIf="
+            <div *ngIf="
                 itemForm.submitted &&
                 itemForm.form.controls['description'].getError('required')
-              "
-            >
-              <small class="text-xs text-red-900"
-                >La descripción requerida.</small
-              >
+              ">
+              <small class="text-xs text-red-900">La descripción requerida.</small>
             </div>
           </div>
         </div>
-        
+
       </div>
-      <dx-data-grid
-        id="grid-billing-client"
-        class="mx-auto mt-2 py-2"
-        [dataSource]="dataSource"
-        [showBorders]="true"
-        [height]="400"
-        [repaintChangesOnly]="true"
-        [showRowLines]="true"
-        (onContentReady)="onContentReady($event)"
-        [allowColumnResizing]="true"
-        noDataText=""
-        (onRowInserted)="save($event)"
-        (onRowUpdated)="update($event)"
-        (onRowRemoved)="removed($event)"
-        >
+      <dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2" [dataSource]="dataSource" [showBorders]="true"
+        [height]="400" [repaintChangesOnly]="true" [showRowLines]="true" (onContentReady)="onContentReady($event)"
+        [allowColumnResizing]="true" noDataText="" (onRowInserted)="save($event)" (onRowUpdated)="update($event)"
+        (onRowRemoved)="removed($event)">
         <dxo-load-panel [enabled]="true"></dxo-load-panel>
         <dxo-scrolling mode="virtual"></dxo-scrolling>
-        <dxo-editing
-          mode="form"
-          [useIcons]="true"
-          [allowAdding]="allowAddEntry"
-          [allowDeleting]="enableEdit"
-          [allowUpdating]="enableEdit"
-        />
-        <dxi-column
-          caption="#"
-          [width]="50"
-          [minWidth]="20"
-          alignment="center"
-          cellTemplate="indexTemplate"
-          [showEditorAlways]="false"
-          [formItem]="{ visible: false }"
-          [allowEditing]="false"
-        >
+        <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="enableEdit"
+          [allowUpdating]="enableEdit">
+
+          <dxo-form>
+            <dxi-item itemType="group">
+              <dxi-item dataField="accountId" [label]="{text:'Cuenta'}" editorType="dxSelectBox" [editorOptions]="{
+
+                dataSource:accountList,
+                displayExpr: combineCodeAndDescription,
+                valueExpr: 'id'
+            
+                            }"></dxi-item>
+              <dxi-item dataField="amount" [label]="{text:'Monto'}" editorType="dxNumberBox" [editorOptions]="{ 
+                showSpinButtons: true, 
+                format: '#,##0.00' 
+              }"></dxi-item>
+              <dxi-item dataField="movement" [label]="{text:'Movimiento'}" editorType="dxSelectBox" [editorOptions]="{
+
+                dataSource:listMovement,
+                displayExpr: 'name',
+                valueExpr: 'code'
+            
+                            }"></dxi-item>
+            </dxi-item>
+
+          </dxo-form>
+
+        </dxo-editing>
+        <dxi-column caption="#" [width]="50" alignment="center" cellTemplate="indexTemplate"
+          [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
         </dxi-column>
+        <dxi-column dataField="accountId" caption="Cuenta" alignment="center" [editorOptions]="editorOptions">
+          <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription"></dxo-lookup>
+          <dxi-validation-rule type="required"></dxi-validation-rule>
+        </dxi-column>
+        <dxi-column caption="Debe" [width]="120" [calculateCellValue]="getDebit">
+        </dxi-column>
+        <dxi-column caption="Haber" [width]="120"[calculateCellValue]="getCredit">
+        </dxi-column>
+        <dxi-column dataField="movement" [visible]="false">
+        </dxi-column>
+        <dxi-column dataField="amount" [visible]="false">
+        </dxi-column>
+        <!--
         <dxi-column
           dataField="accountId"
           caption="Cuenta"
@@ -358,8 +250,8 @@
           >
           </dxo-form-item>
           <dxi-validation-rule type="required"></dxi-validation-rule>
-        </dxi-column>
-        <dxi-column
+        </dxi-column> -->
+        <!-- <dxi-column
           dataField="movement"
           caption="Movimiento"
           alignment="center"
@@ -374,35 +266,25 @@
             
           ></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
-        </dxi-column>
+        </dxi-column> -->
 
         <dxo-toolbar>
           <dxi-item location="before">
-            <div
-              class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow"
-            >
+            <div class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow">
               <label class="block font-mono font-semibold">Total Debe </label>
               <small class="block font-mono font-medium text-red-900">
-                {{ totalDebit | currency : "L. " }}</small
-              >
+                {{ totalDebit | currency : "L. " }}</small>
             </div>
           </dxi-item>
           <dxi-item location="before">
-            <div
-              class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow"
-            >
+            <div class="w-40 flex flex-col text-center border border-b-0 px-1.5 shadow">
               <label class="block font-mono font-semibold">Total Haber </label>
               <small class="block font-mono font-medium text-green-900">
-                {{ totalCredit | currency : "L. " }}</small
-              >
+                {{ totalCredit | currency : "L. " }}</small>
             </div>
           </dxi-item>
-            <dxi-item
-              [widget]="'dxButton'"
-              [options]="{ text: 'Add Row', icon: 'add' }"
-              name="addRowButton"
-            ></dxi-item>
-    
+          <dxi-item [widget]="'dxButton'" [options]="{ text: 'Add Row', icon: 'add' }" name="addRowButton"></dxi-item>
+
         </dxo-toolbar>
         <div *dxTemplate="let d of 'indexTemplate'">
           <span>{{ d.rowIndex + 1 }}</span>
@@ -410,6 +292,15 @@
         <div class="" *dxTemplate="let account of 'accounts'">
           <strong class="">{{ account.code }} </strong>
           <small class="text-gray-400">{{account.description }}</small>
+        </div>
+
+        <div class="" *dxTemplate="let debe of 'debit'">
+          {{see(debe)}}
+          <span>{{debe.amount}}</span>
+          <span>{{debe.motion}}</span>
+        </div>
+        <div class="" *dxTemplate="let debe of 'credit'">
+
         </div>
 
         <dxi-column type="buttons" [width]="110">
@@ -428,19 +319,14 @@
     </div>
 
     <div class="mt-4 flex justify-end">
-      <button
-        type="button"
-        (click)="goBack()"
-        class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600"
-      >
+      <button type="button" (click)="goBack()"
+        class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
         Regresar
       </button>
 
       @if(clientBilling.status !== "Success"){
-      <button
-        type="submit"
-        class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50"
-      >
+      <button type="submit"
+        class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50">
         Guardar
       </button>
       }

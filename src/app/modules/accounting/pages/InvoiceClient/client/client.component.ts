@@ -92,10 +92,10 @@ export class ClientComponent {
       currency: '',
       exchangeRate: 0,
       description: '',
-      typePayment:'',
-      methodPayment:'',
-      rtn:'',
-      supplierName:''
+      typePayment: '',
+      methodPayment: '',
+      rtn: '',
+      supplierName: ''
     };
 
     config({
@@ -115,6 +115,7 @@ export class ClientComponent {
         // console.log(this.journalList);
 
       },
+
     })
 
     this.activeRouter.paramMap.subscribe((params) => {
@@ -140,6 +141,8 @@ export class ClientComponent {
   }
 
   async onSubmit(e: NgForm) {
+    console.log(this.dataSource);
+
     if (e.valid && this.validate()) {
       const transactionData: TransactionModel = {
         createAtDate: this.clientBilling.date,
@@ -149,10 +152,10 @@ export class ClientComponent {
         descriptionPda: this.clientBilling.description,
         currency: this.clientBilling.currency,
         diaryType: this.clientBilling.diaryType,
-        typeSale:this.clientBilling.typePayment,
-        typePayment:this.clientBilling.methodPayment,
-        rtn:this.clientBilling.rtn,
-        supplierName:this.clientBilling.supplierName,
+        typeSale: this.clientBilling.typePayment,
+        typePayment: this.clientBilling.methodPayment,
+        rtn: this.clientBilling.rtn,
+        supplierName: this.clientBilling.supplierName,
         detail: this.dataSource.map((detail) => {
           return {
             id: detail.id,
@@ -175,7 +178,7 @@ export class ClientComponent {
         return;
       }
 
-      
+
 
 
       //is an update
@@ -396,10 +399,10 @@ export class ClientComponent {
     this.clientBilling.description = data.description;
     this.clientBilling.diaryType = data.diaryType
 
-    this.clientBilling.typePayment= data.typeSale;
-    this.clientBilling.methodPayment= data.typePayment
-    this.clientBilling.rtn= data.rtn
-    this.clientBilling.supplierName= data.supplierName
+    this.clientBilling.typePayment = data.typeSale;
+    this.clientBilling.methodPayment = data.typePayment
+    this.clientBilling.rtn = data.rtn
+    this.clientBilling.supplierName = data.supplierName
     //
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
 
@@ -448,7 +451,7 @@ export class ClientComponent {
 
           const roundedSum = parseFloat(sum.toFixed(2));
 
-         item.amount = roundedSum;
+          item.amount = roundedSum;
         });
 
       } else {
@@ -466,17 +469,21 @@ export class ClientComponent {
 
     if (e.data.movement == 'D' && credit.length <= 1) {
 
+      console.log("entro en el debe");
+
+
       if (credit.length == 1) {
         credit.forEach((item) => {
           const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-  
-          // Redondear la suma a dos decimales para asegurar precisión
           const roundedSum = parseFloat(sum.toFixed(2));
 
           item.amount = roundedSum
         });
 
       } else {
+
+        console.log(this.selectedJournal);
+        
 
         this.dataSource.push({
           id: this.selectedJournal?.id ?? 0,
@@ -529,16 +536,16 @@ export class ClientComponent {
       const debe = this.dataSource
         .filter((data) => data.movement === 'D')
         .reduce((sum, item) => sum + item.amount, 0);
-    
+
       // Calcular el total de los movimientos 'C' (haber)
       const haber = this.dataSource
         .filter((data) => data.movement === 'C')
         .reduce((sum, item) => sum + item.amount, 0);
-    
+
       // Redondear los totales a dos decimales
       this.totalCredit = parseFloat(haber.toFixed(2));
       this.totalDebit = parseFloat(debe.toFixed(2));
-    
+
       // Mostrar en la consola para verificar
       // console.log('Total Debit:', this.totalDebit);
       // console.log('Total Credit:', this.totalCredit);
@@ -596,13 +603,13 @@ export class ClientComponent {
     if (e.data.movement == 'D' && credit.length == 1) {
       credit.forEach((item) => {
         const sum = debit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); 
+        item.amount = parseFloat(sum.toFixed(2));
       });
     }
     if (e.data.movement == 'C' && debit.length == 1) {
       debit.forEach((item) => {
         const sum = credit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); 
+        item.amount = parseFloat(sum.toFixed(2));
       });
     }
 
@@ -629,8 +636,9 @@ export class ClientComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => {   
-            return item.supportEntry && item.balances.length > 0})
+          .filter(item => {
+            return item.supportEntry && item.balances.length > 0
+          })
           .map(item => ({
             id: item.id,
             description: item.name,
@@ -643,6 +651,29 @@ export class ClientComponent {
   combineCodeAndDescription = (item: any) => {
     return item ? `${item.description} ${item.code}` : '';
   };
+
+  see(d: any) {
+    console.log(d);
+
+  }
+
+  getCredit(dataRow: any) {
+
+    if (dataRow.movement === "C") {
+      return dataRow.amount;
+    }
+
+    return 0;
+
+  }
+  getDebit(dataRow: any) {
+    if (dataRow.movement === "D") {
+      return dataRow.amount;
+    }
+
+    return 0;
+
+  }
 
 
 }
