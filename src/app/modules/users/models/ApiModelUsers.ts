@@ -10,6 +10,7 @@ export interface UsersResponse {
   companies: any
   active: boolean
   activeRoles:boolean 
+  role?:any
 }
 
 export interface UsersRequest {
@@ -32,5 +33,6 @@ export interface RolesResponse {
   name: string
   active:boolean
   activeRoles:boolean
+  global:boolean
 }
 

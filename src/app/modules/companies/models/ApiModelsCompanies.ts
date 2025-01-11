@@ -27,9 +27,11 @@ export interface CompanyResponse {
     website?: any
     tenantId?: any
     createdAt?: any
-    roles: any
+    roles?:any
+    userIds?:number[]
     isActive: boolean
     permissions:number[]
+    role?:any
   }
   
   

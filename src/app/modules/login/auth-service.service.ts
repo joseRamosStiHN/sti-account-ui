@@ -28,7 +28,7 @@ export class AuthServiceService {
     });
 
     return this.httpClient.post<Login>(
-      `/security/login`,
+     this.securityApi+ `/api/v1/login`,
       login,
       this.httpOptions
     );

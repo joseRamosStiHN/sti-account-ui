@@ -1,6 +1,6 @@
 <div class="container">
   <h2 class="font-medium text-2xl mt-2 mb-5">Nueva Empresa</h2>
-  <form id="companyForm" class="w-100" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
+  <form id="companyForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
     <div class="flex flex-row">
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
         <legend class="text-sm font-thin mb-2">Información General</legend>
@@ -133,23 +133,38 @@
 
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2">
         <legend class="text-sm font-thin mb-2">Usuarios</legend>
-        <dx-data-grid id="companyUserGrid" [dataSource]="userList$ | async" [showBorders]="true">
+        <dx-data-grid id="companyUserGrid" [dataSource]="userList$ | async" [showBorders]="true"
+        (onRowUpdated)="onRowUpdated($event)">
           <dxo-paging [enabled]="false"></dxo-paging>
-          <dxo-editing mode="form" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
+          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
           <dxi-column caption="Nombre" dataField="firstName"  [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="role" caption="Role" alignment="center" [width]="90" 
+          <dxi-column dataField="role" caption="Role" alignment="center" 
           [allowEditing]="true"
             [formItem]="{ visible: true }">
-            <dxo-lookup [dataSource]="rolesList$" valueExpr="id" displayExpr="name"></dxo-lookup>
-            <dxi-validation-rule type="required"></dxi-validation-rule>
+            <dxo-lookup [dataSource]="rolesList$ | async" valueExpr="id" displayExpr="name"></dxo-lookup>
+     
           </dxi-column>
-          <dxi-column caption="Permiso" dataField="activeRoles" [width]="100">
-          </dxi-column>
-          <dxi-column type="buttons" [width]="110">
+
+          <!-- <div *dxTemplate="let data of 'cellTemplate'">
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active"
+                [ngModelOptions]="{standalone: true}">
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
+                     peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
+                     peer dark:bg-gray-700 peer-checked:after:translate-x-full 
+                     rtl:peer-checked:after:-translate-x-full
+                      peer-checked:after:border-white after:content-[''] 
+                      after:absolute after:top-[2px] after:start-[2px] after:bg-white
+                       after:border-gray-300 after:border after:rounded-full after:h-5 
+                       after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+              </div>
+            </label>
+          </div> -->
+          <!-- <dxi-column type="buttons" [width]="110">
             <dxi-button name="edit"></dxi-button>
             <dxi-button name="delete"></dxi-button>
-          </dxi-column>
+          </dxi-column> -->
   
          
         </dx-data-grid>

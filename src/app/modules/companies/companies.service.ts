@@ -8,7 +8,7 @@ import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/model
   providedIn: 'root'
 })
 export class CompaniesService {
-  private apiURL = environment.API;
+  private apiURL = environment.SECURITY_API_URL;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -27,7 +27,7 @@ export class CompaniesService {
    */
   getAllCompanies(): Observable<CompanyResponse[]> {
     return this.httpClient.get<CompanyResponse[]>(
-      '/security/company/'
+      this.apiURL + '/api/v1/company/'
     );
   }
 
@@ -37,12 +37,12 @@ export class CompaniesService {
     *
     * @return response()
     */
-    getCompanyById(id:number): Observable<CompanyResponse> {
-      return this.httpClient.get<CompanyResponse>(
-        `/security/company/${id}`
-      );
-    }
-  
+  getCompanyById(id: number): Observable<CompanyResponse> {
+    return this.httpClient.get<CompanyResponse>(
+      this.apiURL + `/api/v1/company/${id}`
+    );
+  }
+
 
 
   /**
@@ -53,7 +53,7 @@ export class CompaniesService {
   createCompany(data: CompanyRequest): Observable<any> {
     return this.httpClient
       .post<any>(
-        '/security/company',
+        this.apiURL + '/api/v1/company',
         JSON.stringify(data),
         this.httpOptions
       )
@@ -61,18 +61,33 @@ export class CompaniesService {
   }
 
 
-   /**
-     * Error Handler Method
-     *
-     * @return response()
-     */
-    errorHandler(error: any) {
-      let errorMessage = '';
-      if (error.error instanceof ErrorEvent) {
-        errorMessage = error.error.message;
-      } else {
-        errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-      }
-      return throwError(errorMessage);
+  /**
+   * Method to update a user
+   *
+   * @return response()
+   */
+  updateCompany(data: CompanyRequest, id:number): Observable<any> {
+    return this.httpClient
+      .put<any>(
+        this.apiURL + `/api/v1/company/${id}`,
+        JSON.stringify(data),
+        this.httpOptions
+      )
+      .pipe(catchError(this.errorHandler));
+  }
+
+  /**
+    * Error Handler Method
+    *
+    * @return response()
+    */
+  errorHandler(error: any) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = error.error.message;
+    } else {
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
+    return throwError(errorMessage);
+  }
 }

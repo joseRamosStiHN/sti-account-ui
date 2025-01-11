@@ -9,11 +9,12 @@ import { RolesResponse, UsersRequest, UsersResponse } from 'src/app/modules/user
 })
 export class UsersService {
 
-  private apiURL = environment.API;
+  private apiURL = environment.SECURITY_API_URL;
 
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
+
     }),
   };
 
@@ -28,7 +29,7 @@ export class UsersService {
    */
   getAllUsers(): Observable<UsersResponse[]> {
     return this.httpClient.get<UsersResponse[]>(
-      '/security/user/'
+      this.apiURL + '/api/v1/user/'
     );
   }
 
@@ -38,9 +39,9 @@ export class UsersService {
   *
   * @return response()
   */
-  getUSerById(id:number): Observable<UsersResponse> {
+  getUSerById(id: number): Observable<UsersResponse> {
     return this.httpClient.get<UsersResponse>(
-      `/security/user/${id}`
+      this.apiURL + `/api/v1/user/${id}`
     );
   }
 
@@ -52,7 +53,7 @@ export class UsersService {
   createUser(data: UsersRequest): Observable<any> {
     return this.httpClient
       .post<any>(
-        '/security/user/',
+        this.apiURL + '/api/v1/user/',
         JSON.stringify(data),
         this.httpOptions
       )
@@ -65,9 +66,9 @@ export class UsersService {
     *
     * @return response()
     */
-  getAllRoles(): Observable<any[]> {
-    return this.httpClient.get<any[]>(
-      '/security/lookup/roles'
+  getAllRoles(): Observable<RolesResponse[]> {
+    return this.httpClient.get<RolesResponse[]>(
+      this.apiURL + '/api/v1/lookup/roles'
     );
   }
 
