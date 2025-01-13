@@ -499,6 +499,11 @@ export class AccountingAdjustmentComponent {
           this.toastType = typeToast.Success;
           this.messageToast = 'Registros insertados exitosamente';
           this.showToast = true;
+
+          setTimeout(() => {
+            this.router.navigate(['/accounting/adjustment-list']);    
+          }, 3000);
+
         },
         error: (err) => {
           console.error('Error creating transaction:', err);
@@ -679,6 +684,25 @@ export class AccountingAdjustmentComponent {
 
   trackByFn(index: number, item: any) {
     return item.numberPda;  // Asumiendo que numberPda es único
+  }
+
+
+  getCredit(dataRow: any) {
+
+    if (dataRow.movement === "C") {
+      return dataRow.amount;
+    }
+
+    return 0;
+
+  }
+  getDebit(dataRow: any) {
+    if (dataRow.movement === "D") {
+      return dataRow.amount;
+    }
+
+    return 0;
+
   }
 
 }

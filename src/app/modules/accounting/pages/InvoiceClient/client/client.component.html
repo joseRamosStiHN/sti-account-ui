@@ -179,7 +179,8 @@
         <dxo-editing mode="form" [useIcons]="true" [allowAdding]="allowAddEntry" [allowDeleting]="enableEdit"
           [allowUpdating]="enableEdit">
 
-          <dxo-form>
+          <dxo-form itemType="group" [colCount]="2">
+
             <dxi-item itemType="group">
               <dxi-item dataField="accountId" [label]="{text:'Cuenta'}" editorType="dxSelectBox" [editorOptions]="{
 
@@ -188,10 +189,7 @@
                 valueExpr: 'id'
             
                             }"></dxi-item>
-              <dxi-item dataField="amount" [label]="{text:'Monto'}" editorType="dxNumberBox" [editorOptions]="{ 
-                showSpinButtons: true, 
-                format: '#,##0.00' 
-              }"></dxi-item>
+            
               <dxi-item dataField="movement" [label]="{text:'Movimiento'}" editorType="dxSelectBox" [editorOptions]="{
 
                 dataSource:listMovement,
@@ -200,12 +198,18 @@
             
                             }"></dxi-item>
             </dxi-item>
+            <dxi-item itemType="group">
+              <dxi-item dataField="amount" [label]="{text:'Monto'}" editorType="dxNumberBox" [editorOptions]="{ 
+                showSpinButtons: true, 
+                format: '#,##0.00' 
+              }"></dxi-item>
+            </dxi-item>
 
           </dxo-form>
 
         </dxo-editing>
-        <dxi-column caption="#" [width]="50" alignment="center" cellTemplate="indexTemplate"
-          [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
+        <dxi-column caption="#" [width]="50" alignment="center" cellTemplate="indexTemplate" [showEditorAlways]="false"
+          [formItem]="{ visible: false }" [allowEditing]="false">
         </dxi-column>
         <dxi-column dataField="accountId" caption="Cuenta" alignment="center" [editorOptions]="editorOptions">
           <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription"></dxo-lookup>
@@ -213,7 +217,7 @@
         </dxi-column>
         <dxi-column caption="Debe" [width]="120" [calculateCellValue]="getDebit">
         </dxi-column>
-        <dxi-column caption="Haber" [width]="120"[calculateCellValue]="getCredit">
+        <dxi-column caption="Haber" [width]="120" [calculateCellValue]="getCredit">
         </dxi-column>
         <dxi-column dataField="movement" [visible]="false">
         </dxi-column>

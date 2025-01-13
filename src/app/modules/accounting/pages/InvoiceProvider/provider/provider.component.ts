@@ -688,4 +688,21 @@ export class ProviderComponent {
   goBack() {
     window.history.back();
    }
+   getCredit(dataRow: any) {
+
+    if (dataRow.movement === "C") {
+      return dataRow.amount;
+    }
+
+    return 0;
+
+  }
+  getDebit(dataRow: any) {
+    if (dataRow.movement === "D") {
+      return dataRow.amount;
+    }
+
+    return 0;
+
+  }
 }
