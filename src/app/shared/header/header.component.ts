@@ -7,6 +7,7 @@ import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService, NavStiLink } from '../navigation.service';
 import { DropdownComponent } from '../components/dropdown/dropdown.component';
+import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +28,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   nav: NavStiLink[] = [];
   dropdownOpen = false;
     private readonly navigationService = inject(NavigationService);
+    private authService = inject(AuthServiceService);
 
   // nombreUsuario: string = 'Josue Rodriguez';
 
@@ -69,6 +71,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
   logout() {
 
     localStorage.removeItem('userData'); 
+    localStorage.removeItem('company');
+    this.authService.setLogin({
+      userName: '',
+      active: false,
+      companies: [],
+      createdAt: new Date(),
+      email: '',
+      firstName: '',
+      id: 0,
+      lastName: '',
+      roles: []
+    });
+
     this.dropdownOpen = false;        
     this.router.navigate(['/login']);      
  

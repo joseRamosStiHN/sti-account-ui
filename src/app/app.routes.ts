@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { CompanyPagesComponent } from 'src/app/modules/companies/pages/company-pages/company-pages.component';
 import { ListCompaniesComponent } from 'src/app/shared/components/companies/list-companies.component';
+import { AuthGuard } from 'src/app/shared/handlers/Guards/AuthGuard';
 import { AuthLayoutComponent } from 'src/app/shared/layouts/auth-layout/auth-layout.component';
 import { DashboardLayoutComponent } from 'src/app/shared/layouts/dashboard-layout/dashboard-layout.component';
 
@@ -21,6 +22,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayoutComponent,
+    canActivate:[AuthGuard],
     children: [
       {
         path: '',
@@ -43,6 +45,7 @@ export const routes: Routes = [
   {
     path: 'accounting',
     component: DashboardLayoutComponent,
+    canActivate:[AuthGuard],
     loadChildren: () =>
       import('./modules/accounting/accounting.module').then(
         (m) => m.AccountingModule

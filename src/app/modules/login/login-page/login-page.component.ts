@@ -15,12 +15,32 @@ export class LoginPageComponent implements OnInit {
     password: new FormControl('Lcaceres97', [Validators.required]),
   });
 
+  erroLogin: boolean = false;
+
   private authService = inject(AuthServiceService);
   private readonly router = inject(Router);
   private userInfoService = inject(UserInfoService);
-  constructor() {}
+  constructor() { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { 
+
+    localStorage.removeItem('userData'); 
+    localStorage.removeItem('company');
+    this.authService.setLogin({
+      userName: '',
+      active: false,
+      companies: [],
+      createdAt: new Date(),
+      email: '',
+      firstName: '',
+      id: 0,
+      lastName: '',
+      roles: []
+    });
+
+    
+
+  }
 
   onSubmit() {
     if (this.loginForm.valid) {
@@ -28,14 +48,21 @@ export class LoginPageComponent implements OnInit {
         next: (n: any) => {
           if (n.active) {
             this.userInfoService.setUserInfo(n);
+            this.authService.setLogin(n);
             this.router.navigate(['/dashboard']);
+
+
           }
         },
         error: (err: any) => {
+
+          this.erroLogin = true;
+
+
           console.log(err);
         }
       });
-      
+
     }
   }
 }
