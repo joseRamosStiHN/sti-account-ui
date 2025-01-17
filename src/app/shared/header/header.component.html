@@ -3,7 +3,16 @@
   <nav class="border-b-2 h-14">
     <div class="flex justify-between gap-1 items-center p-2">
       <a  (click)="goBack()" class="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer">
-        <img [src]="'assets/logoSti.jpeg'" class="h-8" alt="Logo" />
+
+        @if(nameCompany){
+          <h1 class="font-bold text-2xl text-gray-600 tracking-wide" style="font-family: 'Merriweather', serif;">
+            {{nameCompany}}
+          </h1>
+          
+        }@else{
+          <img [src]="'assets/logoSti.jpeg'" class="h-8" alt="Logo" />
+        }
+
         <span
           class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
         ></span>

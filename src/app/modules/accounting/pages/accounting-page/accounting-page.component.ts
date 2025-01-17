@@ -79,5 +79,9 @@ export class AccountingPageComponent implements OnInit {
         ],
       },
     ]);
+
+    const company = JSON.parse(localStorage.getItem('company') || '');
+
+    this.navigationService.setNameCompany(company.name);
   }
 }

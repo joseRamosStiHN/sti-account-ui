@@ -11,9 +11,12 @@ export class AuthInterceptor implements HttpInterceptor {
       req = req.clone({
         withCredentials: true,
       });
+
+      const companyObject = JSON.parse(company);
+
       const cloned = req.clone({
         setHeaders: {
-          tenantId: "03357b46-02c1-4ce7-afd0-19f8d0276150",
+          tenantId: companyObject.tenantId
         },
       });
       return next.handle(cloned);

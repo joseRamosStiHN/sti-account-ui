@@ -36,6 +36,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // iniciales?: string;
 
+  nameCompany?:string
+
   constructor(private navigate: NavigationService, private router: Router) {}
 
   ngOnInit(): void {
@@ -51,6 +53,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.nav = links;
       })
     );
+
+    this.subscription.add(
+      this.navigate.nameCompany$.subscribe((name)=>{
+        this.nameCompany = name
+      })
+    )
   }
 
   ngOnDestroy(): void {
@@ -62,7 +70,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.navigationService.setNavLinks([]);
     localStorage.removeItem('company'); 
     this.router.navigate(['/dashboard']);      
     this.dropdownOpen = false;        
