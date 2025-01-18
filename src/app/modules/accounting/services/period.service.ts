@@ -75,6 +75,29 @@ export class PeriodService {
       .pipe(catchError(this.errorHandler));
   }
 
+     /**
+   * Method to create a period Anual
+   *
+   * @return response()
+   */
+     createPeriodAnual(data: any, tenantId:string): Observable<PeriodModel> {
+
+     const httpOptionsNewCompany = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          'tenantId':`${tenantId}`
+        }),
+      };
+
+      return this.httpClient
+        .post<PeriodModel>(
+          this.apiURL + '/api/v1/accounting-periods',
+          JSON.stringify(data),
+          httpOptionsNewCompany
+        )
+        .pipe(catchError(this.errorHandler));
+    }
+
 
   updatePeriod(
     id: number,

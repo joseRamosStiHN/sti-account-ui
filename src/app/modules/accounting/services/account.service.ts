@@ -67,6 +67,28 @@ export class AccountService {
       );
   }
 
+
+   /**
+   * Method clone accounts
+   *
+   * @return response()
+   */
+   cloneAccountByCompany(sourceTenantId:string): Observable<any> {
+    return this.httpClient
+      .post(
+        this.apiURL + `/api/v1/accounts/clone?sourceTenantId=${sourceTenantId}`,null,
+        this.httpOptions
+      ).pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 400) {
+            return throwError(error);
+          } 
+          return this.errorHandler(error);
+          
+        })
+       
+      );
+  }
   /**
    * Method to update account
    *

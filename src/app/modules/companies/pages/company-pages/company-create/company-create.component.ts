@@ -8,6 +8,9 @@ import { UsersService } from 'src/app/modules/users/users.service';
 import { typeToast } from 'src/app/modules/accounting/models/models';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { ToastType } from 'devextreme/ui/toast';
+import { PeriodService } from 'src/app/modules/accounting/services/period.service';
+import { AccountService } from 'src/app/modules/accounting/services/account.service';
+import { error } from 'console';
 
 @Component({
   selector: 'app-company-create',
@@ -33,6 +36,8 @@ export class CompanyCreateComponent implements OnInit {
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
+  private readonly periodService = inject(PeriodService);
+  private readonly accountService = inject(AccountService);
 
   constructor() {
     this.companyForm = {
@@ -47,7 +52,7 @@ export class CompanyCreateComponent implements OnInit {
       rtn: "",
       type: "",
       website: "",
-      permissions: [1]
+      permissions: []
     }
   }
 
@@ -114,9 +119,9 @@ export class CompanyCreateComponent implements OnInit {
           role: user.role
         }));
 
-    
+
       });
-      
+
 
 
     } else {
@@ -148,14 +153,23 @@ export class CompanyCreateComponent implements OnInit {
       }
     }
 
-    this.companyForm.roles= []
+    this.companyForm.roles = []
     this.companyForm.userIds = [];
     this.userByCompany.forEach((user) => {
       console.log(this.userByCompany);
-      
+
       this.companyForm.userIds?.push(user.id);
       this.companyForm.roles.push({ id: user.role });
     });
+
+    let permisionArray: number[] = [];
+
+    this.companyForm.userIds?.forEach(() => {
+      permisionArray.push(1)
+    });
+
+    this.companyForm.permissions = permisionArray;
+
     if (this.companyForm.roles.length == 0) {
       this.toastType = typeToast.Error;
       this.messageToast = 'Seleccione al menos un Usario';
@@ -196,6 +210,14 @@ export class CompanyCreateComponent implements OnInit {
       this.companyForm.userIds?.push(user.id);
       this.companyForm.roles.push({ id: user.role });
     })
+    let permisionArray: number[] = [];
+
+    this.companyForm.userIds?.forEach(element => {
+      permisionArray.push(1)
+    });
+
+    this.companyForm.permissions = permisionArray;
+
 
     if (this.companyForm.roles.length == 0) {
       this.toastType = typeToast.Error;
@@ -206,6 +228,8 @@ export class CompanyCreateComponent implements OnInit {
 
     this.companyService.createCompany(this.companyForm).subscribe({
       next: (data) => {
+        this.createPeriod(data.tenantId);
+        this.cloneAccountsToNewCompany(data.tenantId);
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
         this.showToast = true;
@@ -225,23 +249,72 @@ export class CompanyCreateComponent implements OnInit {
 
   }
 
+  createPeriod(tenantId: string) {
+
+    console.log(tenantId);
+    
+
+
+    const firstDayOfYear = new Date(new Date().getFullYear(), 0, 1);
+    const startPeriod = this.toLocalDateTime(firstDayOfYear);
+
+    const period: PeriodModel = {
+      closureType: "Anual",
+      periodName: "Periodo Contable Anual",
+      isAnnual: true,
+      periodStatus: "ACTIVE",
+      daysPeriod: 365,
+      startPeriod: null,
+      status: true
+
+    }
+
+    const request = { period, startPeriod };
+    this.periodService.createPeriodAnual(request, tenantId).subscribe({
+      error: (err) => {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Error al crear el periodo anaul de la empresa';
+        this.showToast = true;
+      },
+    });
+  }
+
+
+  cloneAccountsToNewCompany(sourceTenantId: string) {
+    this.accountService.cloneAccountByCompany(sourceTenantId).subscribe({
+
+      next: (data) =>{
+        console.log(data);
+        
+      },
+
+      error: (err) => {
+        console.log(err);
+        
+        this.toastType = typeToast.Error;
+        this.messageToast = 'No se pudo hacer el clonado de las cuentas';
+        this.showToast = true;
+      }
+    });
+  }
+
   goBack() {
     window.history.back();
   }
 
   onRowUpdated(usuario: any) {
     if (this.id) {
-      console.log(usuario.data,"usuario");
-      
+      console.log(usuario.data, "usuario");
+
       const userExist = this.userByCompany.find(user => user.id == usuario.data.id);
       console.log(userExist);
-      
-      if (!userExist){
+
+      if (!userExist) {
         this.userByCompany.push(usuario.data);
-      }else{
-        userExist.role= usuario.data.role;
+      } else {
+        userExist.role = usuario.data.role;
       }
-      
+
       return
     }
 
@@ -251,4 +324,19 @@ export class CompanyCreateComponent implements OnInit {
     }
 
   }
+
+
+  toLocalDateTime(date: Date | null): string | null {
+    if (!date) return null;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  };
+
 }
