@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 
 export interface NavStiLink {
   label: string;
@@ -14,8 +15,8 @@ export class NavigationService {
   private navLinksSource = new BehaviorSubject<NavStiLink[]>([]);
   navLinks$ = this.navLinksSource.asObservable();
 
-  private nameCompany = new BehaviorSubject<string>('');
-  nameCompany$ = this.nameCompany.asObservable();
+  private company$ = new BehaviorSubject<any>({});
+  companyNavigation = this.company$.asObservable();
 
   constructor() {}
 
@@ -23,7 +24,7 @@ export class NavigationService {
     this.navLinksSource.next(links);
   }
 
-  setNameCompany(name: string) {
-    this.nameCompany.next(name);
+  setNameCompany(company: any) {
+    this.company$.next(company);
   }
 }

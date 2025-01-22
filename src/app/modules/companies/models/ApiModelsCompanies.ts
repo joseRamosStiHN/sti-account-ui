@@ -16,7 +16,6 @@ export interface CompanyResponse {
   }
 
   export interface CompanyRequest {
-    id?: number
     name: string
     description: string
     address: string
@@ -24,14 +23,19 @@ export interface CompanyResponse {
     type: string
     email: string
     phone: string
-    website?: any
-    tenantId?: any
-    createdAt?: any
-    roles?:any
-    userIds?:number[]
+    website: string
     isActive: boolean
-    permissions:number[]
-    role?:any
+    companyLogo: string
+    users: User[]
+    tenantId?:string
   }
   
+  export interface User {
+    id: number
+    roles: Role[]
+  }
+  
+  export interface Role {
+    id: number
+  }
   

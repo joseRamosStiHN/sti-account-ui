@@ -73,11 +73,19 @@ export class AccountService {
    *
    * @return response()
    */
-   cloneAccountByCompany(sourceTenantId:string): Observable<any> {
+   cloneAccountByCompany(sourceTenantId:string,tenantId:string): Observable<any> {
+
+    const httpOptionsNewCompany = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'tenantId':`${tenantId}`
+      }),
+    };
+
     return this.httpClient
       .post(
         this.apiURL + `/api/v1/accounts/clone?sourceTenantId=${sourceTenantId}`,null,
-        this.httpOptions
+        httpOptionsNewCompany
       ).pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === 400) {

@@ -30,6 +30,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private readonly navigationService = inject(NavigationService);
     private authService = inject(AuthServiceService);
 
+    imagePreview: string | ArrayBuffer | null = null;
+
   // nombreUsuario: string = 'Josue Rodriguez';
 
   // tieneFotoPerfil: boolean = false;
@@ -55,8 +57,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     );
 
     this.subscription.add(
-      this.navigate.nameCompany$.subscribe((name)=>{
-        this.nameCompany = name
+      this.navigate.companyNavigation.subscribe((company)=>{
+        this.nameCompany = company.name
+        this.imagePreview = `data:image/png;base64,${company.companyLogo}`;   
       })
     )
   }
@@ -88,7 +91,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       firstName: '',
       id: 0,
       lastName: '',
-      roles: []
+      globalRoles: []
     });
 
     this.dropdownOpen = false;        

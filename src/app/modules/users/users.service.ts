@@ -61,6 +61,23 @@ export class UsersService {
   }
 
 
+
+    /**
+   * Method to update a user
+   *
+   * @return response()
+   */
+    updateUser(data: UsersRequest,id:number): Observable<any> {
+      return this.httpClient
+        .put<any>(
+          this.apiURL + `/api/v1/user/${id}`,
+          JSON.stringify(data),
+          this.httpOptions
+        )
+        .pipe(catchError(this.errorHandler));
+    }
+
+
   /**
     * Method that brings a list with all the roles
     *

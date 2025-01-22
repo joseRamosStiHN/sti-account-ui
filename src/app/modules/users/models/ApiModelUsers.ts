@@ -6,26 +6,38 @@ export interface UsersResponse {
   email: string
   phoneNumber: any
   createdAt: any
-  roles: any
+  globalRoles: any
   companies: any
   active: boolean
   activeRoles:boolean 
-  role?:any
+  roles?:any
 }
 
 export interface UsersRequest {
-
-
-  userName: any
+  userName: string
   firstName: string
   lastName: string
   email: string
-  phoneNumber: any
-  roles: any
-  companies: any
-  active: boolean
-  
+  phoneNumber:string
+  password?: string
+  isActive: boolean
+  globalRoles: GlobalRole[]
+  companies: Company[]
 }
+
+export interface GlobalRole {
+  id: number
+}
+
+export interface Company {
+  id: number
+  roles: Role[]
+}
+
+export interface Role {
+  id: number
+}
+
 
 
 export interface RolesResponse {

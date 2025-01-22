@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ToastType } from 'devextreme/ui/toast';
-import { map, Observable } from 'rxjs';
+import { lastValueFrom, map, Observable, scan } from 'rxjs';
 import { typeToast } from 'src/app/modules/accounting/models/models';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
@@ -17,7 +17,9 @@ export class UserCreateComponent implements OnInit {
   txtPassword!: string;
   txtConfirmPassword!: string;
   companyList$: CompanyResponse[] = [];
-  rolesList$: RolesResponse[] = [];
+  rolesGlobals$: RolesResponse[] = [];
+  rolesCompanys$: RolesResponse[] = [];
+
 
   userForm: UsersRequest;
 
@@ -25,7 +27,7 @@ export class UserCreateComponent implements OnInit {
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
-  @Input('id') id?:number;
+  @Input('id') id?: number;
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -33,53 +35,84 @@ export class UserCreateComponent implements OnInit {
 
   constructor() {
     this.userForm = {
-      active: true,
+      isActive: true,
       companies: [],
       email: "",
       firstName: "",
       lastName: "",
       phoneNumber: '',
-      roles: [],
-      userName: ''
+      globalRoles: [],
+      userName: '',
+      password: ''
     }
   }
 
-  ngOnInit(): void {
-    console.log(this.txtPassword);
-    this.companyService.getAllCompanies().subscribe(
-      data => {
-        this.companyList$ = data.map(company => {
-          company.active = false;
-          company.permissions = [1]
-          company.roles = [{ "id": 1, "name": "ADMIN", "description": "Administrador del sistema", "active": true }]
-          return company
-        })
+ 
+
+  async ngOnInit() {  
+    try {
+      const roles = await lastValueFrom(this.userService.getAllRoles());
+      this.rolesGlobals$ = roles.filter(roles => roles.global).map(roles => {
+        roles.active = false;
+        return roles;
       });
-
-    this.userService.getAllRoles().subscribe(
-      data => {
-        this.rolesList$ = data.map(roles => {
-          roles.active = false;
-          return roles
-        })
-      });;
-
-    if (this.id) {
-      this.userService.getUSerById(Number(this.id)).subscribe(data=>{
+  
+      this.rolesCompanys$ = roles.filter(roles => !roles.global).map(roles => {
+        roles.active = false;
+        return roles;
+      });
+  
+      const companies = await lastValueFrom(this.companyService.getAllCompanies());
+      this.companyList$ = companies.map(company => {
+        company.active = false;
+        return company;
+      });
+  
+      if (this.id) {
+        const user = await lastValueFrom(this.userService.getUSerById(Number(this.id)));
         this.userForm = {
-          active:data.active,
-          companies:data.companies,
-          email:data.email,
-          firstName:data.firstName,
-          lastName:data.lastName,
-          phoneNumber:data.phoneNumber,
-          roles:data.roles,
-          userName:data.userName
+          isActive: user.active,
+          companies: user.companies,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: user.phoneNumber,
+          globalRoles: user.globalRoles,
+          userName: user.userName
         };
+  
+        this.rolesGlobals$ = this.rolesGlobals$.map((role) => {
+          this.userForm.globalRoles.forEach((roleGlobal) => {
+            if (role.id === roleGlobal.id) {
+              role.active = true;
+            }
+          });
+          return role;
+        });
+  
+        this.companyList$ = this.companyList$.map((company: any) => {
+          const matchingCompany = this.userForm.companies.find((companyForm: any) => {
+            return company.id === companyForm.company.id;
+          });
+          if (matchingCompany) {
+            const roleIds = matchingCompany.roles.map((role: any) => role.id);
+            company.roles = roleIds;
+          }
+          return company;
+        });
       }
-      )
+    } catch (error) {
+      console.error('Error al inicializar:', error);
     }
+  }
+  
 
+  onSubmit(e: NgForm){
+    if (this.id) {
+      this.update(e)
+    }else{
+      this.save(e);
+    }
   }
 
 
@@ -88,19 +121,23 @@ export class UserCreateComponent implements OnInit {
 
     if (e.valid) {
 
+      const companys = this.companyList$
+        .filter(company => company?.roles && company.roles.length > 0)
+        .map(company => ({
+          id: company.id,
+          roles: company.roles.map((role: any) => ({ id: role }))
+        }));
 
-
-      const companys = this.companyList$.filter(company => company.active == true);
       this.userForm.companies = companys;
 
-      const roles = this.rolesList$.filter(roles => roles.active == true);
-      this.userForm.roles = roles;
+      const roles = this.rolesGlobals$.filter(roles => roles.active == true);
+      this.userForm.globalRoles = roles;
 
       const request = {
         ...this.userForm, password: e.value.password
       }
 
-      if (request.companies.length ==0) {
+      if (request.companies.length == 0) {
         this.toastType = typeToast.Error;
         this.messageToast = 'Seleccione al menos una Empresa';
         this.showToast = true;
@@ -108,7 +145,7 @@ export class UserCreateComponent implements OnInit {
       }
 
 
-      if (request.roles.length ==0) {
+      if (request.globalRoles.length == 0) {
         this.toastType = typeToast.Error;
         this.messageToast = 'Seleccione al menos un Rol';
         this.showToast = true;
@@ -144,6 +181,84 @@ export class UserCreateComponent implements OnInit {
     }
 
 
+  }
+
+  async update(e: NgForm) {
+
+
+    if (e.valid) {      
+      const companys = this.companyList$
+        .filter(company => company?.roles  && company.roles.length > 0)
+        .map(company => ({
+          id: company.id,
+          roles: company.roles.map((role: any) => ({ id: role }))
+        }));
+
+      this.userForm.companies = companys;
+
+      const roles = this.rolesGlobals$.filter(roles => roles.active == true);
+      this.userForm.globalRoles = roles;
+
+      const request = {
+        ...this.userForm, password: e.value.password
+      }
+
+      if (request.companies.length == 0) {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Seleccione al menos una Empresa';
+        this.showToast = true;
+        return
+      }
+
+
+      if (request.globalRoles.length == 0) {
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Seleccione al menos un Rol';
+        this.showToast = true;
+        return
+      }
+
+      await this.userService.updateUser(request, Number(this.id)).subscribe({
+        next: (data) => {
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Usuario actualizado exitosamente';
+          this.showToast = true;
+          setTimeout(() => {
+            this.goBack();
+          }, 3000);
+
+        },
+        error: (err) => {
+          console.error('Error actualizando Usuario:', err);
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al actualizar el Usuario';
+          this.showToast = true;
+        },
+      });
+    }
+
+
+  }
+
+  calculateFilterExpression(filterValue: any, selectedFilterOperation: any, target: any) {
+    if (target === 'search' && typeof (filterValue) === 'string') {
+      return [(this as any).dataField, 'contains', filterValue];
+    }
+    return function (rowData: any) {
+      return (rowData.AssignedEmployee || []).indexOf(filterValue) !== -1;
+    };
+  }
+
+  cellTemplate(container: any, options: any) {
+    const noBreakSpace = '\u00A0';
+
+    const assignees = (options.value || []).map(
+      (assigneeId: number) => options.column!.lookup!.calculateCellValue!(assigneeId),
+    );
+    const text = assignees.join(', ');
+
+    container.textContent = text || noBreakSpace;
+    container.title = text;
   }
 
   goBack() {

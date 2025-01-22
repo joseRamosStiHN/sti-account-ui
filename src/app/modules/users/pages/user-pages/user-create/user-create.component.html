@@ -1,6 +1,6 @@
 <div class="container">
   <h2 class="font-medium text-2xl mt-2 mb-5">Nuevo Usuario</h2>
-  <form id="userForm" class="w-100" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
+  <form id="userForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
     <div class="grid grid-cols-3 gap-2">
       <div class="form w-full">
         <label for="firstName" class="block mb-2 text-sm text-gray-900">Nombre</label>
@@ -27,7 +27,7 @@
         <input required="true" name="phoneNumber" id="phoneNumber" type="text" placeholder="96xxxxxx, 34xxxxxx"
           [(ngModel)]="userForm.phoneNumber"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required pattern="[0-9]*"/>
+          required pattern="[0-9]*" />
 
         <div *ngIf="itemForm.submitted && itemForm.form.controls['phoneNumber'].getError('required')">
           <small class="text-xs text-red-900">Telefono es requerido.</small>
@@ -55,7 +55,7 @@
         <div class="relative">
           <input [(ngModel)]="txtPassword" type="password" maxlength="20" name="password" id="password"
             class="block w-full p-1.5 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            required />
+            [required]="id != null ? false : true"/>
           <div *ngIf="itemForm.submitted && itemForm.form.controls['password'].getError('required')">
             <small class="text-xs text-red-900">Contraseña es requerida.</small>
           </div>
@@ -76,8 +76,9 @@
         <label for="txtRepeatPassword" class="block mb-2 text-sm text-gray-900">Repetir Contraseña</label>
         <input [(ngModel)]="txtConfirmPassword" required="true" name="txtRepeatPassword" id="txtRepeatPassword"
           type="password"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required />
+          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
+           focus:border-blue-500 focus:outline-none"
+          [required]="id != null ? false : true"/>
         <div *ngIf="itemForm.submitted && itemForm.form.controls['txtRepeatPassword'].getError('required')">
           <small class="text-xs text-red-900">Repetir Contraseña es requerida.</small>
         </div>
@@ -107,38 +108,35 @@
         <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="companyList$">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-group-panel [visible]="false"></dxo-group-panel>
-          <dxo-editing mode="row" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true">
+          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="false">
           </dxo-editing>
           <dxi-column caption="Nombre" dataField="name"></dxi-column>
-          <dxi-column caption="Permiso" dataField="active" [width]="100" cellTemplate="cellTemplate">
+          <dxi-column dataField="roles" caption="roles" [allowSorting]="false"
+            editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate"
+            >
+            <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
+            </dxo-lookup>
           </dxi-column>
-          <div *dxTemplate="let data of 'cellTemplate'">
-            <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active"
-                [ngModelOptions]="{standalone: true}">
-              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
-                     peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
-                     peer dark:bg-gray-700 peer-checked:after:translate-x-full 
-                     rtl:peer-checked:after:-translate-x-full
-                      peer-checked:after:border-white after:content-[''] 
-                      after:absolute after:top-[2px] after:start-[2px] after:bg-white
-                       after:border-gray-300 after:border after:rounded-full after:h-5 
-                       after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-              </div>
-            </label>
+          <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
+            <dx-tag-box [dataSource]="rolesCompanys$" [value]="cellInfo.value" valueExpr="id" displayExpr="name"
+              [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
+              [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
+              (onValueChanged)="cellInfo.setValue($event.value)"
+              (onSelectionChanged)="cellInfo.component.updateDimensions()">
+            </dx-tag-box>
           </div>
         </dx-data-grid>
       </fieldset>
 
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
         <legend class="text-sm font-thin mb-2">Roles Globales</legend>
-        <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="rolesList$">
+        <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="rolesGlobals$">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-group-panel [visible]="false"></dxo-group-panel>
           <dxo-editing mode="row" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true">
           </dxo-editing>
           <dxi-column caption="Nombre" dataField="name"></dxi-column>
-          <dxi-column caption="Permiso" dataField="active" [width]="100" cellTemplate="cellTemplate">
+          <dxi-column caption="Permiso" dataField="globalRoles" [width]="100" cellTemplate="cellTemplate">
           </dxi-column>
           <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">

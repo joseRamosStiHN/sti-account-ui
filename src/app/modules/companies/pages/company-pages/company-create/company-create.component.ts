@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { filter, from, map, mergeMap, Observable, pipe, toArray } from 'rxjs';
+import { filter, from, lastValueFrom, map, mergeMap, Observable, pipe, toArray } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { RolesResponse, UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
@@ -21,7 +21,7 @@ export class CompanyCreateComponent implements OnInit {
   accountsFromSystem: boolean = true;
 
   companyList$: Observable<CompanyResponse[]> | undefined;
-  userList$: Observable<UsersResponse[]> | undefined;
+  userList$: UsersResponse[] = [];
   companyForm: CompanyRequest;
 
   userByCompany: UsersResponse[] = []
@@ -31,8 +31,14 @@ export class CompanyCreateComponent implements OnInit {
   toastType: ToastType = typeToast.Info;
   rolesList$: Observable<RolesResponse[]> | undefined;
 
+  imagePreview: string | ArrayBuffer | null = null;
+  imageBase64: string = ''; 
+
   @Input('id') id?: number;
 
+  tenantId = "";
+
+  rolesCompanys$: RolesResponse[] = [];
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -47,85 +53,60 @@ export class CompanyCreateComponent implements OnInit {
       email: "",
       name: "",
       phone: "",
-      roles: [],
-      userIds: [],
+      users: [],
       rtn: "",
       type: "",
       website: "",
-      permissions: []
+      companyLogo: ""
     }
   }
 
   async ngOnInit() {
     this.companyList$ = this.companyService.getAllCompanies();
 
-    this.rolesList$ = await this.userService.getAllRoles().pipe(
-      map((roles) => {
-        return roles.filter(role => !role.global);
-      })
-    );
+    this.userService.getAllUsers().subscribe((data) => {
+      this.userList$ = data;
+    });
+
+    const users = await lastValueFrom(this.userService.getAllUsers());
+    this.userList$ = users;
+
+    const roles = await lastValueFrom(this.userService.getAllRoles());
+    this.rolesCompanys$ = roles.filter(roles => !roles.global).map(roles => {
+      roles.active = false;
+      return roles;
+    });
     if (this.id) {
-      await this.companyService.getCompanyById(Number(this.id)).subscribe(data => {
+      const company = await lastValueFrom(this.companyService.getCompanyById(Number(this.id)));
 
-        this.companyForm = {
-          address: data.address,
-          description: data.description,
-          email: data.email,
-          isActive: data.active,
-          name: data.name,
-          permissions: data.permissions,
-          phone: data.phone,
-          roles: data.roles,
-          rtn: data.rtn,
-          type: data.type,
-          createdAt: data.createdAt,
-          id: data.id,
-          tenantId: data.tenantId,
-          website: data.website,
-          userIds: []
+      this.companyForm = {
+        address: company.address,
+        description: company.description,
+        email: company.email,
+        isActive: company.active,
+        name: company.name,
+        phone: company.phone,
+        rtn: company.rtn,
+        type: company.type,
+        website: company.website,
+        companyLogo: company.companyLogo,
+        users: company.users,
+        tenantId:company.tenantId
+        
+      }
+      this.imagePreview = `data:image/png;base64,${company.companyLogo}`;      
+
+      this.userList$ = this.userList$.map((user1: any) => {
+        const matchingUser = this.companyForm.users.find((user2: any) => {
+          return user1.id === user2.user.id;
+        });
+        if (matchingUser) {
+          const roleIds = matchingUser.roles.map((role: any) => role.id);
+          user1.roles = roleIds;
         }
+        return user1;
       });
 
-      this.userList$ = this.userService.getAllUsers().pipe(
-        mergeMap(users => {
-          return from(users).pipe(
-            mergeMap(async (user, index) => {
-              const role = this.companyForm.roles[index];
-              const id = role ? await role.id : null;
-              return {
-                ...user,
-                role: id
-              };
-            }),
-            toArray()
-          );
-        })
-      );
-
-      this.userList$.subscribe(users => {
-        const userFilter = users.filter(user => user.role != null);
-        this.userByCompany = userFilter.map(user => ({
-          active: user.active,
-          activeRoles: user.activeRoles,
-          userName: user.userName,
-          companies: user.companies,
-          createdAt: user.createdAt,
-          email: user.email,
-          firstName: user.firstName,
-          id: user.id,
-          lastName: user.lastName,
-          phoneNumber: user.phoneNumber,
-          roles: user.roles,
-          role: user.role
-        }));
-
-
-      });
-
-
-
-    } else {
-      this.userList$ = this.userService.getAllUsers();
     }
   }
   onAccountConfig(event: Event) {
@@ -147,30 +128,17 @@ export class CompanyCreateComponent implements OnInit {
   }
 
   async update() {
-    if (this.companyForm.tenantId == undefined) {
-      this.companyForm = {
-        ...this.companyForm, ...this.companyForm.tenantId
-      }
-    }
+    const users = this.userList$
+      .filter(users => users.roles && users.roles.length > 0)
+      .map(user => ({
+        id: user.id,
+        roles: user.roles.map((role: any) => ({ id: role }))
+      }));
 
-    this.companyForm.roles = []
-    this.companyForm.userIds = [];
-    this.userByCompany.forEach((user) => {
-      console.log(this.userByCompany);
+    this.companyForm.users = users;
+    this.companyForm.companyLogo =  this.imageBase64;
 
-      this.companyForm.userIds?.push(user.id);
-      this.companyForm.roles.push({ id: user.role });
-    });
-
-    let permisionArray: number[] = [];
-
-    this.companyForm.userIds?.forEach(() => {
-      permisionArray.push(1)
-    });
-
-    this.companyForm.permissions = permisionArray;
-
-    if (this.companyForm.roles.length == 0) {
+    if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
       this.messageToast = 'Seleccione al menos un Usario';
       this.showToast = true;
@@ -179,6 +147,11 @@ export class CompanyCreateComponent implements OnInit {
 
     this.companyService.updateCompany(this.companyForm, Number(this.id)).subscribe({
       next: (data) => {
+
+        if (this.tenantId != "") {
+          this.cloneAccountsToNewCompany(this.tenantId,this.companyForm.tenantId || '');
+        }
+
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
         this.showToast = true;
@@ -200,26 +173,18 @@ export class CompanyCreateComponent implements OnInit {
 
   async save() {
 
-    if (this.companyForm.tenantId == undefined) {
-      this.companyForm = {
-        ...this.companyForm, ...this.companyForm.tenantId
-      }
-    }
+    const users = this.userList$
+      .filter(users => users.roles && users.roles.length > 0)
+      .map(user => ({
+        id: user.id,
+        roles: user.roles.map((role: any) => ({ id: role }))
+      }));
 
-    this.userByCompany.forEach((user) => {
-      this.companyForm.userIds?.push(user.id);
-      this.companyForm.roles.push({ id: user.role });
-    })
-    let permisionArray: number[] = [];
-
-    this.companyForm.userIds?.forEach(element => {
-      permisionArray.push(1)
-    });
-
-    this.companyForm.permissions = permisionArray;
+    this.companyForm.users = users;
+    this.companyForm.companyLogo =  this.imageBase64;
 
 
-    if (this.companyForm.roles.length == 0) {
+    if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
       this.messageToast = 'Seleccione al menos un Usario';
       this.showToast = true;
@@ -229,7 +194,9 @@ export class CompanyCreateComponent implements OnInit {
     this.companyService.createCompany(this.companyForm).subscribe({
       next: (data) => {
         this.createPeriod(data.tenantId);
-        this.cloneAccountsToNewCompany(data.tenantId);
+        if (this.tenantId != "") {
+          this.cloneAccountsToNewCompany(this.tenantId,data.tenantId);
+        }
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
         this.showToast = true;
@@ -251,14 +218,10 @@ export class CompanyCreateComponent implements OnInit {
 
   createPeriod(tenantId: string) {
 
-    console.log(tenantId);
-    
-
-
     const firstDayOfYear = new Date(new Date().getFullYear(), 0, 1);
     const startPeriod = this.toLocalDateTime(firstDayOfYear);
 
-    const period: PeriodModel = {
+    const period: any = {
       closureType: "Anual",
       periodName: "Periodo Contable Anual",
       isAnnual: true,
@@ -269,7 +232,8 @@ export class CompanyCreateComponent implements OnInit {
 
     }
 
-    const request = { period, startPeriod };
+    const request = { ...period, startPeriod };
+
     this.periodService.createPeriodAnual(request, tenantId).subscribe({
       error: (err) => {
         this.toastType = typeToast.Error;
@@ -280,17 +244,17 @@ export class CompanyCreateComponent implements OnInit {
   }
 
 
-  cloneAccountsToNewCompany(sourceTenantId: string) {
-    this.accountService.cloneAccountByCompany(sourceTenantId).subscribe({
+  cloneAccountsToNewCompany(sourceTenantId: string, tenantId:string) {
+    this.accountService.cloneAccountByCompany(sourceTenantId,tenantId).subscribe({
 
-      next: (data) =>{
+      next: (data) => {
         console.log(data);
-        
+
       },
 
       error: (err) => {
         console.log(err);
-        
+
         this.toastType = typeToast.Error;
         this.messageToast = 'No se pudo hacer el clonado de las cuentas';
         this.showToast = true;
@@ -302,28 +266,7 @@ export class CompanyCreateComponent implements OnInit {
     window.history.back();
   }
 
-  onRowUpdated(usuario: any) {
-    if (this.id) {
-      console.log(usuario.data, "usuario");
 
-      const userExist = this.userByCompany.find(user => user.id == usuario.data.id);
-      console.log(userExist);
-
-      if (!userExist) {
-        this.userByCompany.push(usuario.data);
-      } else {
-        userExist.role = usuario.data.role;
-      }
-
-      return
-    }
-
-    const userExist = this.userByCompany.find(user => user.id == usuario.data.id);
-    if (!userExist) {
-      this.userByCompany.push(usuario.data);
-    }
-
-  }
 
 
   toLocalDateTime(date: Date | null): string | null {
@@ -339,4 +282,42 @@ export class CompanyCreateComponent implements OnInit {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   };
 
+
+  cellTemplate(container: any, options: any) {
+    const noBreakSpace = '\u00A0';
+
+    const assignees = (options.value || []).map(
+      (assigneeId: number) => options.column!.lookup!.calculateCellValue!(assigneeId),
+    );
+    const text = assignees.join(', ');
+
+    container.textContent = text || noBreakSpace;
+    container.title = text;
+  }
+
+
+
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input?.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        this.imagePreview = reader.result;    
+
+        const base64String = (reader.result as string).split(',')[1];
+        this.imageBase64 = base64String;  
+      
+        
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+
+  
+  
 }

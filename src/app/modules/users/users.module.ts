@@ -8,7 +8,7 @@ import { UserPagesComponent } from './pages/user-pages/user-pages.component';
 import { UserEditComponent } from './pages/user-pages/user-edit/user-edit.component';
 import { UserCreateComponent } from './pages/user-pages/user-create/user-create.component';
 import { FormsModule } from '@angular/forms';
-import { DxToastModule } from 'devextreme-angular';
+import { DxDropDownBoxModule, DxListModule, DxTagBoxModule, DxToastModule } from 'devextreme-angular';
 
 @NgModule({
   declarations: [UserPagesComponent, UserEditComponent, UserCreateComponent],
@@ -19,7 +19,10 @@ import { DxToastModule } from 'devextreme-angular';
     DxDataGridModule,
     DxButtonModule,
     HttpClientModule,
-        DxToastModule,
+    DxListModule,
+    DxToastModule,
+    DxDropDownBoxModule,
+    DxTagBoxModule,
   ],
 })
-export class UsersModule {}
+export class UsersModule { }

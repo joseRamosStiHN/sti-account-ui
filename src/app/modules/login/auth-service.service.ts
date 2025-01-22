@@ -19,7 +19,7 @@ export class AuthServiceService {
     firstName: '',
     id: 0,
     lastName: '',
-    roles: []
+    globalRoles: []
   });
   userAuthenticate$ = this.isLoging.asObservable();
 

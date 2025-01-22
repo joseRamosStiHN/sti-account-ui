@@ -38,7 +38,7 @@ export class ListCompaniesComponent implements OnInit {
       const usuario = JSON.parse(savedUser);
       this.user$ = this.userService.getUSerById(usuario.id);
       this.user$.subscribe(data => {
-        this.isAdmind = data?.roles.some((role: any) => role.name === 'ADMIN' && role.global);
+        this.isAdmind = data?.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
       })
     } else {
       let usuario:any;
@@ -49,7 +49,7 @@ export class ListCompaniesComponent implements OnInit {
       this.user$ = this.userService.getUSerById(usuario);
       this.user$.subscribe((data) => {
         if (data) {
-          this.isAdmind = data.roles.some((role: any) => role.name === 'ADMIN' && role.global);
+          this.isAdmind = data.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
           localStorage.setItem('userData', JSON.stringify(data));
         }
       });

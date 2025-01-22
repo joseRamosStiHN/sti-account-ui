@@ -14,9 +14,12 @@ export class AuthInterceptor implements HttpInterceptor {
 
       const companyObject = JSON.parse(company);
 
+      console.log(companyObject);
+      
+
       const cloned = req.clone({
         setHeaders: {
-          tenantId: companyObject.tenantId
+          tenantId: companyObject.company.tenantId
         },
       });
       return next.handle(cloned);

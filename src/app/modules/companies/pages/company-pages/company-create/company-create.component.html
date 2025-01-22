@@ -4,9 +4,25 @@
     <div class="flex flex-row">
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
         <legend class="text-sm font-thin mb-2">Información General</legend>
-        <div class="w-auto">
-          <img class="h-auto w-60 rounded-lg" src="assets/image-1@2x.jpg" alt="image description" />
+     
+        <div class="flex flex-col items-center space-y-4">
+          <div class="w-60 h-auto">
+            <img *ngIf="imagePreview" [src]="imagePreview" alt="image description" class="h-auto w-full rounded-lg shadow-lg" />
+            <img *ngIf="!imagePreview" class="h-auto w-60 rounded-lg" src="assets/image-1@2x.jpg" alt="image description" />
+          </div>
+      
+          <label class="flex flex-col items-center justify-center w-60 px-4 py-2 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-200 hover:border-gray-400 transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="text-gray-500 text-xs">Selecciona una imagen</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+          </label>
+          
+          
+          
         </div>
+        
         <div class="w-full grid grid-cols-3 gap-3">
           <div class="form">
             <label for="name" class="block mb-2 text-sm text-gray-900">Nombre</label>
@@ -47,8 +63,8 @@
             <label for="type" class="block mb-2 text-sm text-gray-900">Razón</label>
             <select required="true" name="type" id="type" [(ngModel)]="companyForm.type"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
-              <option value="EMPRESA">Empresa</option>
-              <option value="NATURAL">Natural</option>
+              <option value="JURIDICA">JURIDICA</option>
+              <option value="NATURAL">NATURAL</option>
             </select>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')">
               <small class="text-xs text-red-900">Razon es requerida.</small>
@@ -118,8 +134,8 @@
             <select required name="tenantId" id="tenantId" class="bg-gray-50 border
            border-gray-300 text-gray-900 
                         text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-              [(ngModel)]="companyForm.tenantId" required>
-              <option *ngFor="let company of companyList$ | async" [ngValue]="company.id">
+              [(ngModel)]="tenantId" required>
+              <option *ngFor="let company of companyList$ | async" [ngValue]="company.tenantId">
                 {{ company.name }}
               </option>
             </select>
@@ -133,18 +149,26 @@
 
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2">
         <legend class="text-sm font-thin mb-2">Usuarios</legend>
-        <dx-data-grid id="companyUserGrid" [dataSource]="userList$ | async" [showBorders]="true"
-        (onRowUpdated)="onRowUpdated($event)">
+        <dx-data-grid id="companyUserGrid" [dataSource]="userList$" [showBorders]="true">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
           <dxi-column caption="Nombre" dataField="firstName"  [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="role" caption="Role" alignment="center" 
-          [allowEditing]="true"
-            [formItem]="{ visible: true }">
-            <dxo-lookup [dataSource]="rolesList$ | async" valueExpr="id" displayExpr="name"></dxo-lookup>
-     
+          <dxi-column dataField="roles" caption="roles" [allowSorting]="false"
+            editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate"
+            >
+            <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
+            </dxo-lookup>
           </dxi-column>
+
+          <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
+            <dx-tag-box [dataSource]="rolesCompanys$" [value]="cellInfo.value" valueExpr="id" displayExpr="name"
+              [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
+              [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
+              (onValueChanged)="cellInfo.setValue($event.value)"
+              (onSelectionChanged)="cellInfo.component.updateDimensions()">
+            </dx-tag-box>
+          </div>
 
           <!-- <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">

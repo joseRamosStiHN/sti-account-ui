@@ -35,7 +35,7 @@ export class LoginPageComponent implements OnInit {
       firstName: '',
       id: 0,
       lastName: '',
-      roles: []
+      globalRoles: []
     });
 
     
@@ -50,16 +50,11 @@ export class LoginPageComponent implements OnInit {
             this.userInfoService.setUserInfo(n);
             this.authService.setLogin(n);
             this.router.navigate(['/dashboard']);
-
-
           }
         },
         error: (err: any) => {
 
           this.erroLogin = true;
-
-
-          console.log(err);
         }
       });
 
