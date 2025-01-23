@@ -67,10 +67,10 @@ export class UsersService {
    *
    * @return response()
    */
-    updateUser(data: UsersRequest,id:number): Observable<any> {
+    updateUser(data: UsersRequest,id:number, userUpdate:number): Observable<any> {
       return this.httpClient
         .put<any>(
-          this.apiURL + `/api/v1/user/${id}`,
+          this.apiURL + `/api/v1/user/${id}/${userUpdate}`,
           JSON.stringify(data),
           this.httpOptions
         )

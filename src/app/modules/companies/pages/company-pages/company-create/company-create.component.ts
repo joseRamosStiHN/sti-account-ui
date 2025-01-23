@@ -37,6 +37,7 @@ export class CompanyCreateComponent implements OnInit {
   @Input('id') id?: number;
 
   tenantId = "";
+  userId?:number;
 
   rolesCompanys$: RolesResponse[] = [];
 
@@ -62,6 +63,14 @@ export class CompanyCreateComponent implements OnInit {
   }
 
   async ngOnInit() {
+
+    const savedUser = localStorage.getItem('userData');
+    if (savedUser) {
+      const usuario = JSON.parse(savedUser);
+      this.userId = usuario.id
+    }
+
+
     this.companyList$ = this.companyService.getAllCompanies();
 
     this.userService.getAllUsers().subscribe((data) => {
@@ -145,7 +154,7 @@ export class CompanyCreateComponent implements OnInit {
       return
     }
 
-    this.companyService.updateCompany(this.companyForm, Number(this.id)).subscribe({
+    this.companyService.updateCompany(this.companyForm, Number(this.id),Number(this.userId)).subscribe({
       next: (data) => {
 
         if (this.tenantId != "") {

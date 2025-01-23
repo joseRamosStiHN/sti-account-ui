@@ -23,16 +23,16 @@
         </div>
       </div>
       <div class="form w-full">
-        <label for="phoneNumber" class="block mb-2 text-sm text-gray-900">Teléfono</label>
-        <input required="true" name="phoneNumber" id="phoneNumber" type="text" placeholder="96xxxxxx, 34xxxxxx"
-          [(ngModel)]="userForm.phoneNumber"
+        <label for="userPhone" class="block mb-2 text-sm text-gray-900">Teléfono</label>
+        <input required="true" name="userPhone" id="userPhone" type="text" placeholder="96xxxxxx, 34xxxxxx"
+          [(ngModel)]="userForm.userPhone"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
           required pattern="[0-9]*" />
 
-        <div *ngIf="itemForm.submitted && itemForm.form.controls['phoneNumber'].getError('required')">
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['userPhone'].getError('required')">
           <small class="text-xs text-red-900">Telefono es requerido.</small>
         </div>
-        <div *ngIf="itemForm.submitted && itemForm.form.controls['phoneNumber'].hasError('pattern')">
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['userPhone'].hasError('pattern')">
 
           <small class="text-xs text-red-900">Solo se permiten números.</small>
 
@@ -54,7 +54,9 @@
         <label for="password" class="block mb-2 text-sm text-gray-900">Contraseña</label>
         <div class="relative">
           <input [(ngModel)]="txtPassword" type="password" maxlength="20" name="password" id="password"
-            class="block w-full p-1.5 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          autocomplete="new-password"
+            class="block w-full p-1.5 text-sm text-gray-900 border border-gray-300 rounded-lg
+             focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
             [required]="id != null ? false : true"/>
           <div *ngIf="itemForm.submitted && itemForm.form.controls['password'].getError('required')">
             <small class="text-xs text-red-900">Contraseña es requerida.</small>
@@ -99,7 +101,9 @@
       <div class="form col-span-2">
         <label for="txtAddress" class="block mb-2 text-sm text-gray-900">Dirección</label>
         <input required="true" name="txtAddress" id="txtAddress" type="text"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none" />
+        [(ngModel)]="userForm.userAddress"
+          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg
+           focus:ring-blue-500 focus:border-blue-500 focus:outline-none" />
 
       </div>
 

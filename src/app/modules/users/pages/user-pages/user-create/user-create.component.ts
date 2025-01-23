@@ -27,6 +27,8 @@ export class UserCreateComponent implements OnInit {
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
+  userId?:number;
+
   @Input('id') id?: number;
 
   private readonly companyService = inject(CompaniesService);
@@ -40,16 +42,24 @@ export class UserCreateComponent implements OnInit {
       email: "",
       firstName: "",
       lastName: "",
-      phoneNumber: '',
+      userPhone: '',
       globalRoles: [],
       userName: '',
-      password: ''
+      password: '',
+      userAddress:''
     }
   }
 
  
 
   async ngOnInit() {  
+
+    const savedUser = localStorage.getItem('userData');
+    if (savedUser) {
+      const usuario = JSON.parse(savedUser);
+      this.userId = usuario.id
+    }
+
     try {
       const roles = await lastValueFrom(this.userService.getAllRoles());
       this.rolesGlobals$ = roles.filter(roles => roles.global).map(roles => {
@@ -76,9 +86,10 @@ export class UserCreateComponent implements OnInit {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
-          phoneNumber: user.phoneNumber,
+          userPhone: user.userPhone,
           globalRoles: user.globalRoles,
-          userName: user.userName
+          userName: user.userName,
+          userAddress:user.userAddress
         };
   
         this.rolesGlobals$ = this.rolesGlobals$.map((role) => {
@@ -218,7 +229,7 @@ export class UserCreateComponent implements OnInit {
         return
       }
 
-      await this.userService.updateUser(request, Number(this.id)).subscribe({
+      await this.userService.updateUser(request, Number(this.id), Number(this.userId)).subscribe({
         next: (data) => {
           this.toastType = typeToast.Success;
           this.messageToast = 'Usuario actualizado exitosamente';

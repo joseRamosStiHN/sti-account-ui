@@ -66,10 +66,10 @@ export class CompaniesService {
    *
    * @return response()
    */
-  updateCompany(data: CompanyRequest, id:number): Observable<any> {
+  updateCompany(data: CompanyRequest, id:number, actionUser:number): Observable<any> {
     return this.httpClient
       .put<any>(
-        this.apiURL + `/api/v1/company/${id}`,
+        this.apiURL + `/api/v1/company/${id}/${actionUser}`,
         JSON.stringify(data),
         this.httpOptions
       )

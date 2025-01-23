@@ -1,12 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, of, tap } from 'rxjs';
 import { AdjustmentResponse } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import themes from 'devextreme/ui/themes';
 import { typeToast } from 'src/app/modules/accounting/models/models';
 import { ToastType } from 'devextreme/ui/toast';
 import { confirm } from 'devextreme/ui/dialog';
+import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
+import { UsersService } from 'src/app/modules/users/users.service';
 
 @Component({
   selector: 'app-adjustment-list',
@@ -33,6 +35,14 @@ export class AdjustmentListComponent {
 
   selectRows:number[]=[];
 
+
+   
+  user?: UsersResponse;
+  private readonly userService = inject(UsersService);
+ 
+   isRegistreAccounting:boolean = false;
+  isApprove:boolean= false;
+
   private readonly adjustemntService = inject(AdjusmentService);
 
   constructor() { 
@@ -43,6 +53,7 @@ export class AdjustmentListComponent {
 
 
   ngOnInit(): void {
+    this.validPermisition();
     this.dataSource$ = this.adjustemntService.getAll()
       .pipe(
         map((data) => this.fillDataSource(data)),
@@ -120,5 +131,43 @@ export class AdjustmentListComponent {
     );
   }
 
+  async validPermisition() {
 
+    const savedUser = localStorage.getItem('userData');
+    const company = JSON.parse(localStorage.getItem('company') || '');
+
+    if (!savedUser || company == '') {
+      console.error('Datos de usuario o compañía no encontrados.');
+      return;
+    }
+
+    const usuario = JSON.parse(savedUser);
+    this.user =  await firstValueFrom(this.userService.getUSerById(usuario.id));
+
+    const companyRole = this.user.companies.find((com: any) => com.company.id === company.company.id);
+
+    if (!companyRole) {
+      console.error('No se encontró un rol para la compañía especificada.');
+      console.log('company.id:', company.id);
+      console.log('this.user.companies:', this.user.companies);
+      return;
+    }
+
+   await companyRole.roles.forEach((role: any) => { 
+
+      console.log(role);
+      
+
+      if (role.name == 'REGISTRO CONTABLE') {       
+        this.isRegistreAccounting = true;
+      }
+
+      if (role.name == 'APROBADOR') {
+        this.isApprove = true;
+      }
+      
+    })
+
+
+  }
 }

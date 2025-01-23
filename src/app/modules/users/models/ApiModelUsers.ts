@@ -4,7 +4,8 @@ export interface UsersResponse {
   firstName: string
   lastName: string
   email: string
-  phoneNumber: any
+  userPhone: any
+  userAddress:string
   createdAt: any
   globalRoles: any
   companies: any
@@ -14,11 +15,12 @@ export interface UsersResponse {
 }
 
 export interface UsersRequest {
+  userAddress:string
   userName: string
   firstName: string
   lastName: string
   email: string
-  phoneNumber:string
+  userPhone:string
   password?: string
   isActive: boolean
   globalRoles: GlobalRole[]

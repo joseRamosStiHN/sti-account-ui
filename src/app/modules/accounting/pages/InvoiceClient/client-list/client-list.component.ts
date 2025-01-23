@@ -3,10 +3,13 @@ import { Router } from '@angular/router';
 import { BillingListClient, DocumentType, typeToast } from '../../../models/models';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
-import { catchError, filter, map, Observable, of, tap } from 'rxjs';
+import { catchError, filter, firstValueFrom, map, Observable, of, Subscription, tap } from 'rxjs';
 import themes from 'devextreme/ui/themes';
 import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
+import { NavigationService } from 'src/app/shared/navigation.service';
+import { UsersService } from 'src/app/modules/users/users.service';
+import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -21,6 +24,7 @@ const initialValue: [Date, Date] = [
   styleUrl: './client-list.component.css',
 })
 export class ClientListComponent implements OnInit {
+
   dataSource$: Observable<BillingListClient[]> | undefined;
   error: Error | null = null;
   roles: string[] = ['admin', 'teller'];
@@ -31,31 +35,35 @@ export class ClientListComponent implements OnInit {
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-  
+  user?: UsersResponse;
+  private readonly userService = inject(UsersService);
+
+  isRegistreAccounting:boolean = false;
+  isApprove:boolean= false;
 
   // seleccion por paginacion
   allMode: string;
-  checkBoxesMode: string;  
+  checkBoxesMode: string;
   selectOptions: { id: string, name: string }[] = [
     { id: 'allPages', name: 'Todos' },
     { id: 'page', name: 'Página' }
   ];
 
-  selectRows:number[]=[];
+  selectRows: number[] = [];
 
   private readonly router = inject(Router);
   private readonly transService = inject(TransactionService);
+  private readonly navigate = inject(NavigationService);
 
 
-  
-  constructor() { 
+  constructor() {
 
     this.allMode = 'allPages';
     this.checkBoxesMode = themes.current().startsWith('material') ? 'always' : 'onClick';
   }
 
   ngOnInit(): void {
-
+    this.validPermisition();
     this.currentValue = initialValue;
 
     this.dataSource$ = this.transService
@@ -74,14 +82,14 @@ export class ClientListComponent implements OnInit {
       );
   }
 
-  
- 
+
+
 
   onSearch(): void {
     let [dateInit, dateEnd] = this.currentValue;
 
-  
-    if (dateEnd < dateInit) {  
+
+    if (dateEnd < dateInit) {
       return;
     }
 
@@ -89,21 +97,22 @@ export class ClientListComponent implements OnInit {
     dateEnd = new Date(dateEnd);
 
     this.dataSource$ = this.transService
-    .getTransactionByDate(dateInit,dateEnd)
-    .pipe(
-      map((data) => {        
-        return data.filter(item => item.documentType === 1)}),
-      map((data) => this.fillDataSource(data)),
-      tap({
-        error: (err) => {
-          this.error = err;
-        },
-      }),
-      catchError((err) => {
-        console.log('handler error in component');
-        return of([]);
-      })
-    );
+      .getTransactionByDate(dateInit, dateEnd)
+      .pipe(
+        map((data) => {
+          return data.filter(item => item.documentType === 1)
+        }),
+        map((data) => this.fillDataSource(data)),
+        tap({
+          error: (err) => {
+            this.error = err;
+          },
+        }),
+        catchError((err) => {
+          console.log('handler error in component');
+          return of([]);
+        })
+      );
 
   }
 
@@ -117,10 +126,10 @@ export class ClientListComponent implements OnInit {
 
   private fillDataSource(data: TransactionResponse[]): BillingListClient[] {
 
-    
+
     return data.map((item) => {
 
-      
+
       return {
         id: item.id,
         document: item.reference,
@@ -129,22 +138,22 @@ export class ClientListComponent implements OnInit {
         status:
           item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
         description: item.description,
-        numberPda:item.numberPda
+        numberPda: item.numberPda
       } as BillingListClient;
     });
   }
 
   currentValueChanged(event: any): void {
-    const date: [Date,Date] = event.value;
+    const date: [Date, Date] = event.value;
     this.currentValue = date;
   };
 
-  
+
 
   onRowSelected(event: any): void {
 
-    this.selectRows =  event.selectedRowsData.filter( (data:BillingListClient)=> data.status =="Borrador")
-                    .map((data:BillingListClient)=> data.id);                  
+    this.selectRows = event.selectedRowsData.filter((data: BillingListClient) => data.status == "Borrador")
+      .map((data: BillingListClient) => data.id);
   }
 
   posting() {
@@ -154,26 +163,64 @@ export class ClientListComponent implements OnInit {
     );
 
     dialogo.then(async (d) => {
-    
-        this.transService.putAllTransaction(this.selectRows).subscribe({
-          next: (data) => {
-            this.toastType = typeToast.Success;
-            this.messageToast = 'Transacciónes confirmadas con exito';
-            this.showToast = true;
 
-            setTimeout(() => {
-              this.ngOnInit();
-            }, 3000);
-          },
-          error: (err) => {
-            this.toastType = typeToast.Error;
-            this.messageToast = 'Error al intentar confirmar Transacciónes';
-            this.showToast = true;
-          },
-        });
-      }
+      this.transService.putAllTransaction(this.selectRows).subscribe({
+        next: (data) => {
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Transacciónes confirmadas con exito';
+          this.showToast = true;
+
+          setTimeout(() => {
+            this.ngOnInit();
+          }, 3000);
+        },
+        error: (err) => {
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al intentar confirmar Transacciónes';
+          this.showToast = true;
+        },
+      });
+    }
     );
   }
- 
 
+ async validPermisition() {
+
+    const savedUser = localStorage.getItem('userData');
+    const company = JSON.parse(localStorage.getItem('company') || '');
+
+    if (!savedUser || company == '') {
+      console.error('Datos de usuario o compañía no encontrados.');
+      return;
+    }
+
+    const usuario = JSON.parse(savedUser);
+    this.user =  await firstValueFrom(this.userService.getUSerById(usuario.id));
+
+    const companyRole = this.user.companies.find((com: any) => com.company.id === company.company.id);
+
+    if (!companyRole) {
+      console.error('No se encontró un rol para la compañía especificada.');
+      console.log('company.id:', company.id);
+      console.log('this.user.companies:', this.user.companies);
+      return;
+    }
+
+   await companyRole.roles.forEach((role: any) => { 
+
+      console.log(role);
+      
+
+      if (role.name == 'REGISTRO CONTABLE') {       
+        this.isRegistreAccounting = true;
+      }
+
+      if (role.name == 'APROBADOR') {
+        this.isApprove = true;
+      }
+      
+    })
+
+
+  }
 }
