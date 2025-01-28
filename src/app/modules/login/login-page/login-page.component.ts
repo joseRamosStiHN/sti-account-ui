@@ -11,8 +11,8 @@ import { UserInfoService } from 'src/app/shared/userInfo.service';
 })
 export class LoginPageComponent implements OnInit {
   loginForm = new FormGroup({
-    userName: new FormControl('laurent.caceres', [Validators.required]),
-    password: new FormControl('Lcaceres97', [Validators.required]),
+    userName: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
   });
 
   erroLogin: boolean = false;

@@ -1,25 +1,55 @@
-<form class="max-w-xs mx-auto mt-[10%] p-16 bg-white border-2 border-gray-300 shadow-lg"
-  [formGroup]="loginForm" (submit)="onSubmit()">
-  <div class="mb-12">
-    <label for="username" class="block mb-2 text-lg font-semibold text-gray-800">Usuario</label>
-    <input type="text" id="username" formControlName="userName" autocomplete="off"
-      class="w-full p-3 pl-0 border-b-2 border-gray-400 text-gray-800 text-sm focus:outline-none focus:ring-0 focus:border-blue-500"
-      placeholder="lmartinez" required />
+<div class="flex h-full"  style="background-image: url('https://c8.alamy.com/comp/RJK7K0/business-and-financial-conceptbank-accounting-and-invest-background-stock-exchange-and-markets-graphic-detail-RJK7K0.jpg'); background-repeat: no-repeat;
+background-size: cover;">
+  <div class="hidden md:flex w-1/2 bg-cover bg-center">
   </div>
-  
-  <div class="mb-12">
-    <label for="password" class="block mb-2 text-lg font-semibold text-gray-800">Contraseña</label>
-    <input type="password" formControlName="password" id="password"
-      class="w-full p-3 pl-0 border-b-2 border-gray-400 text-gray-800 text-sm focus:outline-none focus:ring-0 focus:border-blue-500"
-      required />
-  </div>
+  <div class="w-full md:w-1/2 flex items-center justify-end ">
+    <form class="w-full h-screen max-w-sm p-8  bg-white  shadow-lg" [formGroup]="loginForm"
+      (submit)="onSubmit()">
+      <div class="mb-12 mt-20">
+        <h2 class="text-4xl  text-center font-serif text-blue-600">STI Accounting</h2>
+      </div>
+      <div class="flex h-3/4 flex-col justify-center">
 
-  <div *ngIf="erroLogin" class="mb-8">
-    <small class="block w-full text-center text-red-600 font-medium">Usuario o Contraseña inválido</small>
-  </div>
+        <div class="mb-6">
+          <h3 class="text-2xl text-center font-serif text-blue-600">Bienvenido</h3>
+          <p class="text-sm text-center text-gray-500 font-serif">Ingresa tu usuario y contraseña para Iniciar Sesion</p>
+        </div>
+      
+        <div class="mb-6">
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-500 font-serif">Usuario</label>
+          <input type="text" id="username" formControlName="userName" autocomplete="off"
+            class="w-full px-4 py-2 border  text-gray-800 text-sm focus:outline-none focus:ring-2
+             focus:ring-blue-400 focus:border-transparent"
+            placeholder="Ingresa tu usuario" required />
+        </div>
 
-  <button type="submit"
-    class="w-full py-3 px-4 border-2 border-blue-400 text-blue-500 font-semibold  focus:outline-none hover:bg-blue-100 transition duration-300 ease-in-out">
-    Iniciar Sesión
-  </button>
-</form>
+        <div class="mb-6">
+          <label for="password" class="block mb-2 text-sm font-medium text-gray-500 font-serif">Contraseña</label>
+          <div class="relative">
+            <input type="password" id="password" formControlName="password"
+              class="w-full px-4 py-2 border  text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              placeholder="Ingresa tu contraseña" required />
+            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600">
+             
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+          <a href="#" class="block text-base font-medium font-serif text-blue-500 text-center w-full">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit"
+          class="w-full py-2 px-4 bg-blue-500 text-white font-semibold  hover:bg-blue-600 transition duration-300">
+          Iniciar sesión
+        </button>
+
+        <div *ngIf="erroLogin" class="mt-4">
+          <small class="block w-full text-center text-red-600 font-medium">Usuario o Contraseña inválido</small>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>
