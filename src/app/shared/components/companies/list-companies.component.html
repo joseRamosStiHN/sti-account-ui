@@ -1,33 +1,33 @@
 @if( isAdmind ){
-<div class="flex justify-end gap-4 mt-4">
-  <button (click)="goToUser()"
-    class="px-6 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-    Crear Usuario
-  </button>
-
-  <button (click)="goToCompany()"
-    class="px-6 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-    Crear Empresa
-  </button>
-</div>
+  <div class="flex justify-end gap-4 mt-4">
+    <button (click)="goToUser  ()"
+      class="px-6 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+      Crear Usuario
+    </button>
+  
+    <button (click)="goToCompany()"
+      class="px-6 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+      Crear Empresa
+    </button>
+  </div>
 }
-
-
-<div class="mt-5">
+  
+<div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
   @if( user$ | async; as info ){ @for (item of info.companies; track $index) {
-  <div class="w-full border rounded-md p-2 mb-2">
-    <div class="grid grid-cols-3 gap-2">
-      <div class="">
-        <h2 class="text-gray-500 sm:text-2xl">{{ item.company.name }}</h2>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <div class="flex items-center justify-center h-48 bg-gray-200"> 
+        <img src="data:image/png;base64,{{ item.company.companyLogo }}" alt="{{ item.company.name }} Logo" class="h-32 w-35 object-contain" />
       </div>
-      <div class="col-span-2 flex flex-row justify-end gap-2">
-        <button class="text-sm border rounded-md p-2">Agregar Usuario</button>
-        <button (click)="goTo(item)" type="button" class="text-sm border rounded-md p-2 z-50 hover:shadow-md">
-          Conectar
-        </button>
+      <div class="p-4">
+        <h2 class="text-gray-800 text-xl font-semibold">{{ item.company.name }}</h2>
+        <div class="flex justify-end gap-2 mt-4">
+          <button class="text-sm border border-blue-500 text-blue-500 rounded-md p-2 hover:bg-blue-500 hover:text-white transition duration-200">Agregar Usuario</button>
+          <button (click)="goTo(item)" type="button" class="text-sm border border-blue-600 text-blue-600 rounded-md p-2 hover:bg-blue-600 hover:text-white transition duration-200">
+            Conectar
+          </button>
+        </div>
       </div>
     </div>
-  </div>
   }
   }
 </div>

@@ -1,0 +1,89 @@
+/* / Estilos para las tarjetas / */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.shadow-lg {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.h-32 {
+    height: 8rem;
+    /* / Ajusta según sea necesario / */
+}
+
+.bg-gray-200 {
+    background-color: #e2e8f0;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.text-gray-800 {
+    color: #2d3748;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.transition {
+    transition: all 0.2s ease-in-out;
+}
+
+.hover\:bg-blue-500:hover {
+    background-color: #3b82f6;
+}
+
+.hover\:text-white:hover {
+    color: #ffffff;
+}
+
+.border {
+    border-width: 1px;
+}
+
+.border-blue-500 {
+    border-color: #3b82f6;
+}
+
+.text-blue-500 {
+    color: #3b82f6;
+}
+
+.hover\:bg-blue-600:hover {
+    background-color: #2563eb;
+}
+
+.hover\:text-white:hover {
+    color: #ffffff;
+}

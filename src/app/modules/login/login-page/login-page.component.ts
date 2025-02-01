@@ -15,7 +15,14 @@ export class LoginPageComponent implements OnInit {
     password: new FormControl('', [Validators.required]),
   });
 
-  erroLogin: boolean = false;
+  backgroundStyle = {
+    'background-image': 'url("/assets/accounting-bg.jpg")',
+    'background-repeat': 'no-repeat',
+    'background-size': 'cover'
+  };
+
+  errorLogin: boolean = false;
+  showPassword = false;
 
   private authService = inject(AuthServiceService);
   private readonly router = inject(Router);
@@ -54,10 +61,15 @@ export class LoginPageComponent implements OnInit {
         },
         error: (err: any) => {
 
-          this.erroLogin = true;
+          this.errorLogin = true;
         }
       });
 
     }
   }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
 }
