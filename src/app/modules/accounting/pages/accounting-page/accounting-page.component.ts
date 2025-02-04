@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { NavigationService } from '../../../../shared/navigation.service';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 @Component({
   selector: 'app-accounting-page',
@@ -22,39 +22,21 @@ export class AccountingPageComponent implements OnInit {
   async ngOnInit() {
     try {
 
-      const savedUser = localStorage.getItem('userData');
-      const company = JSON.parse(localStorage.getItem('company') || '');
-  
-      if (!savedUser || company == '') {
-        console.error('Datos de usuario o compañía no encontrados.');
-        return;
-      }
+      const company = JSON.parse(localStorage.getItem('company') || '');  
   
       this.navigationService.setNameCompany(company.company);
   
-      const usuario = JSON.parse(savedUser);
-  
-      this.user = await firstValueFrom(this.userService.getUSerById(usuario.id));
-  
-      const companyRole =  await this.user.companies.find((com: any) => com.company.id === company.company.id);
-  
-      if (!companyRole) {
-        console.error('No se encontró un rol para la compañía especificada.');
-        console.log('company.id:', company.id); 
-        console.log('this.user.companies:', this.user.companies);
-        return;
-      }
-  
       const contabilidadList: any = [];
 
-      companyRole.roles.forEach((role: any) => {
+      company.roles.forEach((role: any) => {
         if (role.name === 'REGISTRO CONTABLE' || role.name === 'CONSULTA') {
-          this.agregarElementoSiNoExiste(this.navegation, { label: 'Ingresos', path: '/accounting/client-list' });
-          this.agregarElementoSiNoExiste(this.navegation, { label: 'Compras', path: '/accounting/provider-list' });
+          this.agregarElementoSiNoExiste(this.navegation, {id:1 ,label: 'Ingresos', path: '/accounting/client-list' });
+          this.agregarElementoSiNoExiste(this.navegation, { id:2, label: 'Compras', path: '/accounting/provider-list' });
         }
   
         if (role.name === 'CONSULTA') {
           this.agregarElementoSiNoExiste(this.navegation, {
+            id:4 ,
             label: 'Reportes',
             path: '',
             child: [
@@ -79,12 +61,13 @@ export class AccountingPageComponent implements OnInit {
           this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Debito', path: '/accounting/debitnotes-list' });
           this.agregarElementoSiNoExiste(contabilidadList, { label: 'Cierre Contable', path: '/accounting/accounting-closing' });
   
-          this.agregarElementoSiNoExiste(this.navegation, { label: 'Ingresos', path: '/accounting/client-list' });
-          this.agregarElementoSiNoExiste(this.navegation, { label: 'Compras', path: '/accounting/provider-list' });
+          this.agregarElementoSiNoExiste(this.navegation, { id:1 , label: 'Ingresos', path: '/accounting/client-list' });
+          this.agregarElementoSiNoExiste(this.navegation, { id:2, label: 'Compras', path: '/accounting/provider-list' });
         }
 
         if (role.name === 'REGISTRO CONTABLE') {
           this.agregarElementoSiNoExiste(this.navegation, {
+            id:5 ,
             label: 'Configuraciones',
             path: '',
             child: [
@@ -106,12 +89,13 @@ export class AccountingPageComponent implements OnInit {
   
 
       this.agregarElementoSiNoExiste(this.navegation, {
+        id:3 ,
         label: 'Contabilidad',
         path: '',
         child: contabilidadList,
       });
   
-      this.navigationService.setNavLinks(this.navegation);
+      this.navigationService.setNavLinks(this.navegation.sort((a:any,b:any)=>  a.id - b.id ));
   
     } catch (error) {
       console.error('Error al obtener los datos del usuario:', error);

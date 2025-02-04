@@ -2,13 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
-import { Login } from 'src/app/shared/models/LoginResponseModel';
 import { NavigationService } from 'src/app/shared/navigation.service';
-import { UserInfoService } from 'src/app/shared/userInfo.service';
+
 
 @Component({
   selector: 'app-companies',
@@ -19,7 +18,7 @@ import { UserInfoService } from 'src/app/shared/userInfo.service';
 })
 export class ListCompaniesComponent implements OnInit {
   user$: Observable<UsersResponse | null> | undefined;
-  infoService = inject(UserInfoService);
+  authService = inject(AuthServiceService);
   companyList$: Observable<CompanyResponse[]> | undefined;
 
   isAdmind: boolean = false;
@@ -34,15 +33,17 @@ export class ListCompaniesComponent implements OnInit {
     this.navigationService.setNavLinks([]);
     this,this.navigationService.setNameCompany('');
     const savedUser = localStorage.getItem('userData');
+
+
     if (savedUser) {
       const usuario = JSON.parse(savedUser);
-      this.user$ = this.userService.getUSerById(usuario.id);
-      this.user$.subscribe(data => {
-        this.isAdmind = data?.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
-      })
+      this.user$ = of(usuario)
+        this.isAdmind = usuario.globalRoles.some((role: any) => 
+          role.name === 'ADMINISTRADOR' && role.global);
+      
     } else {
       let usuario:any;
-      this.infoService.userDetail$.subscribe((data)=> {
+      this.authService.userAuthenticate$.subscribe((data)=> {
         usuario = data?.id;
       });
       
