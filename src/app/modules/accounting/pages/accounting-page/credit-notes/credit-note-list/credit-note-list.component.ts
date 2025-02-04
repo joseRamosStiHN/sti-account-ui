@@ -138,30 +138,24 @@ export class CreditNoteListComponent {
 
   async validPermisition() {
 
-    const savedUser = localStorage.getItem('userData');
     const company = JSON.parse(localStorage.getItem('company') || '');
 
-    if (!savedUser || company == '') {
+    if ( company == '') {
       console.error('Datos de usuario o compañía no encontrados.');
       return;
     }
 
-    const usuario = JSON.parse(savedUser);
-    this.user =  await firstValueFrom(this.userService.getUSerById(usuario.id));
 
-    const companyRole = this.user.companies.find((com: any) => com.company.id === company.company.id);
 
-    if (!companyRole) {
+    if (!company) {
       console.error('No se encontró un rol para la compañía especificada.');
       console.log('company.id:', company.id);
-      console.log('this.user.companies:', this.user.companies);
+
       return;
     }
 
-   await companyRole.roles.forEach((role: any) => { 
-
-      console.log(role);
-      
+   await company.roles.forEach((role: any) => { 
+    
 
       if (role.name == 'REGISTRO CONTABLE') {       
         this.isRegistreAccounting = true;
