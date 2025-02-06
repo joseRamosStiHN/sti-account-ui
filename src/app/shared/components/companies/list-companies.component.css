@@ -87,3 +87,8 @@
 .hover\:text-white:hover {
     color: #ffffff;
 }
+
+.active {
+    background-color: #457aeb;
+    color: white;
+}
