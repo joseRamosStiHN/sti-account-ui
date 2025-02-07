@@ -19,12 +19,15 @@ import { NavigationService } from 'src/app/shared/navigation.service';
 export class ListCompaniesComponent implements OnInit {
   user$: Observable<UsersResponse | null> | undefined;
   authService = inject(AuthServiceService);
-  companyList$: Observable<any> | undefined;
+  companyList$?: Observable<any[]>;
   isAdmind: boolean = false;
 
   paginatorArray: number[] = [];
 
-  private numberPages = 2;
+
+  startPage = 0
+  endPage = 3;
+  numberPages = 3;
 
 
   private readonly router = inject(Router);
@@ -45,7 +48,7 @@ export class ListCompaniesComponent implements OnInit {
       this.isAdmind = usuario.globalRoles.some((role: any) =>
         role.name === 'ADMINISTRADOR' && role.global);
       this.user$ = of(usuario);
-      this.companyList$ = of(usuario.companies.slice(0, this.numberPages));
+      this.companyList$ = of(usuario.companies);
       this.paginator(usuario);
 
     } else {
@@ -58,7 +61,7 @@ export class ListCompaniesComponent implements OnInit {
         if (data) {
           this.isAdmind = data.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
           localStorage.setItem('userData', JSON.stringify(data));
-          this.companyList$ = of(data.companies.slice(0, this.numberPages));
+          this.companyList$ = of(data.companies);
 
           this.paginator(data);
         }
@@ -111,10 +114,10 @@ export class ListCompaniesComponent implements OnInit {
       const usuario = JSON.parse(savedUser);
       if (search == "") {
 
-        this.companyList$ = of(usuario.companies.slice(0, this.numberPages));
+        this.companyList$ = of(usuario.companies);
         this.paginator(usuario);
-             this.deactivePaginator();
-      this.activePaginator(0);
+        this.deactivePaginator();
+        this.activePaginator(0);
         return
       }
 
@@ -123,7 +126,7 @@ export class ListCompaniesComponent implements OnInit {
       })
 
       this.paginatorArray = Array.from({ length: Math.round(companie.length / this.numberPages) }, (_, i) => i);
-      this.companyList$ = of(companie.slice(0,this.numberPages));
+      this.companyList$ = of(companie);
       this.deactivePaginator();
       this.activePaginator(0);
 
@@ -138,36 +141,41 @@ export class ListCompaniesComponent implements OnInit {
   }
 
   page(page: number) {
-    const savedUser = localStorage.getItem('userData');
-    if (savedUser) {
-      const usuario = JSON.parse(savedUser);
-      this.companyList$ = of(usuario.companies.slice(page - 1 * this.numberPages, page * this.numberPages));
-      this.deactivePaginator();
-      this.activePaginator(page-1);
-    }
+
+    this.startPage = (page - 1) * this.numberPages;
+    this.endPage = page * this.numberPages;
+    this.deactivePaginator()
+    this.activePaginator(page - 1);
   }
 
   pageBack() {
     const pages = document.querySelectorAll('#page');
-      for (let i = 0; i < pages.length; i++) {
-        if (pages[i].className.includes('active') && i > 0  ) {
-          pages[i].classList.remove('active');
-          pages[--i].classList.add('active');
-        }  
-  
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].className.includes('active') && i > 0) {
+
+        this.startPage = (i - 1) * this.numberPages;
+        this.endPage = i * this.numberPages;
+        pages[i].classList.remove('active');
+        pages[--i].classList.add('active');
       }
+
+    }
   }
 
 
   pageNext() {
     const pages = document.querySelectorAll('#page');
-      for (let i = 0; i < pages.length; i++) {
-        if (pages[i].className.includes('active') && i < pages.length -1  ) {
-          pages[i].classList.remove('active');
-          pages[++i].classList.add('active');
-        }  
-  
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].className.includes('active') && i < pages.length - 1) {
+
+        this.startPage = (i + 1) * this.numberPages;
+        this.endPage = (i + 1) + 1 * this.numberPages;
+        pages[i].classList.remove('active');
+        pages[++i].classList.add('active');
+
       }
+
+    }
   }
 
   ngAfterViewInit() {
@@ -179,14 +187,14 @@ export class ListCompaniesComponent implements OnInit {
   }
 
 
-  activePaginator(id:number){
+  activePaginator(id: number) {
     const pages = document.querySelectorAll('#page');
     pages[id].classList.add('active')
   }
 
-  deactivePaginator(){
+  deactivePaginator() {
     const pages = document.querySelectorAll('#page');
-    pages.forEach((page)=>{
+    pages.forEach((page) => {
       if (page.className.includes('active')) {
         page.classList.remove('active');
       }
