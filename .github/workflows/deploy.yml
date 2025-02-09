@@ -25,17 +25,15 @@ jobs:
         run: |
           echo "export const environment = {" > src/environments/environment.prod.ts
           echo "  production: true," >> src/environments/environment.prod.ts
-          echo "  apiUrl: '${{ secrets.API_URL }}'," >> src/environments/environment.prod.ts
-          echo "  apiKey: '${{ secrets.API_KEY }}'" >> src/environments/environment.prod.ts
+          echo "  API: '${{ secrets.ACCOUNTING_API }}'," >> src/environments/environment.prod.ts
+          echo "  SECURITY_API_URL: '${{ secrets.SECURITY_API }}'" >> src/environments/environment.prod.ts
           echo "};" >> src/environments/environment.prod.ts
 
       - name: Verificar variables de entorno antes del build
         run: cat src/environments/environment.prod.ts
 
       - name: Compilar la aplicación
-        run: |
-          npm run build --configuration=production
-          cat dist/sti-proyect/browser/main.*.js | grep "API_URL"
+        run: npm run build --configuration=production
 
       - name: Instalar Netlify CLI
         run: npm install -g netlify-cli@18.0.3
