@@ -18,7 +18,6 @@ import {
 import { GlobalErrorHandler } from './shared/handlers/errors/GlobalErrorHandler';
 import { BrowserModule } from '@angular/platform-browser';
 import { showControlDirective } from 'src/app/shared/directives/showControlDirective';
-import { GlobalHttpErrorHandler } from 'src/app/shared/handlers/httpInterceptors/GlobalHttpErrorHandler';
 import { AuthInterceptor } from 'src/app/shared/handlers/httpInterceptors/AuthInterceptor';
 
 
@@ -29,11 +28,6 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: GlobalHttpErrorHandler,
-      multi: true,
-    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

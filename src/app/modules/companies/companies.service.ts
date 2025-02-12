@@ -1,14 +1,19 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
-import { catchError, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { Company } from 'src/app/shared/models/LoginResponseModel';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompaniesService {
   private apiURL = environment.SECURITY_API_URL;
+
+
+  private iscompanyLoging = new BehaviorSubject<Company | null>(null);
+  companyLogin$ = this.iscompanyLoging.asObservable();
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -66,7 +71,7 @@ export class CompaniesService {
    *
    * @return response()
    */
-  updateCompany(data: CompanyRequest, id:number, actionUser:number): Observable<any> {
+  updateCompany(data: CompanyRequest, id: number, actionUser: number): Observable<any> {
     return this.httpClient
       .put<any>(
         this.apiURL + `/api/v1/company/${id}/${actionUser}`,
@@ -90,4 +95,14 @@ export class CompaniesService {
     }
     return throwError(errorMessage);
   }
+
+
+  setCompany(company: Company) {
+    this.iscompanyLoging.next(company);
+  }
+
+  getCompany():any{
+    return this.iscompanyLoging.getValue();
+  }
+
 }

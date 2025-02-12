@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged, Observable, of, startWith, Subject, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, first, Observable, of, startWith, Subject, switchMap } from 'rxjs';
+import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
+import { Company } from 'src/app/shared/models/LoginResponseModel';
 import { NavigationService } from 'src/app/shared/navigation.service';
 
 
@@ -18,7 +20,7 @@ import { NavigationService } from 'src/app/shared/navigation.service';
 })
 export class ListCompaniesComponent implements OnInit {
   user$: Observable<UsersResponse | null> | undefined;
-  authService = inject(AuthServiceService);
+
   companyList$?: Observable<any[]>;
   isAdmind: boolean = false;
 
@@ -33,45 +35,33 @@ export class ListCompaniesComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly navigationService = inject(NavigationService);
   private readonly userService = inject(UsersService);
+  private readonly authService = inject(AuthServiceService);
+  private readonly companyService = inject(CompaniesService);
 
   constructor() { }
 
   ngOnInit(): void {
     this.navigationService.setNavLinks([]);
-    this.navigationService.setNameCompany('');
-    const savedUser = localStorage.getItem('userData');
+    this.navigationService.setCompany('');
 
+    const savedUser = localStorage.getItem('userData');
+    const userId: number = this.authService.getUserId();
 
     if (savedUser) {
       const usuario = JSON.parse(savedUser);
 
-      this.isAdmind = usuario.globalRoles.some((role: any) =>
-        role.name === 'ADMINISTRADOR' && role.global);
-      this.user$ = of(usuario);
-      this.companyList$ = of(usuario.companies);
-      this.paginator(usuario);
-
+      if (userId == 0 && usuario.id != null) {
+        this.saveUserInMemory(usuario.id);
+      } else {
+        this.user$ = of(usuario);
+        this.isAdmind = this.authService.getRolesUser().some((role: any) =>
+          role.name === 'ADMINISTRADOR' && role.global);
+        this.companyList$ = of(this.authService.getCompaniesList());
+        this.paginator(usuario);
+      }
     } else {
-      let usuario: any;
-      this.authService.userAuthenticate$.subscribe((data) => {
-        usuario = data?.id;
-      });
-      this.user$ = this.userService.getUSerById(usuario);
-      this.user$.subscribe((data) => {
-        if (data) {
-          this.isAdmind = data.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
-          localStorage.setItem('userData', JSON.stringify(data));
-          this.companyList$ = of(data.companies);
-
-          this.paginator(data);
-        }
-      });
-
+      this.saveUserInMemory(userId);
     }
-
-
-
-
   }
 
 
@@ -93,8 +83,10 @@ export class ListCompaniesComponent implements OnInit {
   })();
 
 
-  goTo(company: any) {
+  goTo(cmp: Company) {
+    const {roles, ...company} = cmp;
     localStorage.setItem('company', JSON.stringify(company));
+    this.companyService.setCompany(cmp)
     this.router.navigate(['/accounting']);
 
   };
@@ -125,7 +117,7 @@ export class ListCompaniesComponent implements OnInit {
         return companie.company.name.toUpperCase().includes(search.toUpperCase())
       })
 
-      this.paginatorArray = Array.from({ length: Math.round(companie.length / this.numberPages) }, (_, i) => i);
+      this.paginatorArray = Array.from({ length: Math.ceil(companie.length / this.numberPages) }, (_, i) => i);
       this.companyList$ = of(companie);
       this.deactivePaginator();
       this.activePaginator(0);
@@ -136,7 +128,7 @@ export class ListCompaniesComponent implements OnInit {
 
 
   paginator(usuario: any,) {
-    this.paginatorArray = Array.from({ length: Math.round(usuario.companies.length / this.numberPages) }, (_, i) => i);
+    this.paginatorArray = Array.from({ length: Math.ceil(usuario.companies.length / this.numberPages) }, (_, i) => i);
 
   }
 
@@ -199,6 +191,23 @@ export class ListCompaniesComponent implements OnInit {
         page.classList.remove('active');
       }
     })
+  }
+
+  saveUserInMemory(userId: number) {
+    this.user$ = this.userService.getUSerById(userId);
+
+    this.user$.subscribe((data) => {
+      if (data) {
+
+        this.isAdmind = data.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
+        const { globalRoles, createdAt, ...rest } = data;
+        const companies = rest.companies.map(({ roles, ...company }: Company) => company.company);
+        localStorage.setItem('userData', JSON.stringify({ ...rest, companies }));
+        this.companyList$ = of(rest.companies);
+        this.authService.setLogin(data);
+        this.paginator(data);
+      }
+    });
   }
 
 

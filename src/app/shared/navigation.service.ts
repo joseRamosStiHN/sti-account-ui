@@ -24,7 +24,11 @@ export class NavigationService {
     this.navLinksSource.next(links);
   }
 
-  setNameCompany(company: any) {
+  setCompany(company: any) {
     this.company$.next(company);
+  }
+
+  getCompany(){
+   return this.company$.getValue().company;
   }
 }
