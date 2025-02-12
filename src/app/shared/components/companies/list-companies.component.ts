@@ -53,7 +53,7 @@ export class ListCompaniesComponent implements OnInit {
       if (userId == 0 && usuario.id != null) {
         this.saveUserInMemory(usuario.id);
       } else {
-        this.user$ = of(usuario);
+
         this.isAdmind = this.authService.getRolesUser().some((role: any) =>
           role.name === 'ADMINISTRADOR' && role.global);
         this.companyList$ = of(this.authService.getCompaniesList());
@@ -99,6 +99,11 @@ export class ListCompaniesComponent implements OnInit {
     this.router.navigate(['/dashboard/user']);
   };
 
+
+  addUserCompany = (companie:any) => {
+    this.router.navigate(['/dashboard/companies/edit', companie.company.id]);
+  };
+
   searchCompany(search: string) {
 
     const savedUser = localStorage.getItem('userData');
@@ -106,18 +111,27 @@ export class ListCompaniesComponent implements OnInit {
       const usuario = JSON.parse(savedUser);
       if (search == "") {
 
-        this.companyList$ = of(usuario.companies);
+        this.companyList$ =  of(this.authService.getCompaniesList());
         this.paginator(usuario);
         this.deactivePaginator();
         this.activePaginator(0);
         return
       }
 
-      let companie = usuario.companies.filter((companie: any) => {
+
+      this.startPage = 0
+      this.endPage = 3;
+      this.numberPages = 3;
+
+      let companie = this.authService.getCompaniesList().filter((companie: any) => {
         return companie.company.name.toUpperCase().includes(search.toUpperCase())
       })
 
-      this.paginatorArray = Array.from({ length: Math.ceil(companie.length / this.numberPages) }, (_, i) => i);
+
+      this.paginatorArray = Array.from({ length: Math.ceil(companie.length / this.numberPages) }, 
+      (_, i) => i);
+      
+
       this.companyList$ = of(companie);
       this.deactivePaginator();
       this.activePaginator(0);
@@ -161,7 +175,7 @@ export class ListCompaniesComponent implements OnInit {
       if (pages[i].className.includes('active') && i < pages.length - 1) {
 
         this.startPage = (i + 1) * this.numberPages;
-        this.endPage = (i + 1) + 1 * this.numberPages;
+        this.endPage = (i + 1) + 2 * this.numberPages;
         pages[i].classList.remove('active');
         pages[++i].classList.add('active');
 

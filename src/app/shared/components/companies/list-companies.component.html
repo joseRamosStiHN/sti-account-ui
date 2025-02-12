@@ -36,7 +36,7 @@
     <div class="p-4">
       <h2 class="text-gray-800 text-xl font-semibold">{{item.company.name}}</h2>
       <div class="flex justify-end gap-2 mt-4">
-        <button
+        <button (click)="addUserCompany(item)"
           class="text-sm border border-blue-500 text-blue-500 rounded-md p-2 hover:bg-blue-500 hover:text-white transition duration-200">Agregar
           Usuario</button>
         <button (click)="goTo(item)" type="button"
@@ -70,7 +70,8 @@
     <li>
       <a id="page" class="flex items-center justify-center px-4 h-10 leading-tight text-blue-500 bg-white border border-blue-300 
           hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-800 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-700 
-           dark:hover:text-white cursor-pointer" (click)="page($index+1)"> {{ $index + 1 }}</a>
+           dark:hover:text-white cursor-pointer" (click)="page($index+1)"
+           [ngClass]="{ 'active': $index === 0 }"> {{ $index + 1 }}</a>
     </li>
 
     }
