@@ -8,10 +8,12 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
-        const cloned = req.clone({
+    const tenantId = req.headers.get('tenantId');
+
+    const cloned = req.clone({
       withCredentials: true,
       setHeaders: {
-        tenantId: this.getTenantId(),
+        tenantId: tenantId ?? this.getTenantId(),
       },
     });
     return next.handle(cloned);
