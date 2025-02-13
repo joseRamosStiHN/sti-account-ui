@@ -6,8 +6,13 @@
         <label for="firstName" class="block mb-2 text-sm text-gray-900">Nombre</label>
         <input placeholder="Luis" required="true" name="firstName" id="firstName" type="text"
           [(ngModel)]="userForm.firstName"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required />
+          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500
+           focus:outline-none "
+          [ngClass]="{'bg-gray-200 text-gray-500 cursor-not-allowed border': id != null}"
+          [disabled]="id != null"
+          required 
+          
+          />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['firstName'].getError('required')">
           <small class="text-xs text-red-900">Nombre es requerido.</small>
         </div>
@@ -16,7 +21,10 @@
         <label for="lastName" class="block mb-2 text-sm text-gray-900">Apellidos</label>
         <input placeholder="Martinez" required="true" name="lastName" id="lastName" type="text"
           [(ngModel)]="userForm.lastName"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
+           focus:border-blue-500 focus:outline-none"
+           [ngClass]="{'bg-gray-200 text-gray-500 cursor-not-allowed border': id != null}"
+           [disabled]="id != null"
           required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['lastName'].getError('required')">
           <small class="text-xs text-red-900">Apellido es requerido.</small>
@@ -44,13 +52,15 @@
         <input placeholder="jmartinez" required="true" name="userName" id="userName" type="text"
           [(ngModel)]="userForm.userName"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+          [ngClass]="{'bg-gray-200 text-gray-500 cursor-not-allowed border': id != null}"
+          [disabled]="id != null"
           required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['userName'].getError('required')">
           <small class="text-xs text-red-900">Telefono es requerido.</small>
         </div>
       </div>
 
-      <div class="form">
+      <div class="form" *ngIf="id == null">
         <label for="password" class="block mb-2 text-sm text-gray-900">Contraseña</label>
         <div class="relative">
           <input [(ngModel)]="txtPassword" type="password" maxlength="20" name="password" id="password"
@@ -74,7 +84,7 @@
         }
       </div>
 
-      <div class="form">
+      <div class="form" *ngIf="id == null">
         <label for="txtRepeatPassword" class="block mb-2 text-sm text-gray-900">Repetir Contraseña</label>
         <input [(ngModel)]="txtConfirmPassword" required="true" name="txtRepeatPassword" id="txtRepeatPassword"
           type="password"
