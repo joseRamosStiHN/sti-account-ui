@@ -28,8 +28,8 @@ export class ListCompaniesComponent implements OnInit {
 
 
   startPage = 0
-  endPage = 3;
-  numberPages = 3;
+  endPage = 10;
+  numberPages = 10;
 
 
   private readonly router = inject(Router);
@@ -120,8 +120,8 @@ export class ListCompaniesComponent implements OnInit {
 
 
       this.startPage = 0
-      this.endPage = 3;
-      this.numberPages = 3;
+      this.endPage = 10;
+      this.numberPages = 10;
 
       let companie = this.authService.getCompaniesList().filter((companie: any) => {
         return companie.company.name.toUpperCase().includes(search.toUpperCase())
