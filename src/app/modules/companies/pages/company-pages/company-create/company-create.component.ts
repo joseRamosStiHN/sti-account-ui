@@ -36,7 +36,7 @@ export class CompanyCreateComponent implements OnInit {
 
   @Input('id') id?: number;
 
-  tenantId:string | null= null;
+  tenantId:string='';
   userId?: number;
 
   rolesCompanys$: RolesResponse[] = [];
