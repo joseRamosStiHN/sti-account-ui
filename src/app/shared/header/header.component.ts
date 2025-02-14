@@ -9,6 +9,7 @@ import { NavigationService, NavStiLink } from '../navigation.service';
 import { DropdownComponent } from '../components/dropdown/dropdown.component';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -79,23 +80,31 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
+    this.authService.logout().subscribe({
+      next: (data) => {      
+        localStorage.removeItem('userData'); 
+        localStorage.removeItem('company');
+        this.authService.setLogin({
+          userName: '',
+          active: false,
+          companies: [],
+          createdAt: new Date(),
+          email: '',
+          firstName: '',
+          id: 0,
+          lastName: '',
+          globalRoles: []
+        });
+    
+        this.dropdownOpen = false;        
+        this.router.navigate(['/login']);    
+      },
+      error: (err) => {
 
-    localStorage.removeItem('userData'); 
-    localStorage.removeItem('company');
-    this.authService.setLogin({
-      userName: '',
-      active: false,
-      companies: [],
-      createdAt: new Date(),
-      email: '',
-      firstName: '',
-      id: 0,
-      lastName: '',
-      globalRoles: []
+        console.log(err.error);
+        
+        console.log(err);
+      }
     });
-
-    this.dropdownOpen = false;        
-    this.router.navigate(['/login']);      
- 
   }
 }
