@@ -73,7 +73,7 @@ export class AccountService {
    *
    * @return response()
    */
-   cloneAccountByCompany(sourceTenantId:string,tenantId:string): Observable<any> {
+   cloneAccountByCompany(sourceTenantId:string| null,tenantId:string): Observable<any> {
 
     const httpOptionsNewCompany = {
       headers: new HttpHeaders({

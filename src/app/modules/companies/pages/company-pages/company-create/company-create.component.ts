@@ -32,12 +32,12 @@ export class CompanyCreateComponent implements OnInit {
   rolesList$: Observable<RolesResponse[]> | undefined;
 
   imagePreview: string | ArrayBuffer | null = null;
-  imageBase64: string = ''; 
+  imageBase64: string = '';
 
   @Input('id') id?: number;
 
-  tenantId = "";
-  userId?:number;
+  tenantId:string | null= null;
+  userId?: number;
 
   rolesCompanys$: RolesResponse[] = [];
 
@@ -100,10 +100,10 @@ export class CompanyCreateComponent implements OnInit {
         website: company.website,
         companyLogo: company.companyLogo,
         users: company.users,
-        tenantId:company.tenantId
-        
+        tenantId: company.tenantId
+
       }
-      this.imagePreview = `data:image/png;base64,${company.companyLogo}`;      
+      this.imagePreview = `data:image/png;base64,${company.companyLogo}`;
 
       this.userList$ = this.userList$.map((user1: any) => {
         const matchingUser = this.companyForm.users.find((user2: any) => {
@@ -145,7 +145,7 @@ export class CompanyCreateComponent implements OnInit {
       }));
 
     this.companyForm.users = users;
-    this.companyForm.companyLogo =  this.imageBase64;
+    this.companyForm.companyLogo = this.imageBase64;
 
     if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
@@ -154,11 +154,11 @@ export class CompanyCreateComponent implements OnInit {
       return
     }
 
-    this.companyService.updateCompany(this.companyForm, Number(this.id),Number(this.userId)).subscribe({
+    this.companyService.updateCompany(this.companyForm, Number(this.id), Number(this.userId)).subscribe({
       next: (data) => {
 
         if (this.tenantId != "") {
-          this.cloneAccountsToNewCompany(this.tenantId,this.companyForm.tenantId || '');
+          this.cloneAccountsToNewCompany(this.tenantId, this.companyForm.tenantId || '');
         }
 
         this.toastType = typeToast.Success;
@@ -190,7 +190,7 @@ export class CompanyCreateComponent implements OnInit {
       }));
 
     this.companyForm.users = users;
-    this.companyForm.companyLogo =  this.imageBase64;
+    this.companyForm.companyLogo = this.imageBase64;
 
 
     if (this.companyForm.users.length == 0) {
@@ -203,9 +203,8 @@ export class CompanyCreateComponent implements OnInit {
     this.companyService.createCompany(this.companyForm).subscribe({
       next: (data) => {
         this.createPeriod(data.tenantId);
-        if (this.tenantId != "") {
-          this.cloneAccountsToNewCompany(this.tenantId,data.tenantId);
-        }
+        this.cloneAccountsToNewCompany(this.tenantId, data.tenantId);
+
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
         this.showToast = true;
@@ -253,9 +252,8 @@ export class CompanyCreateComponent implements OnInit {
   }
 
 
-  cloneAccountsToNewCompany(sourceTenantId: string, tenantId:string) {
-    this.accountService.cloneAccountByCompany(sourceTenantId,tenantId).subscribe({
-
+  cloneAccountsToNewCompany(sourceTenantId: string | null, tenantId: string) {
+    this.accountService.cloneAccountByCompany(sourceTenantId, tenantId).subscribe({
       next: (data) => {
         console.log(data);
 
@@ -314,12 +312,12 @@ export class CompanyCreateComponent implements OnInit {
       const reader = new FileReader();
 
       reader.onload = () => {
-        this.imagePreview = reader.result;    
+        this.imagePreview = reader.result;
 
         const base64String = (reader.result as string).split(',')[1];
-        this.imageBase64 = base64String;  
-      
-        
+        this.imageBase64 = base64String;
+
+
       };
 
       reader.readAsDataURL(file);
@@ -327,6 +325,6 @@ export class CompanyCreateComponent implements OnInit {
   }
 
 
-  
-  
+
+
 }
