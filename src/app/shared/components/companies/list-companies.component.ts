@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, first, Observable, of, startWith, Subject, switchMap } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
-import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { CompanieResponse, companyByUser, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
@@ -21,7 +21,7 @@ import { NavigationService } from 'src/app/shared/navigation.service';
 export class ListCompaniesComponent implements OnInit {
   user$: Observable<UsersResponse | null> | undefined;
 
-  companyList$?: Observable<any[]>;
+  companyList$?: Observable<CompanieResponse[]>;
   isAdmind: boolean = false;
 
   paginatorArray: number[] = [];
@@ -47,21 +47,27 @@ export class ListCompaniesComponent implements OnInit {
     const savedUser = localStorage.getItem('userData');
     const userId: number = this.authService.getUserId();
 
-    if (savedUser) {
-      const usuario = JSON.parse(savedUser);
+    // To Do Laurent aqui hacer la paginacion guardar info de usuario en memoria como companias excluyendo roles una ves 
+    //  que se pierda se tiene que volver a recargar si pagino 1 y dos no tiene que volver a cargar el api solo traerlo del arreglo
 
-      if (userId == 0 && usuario.id != null) {
-        this.saveUserInMemory(usuario.id);
-      } else {
+    // if (savedUser) {
+    //   const usuario = JSON.parse(savedUser);
 
-        this.isAdmind = this.authService.getRolesUser().some((role: any) =>
-          role.name === 'ADMINISTRADOR' && role.global);
-        this.companyList$ = of(this.authService.getCompaniesList());
-        this.paginator(usuario);
-      }
-    } else {
-      this.saveUserInMemory(userId);
-    }
+    //   if (userId == 0 && usuario.id != null) {
+    //     this.saveUserInMemory(usuario.id);
+    //   } else {
+
+    //     this.isAdmind = this.authService.getRolesUser().some((role: any) =>
+    //       role.name === 'ADMINISTRADOR' && role.global);
+    //     this.companyList$ = of(this.authService.getCompaniesList());
+    //     this.paginator(usuario);
+    //   }
+    // } else {
+    //   this.saveUserInMemory(userId);
+    // }
+
+    this.saveUserInMemory(1);
+    this.saveCompanysInMemory(0,10)
   }
 
 
@@ -83,12 +89,11 @@ export class ListCompaniesComponent implements OnInit {
   })();
 
 
-  goTo(cmp: Company) {
-    const {roles, ...company} = cmp;
+  goTo(cmp: CompanieResponse) {
+    const {roles , ...company}= cmp;
     localStorage.setItem('company', JSON.stringify(company));
     this.companyService.setCompany(cmp)
     this.router.navigate(['/accounting']);
-
   };
 
   goToCompany() {
@@ -208,19 +213,24 @@ export class ListCompaniesComponent implements OnInit {
   }
 
   saveUserInMemory(userId: number) {
-    this.user$ = this.userService.getUSerById(userId);
 
+    this.user$ = this.userService.getUSerById(userId);
     this.user$.subscribe((data) => {
       if (data) {
 
         this.isAdmind = data.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
         const { globalRoles, createdAt, ...rest } = data;
-        const companies = rest.companies.map(({ roles, ...company }: Company) => company.company);
-        localStorage.setItem('userData', JSON.stringify({ ...rest, companies }));
-        this.companyList$ = of(rest.companies);
+        localStorage.setItem('userData', JSON.stringify({ ...rest }));
         this.authService.setLogin(data);
         this.paginator(data);
       }
+    });
+  }
+
+  saveCompanysInMemory(page:number , size:number) {
+    this.companyService.getCompanysByUser(page,size).subscribe((data)=>{
+      this.companyList$ = of(data.response);
+      return data;
     });
   }
 

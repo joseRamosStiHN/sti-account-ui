@@ -26,11 +26,11 @@ export class AccountingPageComponent implements OnInit {
   async ngOnInit() {
 
     this.subscription.add(
+      
       this.companyService.companyLogin$.subscribe((companie) => {        
         try {
-          const company = JSON.parse(localStorage.getItem('company') || '');
-    
-          this.navigationService.setCompany(company.company);
+        
+          this.navigationService.setCompany(companie);
           const contabilidadList: any = [];
     
           companie?.roles.forEach((role: any) => {

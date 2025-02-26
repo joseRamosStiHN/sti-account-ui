@@ -2,8 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
-import { Company } from 'src/app/shared/models/LoginResponseModel';
+import { CompanieResponse, companyByUser, CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +11,7 @@ export class CompaniesService {
   private apiURL = environment.SECURITY_API_URL;
 
 
-  private iscompanyLoging = new BehaviorSubject<Company | null>(null);
+  private iscompanyLoging = new BehaviorSubject<CompanieResponse | null>(null);
   companyLogin$ = this.iscompanyLoging.asObservable();
 
   httpOptions = {
@@ -35,6 +34,31 @@ export class CompaniesService {
       this.apiURL + '/api/v1/company/'
     );
   }
+
+
+  /**
+    * Method that brings a list companys by User
+    *
+    * @return response()
+    */
+  getCompanysByUser(page:number,size:number): Observable<companyByUser> {
+    return this.httpClient.get<companyByUser>(
+      this.apiURL + `/api/v1/company/company-user?page=${page}&size=${size}`
+    );
+  }
+
+
+  /**
+    * Method that brings a list companys by User
+    *
+    * @return response()
+    */
+  getCompanyByUser(companieId:number): Observable<CompanieResponse> {
+    return this.httpClient.get<CompanieResponse>(
+      this.apiURL + `/api/v1/company/user/${companieId}`
+    );
+  }
+  
 
 
   /**
@@ -97,11 +121,11 @@ export class CompaniesService {
   }
 
 
-  setCompany(company: Company) {
+  setCompany(company: CompanieResponse) {
     this.iscompanyLoging.next(company);
   }
 
-  getCompany():any{
+  getCompany(): any {
     return this.iscompanyLoging.getValue();
   }
 

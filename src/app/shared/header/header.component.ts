@@ -57,10 +57,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       })
     );
 
+    // To Do cargar imagen en header
+
     this.subscription.add(
       this.navigate.companyNavigation.subscribe((company)=>{
         this.nameCompany = company.name
-        this.imagePreview = `data:image/png;base64,${company.companyLogo}`;   
+        // this.imagePreview = `data:image/png;base64,${company.companyLogo}`;   
       })
     )
   }

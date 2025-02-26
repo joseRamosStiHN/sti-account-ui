@@ -3,10 +3,6 @@ import { inject } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { Observable } from "rxjs";
 import { CompaniesService } from "src/app/modules/companies/companies.service";
-import { AuthServiceService } from "src/app/modules/login/auth-service.service";
-import { UsersService } from "src/app/modules/users/users.service";
-import { Company } from "src/app/shared/models/LoginResponseModel";
-import { NavigationService } from "src/app/shared/navigation.service";
 
 
 export const AccountigGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree>
@@ -22,9 +18,8 @@ export const AccountigGuard: CanActivateFn = (route: ActivatedRouteSnapshot, sta
 
         if (!companyService.getCompany()) {
             if (savedUser) {
-                const usuario = JSON.parse(savedUser);
                 const company = JSON.parse(companyStorage);
-               isCompany = saveCompanyInMemory(usuario.id, company.company.id);
+                isCompany = saveCompanyInMemory( company.id);
             }
         }
 
@@ -37,26 +32,21 @@ export const AccountigGuard: CanActivateFn = (route: ActivatedRouteSnapshot, sta
 };
 
 
-function saveCompanyInMemory(userId: number, idCompany: number): boolean {
-    const userService = inject(UsersService);
-    const companyService = inject(CompaniesService);
+function saveCompanyInMemory(idCompany: number): boolean {
 
+    const companyService = inject(CompaniesService);
     let logging = false;
 
-    userService.getUSerById(userId).subscribe({
+    companyService.getCompanyByUser(idCompany).subscribe({
         next: (data) => {
             if (data) {
-                const companie = data.companies.find((com: any) => com.company.id === idCompany);
 
-                if (companie) {
-                    const { roles, ...companyData } = companie;
-                    localStorage.setItem('company', JSON.stringify(companyData));
-                    companyService.setCompany(companie);
-                    logging = true; 
-                } else {
-        
-                    logging = false;
-                }
+                const { roles, ...companyData } = data;
+                localStorage.setItem('company', JSON.stringify(companyData));
+
+                companyService.setCompany(data);
+                logging = true;
+
             } else {
 
                 logging = false;
@@ -68,5 +58,5 @@ function saveCompanyInMemory(userId: number, idCompany: number): boolean {
         }
     });
 
-    return logging; 
+    return logging;
 }
