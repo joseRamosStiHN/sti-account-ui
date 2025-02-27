@@ -30,11 +30,12 @@
   @for (item of companyList$ | async | slice : startPage : endPage; track $index) {
   <div class="bg-white shadow-lg rounded-lg overflow-hidden">
     <div class="flex items-center justify-center h-48 bg-gray-200">
-      <img src="data:image/png;base64,{{ item.company.companyLogo }}" alt="{{ item.company.name }} Logo"
-        class="h-32 w-35 object-contain" />
+        <img [src]="'http://localhost:8081/api/v1/company/logo/' + item.id" alt="Logo">
+
+
     </div>
     <div class="p-4">
-      <h2 class="text-gray-800 text-xl font-semibold">{{item.company.name}}</h2>
+      <h2 class="text-gray-800 text-xl font-semibold">{{item.name}}</h2>
       <div class="flex justify-end gap-2 mt-4">
         <button (click)="addUserCompany(item)"
           class="text-sm border border-blue-500 text-blue-500 rounded-md p-2 hover:bg-blue-500 hover:text-white transition duration-200">Agregar

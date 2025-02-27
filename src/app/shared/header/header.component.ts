@@ -31,7 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private readonly navigationService = inject(NavigationService);
     private authService = inject(AuthServiceService);
 
-    imagePreview: string | ArrayBuffer | null = null;
+    companyId?: number
 
   // nombreUsuario: string = 'Josue Rodriguez';
 
@@ -62,7 +62,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.navigate.companyNavigation.subscribe((company)=>{
         this.nameCompany = company.name
-        // this.imagePreview = `data:image/png;base64,${company.companyLogo}`;   
+        this.companyId = company.id
       })
     )
   }
