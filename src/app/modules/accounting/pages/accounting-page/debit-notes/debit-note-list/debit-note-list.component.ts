@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 
 import { Router } from '@angular/router';
-import { catchError, firstValueFrom, map, Observable, of, tap } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, of, Subscription, tap } from 'rxjs';
 import { AdjustmentResponse } from 'src/app/modules/accounting/models/APIModels';
 import { ToastType } from 'devextreme/ui/toast';
 import { typeToast } from 'src/app/modules/accounting/models/models';
@@ -10,6 +10,7 @@ import themes from 'devextreme/ui/themes';
 import { confirm } from 'devextreme/ui/dialog';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
+import { NavigationService } from 'src/app/shared/navigation.service';
 
 @Component({
   selector: 'app-debit-note-list',
@@ -18,7 +19,7 @@ import { UsersService } from 'src/app/modules/users/users.service';
 })
 export class DebitNoteListComponent {
 
-
+  private subscription: Subscription = new Subscription();
   error: Error | null = null;
   private readonly router = inject(Router);
   dataSource$: Observable<AdjustmentResponse[]> | undefined;
@@ -46,6 +47,7 @@ export class DebitNoteListComponent {
   isApprove:boolean= false;
 
   private readonly transactionService = inject(TransactionService);
+  private readonly navigate = inject(NavigationService);
 
 
   constructor() { 
@@ -57,7 +59,12 @@ export class DebitNoteListComponent {
 
  
   ngOnInit():void {
-    this.validPermisition();
+    this.subscription.add(
+      this.navigate.companyNavigation.subscribe((company)=>{
+        this.validPermisition(company);
+      })
+    )
+    
     this.dataSource$ = this.transactionService.getAllNotasDebits()
       .pipe(
         map((data) => this.fillDataSource(data)),
@@ -135,23 +142,16 @@ export class DebitNoteListComponent {
     );
   }
 
-  async validPermisition() {
-
-    const company = JSON.parse(localStorage.getItem('company') || '');
-
-    if ( company == '') {
+  async validPermisition(company:any) {
+  
+    if (company == '') {
       console.error('Datos de usuario o compañía no encontrados.');
       return;
     }
 
 
-    if (!company) {
-      console.error('No se encontró un rol para la compañía especificada.');
-      console.log('company.id:', company.id);
-      return;
-    }
-
    await company.roles.forEach((role: any) => { 
+
       if (role.name == 'REGISTRO CONTABLE') {       
         this.isRegistreAccounting = true;
       }
@@ -162,7 +162,7 @@ export class DebitNoteListComponent {
       
     })
 
-
   }
+  
 
 }

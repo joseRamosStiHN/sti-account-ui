@@ -25,13 +25,15 @@ export class AccountingPageComponent implements OnInit {
 
   async ngOnInit() {
 
+    const contabilidadList: any = [];
+
     this.subscription.add(
       
       this.companyService.companyLogin$.subscribe((companie) => {        
         try {
         
           this.navigationService.setCompany(companie);
-          const contabilidadList: any = [];
+          
     
           companie?.roles.forEach((role: any) => {
             
@@ -60,8 +62,11 @@ export class AccountingPageComponent implements OnInit {
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Apuntes Contables', path: '/accounting/journal-items' });
             }
     
+     
+            
     
             if (role.name === 'APROBADOR') {
+              console.log(role.name);
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Ajustes Contables', path: '/accounting/adjustment-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Credito', path: '/accounting/creditnotes-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Debito', path: '/accounting/debitnotes-list' });

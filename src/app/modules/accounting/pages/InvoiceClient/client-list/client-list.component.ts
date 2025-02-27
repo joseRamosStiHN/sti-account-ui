@@ -25,6 +25,8 @@ const initialValue: [Date, Date] = [
 })
 export class ClientListComponent implements OnInit {
 
+  private subscription: Subscription = new Subscription();
+
   dataSource$: Observable<BillingListClient[]> | undefined;
   error: Error | null = null;
   roles: string[] = ['admin', 'teller'];
@@ -63,8 +65,13 @@ export class ClientListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.validPermisition();
     this.currentValue = initialValue;
+
+    this.subscription.add(
+      this.navigate.companyNavigation.subscribe((company)=>{
+        this.validPermisition(company);
+      })
+    )
 
     this.dataSource$ = this.transService
       .getAllTransactionByDocumentType(DocumentType.INVOICE_CLIENT)
@@ -80,6 +87,9 @@ export class ClientListComponent implements OnInit {
           return of([]);
         })
       );
+
+
+      
   }
 
 
@@ -184,20 +194,13 @@ export class ClientListComponent implements OnInit {
     );
   }
 
- async validPermisition() {
+ async validPermisition(company:any) {
   
-    const company = JSON.parse(localStorage.getItem('company') || '');
-
     if (company == '') {
       console.error('Datos de usuario o compañía no encontrados.');
       return;
     }
 
-    if (!company) {
-      console.error('No se encontró un rol para la compañía especificada.');
-      console.log('company.id:', company.id)
-      return;
-    }
 
    await company.roles.forEach((role: any) => { 
 
