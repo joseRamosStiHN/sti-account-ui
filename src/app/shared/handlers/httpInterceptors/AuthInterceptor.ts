@@ -23,7 +23,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const company: string = localStorage.getItem('company') ?? '';
     try {
       const companyObject = JSON.parse(company);
-      return companyObject.company.tenantId;
+      return companyObject.tenantId;
     } catch (e) {
       return '';
     }
