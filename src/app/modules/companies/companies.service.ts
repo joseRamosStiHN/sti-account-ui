@@ -12,6 +12,14 @@ export class CompaniesService {
 
 
   private iscompanyLoging = new BehaviorSubject<CompanieResponse | null>(null);
+  private companies = new BehaviorSubject<CompanieResponse[]>([]);
+
+  private loadPages = new BehaviorSubject<Set<number>>(new Set());
+
+ 
+  loadPages$= this.loadPages.asObservable();
+ 
+  companies$ = this.companies.asObservable();
   companyLogin$ = this.iscompanyLoging.asObservable();
 
   httpOptions = {
@@ -41,7 +49,7 @@ export class CompaniesService {
     *
     * @return response()
     */
-  getCompanysByUser(page:number,size:number): Observable<companyByUser> {
+  getCompanysByUser(page:number,size:number): Observable<companyByUser> {    
     return this.httpClient.get<companyByUser>(
       this.apiURL + `/api/v1/company/company-user?page=${page}&size=${size}`
     );
@@ -127,6 +135,22 @@ export class CompaniesService {
 
   getCompany(): any {
     return this.iscompanyLoging.getValue();
+  }
+
+  setCompanys(company: CompanieResponse[]) {
+    this.companies.next(company);
+  }
+  
+  getCompanies(){
+    return this.companies.getValue();
+  }
+
+  setLoadPages(company: Set<number>) {
+    this.loadPages.next(company);
+  }
+  
+  getLoadPages(){
+    return this.loadPages.getValue();
   }
 
 }

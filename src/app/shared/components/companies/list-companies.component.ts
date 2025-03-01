@@ -31,6 +31,8 @@ export class ListCompaniesComponent implements OnInit {
   endPage = 10;
   numberPages = 10;
 
+  private loadedPages = new Set<number>();
+
 
   private readonly router = inject(Router);
   private readonly navigationService = inject(NavigationService);
@@ -41,33 +43,33 @@ export class ListCompaniesComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+   this.loadedPages = this.companyService.getLoadPages()
+
     this.navigationService.setNavLinks([]);
     this.navigationService.setCompany('');
 
     const savedUser = localStorage.getItem('userData');
     const userId: number = this.authService.getUserId();
 
-    // To Do Laurent aqui hacer la paginacion guardar info de usuario en memoria como companias excluyendo roles una ves 
-    //  que se pierda se tiene que volver a recargar si pagino 1 y dos no tiene que volver a cargar el api solo traerlo del arreglo
+    if (savedUser) {
+      const usuario = JSON.parse(savedUser);
 
-    // if (savedUser) {
-    //   const usuario = JSON.parse(savedUser);
+      if (userId == 0 && usuario.id != null) {
+        this.saveUserInMemory(usuario.id);
+        this.saveCompanysInMemory(this.startPage,this.endPage)
+      } else {
+        this.isAdmind = this.authService.getRolesUser().some((role: any) =>
+          role.name === 'ADMINISTRADOR' && role.global);
 
-    //   if (userId == 0 && usuario.id != null) {
-    //     this.saveUserInMemory(usuario.id);
-    //   } else {
+        this.companyList$ = of(this.companyService.getCompanies());
+        this.paginator(Number(localStorage.getItem('totalPages')));
+      }
+    } else {
 
-    //     this.isAdmind = this.authService.getRolesUser().some((role: any) =>
-    //       role.name === 'ADMINISTRADOR' && role.global);
-    //     this.companyList$ = of(this.authService.getCompaniesList());
-    //     this.paginator(usuario);
-    //   }
-    // } else {
-    //   this.saveUserInMemory(userId);
-    // }
+      this.saveUserInMemory(userId);
+      this.saveCompanysInMemory(this.startPage,this.endPage)
+    }
 
-    this.saveUserInMemory(1);
-    this.saveCompanysInMemory(0,10)
   }
 
 
@@ -113,11 +115,11 @@ export class ListCompaniesComponent implements OnInit {
 
     const savedUser = localStorage.getItem('userData');
     if (savedUser) {
-      const usuario = JSON.parse(savedUser);
+
       if (search == "") {
 
-        this.companyList$ =  of(this.authService.getCompaniesList());
-        this.paginator(usuario);
+        this.companyList$ =  of(this.companyService.getCompanies());
+        this.paginator(Number(localStorage.getItem('totalPages')));
         this.deactivePaginator();
         this.activePaginator(0);
         return
@@ -128,8 +130,8 @@ export class ListCompaniesComponent implements OnInit {
       this.endPage = 10;
       this.numberPages = 10;
 
-      let companie = this.authService.getCompaniesList().filter((companie: any) => {
-        return companie.company.name.toUpperCase().includes(search.toUpperCase())
+      let companie = this.companyService.getCompanies().filter((companie: any) => {
+        return companie.name.toUpperCase().includes(search.toUpperCase())
       })
 
 
@@ -146,12 +148,18 @@ export class ListCompaniesComponent implements OnInit {
   }
 
 
-  paginator(usuario: any,) {
-    this.paginatorArray = Array.from({ length: Math.ceil(usuario.companies.length / this.numberPages) }, (_, i) => i);
-
+  paginator(totalPages: number,) {
+    this.paginatorArray = Array.from({ length: totalPages }, (_, i) => i);
   }
 
+
+  
   page(page: number) {
+    
+    if (!this.loadedPages.has(page)  ) {     
+      this.saveCompanysInMemory(page -1, this.numberPages,page); 
+ 
+    }
 
     this.startPage = (page - 1) * this.numberPages;
     this.endPage = page * this.numberPages;
@@ -179,10 +187,15 @@ export class ListCompaniesComponent implements OnInit {
     for (let i = 0; i < pages.length; i++) {
       if (pages[i].className.includes('active') && i < pages.length - 1) {
 
+
         this.startPage = (i + 1) * this.numberPages;
         this.endPage = (i + 1) + 2 * this.numberPages;
         pages[i].classList.remove('active');
         pages[++i].classList.add('active');
+
+        if (!this.loadedPages.has(++i)  ) {     
+          this.saveCompanysInMemory(i -1, this.numberPages, i++);   
+        }
 
       }
 
@@ -222,18 +235,25 @@ export class ListCompaniesComponent implements OnInit {
         const { globalRoles, createdAt, ...rest } = data;
         localStorage.setItem('userData', JSON.stringify({ ...rest }));
         this.authService.setLogin(data);
-        this.paginator(data);
+
       }
     });
   }
 
-  saveCompanysInMemory(page:number , size:number) {
+  saveCompanysInMemory(page:number , size:number, pageLoad = 1) {
+    
     this.companyService.getCompanysByUser(page,size).subscribe((data)=>{
-      this.companyList$ = of(data.response);
-      return data;
+      let companias:any = this.companyService.getCompanies();
+      companias = [...companias, data.response]
+      
+      this.companyService.setCompanys(companias.flat());
+      this.companyList$ = of(this.companyService.getCompanies());
+      this.loadedPages.add(pageLoad);
+      this.companyService.setLoadPages(this.loadedPages);
+
+      localStorage.setItem('totalPages', data.totalPages.toString());
+      this.paginator(data.totalPages);
     });
   }
-
-
 
 }
