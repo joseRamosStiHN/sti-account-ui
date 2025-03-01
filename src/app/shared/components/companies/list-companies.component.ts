@@ -27,11 +27,11 @@ export class ListCompaniesComponent implements OnInit {
   paginatorArray: number[] = [];
 
 
-  startPage = 0
-  endPage = 10;
-  numberPages = 10;
 
-  private loadedPages = new Set<number>();
+  numberPages = 2;
+
+  private companiasMap = new Map<number, CompanieResponse[]>();
+
 
 
   private readonly router = inject(Router);
@@ -43,7 +43,7 @@ export class ListCompaniesComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-   this.loadedPages = this.companyService.getLoadPages()
+    this.companiasMap = this.companyService.getLoadCompanysMap()
 
     this.navigationService.setNavLinks([]);
     this.navigationService.setCompany('');
@@ -56,18 +56,19 @@ export class ListCompaniesComponent implements OnInit {
 
       if (userId == 0 && usuario.id != null) {
         this.saveUserInMemory(usuario.id);
-        this.saveCompanysInMemory(this.startPage,this.endPage)
+        this.saveCompanysInMemory(0, this.numberPages)
       } else {
         this.isAdmind = this.authService.getRolesUser().some((role: any) =>
           role.name === 'ADMINISTRADOR' && role.global);
 
-        this.companyList$ = of(this.companyService.getCompanies());
+        // this.companyList$ = of(this.companyService());
+        this.companyList$ = of(this.companiasMap.get(0) ?? []);
         this.paginator(Number(localStorage.getItem('totalPages')));
       }
     } else {
 
       this.saveUserInMemory(userId);
-      this.saveCompanysInMemory(this.startPage,this.endPage)
+      this.saveCompanysInMemory(0, this.numberPages)
     }
 
   }
@@ -92,7 +93,7 @@ export class ListCompaniesComponent implements OnInit {
 
 
   goTo(cmp: CompanieResponse) {
-    const {roles , ...company}= cmp;
+    const { roles, ...company } = cmp;
     localStorage.setItem('company', JSON.stringify(company));
     this.companyService.setCompany(cmp)
     this.router.navigate(['/accounting']);
@@ -107,7 +108,7 @@ export class ListCompaniesComponent implements OnInit {
   };
 
 
-  addUserCompany = (companie:any) => {
+  addUserCompany = (companie: any) => {
     this.router.navigate(['/dashboard/companies/edit', companie.company.id]);
   };
 
@@ -118,30 +119,38 @@ export class ListCompaniesComponent implements OnInit {
 
       if (search == "") {
 
-        this.companyList$ =  of(this.companyService.getCompanies());
+        this.companiasMap = new Map<number, CompanieResponse[]>();
+        this.saveCompanysInMemory(0, this.numberPages)
+
+        this.companyList$ = of(this.companiasMap.get(0) ?? [])
         this.paginator(Number(localStorage.getItem('totalPages')));
         this.deactivePaginator();
-        this.activePaginator(0);
         return
       }
 
-
-      this.startPage = 0
-      this.endPage = 10;
-      this.numberPages = 10;
 
       let companie = this.companyService.getCompanies().filter((companie: any) => {
         return companie.name.toUpperCase().includes(search.toUpperCase())
       })
 
 
-      this.paginatorArray = Array.from({ length: Math.ceil(companie.length / this.numberPages) }, 
-      (_, i) => i);
-      
 
-      this.companyList$ = of(companie);
+      this.paginatorArray = Array.from({ length: Math.ceil(companie.length / this.numberPages) },
+        (_, i) => i);
+
+      this.companiasMap = new Map<number, CompanieResponse[]>();
+      const companiesByMap = this.dividirBusquedad(companie, this.numberPages);
+
+      for (let index = 0; index < this.paginatorArray.length; index++) {
+        const currentArray = companiesByMap[index];
+        this.companiasMap.set(index, currentArray);
+      }
+      this.companyList$ = of(this.companiasMap.get(0) ?? []);
+
       this.deactivePaginator();
       this.activePaginator(0);
+
+
 
     }
 
@@ -153,16 +162,16 @@ export class ListCompaniesComponent implements OnInit {
   }
 
 
-  
+
   page(page: number) {
-    
-    if (!this.loadedPages.has(page)  ) {     
-      this.saveCompanysInMemory(page -1, this.numberPages,page); 
- 
+
+    if (!this.companiasMap.has(page - 1)) {
+      this.saveCompanysInMemory(page - 1, this.numberPages);
+    } else {
+      this.companyList$ = of(this.companiasMap.get(page - 1) ?? []);
     }
 
-    this.startPage = (page - 1) * this.numberPages;
-    this.endPage = page * this.numberPages;
+
     this.deactivePaginator()
     this.activePaginator(page - 1);
   }
@@ -172,10 +181,14 @@ export class ListCompaniesComponent implements OnInit {
     for (let i = 0; i < pages.length; i++) {
       if (pages[i].className.includes('active') && i > 0) {
 
-        this.startPage = (i - 1) * this.numberPages;
-        this.endPage = i * this.numberPages;
         pages[i].classList.remove('active');
         pages[--i].classList.add('active');
+
+        if (!this.companiasMap.has(i)) {
+          this.saveCompanysInMemory(i, this.numberPages);
+        } else {
+          this.companyList$ = of(this.companiasMap.get(i) ?? []);
+        }
       }
 
     }
@@ -187,16 +200,14 @@ export class ListCompaniesComponent implements OnInit {
     for (let i = 0; i < pages.length; i++) {
       if (pages[i].className.includes('active') && i < pages.length - 1) {
 
-
-        this.startPage = (i + 1) * this.numberPages;
-        this.endPage = (i + 1) + 2 * this.numberPages;
         pages[i].classList.remove('active');
         pages[++i].classList.add('active');
 
-        if (!this.loadedPages.has(++i)  ) {     
-          this.saveCompanysInMemory(i -1, this.numberPages, i++);   
+        if (!this.companiasMap.has(i)) {
+          this.saveCompanysInMemory(i, this.numberPages);
+        } else {
+          this.companyList$ = of(this.companiasMap.get(i) ?? []);
         }
-
       }
 
     }
@@ -240,20 +251,38 @@ export class ListCompaniesComponent implements OnInit {
     });
   }
 
-  saveCompanysInMemory(page:number , size:number, pageLoad = 1) {
-    
-    this.companyService.getCompanysByUser(page,size).subscribe((data)=>{
-      let companias:any = this.companyService.getCompanies();
-      companias = [...companias, data.response]
-      
+  saveCompanysInMemory(page: number, size: number) {
+
+    this.companyService.getCompanysByUser(page, size).subscribe((data) => {
+
+      let companias: any = this.companyService.getCompanies();
+      companias = [...companias, data.response];
+
+      this.companiasMap.set(page, data.response);
+
       this.companyService.setCompanys(companias.flat());
-      this.companyList$ = of(this.companyService.getCompanies());
-      this.loadedPages.add(pageLoad);
-      this.companyService.setLoadPages(this.loadedPages);
+
+
+
+      this.companyList$ = of(this.companiasMap.get(page) ?? []);
+
+      this.companyService.setLoadCompanysMap(this.companiasMap);
 
       localStorage.setItem('totalPages', data.totalPages.toString());
       this.paginator(data.totalPages);
     });
   }
+
+
+  dividirBusquedad(array: any, length: number) {
+    const result = [];
+    for (let i = 0; i < array.length; i += length) {
+      result.push(array.slice(i, i + length));
+    }
+
+    return result;
+  }
+
+
 
 }

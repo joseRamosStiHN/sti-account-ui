@@ -27,7 +27,8 @@
 </div>
 
 <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-  @for (item of companyList$ | async | slice : startPage : endPage; track $index) {
+  <!-- @for (item of companyList$ | async | slice : startPage : endPage; track $index) { -->
+  @for (item of companyList$ | async; track $index) {
   <div class="bg-white shadow-lg rounded-lg overflow-hidden">
     <div class="flex items-center justify-center h-48 bg-gray-200">
         <img [src]="'http://localhost:8081/api/v1/company/logo/' + item.id" alt="Logo"  class="h-32 w-35 object-contain" >

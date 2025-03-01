@@ -14,10 +14,10 @@ export class CompaniesService {
   private iscompanyLoging = new BehaviorSubject<CompanieResponse | null>(null);
   private companies = new BehaviorSubject<CompanieResponse[]>([]);
 
-  private loadPages = new BehaviorSubject<Set<number>>(new Set());
+  private companysMap = new BehaviorSubject< Map<number, CompanieResponse[]> >(new Map());
 
  
-  loadPages$= this.loadPages.asObservable();
+  companysMap$= this.companysMap.asObservable();
  
   companies$ = this.companies.asObservable();
   companyLogin$ = this.iscompanyLoging.asObservable();
@@ -145,12 +145,12 @@ export class CompaniesService {
     return this.companies.getValue();
   }
 
-  setLoadPages(company: Set<number>) {
-    this.loadPages.next(company);
+  setLoadCompanysMap(company:  Map<number, CompanieResponse[]>) {
+    this.companysMap.next(company);
   }
   
-  getLoadPages(){
-    return this.loadPages.getValue();
+  getLoadCompanysMap(){
+    return this.companysMap.getValue();
   }
 
 }
