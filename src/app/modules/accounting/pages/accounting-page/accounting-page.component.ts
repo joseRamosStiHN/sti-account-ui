@@ -66,7 +66,6 @@ export class AccountingPageComponent implements OnInit {
             
     
             if (role.name === 'APROBADOR') {
-              console.log(role.name);
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Ajustes Contables', path: '/accounting/adjustment-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Credito', path: '/accounting/creditnotes-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Debito', path: '/accounting/debitnotes-list' });
