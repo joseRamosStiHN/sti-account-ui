@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, first, Observable, of, startWith, Subject, switchMap } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
@@ -14,7 +15,7 @@ import { NavigationService } from 'src/app/shared/navigation.service';
 @Component({
   selector: 'app-companies',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './list-companies.component.html',
   styleUrl: './list-companies.component.css',
 })
@@ -28,7 +29,7 @@ export class ListCompaniesComponent implements OnInit {
 
 
 
-  numberPages = 2;
+  numberPages = 10;
 
   private companiasMap = new Map<number, CompanieResponse[]>();
 
@@ -283,6 +284,18 @@ export class ListCompaniesComponent implements OnInit {
     return result;
   }
 
+  onPageChange(newValue: number) {
+    this.numberPages = newValue;
+
+    this.companiasMap = new Map<number, CompanieResponse[]>();
+    this.saveCompanysInMemory(0, this.numberPages)
+
+    this.companyList$ = of(this.companiasMap.get(0) ?? [])
+    this.paginator(Number(localStorage.getItem('totalPages')));
+    this.deactivePaginator();
+    this.activePaginator(0);
+
+  }
 
 
 }
