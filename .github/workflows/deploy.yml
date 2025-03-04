@@ -35,6 +35,12 @@ jobs:
       - name: Compilar la aplicación
         run: npm run build --configuration=production
 
+      - name: create _redirect for Netlify
+        run: echo "/* /index.html 200" > dist/sti-proyect/browser/_redirects
+
+      - name: verify redirects
+        run: cat dist/sti-proyect/browser/_redirects
+
       - name: Instalar Netlify CLI
         run: npm install -g netlify-cli@18.0.3
 
