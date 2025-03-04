@@ -39,3 +39,33 @@ export interface CompanyResponse {
     id: number
   }
   
+  export interface companyByUser {
+    pageSize: number
+    totalPages: number
+    pageNumber: number
+    response: CompanieResponse[]
+  }
+  
+  export interface CompanieResponse {
+    id: number
+    name: string
+    description: string
+    address: string
+    rtn: string
+    type: string
+    email: string
+    phone: string
+    website: string
+    tenantId: string
+    createdAt: string
+    roles: Role[]
+    active: boolean
+  }
+  
+  export interface Role {
+    id: number
+    name: string
+    description: string
+    global: boolean
+  }
+  

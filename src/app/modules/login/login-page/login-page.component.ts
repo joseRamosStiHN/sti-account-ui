@@ -50,14 +50,13 @@ export class LoginPageComponent implements OnInit {
   onSubmit() {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
-        next: (n: any) => {
+        next: (n: any) => {          
           if (n.active) {
             this.authService.setLogin(n);
             this.router.navigate(['/dashboard']);
           }
         },
         error: (err: any) => {
-
           this.errorLogin = true;
         }
       });

@@ -9,6 +9,7 @@ import { NavigationService, NavStiLink } from '../navigation.service';
 import { DropdownComponent } from '../components/dropdown/dropdown.component';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -30,7 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private readonly navigationService = inject(NavigationService);
     private authService = inject(AuthServiceService);
 
-    imagePreview: string | ArrayBuffer | null = null;
+    companyId?: number
 
   // nombreUsuario: string = 'Josue Rodriguez';
 
@@ -56,10 +57,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       })
     );
 
+    // To Do cargar imagen en header
+
     this.subscription.add(
       this.navigate.companyNavigation.subscribe((company)=>{
         this.nameCompany = company.name
-        this.imagePreview = `data:image/png;base64,${company.companyLogo}`;   
+        this.companyId = company.id
       })
     )
   }
@@ -79,23 +82,31 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
+    this.authService.logout().subscribe({
+      next: (data) => {      
+        localStorage.removeItem('userData'); 
+        localStorage.removeItem('company');
+        this.authService.setLogin({
+          userName: '',
+          active: false,
+          companies: [],
+          createdAt: new Date(),
+          email: '',
+          firstName: '',
+          id: 0,
+          lastName: '',
+          globalRoles: []
+        });
+    
+        this.dropdownOpen = false;        
+        this.router.navigate(['/login']);    
+      },
+      error: (err) => {
 
-    localStorage.removeItem('userData'); 
-    localStorage.removeItem('company');
-    this.authService.setLogin({
-      userName: '',
-      active: false,
-      companies: [],
-      createdAt: new Date(),
-      email: '',
-      firstName: '',
-      id: 0,
-      lastName: '',
-      globalRoles: []
+        console.log(err.error);
+        
+        console.log(err);
+      }
     });
-
-    this.dropdownOpen = false;        
-    this.router.navigate(['/login']);      
- 
   }
 }

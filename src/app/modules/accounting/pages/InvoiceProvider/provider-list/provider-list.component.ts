@@ -4,11 +4,12 @@ import { BillingListProvider, DocumentType, typeToast } from '../../../models/mo
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionResponse } from '../../../models/APIModels';
 import { ToastType } from 'devextreme/ui/toast';
-import { catchError, firstValueFrom, map, Observable, of, tap } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, of, Subscription, tap } from 'rxjs';
 import themes from 'devextreme/ui/themes';
 import { confirm } from 'devextreme/ui/dialog';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
+import { NavigationService } from 'src/app/shared/navigation.service';
 
 const msInDay = 1000 * 60 * 60 * 24;
 const now = new Date();
@@ -22,6 +23,9 @@ const initialValue: [Date, Date] = [
   styleUrl: './provider-list.component.css',
 })
 export class ProviderListComponent {
+
+  private subscription: Subscription = new Subscription();
+
   dataSource$: Observable<BillingListProvider[]> | undefined;
 
   currentValue!: (string | number | Date)[];
@@ -52,6 +56,7 @@ export class ProviderListComponent {
 
   private readonly router = inject(Router);
   private readonly service = inject(TransactionService);
+    private readonly navigate = inject(NavigationService);
 
   constructor() {
 
@@ -60,7 +65,11 @@ export class ProviderListComponent {
   }
 
   ngOnInit(): void {
-    this.validPermisition();
+    this.subscription.add(
+      this.navigate.companyNavigation.subscribe((company)=>{
+        this.validPermisition(company);
+      })
+    )
     this.currentValue = initialValue;
     this.dataSource$ = this.service
       .getAllTransactionByDocumentType(DocumentType.INVOICE_PROVIDER)
@@ -161,32 +170,25 @@ export class ProviderListComponent {
   }
 
 
-  async validPermisition() {
-
-    const company = JSON.parse(localStorage.getItem('company') || '');
-
+  async validPermisition(company:any) {
+  
     if (company == '') {
       console.error('Datos de usuario o compañía no encontrados.');
       return;
     }
-    if (!company) {
-      console.error('No se encontró un rol para la compañía especificada.');
-      console.log('company.id:', company.id);
-      return;
-    }
 
-    await company.roles.forEach((role: any) => {
 
-      if (role.name == 'REGISTRO CONTABLE') {
+   await company.roles.forEach((role: any) => { 
+
+      if (role.name == 'REGISTRO CONTABLE') {       
         this.isRegistreAccounting = true;
       }
 
       if (role.name == 'APROBADOR') {
         this.isApprove = true;
       }
-
+      
     })
-
 
   }
 }

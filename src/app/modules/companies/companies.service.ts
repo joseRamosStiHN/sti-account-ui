@@ -1,14 +1,26 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
-import { catchError, Observable, throwError } from 'rxjs';
-import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
+import { CompanieResponse, companyByUser, CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompaniesService {
   private apiURL = environment.SECURITY_API_URL;
+
+
+  private iscompanyLoging = new BehaviorSubject<CompanieResponse | null>(null);
+  private companies = new BehaviorSubject<CompanieResponse[]>([]);
+
+  private companysMap = new BehaviorSubject< Map<number, CompanieResponse[]> >(new Map());
+
+ 
+  companysMap$= this.companysMap.asObservable();
+ 
+  companies$ = this.companies.asObservable();
+  companyLogin$ = this.iscompanyLoging.asObservable();
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -30,6 +42,31 @@ export class CompaniesService {
       this.apiURL + '/api/v1/company/'
     );
   }
+
+
+  /**
+    * Method that brings a list companys by User
+    *
+    * @return response()
+    */
+  getCompanysByUser(page:number,size:number): Observable<companyByUser> {    
+    return this.httpClient.get<companyByUser>(
+      this.apiURL + `/api/v1/company/company-user?page=${page}&size=${size}`
+    );
+  }
+
+
+  /**
+    * Method that brings a list companys by User
+    *
+    * @return response()
+    */
+  getCompanyByUser(companieId:number): Observable<CompanieResponse> {
+    return this.httpClient.get<CompanieResponse>(
+      this.apiURL + `/api/v1/company/user/${companieId}`
+    );
+  }
+  
 
 
   /**
@@ -66,7 +103,7 @@ export class CompaniesService {
    *
    * @return response()
    */
-  updateCompany(data: CompanyRequest, id:number, actionUser:number): Observable<any> {
+  updateCompany(data: CompanyRequest, id: number, actionUser: number): Observable<any> {
     return this.httpClient
       .put<any>(
         this.apiURL + `/api/v1/company/${id}/${actionUser}`,
@@ -90,4 +127,30 @@ export class CompaniesService {
     }
     return throwError(errorMessage);
   }
+
+
+  setCompany(company: CompanieResponse) {
+    this.iscompanyLoging.next(company);
+  }
+
+  getCompany(): any {
+    return this.iscompanyLoging.getValue();
+  }
+
+  setCompanys(company: CompanieResponse[]) {
+    this.companies.next(company);
+  }
+  
+  getCompanies(){
+    return this.companies.getValue();
+  }
+
+  setLoadCompanysMap(company:  Map<number, CompanieResponse[]>) {
+    this.companysMap.next(company);
+  }
+  
+  getLoadCompanysMap(){
+    return this.companysMap.getValue();
+  }
+
 }
