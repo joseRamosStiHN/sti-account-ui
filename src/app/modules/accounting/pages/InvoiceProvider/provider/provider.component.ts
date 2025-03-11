@@ -447,7 +447,7 @@ export class ProviderComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry && item.balances.length > 0)
+          .filter(item => item.supportEntry )
           .map(item => ({
             id: item.id,
             description: item.name,

@@ -637,7 +637,7 @@ export class ClientComponent {
       next: (data) => {
         this.accountList = data
           .filter(item => {
-            return item.supportEntry && item.balances.length > 0
+            return item.supportEntry
           })
           .map(item => ({
             id: item.id,
