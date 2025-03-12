@@ -50,9 +50,11 @@
     <div class="p-4">
       <h2 class="text-gray-800 text-xl font-semibold">{{item.name}}</h2>
       <div class="flex justify-end gap-2 mt-4">
+        @if( isAdmind ){
         <button (click)="addUserCompany(item)"
           class="text-sm border border-blue-500 text-blue-500 rounded-md p-2 hover:bg-blue-500 hover:text-white transition duration-200">Agregar
           Usuario</button>
+        }
         <button (click)="goTo(item)" type="button"
           class="text-sm border border-blue-600 text-blue-600 rounded-md p-2 hover:bg-blue-600 hover:text-white transition duration-200">
           Conectar

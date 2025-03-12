@@ -45,6 +45,18 @@ export class UsersService {
     );
   }
 
+
+  /**
+   * Method that brings a list with all the users by companys
+   *
+   * @return response()
+   */
+  getAllUsersByCompany(id:number): Observable<UsersResponse[]> {
+    return this.httpClient.get<UsersResponse[]>(
+      this.apiURL + `/api/v1/user/by-company/${id}`
+    );
+  }
+
   /**
    * Method to create a user
    *

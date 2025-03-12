@@ -30,6 +30,7 @@ export class UserCreateComponent implements OnInit {
   userId?:number;
 
   @Input('id') id?: number;
+  @Input('companyId') companyId?: number;
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -72,8 +73,15 @@ export class UserCreateComponent implements OnInit {
         return roles;
       });
   
-      const companies = await lastValueFrom(this.companyService.getAllCompanies());
-      this.companyList$ = companies.map(company => {
+      let companies= [];
+      if (!this.companyId) {
+        companies =  await lastValueFrom(this.companyService.getAllCompanies());
+      }else{
+        const company =  await lastValueFrom(this.companyService.getCompanyById(this.companyId));
+        companies.push(company);
+      }
+      
+      this.companyList$ = companies.map((company:any) => {
         company.active = false;
         return company;
       });

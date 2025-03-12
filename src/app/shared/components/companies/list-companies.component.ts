@@ -110,7 +110,7 @@ export class ListCompaniesComponent implements OnInit {
 
 
   addUserCompany = (companie: any) => {
-    this.router.navigate(['/dashboard/companies/edit', companie.company.id]);
+    this.router.navigate(['/dashboard/user/company/', companie.id]);
   };
 
   searchCompany(search: string) {

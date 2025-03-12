@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
@@ -11,6 +11,7 @@ import { UsersService } from 'src/app/modules/users/users.service';
 })
 export class UserPagesComponent implements OnInit {
 
+  @Input('id') id?: number;
 
   userList$: Observable<UsersResponse[]> | undefined;
 
@@ -19,17 +20,29 @@ export class UserPagesComponent implements OnInit {
 
 
   ngOnInit(): void {
-
-    this.userList$ = this.userService.getAllUsers();
-
+    if (this.id) {
+      this.userList$ = this.userService.getAllUsersByCompany(Number(this.id));
+    }else{
+      this.userList$ = this.userService.getAllUsers();
+    }
 
   }
 
   addUser() {
-    this.router.navigate(['/dashboard/user/create']);
+    if (this.id) {
+      this.router.navigate(['/dashboard/user/create/userByCompany/'+this.id]);
+    }else{
+      this.router.navigate(['/dashboard/user/create']);
+    }
+  
   }
 
   onEditUser(e: any) {
-    this.router.navigate(['/dashboard/user/edit', e.id]);
+    if (this.id) {
+      this.router.navigate([`/dashboard/user/edit/${e.id}/userByCompany`, this.id]);
+    }else{
+      this.router.navigate(['/dashboard/user/edit', e.id]);
+    }
+   
   }
 }
