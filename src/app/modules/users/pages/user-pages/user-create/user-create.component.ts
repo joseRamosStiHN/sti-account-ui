@@ -4,7 +4,7 @@ import { ToastType } from 'devextreme/ui/toast';
 import { lastValueFrom, map, Observable, scan } from 'rxjs';
 import { typeToast } from 'src/app/modules/accounting/models/models';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
-import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { CompanieResponse, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { RolesResponse, UsersRequest } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
 
@@ -182,6 +182,7 @@ export class UserCreateComponent implements OnInit {
 
       await this.userService.createUser(request).subscribe({
         next: (data) => {
+          this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
           this.toastType = typeToast.Success;
           this.messageToast = 'Usuario creado exitosamente';
           this.showToast = true;
@@ -239,6 +240,7 @@ export class UserCreateComponent implements OnInit {
 
       await this.userService.updateUser(request, Number(this.id), Number(this.userId)).subscribe({
         next: (data) => {
+           this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
           this.toastType = typeToast.Success;
           this.messageToast = 'Usuario actualizado exitosamente';
           this.showToast = true;

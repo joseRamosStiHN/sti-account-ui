@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { environment } from '@environment/environment';
 import { debounceTime, distinctUntilChanged, first, Observable, of, startWith, Subject, switchMap } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import { CompanieResponse, companyByUser, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
@@ -34,6 +35,9 @@ export class ListCompaniesComponent implements OnInit {
   private companiasMap = new Map<number, CompanieResponse[]>();
 
 
+   apiLogo = environment.SECURITY_API_URL +'/api/v1/company/logo/'
+
+
 
   private readonly router = inject(Router);
   private readonly navigationService = inject(NavigationService);
@@ -55,7 +59,7 @@ export class ListCompaniesComponent implements OnInit {
     if (savedUser) {
       const usuario = JSON.parse(savedUser);
 
-      if (userId == 0 && usuario.id != null) {
+      if (userId == 0 && usuario.id != null || this.companiasMap.size == 0) {
         this.saveUserInMemory(usuario.id);
         this.saveCompanysInMemory(0, this.numberPages)
       } else {

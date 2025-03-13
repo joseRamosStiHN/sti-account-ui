@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { filter, from, lastValueFrom, map, mergeMap, Observable, pipe, toArray } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
-import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { CompanieResponse, CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { RolesResponse, UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
 import { typeToast } from 'src/app/modules/accounting/models/models';
@@ -11,6 +11,7 @@ import { ToastType } from 'devextreme/ui/toast';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { error } from 'console';
+import { environment } from '@environment/environment';
 
 @Component({
   selector: 'app-company-create',
@@ -40,6 +41,9 @@ export class CompanyCreateComponent implements OnInit {
   userId?: number;
 
   rolesCompanys$: RolesResponse[] = [];
+
+     apiLogo = environment.SECURITY_API_URL +'/api/v1/company/logo/'
+
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -161,6 +165,7 @@ export class CompanyCreateComponent implements OnInit {
           this.cloneAccountsToNewCompany(this.tenantId, this.companyForm.tenantId || '');
         }
 
+        this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
         this.showToast = true;
@@ -204,6 +209,7 @@ export class CompanyCreateComponent implements OnInit {
       next: (data) => {
         this.createPeriod(data.tenantId);
         this.cloneAccountsToNewCompany(this.tenantId, data.tenantId);
+        this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
 
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
