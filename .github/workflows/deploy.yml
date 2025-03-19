@@ -1,0 +1,51 @@
+name: Deploy Accounting UI to Netlify
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Crear archivo de variables de entorno
+        run: |
+          echo "export const environment = {" > src/environments/environment.prod.ts
+          echo "  production: true," >> src/environments/environment.prod.ts
+          echo "  API: '${{ secrets.ACCOUNTING_API }}'," >> src/environments/environment.prod.ts
+          echo "  SECURITY_API_URL: '${{ secrets.SECURITY_API }}'" >> src/environments/environment.prod.ts
+          echo "};" >> src/environments/environment.prod.ts
+
+      - name: Verificar variables de entorno antes del build
+        run: cat src/environments/environment.prod.ts
+
+      - name: Compilar la aplicación
+        run: npm run build --configuration=production
+
+      - name: create _redirect for Netlify
+        run: echo "/* /index.html 200" > dist/sti-proyect/browser/_redirects
+
+      - name: verify redirects
+        run: cat dist/sti-proyect/browser/_redirects
+
+      - name: Instalar Netlify CLI
+        run: npm install -g netlify-cli@18.0.3
+
+      - name: Desplegar en Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: netlify deploy --prod --dir=dist/sti-proyect/browser
