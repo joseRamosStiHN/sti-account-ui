@@ -8,11 +8,23 @@ const routers: Routes = [
     component: UserPagesComponent,
   },
   {
+    path: 'company/:id',
+    component: UserPagesComponent,
+  },
+  {
     path: 'create',
     component: UserCreateComponent,
   },
   {
+    path: 'create/userByCompany/:companyId',
+    component: UserCreateComponent,
+  },
+  {
     path: 'edit/:id',
+    component: UserCreateComponent,
+  },
+  {
+    path: 'edit/:id/userByCompany/:companyId',
     component: UserCreateComponent,
   },
 ];

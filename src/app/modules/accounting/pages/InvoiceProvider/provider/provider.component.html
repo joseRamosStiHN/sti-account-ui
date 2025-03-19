@@ -1,6 +1,6 @@
 <div class="mt-2 px-1">
   <div class="flex flex-row justify-between">
-    <div class="w-100 flex justify-between mb-5">
+    <div class="w-100 flex justify-between mb-5 mt-5">
       <h2 class="text-2xl font-semibold">Factura de Compras</h2>
     </div>
     @if(providerBilling.id && providerBilling.status === 'Draft'){
@@ -55,7 +55,7 @@
     <div class="container">
       <div class="grid grid-cols-2 gap-2">
         <div class="form-group">
-          <label for="billingNumber" class="block mb-2 text-sm text-gray-900">Número de Factura</label>
+          <label for="billingNumber" class="block mb-2 text-sm text-gray-900">Número de Factura:</label>
           <input [(ngModel)]="providerBilling.billingNumber" id="billingNumber" name="billingNumber" type="text"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
             placeholder="FACT00001" required />
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div>
-          <label for="date" class="block mb-2 text-sm text-gray-900">Fecha</label>
+          <label for="date" class="block mb-2 text-sm text-gray-900">Fecha:</label>
           <input type="date" [(ngModel)]="providerBilling.date" id="date" name="date"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
             placeholder="" required />
@@ -75,12 +75,12 @@
               itemForm.submitted &&
               itemForm.form.controls['date'].getError('required')
             ">
-            <small class="text-xs text-red-900">La fecha es requerida.</small>
+            <small class="text-xs text-red-900">Fecha es requerida.</small>
           </div>
         </div>
 
         <div>
-          <label for="txt_moneda" class="block mb-2 text-sm text-gray-900">Moneda</label>
+          <label for="txt_moneda" class="block mb-2 text-sm text-gray-900">Moneda:</label>
           <select [(ngModel)]="providerBilling.currency" required name="currency" id="txt_moneda"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option selected>L</option>
@@ -90,11 +90,11 @@
               itemForm.submitted &&
               itemForm.form.controls['currency'].getError('required')
             ">
-            <small class="text-xs text-red-900">La moneda es requerida.</small>
+            <small class="text-xs text-red-900">Moneda es requerida.</small>
           </div>
         </div>
         <div>
-          <label for="exchangeRate" class="block mb-2 text-sm text-gray-900">Tasa de Cambio</label>
+          <label for="exchangeRate" class="block mb-2 text-sm text-gray-900">Tasa de Cambio:</label>
           <select [(ngModel)]="providerBilling.exchangeRate" required="true" name="exchangeRate" id="exchangeRate"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option selected>24.7012</option>
@@ -105,14 +105,14 @@
               itemForm.form.controls['exchangeRate'].errors &&
               itemForm.form.controls['exchangeRate'].errors['required']
             ">
-            <small class="text-xs text-red-900">La tasa de cambio es requerida.</small>
+            <small class="text-xs text-red-900">Tasa de cambio es requerida.</small>
           </div>
         </div>
-        <div class="mb-2 mt-1">
+        <div class="mb-2 mt-1 hidden">
           <label
             for="select_journey"
             class="block mt-1 mb-2 text-sm text-gray-900"
-            >Diario</label
+            >Diario:</label
           >
           <select
             [(ngModel)]="providerBilling.diaryType"
@@ -130,7 +130,7 @@
         </div>
         <div>
           <label for="typePayment" class="block mb-2 text-sm text-gray-900"
-            >Tipo de Pago</label
+            >Tipo de Pago:</label
           >
           <select
             [(ngModel)]="providerBilling.typePayment"
@@ -150,13 +150,13 @@
             "
           >
             <small class="text-xs text-red-900"
-              >tipo de Pago es requerido.</small
+              >Tipo de Pago es requerido.</small
             >
           </div>
         </div>
         <div>
           <label for="methodPayment" class="block mb-2 text-sm text-gray-900"
-            >Metodo de Pago</label
+            >Método de Pago:</label
           >
           <select
             [(ngModel)]="providerBilling.methodPayment"
@@ -176,13 +176,13 @@
             "
           >
             <small class="text-xs text-red-900"
-              >Medod de Pago requerido.</small
+              >Método de Pago requerido.</small
             >
           </div>
         </div>
         <div>
           <label for="rtn" class="block mb-2 text-sm text-gray-900"
-            >Rtn</label
+            >RTN:</label
           >
           <select
             [(ngModel)]="providerBilling.rtn"
@@ -202,13 +202,13 @@
             "
           >
             <small class="text-xs text-red-900"
-              >Rtn es requerido.</small
+              >RTN es requerido.</small
             >
           </div>
         </div>
         <div class="form-group">
           <label for="supplierName" class="block mb-2 text-sm text-gray-900"
-            >Nombre de Proveedor</label
+            >Nombre de Proveedor:</label
           >
           <input
             [(ngModel)]="providerBilling.supplierName"
@@ -236,7 +236,7 @@
       <div class="w-full flex flex-row gap-2">
         <div class="basis-1/2">
           <div class="mb-2 mt-1">
-        <label for="txt_description" class="block mb-2 text-sm text-gray-900">Descripción de la partida</label>
+        <label for="txt_description" class="block mb-2 text-sm text-gray-900">Descripción de la Partida:</label>
         <input [(ngModel)]="providerBilling.description" type="text" name="description" id="txt_description"
           maxlength="150"
           class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
@@ -320,9 +320,9 @@
           <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name"></dxo-lookup>
           <dxi-validation-rule type="required"></dxi-validation-rule>
         </dxi-column> -->
-        <dxi-column caption="Debe" [width]="120" [calculateCellValue]="getDebit">
+        <dxi-column caption="Debe" [width]="120" [calculateCellValue]="getDebit" [format]="'currency'">
         </dxi-column>
-        <dxi-column caption="Haber" [width]="120" [calculateCellValue]="getCredit">
+        <dxi-column caption="Haber" [width]="120" [calculateCellValue]="getCredit" [format]="'currency'">
         </dxi-column>
         <dxi-column dataField="movement" [visible]="false">
         </dxi-column>
@@ -370,7 +370,7 @@
     <div class="mt-4 flex justify-end">
       <button type="button" (click)="goBack()"
       class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
-        regresar
+        Regresar
       </button>
 
       @if(providerBilling.status !== "Success"){

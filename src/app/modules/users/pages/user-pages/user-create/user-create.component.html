@@ -3,13 +3,11 @@
   <form id="userForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
     <div class="grid grid-cols-3 gap-2">
       <div class="form w-full">
-        <label for="firstName" class="block mb-2 text-sm text-gray-900">Nombre</label>
+        <label for="firstName" class="block mb-2 text-sm text-gray-900">Nombres:</label>
         <input placeholder="Luis" required="true" name="firstName" id="firstName" type="text"
           [(ngModel)]="userForm.firstName"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500
            focus:outline-none "
-          [ngClass]="{'bg-gray-200 text-gray-500 cursor-not-allowed border': id != null}"
-          [disabled]="id != null"
           required 
           
           />
@@ -18,27 +16,25 @@
         </div>
       </div>
       <div class="form w-full">
-        <label for="lastName" class="block mb-2 text-sm text-gray-900">Apellidos</label>
+        <label for="lastName" class="block mb-2 text-sm text-gray-900">Apellidos:</label>
         <input placeholder="Martinez" required="true" name="lastName" id="lastName" type="text"
           [(ngModel)]="userForm.lastName"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
            focus:border-blue-500 focus:outline-none"
-           [ngClass]="{'bg-gray-200 text-gray-500 cursor-not-allowed border': id != null}"
-           [disabled]="id != null"
           required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['lastName'].getError('required')">
           <small class="text-xs text-red-900">Apellido es requerido.</small>
         </div>
       </div>
       <div class="form w-full">
-        <label for="userPhone" class="block mb-2 text-sm text-gray-900">Teléfono</label>
+        <label for="userPhone" class="block mb-2 text-sm text-gray-900">Teléfono:</label>
         <input required="true" name="userPhone" id="userPhone" type="text" placeholder="96xxxxxx, 34xxxxxx"
           [(ngModel)]="userForm.userPhone"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
           required pattern="[0-9]*" />
 
         <div *ngIf="itemForm.submitted && itemForm.form.controls['userPhone'].getError('required')">
-          <small class="text-xs text-red-900">Telefono es requerido.</small>
+          <small class="text-xs text-red-900">Teléfono es requerido.</small>
         </div>
         <div *ngIf="itemForm.submitted && itemForm.form.controls['userPhone'].hasError('pattern')">
 
@@ -48,20 +44,18 @@
       </div>
 
       <div class="form w-full">
-        <label for="userName" class="block mb-2 text-sm text-gray-900">Nombre de Usuario</label>
-        <input placeholder="jmartinez" required="true" name="userName" id="userName" type="text"
+        <label for="userName" class="block mb-2 text-sm text-gray-900">Nombre de Usuario:</label>
+        <input placeholder="lmartinez" required="true" name="userName" id="userName" type="text"
           [(ngModel)]="userForm.userName"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          [ngClass]="{'bg-gray-200 text-gray-500 cursor-not-allowed border': id != null}"
-          [disabled]="id != null"
           required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['userName'].getError('required')">
-          <small class="text-xs text-red-900">Telefono es requerido.</small>
+          <small class="text-xs text-red-900">Nombre de Usuario es requerido.</small>
         </div>
       </div>
 
       <div class="form" *ngIf="id == null">
-        <label for="password" class="block mb-2 text-sm text-gray-900">Contraseña</label>
+        <label for="password" class="block mb-2 text-sm text-gray-900">Contraseña:</label>
         <div class="relative">
           <input [(ngModel)]="txtPassword" type="password" maxlength="20" name="password" id="password"
           autocomplete="new-password"
@@ -79,13 +73,13 @@
         @if(txtPassword !== undefined && txtPassword !== "" && txtPassword ===
         txtConfirmPassword) {
         <button class="text-gray-600 border rounded-md text-sm px-1 py-0 bg-gray-200">
-          copiar
+          Copiar
         </button>
         }
       </div>
 
       <div class="form" *ngIf="id == null">
-        <label for="txtRepeatPassword" class="block mb-2 text-sm text-gray-900">Repetir Contraseña</label>
+        <label for="txtRepeatPassword" class="block mb-2 text-sm text-gray-900">Repetir Contraseña:</label>
         <input [(ngModel)]="txtConfirmPassword" required="true" name="txtRepeatPassword" id="txtRepeatPassword"
           type="password"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
@@ -97,19 +91,19 @@
       </div>
 
       <div class="form">
-        <label for="email" class="block mb-2 text-sm text-gray-900">Correo Electrónico</label>
+        <label for="email" class="block mb-2 text-sm text-gray-900">Correo Electrónico:</label>
         <input required="true" name="email" id="email" type="email" [(ngModel)]="userForm.email"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
           required email required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
-          <small class="text-xs text-red-900">Correo es requerido.</small>
+          <small class="text-xs text-red-900">Correo Electrónico es requerido.</small>
         </div>
         <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
           <small class="text-xs text-red-900">Formato de correo invalido.</small>
         </div>
       </div>
       <div class="form col-span-2">
-        <label for="txtAddress" class="block mb-2 text-sm text-gray-900">Dirección</label>
+        <label for="txtAddress" class="block mb-2 text-sm text-gray-900">Dirección:</label>
         <input required="true" name="txtAddress" id="txtAddress" type="text"
         [(ngModel)]="userForm.userAddress"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg
@@ -117,40 +111,45 @@
 
       </div>
 
+      <br>
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
-        <legend class="text-sm font-thin mb-2">Empresas</legend>
-        <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="companyList$">
+        <legend class="font-medium ml-2">Empresas</legend>
+        <dx-data-grid id="companyUser Grid" [showBorders]="true" [dataSource]="companyList$" 
+                       [selection]="{ mode: 'single' }" (onSelectionChanged)="onCompanySelectionChanged($event)">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-group-panel [visible]="false"></dxo-group-panel>
-          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="false">
+          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
-          <dxi-column caption="Nombre" dataField="name"></dxi-column>
-          <dxi-column dataField="roles" caption="roles" [allowSorting]="false"
-            editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate"
-            >
+          
+          <dxi-column caption="Nombre" dataField="name" [allowEditing]="false"></dxi-column>
+          
+          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false"
+                      editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate">
             <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
             </dxo-lookup>
           </dxi-column>
+          
           <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
             <dx-tag-box [dataSource]="rolesCompanys$" [value]="cellInfo.value" valueExpr="id" displayExpr="name"
-              [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
-              [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
-              (onValueChanged)="cellInfo.setValue($event.value)"
-              (onSelectionChanged)="cellInfo.component.updateDimensions()">
+                        [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
+                        [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
+                        (onValueChanged)="cellInfo.setValue($event.value)"
+                        (onSelectionChanged)="cellInfo.component.updateDimensions()">
             </dx-tag-box>
           </div>
         </dx-data-grid>
       </fieldset>
 
+      <br>
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
-        <legend class="text-sm font-thin mb-2">Roles Globales</legend>
+        <legend class="font-medium ml-2">Roles Globales</legend>
         <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="rolesGlobals$">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-group-panel [visible]="false"></dxo-group-panel>
-          <dxo-editing mode="row" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true">
+          <dxo-editing mode="row" [allowUpdating]="false" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
           <dxi-column caption="Nombre" dataField="name"></dxi-column>
-          <dxi-column caption="Permiso" dataField="globalRoles" [width]="100" cellTemplate="cellTemplate">
+          <dxi-column caption="Asignar Permiso" dataField="globalRoles" [width]="150" cellTemplate="cellTemplate">
           </dxi-column>
           <div *dxTemplate="let data of 'cellTemplate'">
             <label class="inline-flex items-center cursor-pointer">

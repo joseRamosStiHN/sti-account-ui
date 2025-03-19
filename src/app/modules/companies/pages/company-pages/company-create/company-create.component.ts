@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { filter, from, lastValueFrom, map, mergeMap, Observable, pipe, toArray } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
-import { CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { CompanieResponse, CompanyRequest, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { RolesResponse, UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
 import { typeToast } from 'src/app/modules/accounting/models/models';
@@ -11,6 +11,7 @@ import { ToastType } from 'devextreme/ui/toast';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { error } from 'console';
+import { environment } from '@environment/environment';
 
 @Component({
   selector: 'app-company-create',
@@ -18,8 +19,8 @@ import { error } from 'console';
   styleUrl: './company-create.component.css',
 })
 export class CompanyCreateComponent implements OnInit {
-  accountsFromSystem: boolean = true;
-
+  accountsFromSystem: number = 1;
+  
   companyList$: Observable<CompanyResponse[]> | undefined;
   userList$: UsersResponse[] = [];
   companyForm: CompanyRequest;
@@ -36,10 +37,13 @@ export class CompanyCreateComponent implements OnInit {
 
   @Input('id') id?: number;
 
-  tenantId:string='';
+  tenantId: string = '';
   userId?: number;
 
   rolesCompanys$: RolesResponse[] = [];
+
+  apiLogo = environment.SECURITY_API_URL + '/api/v1/company/logo/'
+
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -118,13 +122,23 @@ export class CompanyCreateComponent implements OnInit {
 
     }
   }
+
   onAccountConfig(event: Event) {
     const data = event.target as HTMLInputElement;
-    this.accountsFromSystem = Boolean(parseInt(data.value));
+    this.accountsFromSystem = parseInt(data.value);
+    console.log(this.accountsFromSystem);
   }
 
 
   async onSubmit(e: NgForm) {
+
+    if (!e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor, complete todos los campos requeridos.';
+      this.showToast = true;
+      return;
+    }
+
     if (e.valid) {
       if (this.id) {
         this.update();
@@ -157,10 +171,11 @@ export class CompanyCreateComponent implements OnInit {
     this.companyService.updateCompany(this.companyForm, Number(this.id), Number(this.userId)).subscribe({
       next: (data) => {
 
-        if (this.tenantId != "") {
+        if (this.tenantId != "" && this.accountsFromSystem !== 0) {
           this.cloneAccountsToNewCompany(this.tenantId, this.companyForm.tenantId || '');
         }
-
+        
+        this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
         this.showToast = true;
@@ -195,7 +210,7 @@ export class CompanyCreateComponent implements OnInit {
 
     if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
-      this.messageToast = 'Seleccione al menos un Usario';
+      this.messageToast = 'Seleccione al menos un usuario';
       this.showToast = true;
       return
     }
@@ -203,7 +218,12 @@ export class CompanyCreateComponent implements OnInit {
     this.companyService.createCompany(this.companyForm).subscribe({
       next: (data) => {
         this.createPeriod(data.tenantId);
-        this.cloneAccountsToNewCompany(this.tenantId, data.tenantId);
+
+        if (this.accountsFromSystem !== 0) {
+          this.cloneAccountsToNewCompany(this.tenantId, data.tenantId);
+        }
+
+        this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
 
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
@@ -324,7 +344,9 @@ export class CompanyCreateComponent implements OnInit {
     }
   }
 
-
+  onSelectionChanged(event: { selectedRowsData: any; }) {
+    const selectedRows = event.selectedRowsData;
+  }
 
 
 }

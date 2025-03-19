@@ -122,6 +122,7 @@ export class ProviderListComponent {
         id: item.id,
         document: item.reference,
         dateAt: item.date,
+        creationDate: new Date(item.creationDate),
         status:
           item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Publicado',
         description: item.description,
@@ -149,22 +150,24 @@ export class ProviderListComponent {
 
     dialogo.then(async (d) => {
 
-      this.service.putAllTransaction(this.selectRows).subscribe({
-        next: (data) => {
-          this.toastType = typeToast.Success;
-          this.messageToast = 'Transacciónes confirmadas con exito';
-          this.showToast = true;
-
-          setTimeout(() => {
-            this.ngOnInit();
-          }, 3000);
-        },
-        error: (err) => {
-          this.toastType = typeToast.Error;
-          this.messageToast = 'Error al intentar confirmar Transacciónes';
-          this.showToast = true;
-        },
-      });
+      if (d) {
+        this.service.putAllTransaction(this.selectRows).subscribe({
+          next: (data) => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Transacciónes confirmadas con exito';
+            this.showToast = true;
+  
+            setTimeout(() => {
+              this.ngOnInit();
+            }, 3000);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar confirmar Transacciónes';
+            this.showToast = true;
+          },
+        });
+      }
     }
     );
   }

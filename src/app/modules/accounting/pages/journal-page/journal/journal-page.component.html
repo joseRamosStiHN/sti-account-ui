@@ -13,7 +13,7 @@
           <legend class="text-2xl font-semibold mb-5">Diario Contable</legend>
           <div class="form">
             <label for="nameJourney" class="block mb-2 text-sm text-gray-900"
-              >Nombre del Diario</label
+              >Nombre del Diario:</label
             >
             <input
               [(ngModel)]="journalForm.diaryName"
@@ -37,7 +37,7 @@
           </div>
           <div class="form">
             <label for="type" class="block mb-2 text-sm text-gray-900"
-              >Tipo</label
+              >Tipo:</label
             >
             <select
               [(ngModel)]="journalForm.accountType"
@@ -74,7 +74,7 @@
           <legend class="font-medium ml-2">Información Contable</legend>
           <div class="form p-2" *ngIf="selectedTypeName !== null">
             <label for="defaultAccount" class="block mb-2 text-sm text-gray-900"
-              >Cuenta {{ selectedTypeName }} Predeterminada
+              >Cuenta {{ selectedTypeName }} Predeterminada:
             </label>
             <select
               [(ngModel)]="journalForm.defaultAccount"
@@ -93,7 +93,7 @@
           </div>
           <div class="form p-2">
             <label for="code" class="block mb-2 text-sm text-gray-900"
-              >Código Corto</label
+              >Código Corto:</label
             >
             <input
               [(ngModel)]="journalForm.code"
@@ -132,6 +132,9 @@
       </button>
     </div>
   </form>
+  <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
+    <dxo-position my="top" at="top" of="#journalForm"> </dxo-position>
+  </dx-toast>
 </div>
 
 <!-- <div class="mt-2 px-1 h-[80vh] relative">

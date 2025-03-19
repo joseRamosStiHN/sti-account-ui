@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { environment } from '@environment/environment';
 import { debounceTime, distinctUntilChanged, first, Observable, of, startWith, Subject, switchMap } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import { CompanieResponse, companyByUser, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
@@ -34,6 +35,9 @@ export class ListCompaniesComponent implements OnInit {
   private companiasMap = new Map<number, CompanieResponse[]>();
 
 
+  apiLogo = environment.SECURITY_API_URL + '/api/v1/company/logo/'
+
+
 
   private readonly router = inject(Router);
   private readonly navigationService = inject(NavigationService);
@@ -55,7 +59,7 @@ export class ListCompaniesComponent implements OnInit {
     if (savedUser) {
       const usuario = JSON.parse(savedUser);
 
-      if (userId == 0 && usuario.id != null) {
+      if (userId == 0 && usuario.id != null || this.companiasMap.size == 0) {
         this.saveUserInMemory(usuario.id);
         this.saveCompanysInMemory(0, this.numberPages)
       } else {
@@ -78,6 +82,7 @@ export class ListCompaniesComponent implements OnInit {
   getValue(event: Event): string {
     return (event.target as HTMLInputElement).value;
   }
+
   search(packageName: string) {
     this.debounceSearch(packageName);
   }
@@ -110,53 +115,49 @@ export class ListCompaniesComponent implements OnInit {
 
 
   addUserCompany = (companie: any) => {
-    this.router.navigate(['/dashboard/companies/edit', companie.company.id]);
+    this.router.navigate(['/dashboard/user/company/', companie.id]);
   };
 
   searchCompany(search: string) {
-
     const savedUser = localStorage.getItem('userData');
     if (savedUser) {
-
-      if (search == "") {
-
+      if (search === "") {
+        // Cuando se borra el texto de búsqueda, restablece el mapa de empresas
         this.companiasMap = new Map<number, CompanieResponse[]>();
-        this.saveCompanysInMemory(0, this.numberPages)
-
-        this.companyList$ = of(this.companiasMap.get(0) ?? [])
+        this.saveCompanysInMemory(0, this.numberPages);
+        this.companyList$ = of(this.companiasMap.get(0) ?? []);
         this.paginator(Number(localStorage.getItem('totalPages')));
         this.deactivePaginator();
-        return
+        return;
       }
 
+      // Filtrar las empresas basadas en el nombre
+      const filteredCompanies = this.companyService.getCompanies().filter((companie: CompanieResponse) => {
+        return companie.name.toUpperCase().includes(search.toUpperCase());
+      });
 
-      let companie = this.companyService.getCompanies().filter((companie: any) => {
-        return companie.name.toUpperCase().includes(search.toUpperCase())
-      })
-
-
-
-      this.paginatorArray = Array.from({ length: Math.ceil(companie.length / this.numberPages) },
-        (_, i) => i);
-
-      this.companiasMap = new Map<number, CompanieResponse[]>();
-      const companiesByMap = this.dividirBusquedad(companie, this.numberPages);
-
-      for (let index = 0; index < this.paginatorArray.length; index++) {
-        const currentArray = companiesByMap[index];
-        this.companiasMap.set(index, currentArray);
-      }
-      this.companyList$ = of(this.companiasMap.get(0) ?? []);
-
-      this.deactivePaginator();
-      this.activePaginator(0);
-
-
-
+      // Actualizar la lista de empresas sin duplicados
+      this.updateCompanyList(filteredCompanies);
     }
-
   }
 
+  private updateCompanyList(companies: CompanieResponse[]) {
+    // Eliminar duplicados
+    const uniqueCompanies = Array.from(new Set(companies.map(company => company.id)))
+      .map(id => companies.find(company => company.id === id));
+
+    this.paginatorArray = Array.from({ length: Math.ceil(uniqueCompanies.length / this.numberPages) }, (_, i) => i);
+    this.companiasMap = new Map<number, CompanieResponse[]>();
+    const companiesByMap = this.dividirBusquedad(uniqueCompanies, this.numberPages);
+
+    for (let index = 0; index < this.paginatorArray.length; index++) {
+      const currentArray = companiesByMap[index];
+      this.companiasMap.set(index, currentArray);
+    }
+    this.companyList$ = of(this.companiasMap.get(0) ?? []);
+    this.deactivePaginator();
+    this.activePaginator(0);
+  }
 
   paginator(totalPages: number,) {
     this.paginatorArray = Array.from({ length: totalPages }, (_, i) => i);

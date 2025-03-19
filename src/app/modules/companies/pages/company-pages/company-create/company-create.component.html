@@ -3,12 +3,12 @@
   <form id="companyForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
     <div class="flex flex-row">
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
-        <legend class="text-sm font-thin mb-2">Información General</legend>
+        <legend class="font-medium ml-2"><strong>Información General</strong></legend> 
      
         <div class="flex flex-col items-center space-y-4">
-          <div class="w-60 h-auto">
-            <img *ngIf="imagePreview" [src]="imagePreview" alt="image description" class="h-auto w-full rounded-lg shadow-lg" />
-            <img *ngIf="!imagePreview" class="h-auto w-60 rounded-lg" src="assets/image-1@2x.jpg" alt="image description" />
+          <div class="w-60 h-auto">       
+            <img *ngIf="id"  [src]="apiLogo + id" alt="Logo"  class="h-auto w-full rounded-lg shadow-lg" > 
+            <img *ngIf="imagePreview && !id" [src]="imagePreview" alt="image description" class="h-auto w-full rounded-lg shadow-lg" />
           </div>
       
           <label class="flex flex-col items-center justify-center w-60 px-4 py-2 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-200 hover:border-gray-400 transition-all duration-200">
@@ -25,7 +25,7 @@
         
         <div class="w-full grid grid-cols-3 gap-3">
           <div class="form">
-            <label for="name" class="block mb-2 text-sm text-gray-900">Nombre</label>
+            <label for="name" class="block mb-2 text-sm text-gray-900">Nombre:</label>
             <input id="name" name="name" type="text" [(ngModel)]="companyForm.name"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="Empresa XYZ" required />
@@ -35,22 +35,22 @@
           </div>
 
           <div class="form">
-            <label for="address" class="block mb-2 text-sm text-gray-900">Dirección</label>
+            <label for="address" class="block mb-2 text-sm text-gray-900">Dirección:</label>
             <input id="address" name="address" type="text"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               [(ngModel)]="companyForm.address" placeholder="Colonia las Colinas, Tegucigalpa, Honduras" required />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['address'].getError('required')">
-              <small class="text-xs text-red-900">Direccion es requerida.</small>
+              <small class="text-xs text-red-900">Dirección es requerida.</small>
             </div>
           </div>
 
           <div class="form">
-            <label for="rtn" class="block mb-2 text-sm text-gray-900">Rtn</label>
+            <label for="rtn" class="block mb-2 text-sm text-gray-900">RTN:</label>
             <input id="rtn" name="rtn" type="text" [(ngModel)]="companyForm.rtn"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="" required pattern="[0-9]*" />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')">
-              <small class="text-xs text-red-900">Rtn es requerido.</small>
+              <small class="text-xs text-red-900">RTN es requerido.</small>
             </div>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].hasError('pattern')">
 
@@ -60,36 +60,36 @@
           </div>
 
           <div class="form">
-            <label for="type" class="block mb-2 text-sm text-gray-900">Razón</label>
+            <label for="type" class="block mb-2 text-sm text-gray-900">Razón:</label>
             <select required="true" name="type" id="type" [(ngModel)]="companyForm.type"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
               <option value="JURIDICA">JURIDICA</option>
               <option value="NATURAL">NATURAL</option>
             </select>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')">
-              <small class="text-xs text-red-900">Razon es requerida.</small>
+              <small class="text-xs text-red-900">Razón es requerida.</small>
             </div>
           </div>
 
           <div class="form">
-            <label for="email" class="block mb-2 text-sm text-gray-900">Correo</label>
+            <label for="email" class="block mb-2 text-sm text-gray-900">Correo Electrónico:</label>
             <input id="email" name="email" type="email" [(ngModel)]="companyForm.email"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="" email required />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
-              <small class="text-xs text-red-900">Correo es requerido.</small>
+              <small class="text-xs text-red-900">Correo Electrónico es requerido.</small>
             </div>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
               <small class="text-xs text-red-900">Formato de correo invalido.</small>
             </div>
           </div>
           <div class="form">
-            <label for="phone" class="block mb-2 text-sm text-gray-900">Telefono</label>
+            <label for="phone" class="block mb-2 text-sm text-gray-900">Teléfono:</label>
             <input id="phone" name="phone" type="url" [(ngModel)]="companyForm.phone"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="" required pattern="[0-9]*" />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].getError('required')">
-              <small class="text-xs text-red-900">Telefono es requerido.</small>
+              <small class="text-xs text-red-900">Teléfono es requerido.</small>
             </div>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].hasError('pattern')">
               <small class="text-xs text-red-900">Solo se permiten números.</small>
@@ -97,7 +97,7 @@
           </div>
 
           <div class="form">
-            <label for="website" class="block mb-2 text-sm text-gray-900">Sitio Web</label>
+            <label for="website" class="block mb-2 text-sm text-gray-900">Sitio Web:</label>
             <input id="website" name="website" type="url" [(ngModel)]="companyForm.website"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="" />
@@ -107,12 +107,12 @@
           </div>
 
           <div class="form col-span-3">
-            <label for="description" class="block mb-2 text-sm text-gray-900">Descripción</label>
+            <label for="description" class="block mb-2 text-sm text-gray-900">Descripción:</label>
             <textarea name="description" id="description" rows="2" [(ngModel)]="companyForm.description" class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500
                focus:border-blue-500 focus:outline-none">
           </textarea>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['description'].getError('required')">
-              <small class="text-xs text-red-900">Descripcion es requerida.</small>
+              <small class="text-xs text-red-900">Descripción es requerida.</small>
             </div>
           </div>
         </div>
@@ -120,15 +120,16 @@
     </div>
     <div class="grid grid-cols-3 gap-2 mt-2">
       <fieldset class="flex border rounded-sm w-full gap-2 p-2">
-        <legend class="text-sm font-thin mb-2">Información Contable</legend>
+        <legend class="font-medium ml-2"><strong>Información Contable</strong></legend>
         <div class="form w-full">
-          <label for="accountConfig" class="block mb-2 text-sm text-gray-900">Configuración de cuentas</label>
+          <label for="accountConfig" class="block mb-2 text-sm text-gray-900">Configuración de Cuentas:</label>
           <select required="true" name="accountConfig" id="accountConfig" (change)="onAccountConfig($event)"
             class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
-            <option selected value="1">Usar cuentas del Sistema</option>
-            <option value="0">Copiar de Empresa</option>
+            <option value="1">Usar Cuentas del Sistema</option>
+            <option value="0">No Configurar Cuentas</option>
+            <option value="2">Copiar de Empresa</option>
           </select>
-          @if(!accountsFromSystem) {
+          @if(accountsFromSystem === 2) {
           <div class="form w-full">
             <label for="copyFromSelect" class="block mb-2 text-sm text-gray-900"></label>
             <select required name="tenantId" id="tenantId" class="bg-gray-50 border
@@ -148,49 +149,27 @@
       </fieldset>
 
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2">
-        <legend class="text-sm font-thin mb-2">Usuarios</legend>
-        <dx-data-grid id="companyUserGrid" [dataSource]="userList$" [showBorders]="true">
+        <legend class="font-medium ml-2"><strong>Usuarios</strong></legend>
+        <dx-data-grid id="companyUser Grid" [dataSource]="userList$" [showBorders]="true" 
+                       [selection]="{ mode: 'single' }" (onSelectionChanged)="onSelectionChanged($event)">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
-          <dxi-column caption="Nombre" dataField="firstName"  [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="roles" caption="roles" [allowSorting]="false"
-            editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate"
-            >
+          <dxi-column caption="Nombre" dataField="firstName" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false"
+                      editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate">
             <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
             </dxo-lookup>
           </dxi-column>
-
+      
           <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
             <dx-tag-box [dataSource]="rolesCompanys$" [value]="cellInfo.value" valueExpr="id" displayExpr="name"
-              [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
-              [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
-              (onValueChanged)="cellInfo.setValue($event.value)"
-              (onSelectionChanged)="cellInfo.component.updateDimensions()">
+                        [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
+                        [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
+                        (onValueChanged)="cellInfo.setValue($event.value)"
+                        (onSelectionChanged)="cellInfo.component.updateDimensions()">
             </dx-tag-box>
           </div>
-
-          <!-- <div *dxTemplate="let data of 'cellTemplate'">
-            <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" class="sr-only peer" [(ngModel)]="data.data.active"
-                [ngModelOptions]="{standalone: true}">
-              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
-                     peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
-                     peer dark:bg-gray-700 peer-checked:after:translate-x-full 
-                     rtl:peer-checked:after:-translate-x-full
-                      peer-checked:after:border-white after:content-[''] 
-                      after:absolute after:top-[2px] after:start-[2px] after:bg-white
-                       after:border-gray-300 after:border after:rounded-full after:h-5 
-                       after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-              </div>
-            </label>
-          </div> -->
-          <!-- <dxi-column type="buttons" [width]="110">
-            <dxi-button name="edit"></dxi-button>
-            <dxi-button name="delete"></dxi-button>
-          </dxi-column> -->
-  
-         
         </dx-data-grid>
       </fieldset>
 

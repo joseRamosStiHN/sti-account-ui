@@ -60,8 +60,11 @@ export class AdjusmentService {
     }
 
     putStatusAdjusment(id: number): Observable<any> {
-      const url = `${this.apiURL}/api/v1/adjustment/${id}/post`;
-      return this.httpClient.put(url, null, this.httpOptions);
+
+      const transaccion = [id]
+
+      const url = `${this.apiURL}/api/v1/adjustment/confirm-adjustments`;
+      return this.httpClient.put(url, transaccion, this.httpOptions);
     }
 
     getAllAdjustmentByTrasactionId(id: number): Observable<AdjustmentResponseById[]> {
