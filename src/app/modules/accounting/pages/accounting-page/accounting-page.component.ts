@@ -56,8 +56,8 @@ export class AccountingPageComponent implements OnInit {
               });
     
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Ajustes Contables', path: '/accounting/adjustment-list' });
-              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Credito', path: '/accounting/creditnotes-list' });
-              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Debito', path: '/accounting/debitnotes-list' });
+              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Crédito', path: '/accounting/creditnotes-list' });
+              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Débito', path: '/accounting/debitnotes-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Asientos Contables', path: '/accounting/journal-entries' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Apuntes Contables', path: '/accounting/journal-items' });
             }
@@ -67,8 +67,8 @@ export class AccountingPageComponent implements OnInit {
     
             if (role.name === 'APROBADOR') {
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Ajustes Contables', path: '/accounting/adjustment-list' });
-              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Credito', path: '/accounting/creditnotes-list' });
-              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Debito', path: '/accounting/debitnotes-list' });
+              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Crédito', path: '/accounting/creditnotes-list' });
+              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Débito', path: '/accounting/debitnotes-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Cierre Contable', path: '/accounting/accounting-closing' });
     
               this.agregarElementoSiNoExiste(this.navegation, { id: 1, label: 'Ingresos', path: '/accounting/client-list' });
@@ -91,8 +91,8 @@ export class AccountingPageComponent implements OnInit {
               });
     
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Ajustes Contables', path: '/accounting/adjustment-list' });
-              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Credito', path: '/accounting/creditnotes-list' });
-              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Debito', path: '/accounting/debitnotes-list' });
+              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Crédito', path: '/accounting/creditnotes-list' });
+              this.agregarElementoSiNoExiste(contabilidadList, { label: 'Notas de Débito', path: '/accounting/debitnotes-list' });
               this.agregarElementoSiNoExiste(contabilidadList, { label: 'Subida de Facturas', path: '/accounting/bulk-upload-file' });
             }
           });

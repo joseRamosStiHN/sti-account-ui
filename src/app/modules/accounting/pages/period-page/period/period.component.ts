@@ -70,6 +70,14 @@ export class PeriodComponent {
 
 
   async save(e: NgForm) {
+
+    if (!e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor, complete todos los campos requeridos.';
+      this.showToast = true;
+      return;
+    }
+
     if (e.valid && this.validationDate(e)) {
       let dialogo = await confirm(`¿Está seguro de que desea realizar esta acción?`, 'Advertencia');
       if (!dialogo) {
@@ -91,7 +99,7 @@ export class PeriodComponent {
 
     const startPeriod = this.toLocalDateTime(this.periodForm.startPeriod);
 
-    const request = { ...this.periodForm , startPeriod };
+    const request = { ...this.periodForm, startPeriod };
 
 
 
@@ -117,9 +125,9 @@ export class PeriodComponent {
 
     const startPeriod = this.toLocalDateTime(this.periodForm.startPeriod);
 
-    const request = { ...this.periodForm , startPeriod };
+    const request = { ...this.periodForm, startPeriod };
 
-  
+
     this.periodService.createPeriod(request).subscribe({
       next: (data) => {
         this.toastType = typeToast.Success;

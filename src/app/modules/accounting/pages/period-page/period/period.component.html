@@ -10,7 +10,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-2">
                     <div class="form-group">
-                        <label for="closureType" class="block mb-2 text-sm text-gray-900">Tipo de Período</label>
+                        <label for="closureType" class="block mb-2 text-sm text-gray-900">Tipo de Período:</label>
                         <select [(ngModel)]="periodForm.closureType"
                         required="true" name="closureType" id="closureType"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
@@ -25,7 +25,7 @@
                     </div>
     
                     <div class="form-group">
-                        <label for="date" class="block mb-2 text-sm text-gray-900" >Fecha Inicio Periodo</label>
+                        <label for="date" class="block mb-2 text-sm text-gray-900" >Fecha Inicio Periodo:</label>
                         <input
                           type="date"
                           [ngModel]="periodForm.startPeriod | date:'yyyy-MM-dd' : 'UTC'"
@@ -47,7 +47,7 @@
                
 
                    <div class="form-group">
-                          <label for="periodName" class="block mb-2 text-sm text-gray-900">Nombre Periodo</label>
+                          <label for="periodName" class="block mb-2 text-sm text-gray-900">Nombre Periodo:</label>
                           <input [(ngModel)]="periodForm.periodName" id="periodName" name="periodName" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
                                   w-full p-2" placeholder="" required />
                           <div *ngIf="

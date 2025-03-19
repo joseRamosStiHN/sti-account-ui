@@ -100,8 +100,11 @@ export class TransactionService {
   }
 
   postTransaction(id: number): Observable<any> {
-    const url = `${this.apiURL}/api/v1/transaction/${id}/post`;
-    return this.httpClient.put(url, null, this.httpOptions);
+
+    const transaccion = [id]
+
+    const url = `${this.apiURL}/api/v1/transaction/confirm-transactions`;
+    return this.httpClient.put(url, transaccion, this.httpOptions);
   }
 
   putAllTransaction(transacctions: number []): Observable<any> {
@@ -241,13 +244,20 @@ export class TransactionService {
 
 
   putStatusCreditNotes(id: number): Observable<any> {
-    const url = `${this.apiURL}/api/v1/credit-notes/${id}/post`;
-    return this.httpClient.put(url, null, this.httpOptions);
+    
+    const transaccion = [id];
+    
+    const url = `${this.apiURL}/api/v1/credit-notes/confirm-credit-notes`;
+
+    return this.httpClient.put(url, transaccion, this.httpOptions);
   }
 
   putStatusDebitNotes(id: number): Observable<any> {
-    const url = `${this.apiURL}/api/v1/debit-notes/${id}/post`;
-    return this.httpClient.put(url, null, this.httpOptions);
+
+    const transaccion = [id]
+
+    const url = `${this.apiURL}/api/v1/debit-notes/confirm-debit-notes`;
+    return this.httpClient.put(url, transaccion, this.httpOptions);
   }
 
   /**

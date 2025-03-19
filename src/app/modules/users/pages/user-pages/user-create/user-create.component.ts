@@ -127,6 +127,13 @@ export class UserCreateComponent implements OnInit {
   
 
   onSubmit(e: NgForm){
+    if (!e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor, complete todos los campos requeridos.';
+      this.showToast = true;
+      return;
+    }
+    
     if (this.id) {
       this.update(e)
     }else{
@@ -286,6 +293,10 @@ export class UserCreateComponent implements OnInit {
     window.history.back();
   }
 
-
+  onCompanySelectionChanged(event: { selectedRowsData: any; }) {
+    const selectedRows = event.selectedRowsData;
+    console.log('Filas seleccionadas en Empresas:', selectedRows);
+    // Aquí puedes agregar lógica adicional si es necesario
+  }
 
 }

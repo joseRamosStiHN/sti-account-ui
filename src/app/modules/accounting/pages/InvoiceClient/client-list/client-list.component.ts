@@ -174,22 +174,24 @@ export class ClientListComponent implements OnInit {
 
     dialogo.then(async (d) => {
 
-      this.transService.putAllTransaction(this.selectRows).subscribe({
-        next: (data) => {
-          this.toastType = typeToast.Success;
-          this.messageToast = 'Transacciónes confirmadas con exito';
-          this.showToast = true;
-
-          setTimeout(() => {
-            this.ngOnInit();
-          }, 3000);
-        },
-        error: (err) => {
-          this.toastType = typeToast.Error;
-          this.messageToast = 'Error al intentar confirmar Transacciónes';
-          this.showToast = true;
-        },
-      });
+      if (d) {
+        this.transService.putAllTransaction(this.selectRows).subscribe({
+          next: (data) => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Transacciónes confirmadas con exito';
+            this.showToast = true;
+  
+            setTimeout(() => {
+              this.ngOnInit();
+            }, 3000);
+          },
+          error: (err) => {
+            this.toastType = typeToast.Error;
+            this.messageToast = 'Error al intentar confirmar Transacciónes';
+            this.showToast = true;
+          },
+        });
+      }
     }
     );
   }

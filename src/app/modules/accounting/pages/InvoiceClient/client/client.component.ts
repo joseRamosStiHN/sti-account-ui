@@ -98,6 +98,10 @@ export class ClientComponent {
       supplierName: ''
     };
 
+    this.showToast = false;
+    this.messageToast = '';
+    this.toastType = typeToast.Info;
+
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
@@ -110,10 +114,16 @@ export class ClientComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.accountType == JournalTypes.Ventas && item.status);
+          .filter(item => item.accountType == JournalTypes.Ventas && item.status == true);
 
-        // console.log(this.journalList);
-
+        if (this.journalList.length > 0) {
+          this.clientBilling.diaryType = this.journalList[0].id;
+          this.loadAccounts();
+        } else {
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Debe de crear o activar un diario de ingresos para poder continuar';
+          this.showToast = true;
+        }
       },
 
     })
@@ -142,6 +152,20 @@ export class ClientComponent {
 
   async onSubmit(e: NgForm) {
     console.log(this.dataSource);
+
+    if (!e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor, complete todos los campos requeridos.';
+      this.showToast = true;
+      return;
+    }
+
+    if (this.dataSource.length === 0) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Debe agregar al menos una transacción antes de continuar.';
+      this.showToast = true;
+      return;
+    }
 
     if (e.valid && this.validate()) {
       const transactionData: TransactionModel = {
@@ -243,7 +267,12 @@ export class ClientComponent {
             this.toastType = typeToast.Success;
             this.messageToast = 'Transacción publicada con exito';
             this.showToast = true;
-            this.router.navigate(['/accounting/client-list']);
+
+            setTimeout(() => {
+              this.router.navigate(['/accounting/client-list']);
+            }, 1500);
+
+
           },
           error: (err) => {
             this.toastType = typeToast.Error;
@@ -346,7 +375,7 @@ export class ClientComponent {
     this.showToast = false;
     if (this.dataSource.length < 2) {
       // si el array contiene menos de 2 registros
-      this.messageToast = 'Debe agregar al menos 2 transacciones';
+      this.messageToast = 'Debe agregar al menos 2 transacciones para continuar';
       this.showToast = true;
       this.toastType = typeToast.Error;
       //console.log('invalida number of tnx');
@@ -438,94 +467,126 @@ export class ClientComponent {
   }
 
 
+  /*   save(e: any) {
+  
+  
+      const credit = this.dataSource.filter((data) => data.movement === 'C');
+      const debit = this.dataSource.filter((data) => data.movement === 'D');
+  
+      if (e.data.movement == 'C' && debit.length <= 1) {
+        if (debit.length == 1) {
+          debit.forEach((item) => {
+            const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
+  
+            const roundedSum = parseFloat(sum.toFixed(2));
+  
+            item.amount = roundedSum;
+          });
+  
+        } else {
+  
+          this.dataSource.push({
+            id: this.selectedJournal?.id ?? 0,
+            accountId: this.selectedJournal?.defaultAccount ?? 0,
+            amount: parseFloat(e.data.amount.toFixed(2)),
+            movement: 'D',
+  
+          });
+        }
+  
+      }
+  
+      if (e.data.movement == 'D' && credit.length <= 1) {
+  
+        console.log("entro en el debe");
+  
+  
+        if (credit.length == 1) {
+          credit.forEach((item) => {
+            const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
+            const roundedSum = parseFloat(sum.toFixed(2));
+  
+            item.amount = roundedSum
+          });
+  
+        } else {
+  
+          console.log(this.selectedJournal);
+  
+  
+          this.dataSource.push({
+            id: this.selectedJournal?.id ?? 0,
+            accountId: this.selectedJournal?.defaultAccount ?? 0,
+            amount: parseFloat(e.data.amount.toFixed(2)),
+            movement: 'C',
+  
+          });
+        }
+  
+      }
+  
+      this.updateAmounts();
+  
+  
+  
+  
+  
+      // let foundItems = this.dataSource.filter((data) => data.movement === 'D');
+      // console.log(foundItems.length);
+  
+      // console.log("afuera");
+      // if (foundItems.length = 0) {
+      //   console.log("aqui entro");
+  
+      //   foundItems.forEach((item) => {
+      //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
+      //     item.amount = sum
+      //   });
+      // } else {
+  
+      //   this.totalCredit = e.data.amount;
+      //   this.totalDebit = e.data.amount;
+  
+      //   this.dataSource.push({
+      //     id: this.selectedJournal?.id ?? 0,
+      //     accountId: this.selectedJournal?.defaultAccount ?? 0,
+      //     amount: e.data.amount,
+      //     movement: 'C',
+  
+      //   });
+      // }
+    } */
+
   save(e: any) {
-
-
     const credit = this.dataSource.filter((data) => data.movement === 'C');
     const debit = this.dataSource.filter((data) => data.movement === 'D');
 
-    if (e.data.movement == 'C' && debit.length <= 1) {
-      if (debit.length == 1) {
+    // Si el movimiento es 'C' (Haber)
+    if (e.data.movement == 'C') {
+      // Si ya hay un movimiento de 'D' (Debe), actualiza el monto
+      if (debit.length === 1) {
         debit.forEach((item) => {
           const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-
           const roundedSum = parseFloat(sum.toFixed(2));
-
           item.amount = roundedSum;
         });
-
-      } else {
-
-        this.dataSource.push({
-          id: this.selectedJournal?.id ?? 0,
-          accountId: this.selectedJournal?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),
-          movement: 'D',
-
-        });
       }
-
     }
 
-    if (e.data.movement == 'D' && credit.length <= 1) {
-
-      console.log("entro en el debe");
-
-
-      if (credit.length == 1) {
+    // Si el movimiento es 'D' (Debe)
+    if (e.data.movement == 'D') {
+      // Si ya hay un movimiento de 'C' (Haber), actualiza el monto
+      if (credit.length === 1) {
         credit.forEach((item) => {
           const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
           const roundedSum = parseFloat(sum.toFixed(2));
-
-          item.amount = roundedSum
-        });
-
-      } else {
-
-        console.log(this.selectedJournal);
-        
-
-        this.dataSource.push({
-          id: this.selectedJournal?.id ?? 0,
-          accountId: this.selectedJournal?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),
-          movement: 'C',
-
+          item.amount = roundedSum;
         });
       }
-
     }
 
+    // Actualiza los montos totales
     this.updateAmounts();
-
-
-
-
-
-    // let foundItems = this.dataSource.filter((data) => data.movement === 'D');
-    // console.log(foundItems.length);
-
-    // console.log("afuera");
-    // if (foundItems.length = 0) {
-    //   console.log("aqui entro");
-
-    //   foundItems.forEach((item) => {
-    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-    //     item.amount = sum
-    //   });
-    // } else {
-
-    //   this.totalCredit = e.data.amount;
-    //   this.totalDebit = e.data.amount;
-
-    //   this.dataSource.push({
-    //     id: this.selectedJournal?.id ?? 0,
-    //     accountId: this.selectedJournal?.defaultAccount ?? 0,
-    //     amount: e.data.amount,
-    //     movement: 'C',
-
-    //   });
-    // }
   }
 
   private updateAmounts(): void {

@@ -143,7 +143,7 @@ export class AccountComponent implements OnInit {
     this.accountService.createAccount(request).subscribe({
       next: (result) => {
         this.toastType = typeToast.Success;
-        this.messageToast = 'Cuenta Creada Con exito';
+        this.messageToast = 'Cuenta Creada Exitosamente';
         this.showToast = true;
         this.redirectTo();
 

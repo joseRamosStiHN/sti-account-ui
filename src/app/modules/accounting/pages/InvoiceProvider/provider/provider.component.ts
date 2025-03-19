@@ -42,10 +42,10 @@ export class ProviderComponent {
     currency: '',
     exchangeRate: 0,
     description: '',
-    methodPayment:'',
-    typePayment:'',
-    rtn:'',
-    supplierName:''
+    methodPayment: '',
+    typePayment: '',
+    rtn: '',
+    supplierName: ''
   };
 
   selectedJournal?: JournalModel | null = null;
@@ -93,6 +93,11 @@ export class ProviderComponent {
   private readonly journalService = inject(JournalService);
 
   constructor() {
+
+    this.showToast = false;
+    this.messageToast = '';
+    this.toastType = typeToast.Info;
+
     config({
       defaultCurrency: 'HNL',
       defaultUseCurrencyAccountingStyle: true,
@@ -105,7 +110,17 @@ export class ProviderComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.accountType == JournalTypes.Compras && item.status);
+          .filter(item => item.accountType == JournalTypes.Compras && item.status == true);
+
+        if (this.journalList.length > 0) {
+          this.providerBilling.diaryType = this.journalList[0].id;
+          this.loadAccounts();
+        } else {
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Debe de crear o activar un diario de compras para poder continuar';
+          this.showToast = true;
+        }
+
       },
     })
 
@@ -116,11 +131,11 @@ export class ProviderComponent {
         this.transactionService.getTransactionById(findId).subscribe({
           next: (data) => this.fillBilling(data),
         });
-      }else{
+      } else {
         //verifica que haya un periodo activo para poder crear partida
         this.periodService.getStatusPeriod().subscribe({
           next: (status) => {
-            if (!status) {              
+            if (!status) {
               this.react();
             }
           },
@@ -133,25 +148,35 @@ export class ProviderComponent {
   }
 
   async onSubmit(e: NgForm) {
-   
+
+    if (!e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor, complete todos los campos requeridos.';
+      this.showToast = true;
+      return;
+    }
+
+    if (this.dataSource.length === 0) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Debe agregar al menos una transacción antes de continuar.';
+      this.showToast = true;
+      return;
+    }
+
     if (e.valid && this.validate()) {
-
-     
-
-
       const transactionData: TransactionModel = {
-          
+
         createAtDate: this.providerBilling.date,
         reference: this.providerBilling.billingNumber,
         documentType: 2,
         exchangeRate: this.providerBilling.exchangeRate,
         descriptionPda: this.providerBilling.description,
         currency: this.providerBilling.currency,
-        diaryType:this.providerBilling.diaryType,
-        typeSale:this.providerBilling.typePayment,
-        typePayment:this.providerBilling.methodPayment,
-        rtn:this.providerBilling.rtn,
-        supplierName:this.providerBilling.supplierName,
+        diaryType: this.providerBilling.diaryType,
+        typeSale: this.providerBilling.typePayment,
+        typePayment: this.providerBilling.methodPayment,
+        rtn: this.providerBilling.rtn,
+        supplierName: this.providerBilling.supplierName,
         detail: this.dataSource.map((detail) => {
           return {
             accountId: detail.accountId,
@@ -172,7 +197,7 @@ export class ProviderComponent {
       }
 
 
-      
+
 
       if (this.id) {
         //Cuando Actualiza la Factura de proveedores
@@ -187,9 +212,9 @@ export class ProviderComponent {
               this.showToast = true;
 
               setTimeout(() => {
-                this.router.navigate(['/accounting/provider-list']); 
+                this.router.navigate(['/accounting/provider-list']);
               }, 2000);
-             
+
             },
             error: (err) => {
               this.toastType = typeToast.Error;
@@ -200,23 +225,23 @@ export class ProviderComponent {
           });
         return;
 
-      } 
-        this.transactionService.createTransaction(transactionData).subscribe({
-          next: (data) => {
-          
-            this.providerBilling.id = data.id;
-            this.providerBilling.status = 'Draft';
-            this.toastType = typeToast.Success;
-            this.messageToast = 'Registros insertados exitosamente';
-            this.showToast = true;
+      }
+      this.transactionService.createTransaction(transactionData).subscribe({
+        next: (data) => {
 
-            setTimeout(() => {
-              this.router.navigate(['/accounting/provider-list']); 
-            }, 2000);
-          },
-          error: (err) => console.error('error', err),
-        });
-      
+          this.providerBilling.id = data.id;
+          this.providerBilling.status = 'Draft';
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Registros insertados exitosamente';
+          this.showToast = true;
+
+          setTimeout(() => {
+            this.router.navigate(['/accounting/provider-list']);
+          }, 2000);
+        },
+        error: (err) => console.error('error', err),
+      });
+
 
 
 
@@ -276,9 +301,9 @@ export class ProviderComponent {
             this.messageToast = 'Transacción publicada con exito';
             this.showToast = true;
             setTimeout(() => {
-              this.router.navigate(['/accounting/provider-list']); 
+              this.router.navigate(['/accounting/provider-list']);
             }, 2000);
-        
+
           },
           error: (err) => {
             this.toastType = typeToast.Error;
@@ -290,7 +315,6 @@ export class ProviderComponent {
           },
         });
 
-        this.router.navigate(['/accounting/client-list']);
       }
     });
   }
@@ -367,7 +391,7 @@ export class ProviderComponent {
     // operar sobre el total y verificar que lleve a cero la operación
     const total = this.totalCredit - this.totalDebit;
     // console.log(total);
-    
+
     if (total !== 0) {
       this.messageToast =
         'El balance no es correcto, por favor ingrese los valores correctos';
@@ -411,12 +435,12 @@ export class ProviderComponent {
     this.providerBilling.exchangeRate = data.exchangeRate;
     this.providerBilling.date = data.date;
     this.providerBilling.description = data.description;
-    this.providerBilling.diaryType= data.diaryType;
+    this.providerBilling.diaryType = data.diaryType;
 
-    this.providerBilling.typePayment= data.typeSale;
-    this.providerBilling.methodPayment= data.typePayment
-    this.providerBilling.rtn= data.rtn
-    this.providerBilling.supplierName= data.supplierName
+    this.providerBilling.typePayment = data.typeSale;
+    this.providerBilling.methodPayment = data.typePayment
+    this.providerBilling.rtn = data.rtn
+    this.providerBilling.supplierName = data.supplierName
 
     this.loadAccounts();
     const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
@@ -438,16 +462,16 @@ export class ProviderComponent {
 
     if (e.target.value) {
       this.dataSource = [];
-   
-     this.loadAccounts();
+
+      this.loadAccounts();
     }
   }
 
-  loadAccounts(){
+  loadAccounts() {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => item.supportEntry )
+          .filter(item => item.supportEntry)
           .map(item => ({
             id: item.id,
             description: item.name,
@@ -456,23 +480,24 @@ export class ProviderComponent {
       },
     });
   }
-  save(e: any) {
+
+/*   save(e: any) {
 
     const credit = this.dataSource.filter((data) => data.movement === 'C');
     const debit = this.dataSource.filter((data) => data.movement === 'D');
-  
+
     // console.log("credit", credit);
     // console.log("debit", debit);
-  
+
     if (e.data.movement === 'C' && debit.length <= 1) {
       if (debit.length === 1) {
         debit.forEach((item) => {
           // Sumar el monto de los movimientos 'C'
           const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-          
+
           // Redondear la suma a dos decimales para asegurar precisión
           const roundedSum = parseFloat(sum.toFixed(2));
-  
+
           // Asignar el valor redondeado
           // console.log('Suma calculada para movimiento C (redondeada):', roundedSum);
           item.amount = roundedSum;  // Redondear a dos decimales
@@ -487,16 +512,16 @@ export class ProviderComponent {
         });
       }
     }
-  
+
     if (e.data.movement === 'D' && credit.length <= 1) {
       if (credit.length === 1) {
         credit.forEach((item) => {
           // Sumar el monto de los movimientos 'D'
           const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-  
+
           // Redondear la suma a dos decimales para asegurar precisión
           const roundedSum = parseFloat(sum.toFixed(2));
-  
+
           // Asignar el valor redondeado
           // console.log('Suma calculada para movimiento D (redondeada):', roundedSum);
           item.amount = roundedSum;  // Redondear a dos decimales
@@ -511,7 +536,7 @@ export class ProviderComponent {
         });
       }
     }
-  
+
     this.updateAmounts();
 
 
@@ -544,30 +569,61 @@ export class ProviderComponent {
     //   });
 
 
-      // setTimeout(() => {
-      //   const rows = document.querySelectorAll('.dx-data-row');
+    // setTimeout(() => {
+    //   const rows = document.querySelectorAll('.dx-data-row');
 
-      //   rows.forEach(row => {
-      //     const tds = row.querySelectorAll("td");
-      //     tds.forEach(td => {
-      //       const codeAccount = td.textContent
-      //       if (codeAccount == 'Debe') {
-      //         const editButtons = row.querySelectorAll(".dx-link-edit");
-      //         const deleteButtons = row.querySelectorAll(".dx-link-delete");
-      //         editButtons.forEach(button => {
-      //           (button as HTMLElement).style.display = 'none';
-      //         });
+    //   rows.forEach(row => {
+    //     const tds = row.querySelectorAll("td");
+    //     tds.forEach(td => {
+    //       const codeAccount = td.textContent
+    //       if (codeAccount == 'Debe') {
+    //         const editButtons = row.querySelectorAll(".dx-link-edit");
+    //         const deleteButtons = row.querySelectorAll(".dx-link-delete");
+    //         editButtons.forEach(button => {
+    //           (button as HTMLElement).style.display = 'none';
+    //         });
 
-      //         deleteButtons.forEach(button => {
-      //           (button as HTMLElement).style.display = 'none'; 
-      //         });
-      //       }
-      //     })
-      //   });
-      // }, 2);
+    //         deleteButtons.forEach(button => {
+    //           (button as HTMLElement).style.display = 'none'; 
+    //         });
+    //       }
+    //     })
+    //   });
+    // }, 2);
+  } */
+
+
+    save(e: any) {
+      const credit = this.dataSource.filter((data) => data.movement === 'C');
+      const debit = this.dataSource.filter((data) => data.movement === 'D');
+  
+      // Si el movimiento es 'C' (Haber)
+      if (e.data.movement == 'C') {
+        // Si ya hay un movimiento de 'D' (Debe), actualiza el monto
+        if (debit.length === 1) {
+          debit.forEach((item) => {
+            const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
+            const roundedSum = parseFloat(sum.toFixed(2));
+            item.amount = roundedSum;
+          });
+        }
+      }
+  
+      // Si el movimiento es 'D' (Debe)
+      if (e.data.movement == 'D') {
+        // Si ya hay un movimiento de 'C' (Haber), actualiza el monto
+        if (credit.length === 1) {
+          credit.forEach((item) => {
+            const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
+            const roundedSum = parseFloat(sum.toFixed(2));
+            item.amount = roundedSum;
+          });
+        }
+      }
+  
+      // Actualiza los montos totales
+      this.updateAmounts();
     }
-
-    
   
 
   private updateAmounts(): void {
@@ -578,16 +634,16 @@ export class ProviderComponent {
       const debe = this.dataSource
         .filter((data) => data.movement === 'D')
         .reduce((sum, item) => sum + item.amount, 0);
-    
+
       // Calcular el total de los movimientos 'C' (haber)
       const haber = this.dataSource
         .filter((data) => data.movement === 'C')
         .reduce((sum, item) => sum + item.amount, 0);
-    
+
       // Redondear los totales a dos decimales
       this.totalCredit = parseFloat(haber.toFixed(2));
       this.totalDebit = parseFloat(debe.toFixed(2));
-    
+
       // Mostrar en la consola para verificar
       // console.log('Total Debit:', this.totalDebit);
       // console.log('Total Credit:', this.totalCredit);
@@ -597,7 +653,7 @@ export class ProviderComponent {
   update(e: any) {
     const credit = this.dataSource.filter((data) => data.movement === 'C');
     const debit = this.dataSource.filter((data) => data.movement === 'D');
-  
+
     if (e.data.movement === 'D' && credit.length === 1) {
       credit.forEach((item) => {
         const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
@@ -605,7 +661,7 @@ export class ProviderComponent {
         // console.log('Nuevo monto para crédito:', item.amount); // Mostrar en consola
       });
     }
-  
+
     if (e.data.movement === 'C' && debit.length === 1) {
       debit.forEach((item) => {
         const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
@@ -613,7 +669,7 @@ export class ProviderComponent {
         // console.log('Nuevo monto para débito:', item.amount); // Mostrar en consola
       });
     }
-  
+
 
 
 
@@ -632,7 +688,7 @@ export class ProviderComponent {
   removed(e: any) {
     const credit = this.dataSource.filter((data) => data.movement === 'C');
     const debit = this.dataSource.filter((data) => data.movement === 'D');
-  
+
     // Eliminar todos los registros si hay uno de cada tipo y ninguno más
     if (e.data.movement === 'D' && credit.length === 1 && debit.length === 0) {
       this.dataSource = [];
@@ -642,7 +698,7 @@ export class ProviderComponent {
       this.dataSource = [];
       return;
     }
-  
+
     // Actualizar el monto del movimiento de crédito
     if (e.data.movement === 'D' && credit.length === 1) {
       credit.forEach((item) => {
@@ -650,7 +706,7 @@ export class ProviderComponent {
         item.amount = parseFloat(sum.toFixed(2)); // Redondear a dos decimales
       });
     }
-  
+
     // Actualizar el monto del movimiento de débito
     if (e.data.movement === 'C' && debit.length === 1) {
       debit.forEach((item) => {
@@ -658,7 +714,7 @@ export class ProviderComponent {
         item.amount = parseFloat(sum.toFixed(2)); // Redondear a dos decimales
       });
     }
-  
+
 
     this.updateAmounts();
 
@@ -687,8 +743,8 @@ export class ProviderComponent {
 
   goBack() {
     window.history.back();
-   }
-   getCredit(dataRow: any) {
+  }
+  getCredit(dataRow: any) {
 
     if (dataRow.movement === "C") {
       return dataRow.amount;

@@ -122,10 +122,11 @@ export class DebitNoteListComponent {
 
     dialogo.then(async (d) => {
     
+      if (d) {
         this.transactionService.putAllDebitNotes(this.selectRows).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Notas de Debito confirmadas con exito';
+            this.messageToast = 'Notas de Débito confirmadas con exito';
             this.showToast = true;
 
             setTimeout(() => {
@@ -134,10 +135,12 @@ export class DebitNoteListComponent {
           },
           error: (err) => {
             this.toastType = typeToast.Error;
-            this.messageToast = 'Error al intentar confirmar Notas de debitos';
+            this.messageToast = 'Error al intentar confirmar Notas de Débito';
             this.showToast = true;
           },
         });
+      }
+      
       }
     );
   }

@@ -19,7 +19,7 @@
       ></span>
       <span
         class="relative text-white transition-colors duration-200 ease-in-out group-hover:text-white"
-      >confirmar</span>
+      >Confirmar</span>
     </button>
   </div>
   <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2">
@@ -66,12 +66,21 @@
       <dxi-column caption="No. Factura" dataField="document"></dxi-column>
       <dxi-column caption="Descripción" dataField="description"></dxi-column>
       <dxi-column
-        caption="Fecha"
-        dataField="dateAt"
-        dataType="date"
-        alignment="center"
-        width="90"
-      ></dxi-column>
+      caption="Fecha Creación"
+      dataField="creationDate"
+      format="shortDate"
+      dataType="date"
+      alignment="center"
+      format="dd/MM/yyyy"
+      width="150"
+    ></dxi-column>
+      <dxi-column
+      caption="Fecha Registro"
+      dataField="dateAt"
+      dataType="date"
+      alignment="center"
+      width="150"
+    ></dxi-column>
 
       <dxi-column
         caption="Estado"

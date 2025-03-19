@@ -105,6 +105,13 @@ export class JournalPageComponent {
   }
 
   onSubmit(e: NgForm) {
+    if (!e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor, complete todos los campos requeridos.';
+      this.showToast = true;
+      return;
+    }
+
     if (this.id) {
       this.journalService
         .updateJournal(Number(this.id), this.journalForm)
@@ -139,12 +146,14 @@ export class JournalPageComponent {
         error: (err) => {
           console.error('Error creating transaction:', err);
           this.toastType = typeToast.Error;
-          this.messageToast = 'Error al crear la transacción';
+          this.messageToast = 'Ya existe un diario con el tipo seleccionado';
           this.showToast = true;
+        
         },
       });
     }
   }
+
   private showDefaultAccountName(Selected: string): void {
     if (Selected === '1') {
       this.selectedTypeName = ' de Ingreso';

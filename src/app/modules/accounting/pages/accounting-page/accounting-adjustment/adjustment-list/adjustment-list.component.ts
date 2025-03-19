@@ -116,7 +116,8 @@ export class AdjustmentListComponent {
     );
 
     dialogo.then(async (d) => {
-    
+
+      if (d) {
         this.adjustemntService.putAllAdjustment(this.selectRows).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
@@ -133,6 +134,9 @@ export class AdjustmentListComponent {
             this.showToast = true;
           },
         });
+      }
+    
+       
       }
     );
   }
