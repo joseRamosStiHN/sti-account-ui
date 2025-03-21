@@ -520,6 +520,9 @@ const tasks: Task[] = [{
 export class SeniorAccountantsComponent {
 
 
+  company: any;
+
+  periodoAnual: any;
 
   tranactionList$?: Observable<SeniorAccounts[]>;
   loadingData: boolean = true;
@@ -529,6 +532,9 @@ export class SeniorAccountantsComponent {
   employees: Employee[] = employees
   constructor(private cdr: ChangeDetectorRef) { }
   ngOnInit(): void {
+
+    this.loadInfoBalance();
+
     this.tranactionList$ = this.transactionService.getAllLedgerAcounts().pipe(
       tap(data => {
         data.forEach(accounts => {
@@ -560,7 +566,28 @@ export class SeniorAccountantsComponent {
     });
   }
 
+  loadInfoBalance(){
 
+    this.company = JSON.parse(localStorage.getItem("company") ?? "");
+
+    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+
+
+    const startDate = new Date(periodo.startPeriod);
+    const endDate = new Date(periodo.endPeriod);
+
+    const formatMonth = (month:any) => {
+      const months = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ];
+      return months[month];
+    };
+
+    this.periodoAnual = `Del ${startDate.getDate()} de ${formatMonth(startDate.getMonth())} al ${endDate.getDate()} de ${formatMonth(endDate.getMonth())} de ${startDate.getFullYear()}`;
+
+
+  }
 
 
 

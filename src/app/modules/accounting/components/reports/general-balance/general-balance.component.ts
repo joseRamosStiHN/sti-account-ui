@@ -326,6 +326,10 @@ export class GeneralBalanceComponent implements OnInit {
   totalActivoSumary: number = 0;
   selectedPeriod: number = 0;
 
+  company: any;
+
+  periodoAnual: any;
+
   periodList$: Observable<PeriodModel[]> | undefined;
 
   private readonly periodoService = inject(PeriodService);
@@ -336,6 +340,10 @@ export class GeneralBalanceComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+
+
+    this.loadInfoBalance();
+
     this.setInitValues(0);
 
     this.periodList$ = this.periodoService.getAllPeriods().pipe(
@@ -549,41 +557,41 @@ export class GeneralBalanceComponent implements OnInit {
       let ws1: XLSX.WorkSheet = XLSX.utils.table_to_sheet(table1);
       let ws2: XLSX.WorkSheet = XLSX.utils.table_to_sheet(table2);
 
-      ws1 =  this.getFilterRows(ws1);
+      ws1 = this.getFilterRows(ws1);
       ws2 = this.getFilterRows(ws2);
 
       const combinedSheet: XLSX.WorkSheet = {};
       combinedSheet['C1'] = {
         v: "Balance General",
         s: {
-          font: { bold: true, font: 48 }, 
+          font: { bold: true, font: 48 },
           alignment: { horizontal: "center", vertical: "center" },
-          fill: { fgColor: { rgb: "FFFFFF" } }, 
+          fill: { fgColor: { rgb: "FFFFFF" } },
         }
       };
 
       combinedSheet['A2'] = { v: "", s: { fill: { fgColor: { rgb: "FFFFFF" } } } };
       combinedSheet['A3'] = { v: "", s: { fill: { fgColor: { rgb: "FFFFFF" } } } };
 
-      this.applyStyles(ws1, 0); 
+      this.applyStyles(ws1, 0);
 
 
       Object.keys(ws1).forEach(cell => {
         const row = parseInt(cell.replace(/\D/g, ""));
         const col = cell.replace(/\d/g, "");
-        const newRow = row + 3; 
+        const newRow = row + 3;
         const newCell = col + newRow;
 
         combinedSheet[newCell] = ws1[cell];
       });
 
 
-      this.applyStyles(ws2, 3); 
+      this.applyStyles(ws2, 3);
 
       Object.keys(ws2).forEach(cell => {
         const row = parseInt(cell.replace(/\D/g, ""));
         const col = cell.replace(/\d/g, "");
-        const newCol = String.fromCharCode(col.charCodeAt(0) + 3); 
+        const newCol = String.fromCharCode(col.charCodeAt(0) + 3);
         const newCell = newCol + (row + 3);
 
         combinedSheet[newCell] = ws2[cell];
@@ -591,18 +599,18 @@ export class GeneralBalanceComponent implements OnInit {
 
 
       combinedSheet['!cols'] = [
-        { wpx: 300 }, 
-        { wpx: 150 }, 
-        {},          
-        { wpx: 300 }, 
-        { wpx: 150 }, 
-        {},          
-        {}    
+        { wpx: 300 },
+        { wpx: 150 },
+        {},
+        { wpx: 300 },
+        { wpx: 150 },
+        {},
+        {}
       ];
 
 
       const lastRowCombined = Math.max(this.getLastRow(ws1), this.getLastRow(ws2) + 1);
-      combinedSheet['!ref'] = `A1:G${lastRowCombined + 3}`;  
+      combinedSheet['!ref'] = `A1:G${lastRowCombined + 3}`;
 
 
       XLSX.utils.book_append_sheet(wb, combinedSheet, 'Balance General');
@@ -659,7 +667,7 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
 
-  getFilterRows(obj:XLSX.WorkSheet){
+  getFilterRows(obj: XLSX.WorkSheet) {
     const newObjA: any = {};
     Object.keys(obj).forEach(key => {
       if (key.startsWith('A')) {
@@ -678,14 +686,38 @@ export class GeneralBalanceComponent implements OnInit {
 
     const resultObj: any = {};
     Object.keys(newObjA).forEach(key => {
-      const matchingKey = key.replace('A', 'B');  
+      const matchingKey = key.replace('A', 'B');
       if (newObjB[matchingKey]) {
-        resultObj[key] = newObjA[key];            
-        resultObj[matchingKey] = newObjB[matchingKey]; 
+        resultObj[key] = newObjA[key];
+        resultObj[matchingKey] = newObjB[matchingKey];
       }
     });
 
-    return {...obj,...resultObj};
+    return { ...obj, ...resultObj };
+
+  }
+
+
+  loadInfoBalance(){
+
+    this.company = JSON.parse(localStorage.getItem("company") ?? "");
+
+    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+
+
+    const startDate = new Date(periodo.startPeriod);
+    const endDate = new Date(periodo.endPeriod);
+
+    const formatMonth = (month:any) => {
+      const months = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ];
+      return months[month];
+    };
+
+    this.periodoAnual = `Del ${startDate.getDate()} de ${formatMonth(startDate.getMonth())} al ${endDate.getDate()} de ${formatMonth(endDate.getMonth())} de ${startDate.getFullYear()}`;
+
 
   }
 }  

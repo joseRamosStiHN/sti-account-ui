@@ -154,7 +154,10 @@
 </dx-data-grid>
  -->
 
+
+<h1 class="text-2xl font-semibold text-center mb-2">{{company.name}}</h1>
 <h2 class="text-2xl font-semibold mb-5 text-center mt-4">Mayores Contables</h2>
+<h3 class="font-semibold text-center mb-2">{{periodoAnual}}</h3>
 <dx-data-grid id="gridJournalEntry" [dataSource]="tranactionList$ | async" class="mt-5 shadow-lg overflow-hidden mb-10"
   [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
   [allowColumnReordering]="true" [showBorders]="true" [width]="'100%'"

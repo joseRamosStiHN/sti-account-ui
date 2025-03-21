@@ -1,9 +1,9 @@
 <div class="w-100 items-center mt-5">
 
 
-  <h1 class="text-2xl font-semibold text-center mb-2">Empresa XYZ</h1>
+  <h1 class="text-2xl font-semibold text-center mb-2">{{company.name}}</h1>
   <h2 class="font-semibold mb-2 text-center">Balance General</h2>
-  <h3 class="font-semibold text-center mb-2">Del 1 de Enero al 31 de Diciembre de 2024</h3>
+  <h3 class="font-semibold text-center mb-2">{{periodoAnual}}</h3>
   <br>
   <form class="flex justify-start items-center m-5 gap-4"  #itemForm="ngForm"
   (ngSubmit)="onSubmit(itemForm)"

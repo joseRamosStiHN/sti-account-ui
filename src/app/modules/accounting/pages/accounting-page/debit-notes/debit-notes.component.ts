@@ -154,7 +154,7 @@ export class DebitNotesComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.accountType == JournalTypes.Compras && item.status);
+          .filter(item =>  item.diaryName === "Compras" && item.status);
       },
     });
 
@@ -643,10 +643,13 @@ export class DebitNotesComponent {
 
         transaccion.details?.forEach(details => details.movement = "D")
 
+
+        const total = transaccion.details?.reduce((sum, details) => ((details.movement = "D"), sum + (details.amount || 0)), 0) || 0;
+
         transaccion.details?.push({
           "id": 0,
           "accountId": this.journalForm?.defaultAccount ?? 0,
-          "amount": itemToRemove?.amount ?? 0,
+          "amount": total ?? 0,
           "movement": "C",
           "accountName": this.journalForm?.defaultAccountName ?? '',
         });

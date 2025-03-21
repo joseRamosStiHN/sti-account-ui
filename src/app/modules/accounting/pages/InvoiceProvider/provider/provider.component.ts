@@ -110,7 +110,7 @@ export class ProviderComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.accountType == JournalTypes.Compras && item.status == true);
+          .filter(item => item.diaryName	 == "Compras" && item.status == true);
 
         if (this.journalList.length > 0) {
           this.providerBilling.diaryType = this.journalList[0].id;

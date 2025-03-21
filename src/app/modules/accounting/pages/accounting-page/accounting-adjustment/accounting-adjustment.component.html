@@ -79,16 +79,16 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr *ngFor="let item of transactionOriginal.details; let i = index" class="hover:bg-gray-50">
                             <td class="px-3 py-2 font-medium text-gray-800">{{ item.nameAccount }}</td>
-                            <td class="px-3 py-2 text-right border-l">{{ item.debe | currency }}</td>
-                            <td class="px-3 py-2 text-right border-l">{{ item.haber | currency }}</td>
+                            <td class="px-3 py-2 text-right border-l">{{ item.debe | currency:'L' }}</td>
+                            <td class="px-3 py-2 text-right border-l">{{ item.haber | currency:'L' }}</td>
                         </tr>
 
                         <!-- Total row -->
                         <tr class="bg-gray-100 font-bold text-gray-900">
                             <td class="px-3 py-2">Total</td>
-                            <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalDebit | currency }}
+                            <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalDebit | currency:'L' }}
                             </td>
-                            <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalCredit | currency }}
+                            <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalCredit | currency:'L' }}
                             </td>
                         </tr>
                     </tbody>
@@ -127,14 +127,14 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr *ngFor="let item of transactionOriginal.details" class="hover:bg-gray-50">
                                     <td class="px-3 py-2 font-medium text-gray-800">{{ item.nameAccount }}</td>
-                                    <td class="px-3 py-2 text-right border-l">{{ item.debe | currency }}</td>
-                                    <td class="px-3 py-2 text-right border-l">{{ item.haber | currency }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ item.debe | currency:'L' }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ item.haber | currency:'L' }}</td>
                                 </tr>
         
                                 <tr class="bg-gray-100 font-bold text-gray-900">
                                     <td class="px-3 py-2">Total</td>
-                                    <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalDebit | currency }}</td>
-                                    <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalCredit | currency }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalDebit | currency:'L' }}</td>
+                                    <td class="px-3 py-2 text-right border-l">{{ transactionOriginal.totalCredit | currency:'L' }}</td>
                                 </tr>
                             </tbody>
                         </table>

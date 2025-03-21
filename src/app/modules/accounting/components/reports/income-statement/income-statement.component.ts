@@ -134,6 +134,10 @@ export class IncomeStatementComponent implements OnInit {
   selectedPeriod: number = 0;
   
 
+  company: any;
+
+  periodoAnual: any;
+
   periodList$: Observable<PeriodModel[]> | undefined;
 
   private readonly periodoService = inject(PeriodService);
@@ -150,6 +154,9 @@ export class IncomeStatementComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.loadInfoBalance();
+
     this.reportService.getIncomeStatement(0).subscribe((data: IncomeStatement[]) => {
       this.incomnetStatment = data;
       this.pivotDataSource = {
@@ -356,6 +363,30 @@ export class IncomeStatementComponent implements OnInit {
         saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Estado de Resultados.xlsx');
       });
     });
+  }
+
+
+  loadInfoBalance(){
+
+    this.company = JSON.parse(localStorage.getItem("company") ?? "");
+
+    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+
+
+    const startDate = new Date(periodo.startPeriod);
+    const endDate = new Date(periodo.endPeriod);
+
+    const formatMonth = (month:any) => {
+      const months = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ];
+      return months[month];
+    };
+
+    this.periodoAnual = `Del ${startDate.getDate()} de ${formatMonth(startDate.getMonth())} al ${endDate.getDate()} de ${formatMonth(endDate.getMonth())} de ${startDate.getFullYear()}`;
+
+
   }
 }
 

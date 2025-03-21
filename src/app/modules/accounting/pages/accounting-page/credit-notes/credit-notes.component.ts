@@ -151,7 +151,7 @@ export class CreditNotesComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.accountType == JournalTypes.Ventas && item.status);
+          .filter(item =>  item.diaryName === "Ingresos"  && item.status);
       },
     })
 
@@ -638,15 +638,18 @@ export class CreditNotesComponent {
 
         transaccion.details?.forEach(details => details.movement = "C")
 
+        const total = transaccion.details?.reduce((sum, details) => ((details.movement = "C"), sum + (details.amount || 0)), 0) || 0;
+
         transaccion.details?.push({
           "id": 0,
-          "accountId": this.journalForm?.defaultAccount ?? 0,
-          "amount": itemToRemove?.amount ?? 0,
+          "accountId":total ?? 0,
+          "amount": total?? 0,
           "movement": "D",
           "accountName": this.journalForm?.defaultAccountName ?? ''
         });
 
   
+        
 
         this.dataSource = transaccion?.details ?? [];
         // setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
@@ -754,6 +757,7 @@ export class CreditNotesComponent {
   }
 
   getCredit(dataRow: any) {
+    
 
     if (dataRow.movement === "C") {
       return dataRow.amount;
@@ -763,6 +767,9 @@ export class CreditNotesComponent {
 
   }
   getDebit(dataRow: any) {
+
+
+    
     if (dataRow.movement === "D") {
       return dataRow.amount;
     }

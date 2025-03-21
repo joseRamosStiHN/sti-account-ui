@@ -162,7 +162,7 @@ export class AccountingAdjustmentComponent {
                 accountId: item.accountId,
                 amount: item.amount,
                 id: item.id,
-                movement: item.typicalBalance,
+                movement: item.shortEntryType,
                 accountName: item.accountName,
                 debit: item.debit,
                 credit: item.credit
