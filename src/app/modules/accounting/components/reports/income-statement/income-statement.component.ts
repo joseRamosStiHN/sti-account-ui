@@ -155,7 +155,11 @@ export class IncomeStatementComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.loadInfoBalance();
+    this.company = JSON.parse(localStorage.getItem("company") ?? "");
+
+    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+
+    this.loadInfoBalance(periodo);
 
     this.reportService.getIncomeStatement(0).subscribe((data: IncomeStatement[]) => {
       this.incomnetStatment = data;
@@ -256,11 +260,10 @@ export class IncomeStatementComponent implements OnInit {
 
   async onSubmit(e: NgForm) {
 
-    console.log(e.form.value.period);
     
     if (e.valid) {
 
-      this.reportService.getIncomeStatement(e.form.value.period).subscribe((data: IncomeStatement[]) => {
+      await this.reportService.getIncomeStatement(e.form.value.period).subscribe((data: IncomeStatement[]) => {
         this.incomnetStatment = data;
         this.pivotDataSource = {
           fields: [
@@ -344,6 +347,15 @@ export class IncomeStatementComponent implements OnInit {
           store: this.incomnetStatment,
         };
       });
+
+      await this.periodList$?.subscribe(data=>{
+     
+        const periodo =  data.find(periodo=> periodo.id === e.form.value.period);
+
+        this.loadInfoBalance(periodo);
+        
+
+      })
     }
 
 
@@ -366,11 +378,9 @@ export class IncomeStatementComponent implements OnInit {
   }
 
 
-  loadInfoBalance(){
+  loadInfoBalance(periodo:any){
 
-    this.company = JSON.parse(localStorage.getItem("company") ?? "");
-
-    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+  
 
 
     const startDate = new Date(periodo.startPeriod);

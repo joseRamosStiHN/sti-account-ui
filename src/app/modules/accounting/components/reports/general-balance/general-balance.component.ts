@@ -341,8 +341,11 @@ export class GeneralBalanceComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.company = JSON.parse(localStorage.getItem("company") ?? "");
 
-    this.loadInfoBalance();
+    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+
+    this.loadInfoBalance(periodo);
 
     this.setInitValues(0);
 
@@ -534,10 +537,25 @@ export class GeneralBalanceComponent implements OnInit {
   async onSubmit(e: NgForm) {
 
     console.log(e.form.value.period);
+    
+    
 
     if (e.valid) {
 
-      this.setInitValues(e.form.value.period)
+      await this.setInitValues(e.form.value.period);
+
+      await this.periodList$?.subscribe(data=>{
+      
+      
+        const periodo =  data.find(periodo=> periodo.id === e.form.value.period);
+
+        console.log(periodo);
+        
+
+        this.loadInfoBalance(periodo);
+        
+
+      })
     }
 
 
@@ -698,11 +716,9 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
 
-  loadInfoBalance(){
+  loadInfoBalance(periodo:any){
 
-    this.company = JSON.parse(localStorage.getItem("company") ?? "");
 
-    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
 
 
     const startDate = new Date(periodo.startPeriod);
