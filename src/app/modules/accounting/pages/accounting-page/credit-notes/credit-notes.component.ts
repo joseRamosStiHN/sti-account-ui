@@ -11,6 +11,7 @@ import { TransactionService } from 'src/app/modules/accounting/services/transact
 import { NgForm } from '@angular/forms';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import config from 'devextreme/core/config';
 
 
 interface LocalData {
@@ -134,7 +135,11 @@ export class CreditNotesComponent {
   };
 
   constructor() {
-
+    config({
+      defaultCurrency: 'HNL',
+      defaultUseCurrencyAccountingStyle: true,
+      serverDecimalSeparator: '.',
+    });
 
   }
 

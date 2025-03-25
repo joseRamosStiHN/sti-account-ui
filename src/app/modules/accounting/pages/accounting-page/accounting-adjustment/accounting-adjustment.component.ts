@@ -12,6 +12,7 @@ import { AdjustmentDetailById, AdjustmentRequest, AdjustmentResponseById } from 
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import config from 'devextreme/core/config';
 
 
 
@@ -132,6 +133,11 @@ export class AccountingAdjustmentComponent {
 
   constructor() {
     this.initializeShowDetails();
+    config({
+      defaultCurrency: 'HNL',
+      defaultUseCurrencyAccountingStyle: true,
+      serverDecimalSeparator: '.',
+    });
   }
 
 

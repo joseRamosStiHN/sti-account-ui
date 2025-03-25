@@ -22,7 +22,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 auto-cols-fr mt-10">
             <div class="flex flex-wrap">
                 <div class="flex-grow">
-                    <label for="parent-account" class="block mb-2 text-sm text-gray-900">Referencia Contable</label>
+                    <label for="parent-account" class="block mb-2 text-sm text-gray-900">Referencia Contable:</label>
                     <dx-select-box value="dataTable.referenceNumber" [dataSource]="dataTable" name="id"
                         [searchEnabled]="true" [(ngModel)]="selectRow.referenceNumber" valueExpr="referenceNumber"
                         displayExpr="referenceNumber" [searchExpr]="['referenceNumber', 'journalEntry']" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
@@ -151,7 +151,7 @@
 
 
         <div class="mb-2 mt-5">
-            <label for="description" class="block mb-2 text-sm text-gray-900">Descripción del Ajuste</label>
+            <label for="description" class="block mb-2 text-sm text-gray-900">Descripción del Ajuste:</label>
             <input type="text" name="description" maxlength="150" [(ngModel)]="description" id="description"
                 class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Ingresa una Descripción corta acerca del Ajuste" required />
@@ -204,9 +204,9 @@
                     [displayExpr]="combineCodeAndDescription"></dxo-lookup>
                 <dxi-validation-rule type="required"></dxi-validation-rule>
             </dxi-column>
-            <dxi-column caption="Debe" [width]="120" [calculateCellValue]="getDebit">
+            <dxi-column caption="Debe" [width]="120" [calculateCellValue]="getDebit" [format]="'currency'">
             </dxi-column>
-            <dxi-column caption="Haber" [width]="120" [calculateCellValue]="getCredit">
+            <dxi-column caption="Haber" [width]="120" [calculateCellValue]="getCredit" [format]="'currency'">
             </dxi-column>
             <dxi-column dataField="movement" [visible]="false">
             </dxi-column>

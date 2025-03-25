@@ -12,6 +12,7 @@ import { AdjustmentRequest } from 'src/app/modules/accounting/models/APIModels';
 import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import config from 'devextreme/core/config';
 
 
 
@@ -96,7 +97,7 @@ export class DebitNotesComponent {
   creditTransaction: LocalData[] = [];
   journalForm?: JournalModel;
 
-  status:string="";
+  status: string = "";
 
   // modal
   popupVisible = false;
@@ -138,6 +139,11 @@ export class DebitNotesComponent {
 
   constructor() {
 
+    config({
+      defaultCurrency: 'HNL',
+      defaultUseCurrencyAccountingStyle: true,
+      serverDecimalSeparator: '.',
+    });
 
   }
 
@@ -154,41 +160,41 @@ export class DebitNotesComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item =>  item.diaryName === "Compras" && item.status);
+          .filter(item => item.diaryName === "Compras" && item.status);
       },
     });
 
     this.activeRouter.paramMap.subscribe((params) => {
-      this.id = params.get('id');   
+      this.id = params.get('id');
       const findId = Number(this.id);
       if (findId) {
 
-        this.allowAddEntry= false;
-        
+        this.allowAddEntry = false;
+
         this.transService.getNoteDebitById(findId).subscribe({
           next: (data) => {
-            this.selectRow.referenceNumber=data.invoiceNo;
+            this.selectRow.referenceNumber = data.invoiceNo;
             this.description = data.descriptionNote;
             this.debitNotes.date = data.date;
             this.debitNotes.dayri = data.diaryType;
 
             this.status = data.status;
-    
-            const transaccion =  data.detailNote.map((item: any) => {
+
+            const transaccion = data.detailNote.map((item: any) => {
               return {
                 accountId: item.accountId,
                 amount: item.amount,
                 id: item.id,
                 movement: item.shortEntryType,
                 accountName: item.accountName,
-                debit:  item.debit,
+                debit: item.debit,
                 credit: item.credit
               } as Transaction;
             })
             this.accountService.getAllAccount().subscribe({
               next: (data) => {
                 this.accountList = data
-                  .filter(item => item.supportEntry )
+                  .filter(item => item.supportEntry)
                   .map(item => ({
                     id: item.id,
                     description: item.name,
@@ -219,7 +225,7 @@ export class DebitNotesComponent {
 
           const roundedSum = parseFloat(sum.toFixed(2));
 
-         item.amount = roundedSum;
+          item.amount = roundedSum;
         });
 
       } else {
@@ -240,7 +246,7 @@ export class DebitNotesComponent {
       if (credit.length == 1) {
         credit.forEach((item) => {
           const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-  
+
           // Redondear la suma a dos decimales para asegurar precisión
           const roundedSum = parseFloat(sum.toFixed(2));
 
@@ -264,7 +270,7 @@ export class DebitNotesComponent {
   }
 
 
-  removedRow(e:any): void {
+  removedRow(e: any): void {
     const credit = this.dataSource.filter((data) => data.movement === 'C');
     const debit = this.dataSource.filter((data) => data.movement === 'D');
 
@@ -280,13 +286,13 @@ export class DebitNotesComponent {
     if (e.data.movement == 'D' && credit.length == 1) {
       credit.forEach((item) => {
         const sum = debit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); 
+        item.amount = parseFloat(sum.toFixed(2));
       });
     }
     if (e.data.movement == 'C' && debit.length == 1) {
       debit.forEach((item) => {
         const sum = credit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); 
+        item.amount = parseFloat(sum.toFixed(2));
       });
     }
 
@@ -294,7 +300,7 @@ export class DebitNotesComponent {
 
   }
 
-  updateRow(e:any): void {
+  updateRow(e: any): void {
 
     const credit = this.dataSource.filter((data) => data.movement === 'C');
     const debit = this.dataSource.filter((data) => data.movement === 'D');
@@ -327,16 +333,16 @@ export class DebitNotesComponent {
       const debe = this.dataSource
         .filter((data) => data.movement === 'D')
         .reduce((sum, item) => sum + item.amount, 0);
-    
+
       // Calcular el total de los movimientos 'C' (haber)
       const haber = this.dataSource
         .filter((data) => data.movement === 'C')
         .reduce((sum, item) => sum + item.amount, 0);
-    
+
       // Redondear los totales a dos decimales
       this.totalCredit = parseFloat(haber.toFixed(2));
       this.totalDebit = parseFloat(debe.toFixed(2));
-    
+
       // Mostrar en la consola para verificar
       // console.log('Total Debit:', this.totalDebit);
       // console.log('Total Credit:', this.totalCredit);
@@ -482,7 +488,7 @@ export class DebitNotesComponent {
         }),
       };
 
-      
+
 
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
@@ -613,7 +619,7 @@ export class DebitNotesComponent {
       this.accountService.getAllAccount().subscribe({
         next: (data) => {
           this.accountList = data
-            .filter(item => item.supportEntry 
+            .filter(item => item.supportEntry
               || item.id == this.journalForm?.defaultAccount
             )
             .map(item => ({
@@ -665,7 +671,7 @@ export class DebitNotesComponent {
 
   }
 
-  
+
   showDetails: boolean = false;
 
   toggleDetails() {
@@ -681,8 +687,8 @@ export class DebitNotesComponent {
             .reduce((total: any, item: any) => total + item.amount, 0),
           totalCredit: transaction.detailNote?.filter((item: any) => item.shortEntryType === "C")
             .reduce((total: any, item: any) => total + item.amount, 0),
-            date:transaction.date,
-            user:transaction.user,
+          date: transaction.date,
+          user: transaction.user,
           details: transaction.detailNote?.map((item: any) => ({
             id: item.id,
             nameAccount: item.accountName,

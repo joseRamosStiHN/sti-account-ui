@@ -114,7 +114,7 @@ export class ClientComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.diaryName === "Ingresos" && item.status == true);
+          .filter(item => item.accountTypeName === "Ingresos" && item.status == true);
 
         if (this.journalList.length > 0) {
           this.clientBilling.diaryType = this.journalList[0].id;
