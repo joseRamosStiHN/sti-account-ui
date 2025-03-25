@@ -535,9 +535,6 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
   async onSubmit(e: NgForm) {
-
-    console.log(e.form.value.period);
-    
     
 
     if (e.valid) {
@@ -545,12 +542,8 @@ export class GeneralBalanceComponent implements OnInit {
       await this.setInitValues(e.form.value.period);
 
       await this.periodList$?.subscribe(data=>{
-      
-      
+     
         const periodo =  data.find(periodo=> periodo.id === e.form.value.period);
-
-        console.log(periodo);
-        
 
         this.loadInfoBalance(periodo);
         

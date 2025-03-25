@@ -156,7 +156,7 @@ export class CreditNotesComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item =>  item.diaryName === "Ingresos"  && item.status);
+          .filter(item =>  item.accountTypeName	 === "Ingresos"  && item.status);
       },
     })
 

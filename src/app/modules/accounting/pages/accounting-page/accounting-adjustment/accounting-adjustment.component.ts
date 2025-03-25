@@ -188,6 +188,8 @@ export class AccountingAdjustmentComponent {
 
             this.dataSource = transaccion
 
+            this.updateAmounts();
+
             // setTimeout(() => {
             //   this.hideEditDeleteButtons("Haber");
             // }, 10000);

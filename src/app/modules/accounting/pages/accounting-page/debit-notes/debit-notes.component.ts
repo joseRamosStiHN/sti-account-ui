@@ -160,7 +160,7 @@ export class DebitNotesComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => item.diaryName === "Compras" && item.status);
+          .filter(item => item.accountTypeName	 === "Compras" && item.status);
       },
     });
 
