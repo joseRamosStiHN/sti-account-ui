@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { NavigationService, NavStiLink } from '../navigation.service';
 import { DropdownComponent } from '../components/dropdown/dropdown.component';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
+import { environment } from '@environment/environment';
 
 
 @Component({
@@ -40,6 +41,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // iniciales?: string;
 
   nameCompany?:string
+
+    apiLogo = environment.SECURITY_API_URL + '/api/v1/company/logo/'
+  
 
   constructor(private navigate: NavigationService, private router: Router) {}
 
