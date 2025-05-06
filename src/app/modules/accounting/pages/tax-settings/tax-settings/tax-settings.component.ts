@@ -24,6 +24,7 @@ export class TaxSettingsComponent {
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
+  onward: boolean = false;
 
   private readonly router = inject(Router);
   private readonly periodService = inject(PeriodService);

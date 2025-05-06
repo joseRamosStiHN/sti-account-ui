@@ -20,7 +20,7 @@ import { environment } from '@environment/environment';
 })
 export class CompanyCreateComponent implements OnInit {
   accountsFromSystem: number = 1;
-  
+
   companyList$: Observable<CompanyResponse[]> | undefined;
   userList$: UsersResponse[] = [];
   companyForm: CompanyRequest;
@@ -34,6 +34,7 @@ export class CompanyCreateComponent implements OnInit {
 
   imagePreview: string | ArrayBuffer | null = null;
   imageBase64: string = '';
+  imageChanged = false;
 
   @Input('id') id?: number;
 
@@ -163,7 +164,7 @@ export class CompanyCreateComponent implements OnInit {
 
     if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
-      this.messageToast = 'Seleccione al menos un Usario';
+      this.messageToast = 'Seleccione al menos un Usuario';
       this.showToast = true;
       return
     }
@@ -174,7 +175,7 @@ export class CompanyCreateComponent implements OnInit {
         if (this.tenantId != "" && this.accountsFromSystem !== 0) {
           this.cloneAccountsToNewCompany(this.tenantId, this.companyForm.tenantId || '');
         }
-        
+
         this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
         this.toastType = typeToast.Success;
         this.messageToast = 'Empresa registrada exitosamente';
@@ -333,16 +334,14 @@ export class CompanyCreateComponent implements OnInit {
 
       reader.onload = () => {
         this.imagePreview = reader.result;
-
-        const base64String = (reader.result as string).split(',')[1];
-        this.imageBase64 = base64String;
-
-
+        this.imageBase64 = (reader.result as string).split(',')[1];
+        this.imageChanged = true;
       };
 
       reader.readAsDataURL(file);
     }
   }
+
 
   onSelectionChanged(event: { selectedRowsData: any; }) {
     const selectedRows = event.selectedRowsData;

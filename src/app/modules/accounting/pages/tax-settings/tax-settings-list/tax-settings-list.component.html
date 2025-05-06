@@ -25,10 +25,10 @@
         [allowEditing]="false"
       >
         </dxi-column>
-        <dxi-column caption="Tipo" width="200" dataField="type"
+        <dxi-column caption="Tipo" width="400" dataField="type"
         alignment="left"></dxi-column>
-        <dxi-column caption="Tipo de Impuesto" dataField="taxRate" alignment="left"></dxi-column>
-        <dxi-column caption="Desde" width="200" dataField="fromValue"
+       <!--  <dxi-column caption="Tipo de Impuesto" dataField="taxRate" alignment="left"></dxi-column> -->
+        <dxi-column caption="Desde" width="300" dataField="fromValue"
             alignment="right" [format]="{ 
                 style: 'currency', 
                 currency: 'HNL', 
@@ -38,6 +38,7 @@
 
             <dxi-column
             caption="Hasta"
+            width="300"
             dataField="toValue"
             [format]="{ 
                 style: 'currency', 
@@ -49,10 +50,11 @@
           ></dxi-column>
           <dxi-column
             caption="Porcentaje"
+            width="200"
             dataField="percent"
           ></dxi-column>
 
-          <dxi-column caption="Fecha Inicio" width="200" [calculateDisplayValue]="formatDateInit"
+          <dxi-column caption="Fecha Creación" width="200" [calculateDisplayValue]="formatDateInit"
             alignment="left"></dxi-column>
 
 

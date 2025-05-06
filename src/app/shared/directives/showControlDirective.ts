@@ -12,7 +12,7 @@ export class showControlDirective {
   constructor(private renderer: Renderer2) {}
 
   ngOnInit() {
-    console.log(this.element);
+    //console.log(this.element);
     /* console.log(this.roles);
     this.t.find(x=> this.roles.includes(x))
     console.log('permiso', this.hasPermission);

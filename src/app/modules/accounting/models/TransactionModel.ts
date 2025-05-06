@@ -7,12 +7,12 @@ export interface TransactionModel {
   descriptionPda: string;
   currency: string;
   diaryType?:number;
-  typeSale:string;
+  typeSale:string | null;
   cashValue?:number;
   creditValue?:number;
-  typePayment:string;
-  rtn:string;
-  supplierName:string;
+  typePayment:string | null;
+  rtn:string | null;
+  supplierName:string | null;
   detail: TransactionDetailModel[];
 }
 

@@ -40,11 +40,13 @@ export class AccountingPageComponent implements OnInit {
             if (role.name === 'REGISTRO CONTABLE' || role.name === 'CONSULTA') {
               this.agregarElementoSiNoExiste(this.navegation, { id: 1, label: 'Ingresos', path: '/accounting/client-list' });
               this.agregarElementoSiNoExiste(this.navegation, { id: 2, label: 'Compras', path: '/accounting/provider-list' });
+              this.agregarElementoSiNoExiste(this.navegation, { id: 3, label: 'Varios', path: '/accounting/various-operations-list' });
+
             }
     
             if (role.name === 'CONSULTA') {
               this.agregarElementoSiNoExiste(this.navegation, {
-                id: 4,
+                id: 5,
                 label: 'Reportes',
                 path: '',
                 child: [
@@ -73,11 +75,13 @@ export class AccountingPageComponent implements OnInit {
     
               this.agregarElementoSiNoExiste(this.navegation, { id: 1, label: 'Ingresos', path: '/accounting/client-list' });
               this.agregarElementoSiNoExiste(this.navegation, { id: 2, label: 'Compras', path: '/accounting/provider-list' });
+              this.agregarElementoSiNoExiste(this.navegation, { id: 3, label: 'Varios', path: '/accounting/various-operations-list' });
+
             }
     
             if (role.name === 'REGISTRO CONTABLE') {
               this.agregarElementoSiNoExiste(this.navegation, {
-                id: 5,
+                id: 6,
                 label: 'Configuraciones',
                 path: '',
                 child: [
@@ -99,7 +103,7 @@ export class AccountingPageComponent implements OnInit {
     
     
           this.agregarElementoSiNoExiste(this.navegation, {
-            id: 3,
+            id: 4,
             label: 'Contabilidad',
             path: '',
             child: contabilidadList,

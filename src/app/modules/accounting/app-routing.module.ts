@@ -34,6 +34,8 @@ import { TaxSettingsListComponent } from 'src/app/modules/accounting/pages/tax-s
 import { BulkConfigurationListComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-configuration/bulk-configuration-list/bulk-configuration-list.component';
 import { BulkConfigurationComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-configuration/bulk-configuration/bulk-configuration.component';
 import { UploadBulkFileComponent } from 'src/app/modules/accounting/pages/upload-bulk/upload-bulk-file/upload-bulk-file.component';
+import { VariousOperationsListComponent } from 'src/app/modules/accounting/pages/various-operations/various-operations-list/various-operations-list.component';
+import { VariousOperationsComponent } from 'src/app/modules/accounting/pages/various-operations/various-operations/various-operations.component';
 
 const routes: Routes = [
   {
@@ -106,6 +108,9 @@ const routes: Routes = [
       { path: 'configuration/bulk-configuration/create', component: BulkConfigurationComponent },
       { path: 'configuration/bulk-configuration/:id', component: BulkConfigurationComponent },
       { path: 'bulk-upload-file', component: UploadBulkFileComponent },
+      { path: 'various-operations', component: VariousOperationsComponent },
+      { path: 'various-operations/:id', component: VariousOperationsComponent },
+      { path: 'various-operations-list', component: VariousOperationsListComponent },
     ],
   },
 ];
