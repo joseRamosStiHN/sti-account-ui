@@ -96,7 +96,7 @@ export class JournalPageComponent {
         results.map((result: AccountTypeResponse) => {
           return {
             id: result.id,
-            isActive: NoActive.includes(result.name),
+            isActive: false,
             name: result.name,
           };
         })
@@ -148,7 +148,7 @@ export class JournalPageComponent {
           this.toastType = typeToast.Error;
           this.messageToast = 'Ya existe un diario con el tipo seleccionado';
           this.showToast = true;
-        
+
         },
       });
     }
@@ -163,50 +163,85 @@ export class JournalPageComponent {
       this.selectedTypeName = ' de Gastos';
       return;
     }
+    if (Selected === '3') {
+      this.selectedTypeName = ' de Efectivo';
+      return;
+    }
+    if (Selected === '4') {
+      this.selectedTypeName = ' de Bancos';
+      return;
+    }
     if (Selected === '5') {
-      this.selectedTypeName = '';
+      this.selectedTypeName = 'de Varios';
+      return;
+    }
+    if (Selected === '6') {
+      this.selectedTypeName = 'de Patrimonio';
+      return;
+    }
+    if (Selected === '7') {
+      this.selectedTypeName = 'de Compras';
       return;
     }
     this.selectedTypeName = null;
   }
 
+  /*   onChangeType(e: any) {
+      //set Selected type
+      this.showDefaultAccountName(e.target.value);
+      
+      if (e.target.value == JournalTypes.Ventas) {
+        this.accountsFilter = this.accounts.filter(
+          (account) => account.accountType == JournalTypes.Ventas
+        );
+        return;
+      }
+  
+      if (e.target.value == JournalTypes.Compras) {
+        this.accountsFilter = this.accounts.filter(
+          (account) => account.accountType == JournalTypes.Compras
+        );
+        return;
+      }
+  
+      if (e.target.value == JournalTypes.Varios) {
+        this.accountsFilter = this.accounts.filter(
+          (account) => account.accountType == JournalTypes.Varios
+        );
+        return;
+      }
+  
+      if (e.target.value == JournalTypes.Bancos) {
+        this.accountsFilter = this.accounts.filter(
+          (account) => account.accountType == JournalTypes.Bancos
+        );
+        return;
+      }
+      if (e.target.value == JournalTypes.Efectivo) {
+        this.accountsFilter = this.accounts.filter(
+          (account) => account.accountType == JournalTypes.Efectivo
+        );
+        return;
+      }
+    } */
+
   onChangeType(e: any) {
-    //set Selected type
+    // Set Selected type
     this.showDefaultAccountName(e.target.value);
-    if (e.target.value == JournalTypes.Ventas) {
-      this.accountsFilter = this.accounts.filter(
-        (account) => account.accountType == JournalTypes.Ventas
-      );
-      return;
-    }
 
-    if (e.target.value == JournalTypes.Compras) {
-      this.accountsFilter = this.accounts.filter(
-        (account) => account.accountType == JournalTypes.Compras
-      );
-      return;
-    }
+    // Filtrar cuentas según el tipo seleccionado
+    this.accountsFilter = this.accounts.filter(
+      (account) => account.accountType == e.target.value
+    );
 
-    if (e.target.value == JournalTypes.Varios) {
-      this.accountsFilter = this.accounts.filter(
-        (account) => account.accountType == JournalTypes.Varios
-      );
-      return;
-    }
-
-    if (e.target.value == JournalTypes.Bancos) {
-      this.accountsFilter = this.accounts.filter(
-        (account) => account.accountType == JournalTypes.Bancos
-      );
-      return;
-    }
-    if (e.target.value == JournalTypes.Efectivo) {
-      this.accountsFilter = this.accounts.filter(
-        (account) => account.accountType == JournalTypes.Efectivo
-      );
-      return;
+    // Verificar si se encontraron cuentas
+    if (this.accountsFilter.length === 0) {
+      this.toastType = typeToast.Warning;
+      this.messageToast = 'No se encontraron cuentas para el tipo seleccionado';
+      this.showToast = true;
     }
   }
+
   loadAccountsOnEdit(journal: JournalModel) {
     this.journalForm = journal;
     this.showDefaultAccountName(this.journalForm.accountType.toString());

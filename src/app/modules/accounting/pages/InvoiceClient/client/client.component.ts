@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, inject, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, Validators } from '@angular/forms';
 import { DxDataGridComponent, DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import config from 'devextreme/core/config';
 import { confirm } from 'devextreme/ui/dialog';
@@ -77,6 +77,7 @@ export class ClientComponent {
   ];
   accountList: AccountModel[] = [];
 
+  @ViewChild('itemForm') itemForm!: NgForm;
   //
   private readonly router = inject(Router);
   private readonly activeRouter = inject(ActivatedRoute);
@@ -149,6 +150,7 @@ export class ClientComponent {
       }
     });
   }
+  
 
   async onSubmit(e: NgForm) {
     console.log(this.dataSource);
@@ -736,5 +738,39 @@ export class ClientComponent {
 
   }
 
+  onCurrencyChange() {
+    if (!this.itemForm || !this.itemForm.form) {
+      return;
+    }
+    const exchangeRateControl = this.itemForm.form.get('exchangeRate');
 
+    if (!exchangeRateControl) {
+      return;
+    }
+
+    if (this.clientBilling.currency === 'USD') {
+      exchangeRateControl.setValidators([Validators.required]);
+    } else {
+      exchangeRateControl.clearValidators();
+    }
+    exchangeRateControl.updateValueAndValidity();
+  }
+
+  onRtnChange() {
+    if (!this.itemForm || !this.itemForm.form) {
+      return;
+    }
+    const supplierNameControl = this.itemForm.form.get('supplierName');
+
+    if (!supplierNameControl) {
+      return;
+    }
+
+    if (this.clientBilling.rtn === 'SI') {
+      supplierNameControl.setValidators([Validators.required]);
+    } else {
+      supplierNameControl.clearValidators();
+    }
+    supplierNameControl.updateValueAndValidity();
+  }
 }

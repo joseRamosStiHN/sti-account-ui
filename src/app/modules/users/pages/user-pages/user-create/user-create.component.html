@@ -31,15 +31,15 @@
         <input required="true" name="userPhone" id="userPhone" type="text" placeholder="96xxxxxx, 34xxxxxx"
           [(ngModel)]="userForm.userPhone"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required pattern="[0-9]*" />
+          required pattern="^(?:\+504 \d{4}-\d{4}|\d{8}|\d{4}-\d{4})$" />
 
         <div *ngIf="itemForm.submitted && itemForm.form.controls['userPhone'].getError('required')">
           <small class="text-xs text-red-900">Teléfono es requerido.</small>
         </div>
         <div *ngIf="itemForm.submitted && itemForm.form.controls['userPhone'].hasError('pattern')">
 
-          <small class="text-xs text-red-900">Solo se permiten números.</small>
-
+          <small class="text-xs text-red-900">Formato inválido. Debe ser +504 2280-3450, 96588978 o
+            9685-1590.</small>
         </div>
       </div>
 

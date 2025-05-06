@@ -3,26 +3,32 @@
   <form id="companyForm" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
     <div class="flex flex-row">
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2">
-        <legend class="font-medium ml-2"><strong>Información General</strong></legend> 
-     
+        <legend class="font-medium ml-2"><strong>Información General</strong></legend>
+
         <div class="flex flex-col items-center space-y-4">
-          <div class="w-60 h-auto">       
-            <img *ngIf="id"  [src]="apiLogo + id" alt="Logo"  class="h-auto w-full rounded-lg shadow-lg" > 
-            <img *ngIf="imagePreview && !id" [src]="imagePreview" alt="image description" class="h-auto w-full rounded-lg shadow-lg" />
+          <div class="w-60 h-auto">
+            <!-- Mostrar la imagen cargada desde el servidor si no se ha cambiado la imagen -->
+            <img *ngIf="!imageChanged && id" [src]="apiLogo + id" alt="Logo" class="h-auto w-full rounded-lg shadow-lg">
+
+            <!-- Mostrar vista previa si se cambió la imagen -->
+            <img *ngIf="imageChanged" [src]="imagePreview" alt="Preview" class="h-auto w-full rounded-lg shadow-lg">
+
           </div>
-      
-          <label class="flex flex-col items-center justify-center w-60 px-4 py-2 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-200 hover:border-gray-400 transition-all duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+          <label
+            class="flex flex-col items-center justify-center w-60 px-4 py-2 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-200 hover:border-gray-400 transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500 mb-1" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             <span class="text-gray-500 text-xs">Selecciona una imagen</span>
             <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
           </label>
-          
-          
-          
+
+
+
         </div>
-        
+
         <div class="w-full grid grid-cols-3 gap-3">
           <div class="form">
             <label for="name" class="block mb-2 text-sm text-gray-900">Nombre:</label>
@@ -85,14 +91,15 @@
           </div>
           <div class="form">
             <label for="phone" class="block mb-2 text-sm text-gray-900">Teléfono:</label>
-            <input id="phone" name="phone" type="url" [(ngModel)]="companyForm.phone"
+            <input id="phone" name="phone" type="text" [(ngModel)]="companyForm.phone"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder="" required pattern="[0-9]*" />
+              placeholder="" required pattern="^(?:\+504 \d{4}-\d{4}|\d{8}|\d{4}-\d{4})$" />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].getError('required')">
               <small class="text-xs text-red-900">Teléfono es requerido.</small>
             </div>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['phone'].hasError('pattern')">
-              <small class="text-xs text-red-900">Solo se permiten números.</small>
+              <small class="text-xs text-red-900">Formato inválido. Debe ser +504 2280-3450, 96588978 o
+                9685-1590.</small>
             </div>
           </div>
 
@@ -150,24 +157,24 @@
 
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2">
         <legend class="font-medium ml-2"><strong>Usuarios</strong></legend>
-        <dx-data-grid id="companyUser Grid" [dataSource]="userList$" [showBorders]="true" 
-                       [selection]="{ mode: 'single' }" (onSelectionChanged)="onSelectionChanged($event)">
+        <dx-data-grid id="companyUser Grid" [dataSource]="userList$" [showBorders]="true"
+          [selection]="{ mode: 'single' }" (onSelectionChanged)="onSelectionChanged($event)">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
           <dxi-column caption="Nombre" dataField="firstName" [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false"
-                      editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate">
+          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false" editCellTemplate="tagBoxEditor"
+            [cellTemplate]="cellTemplate">
             <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
             </dxo-lookup>
           </dxi-column>
-      
+
           <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
             <dx-tag-box [dataSource]="rolesCompanys$" [value]="cellInfo.value" valueExpr="id" displayExpr="name"
-                        [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
-                        [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
-                        (onValueChanged)="cellInfo.setValue($event.value)"
-                        (onSelectionChanged)="cellInfo.component.updateDimensions()">
+              [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
+              [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
+              (onValueChanged)="cellInfo.setValue($event.value)"
+              (onSelectionChanged)="cellInfo.component.updateDimensions()">
             </dx-tag-box>
           </div>
         </dx-data-grid>

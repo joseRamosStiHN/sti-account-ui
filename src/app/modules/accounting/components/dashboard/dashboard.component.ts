@@ -20,7 +20,7 @@ export class DashboardComponent {
     this.periodService.getAllPeriods().subscribe({
       next: (data) => {
 
-       console.log(data);
+       //console.log(data);
 
       const company = data.find(c=> c.closureType == "Anual" && c.isAnnual);
 

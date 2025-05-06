@@ -23,7 +23,7 @@ export class JournalService {
     }),
   };
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
 
   /**
@@ -84,13 +84,25 @@ export class JournalService {
     );
   }
 
-
-   /**
-   * Error Handler Method
+  /**
+   * Method to get a journal by account type
    *
+   * @param accountTypeId
    * @return response()
    */
-   errorHandler(error: any) {
+  getJournalByAccountType(accountTypeId: number): Observable<JournalModel> {
+    const url = `${this.apiURL}/api/v1/accounting-journal/by-account-type/${accountTypeId}`;
+    return this.httpClient.get<JournalModel>(url).pipe(
+      catchError(this.errorHandler)
+    );
+  }
+
+  /**
+  * Error Handler Method
+  *
+  * @return response()
+  */
+  errorHandler(error: any) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message;

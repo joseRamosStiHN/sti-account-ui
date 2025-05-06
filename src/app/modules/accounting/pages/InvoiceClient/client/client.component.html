@@ -47,10 +47,10 @@
 
         <div>
           <label for="txt_moneda" class="block mb-2 text-sm text-gray-900">Moneda:</label>
-          <select [(ngModel)]="clientBilling.currency" required name="currency" id="txt_moneda"
+          <select [(ngModel)]="clientBilling.currency" (change)="onCurrencyChange()" required name="currency" id="txt_moneda"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-            <option selected>L</option>
-            <option>USD</option>
+            <option value="L" selected>L</option>
+            <option value="USD">USD</option>
           </select>
           <div *ngIf="
               itemForm.submitted &&
@@ -124,7 +124,7 @@
         </div>
         <div>
           <label for="rtn" class="block mb-2 text-sm text-gray-900">RTN:</label>
-          <select [(ngModel)]="clientBilling.rtn" required="true" name="rtn" id="rtn"
+          <select [(ngModel)]="clientBilling.rtn" (change)="onRtnChange()" required="true" name="rtn" id="rtn"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
             <option value="SI">Si</option>
             <option value="NO">No</option>

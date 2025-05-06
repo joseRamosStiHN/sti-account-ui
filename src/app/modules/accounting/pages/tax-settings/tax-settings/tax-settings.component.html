@@ -2,15 +2,14 @@
     <div class="flex flex-row justify-between">
         <div class="w-100 flex justify-between mb-5">
             <h2 class="text-2xl font-semibold">Impuestos</h2>
-          </div>
+        </div>
     </div>
-    <form id="taxform" class="p-2 grid grid-cols-1 sm:grid-cols-2 gap-4"#itemForm="ngForm" (ngSubmit)="save(itemForm)">
+    <form id="taxform" class="p-2 grid grid-cols-1 sm:grid-cols-2 gap-4" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
         <div class="mb-4">
-            <label for="taxRate" class="block text-gray-700 font-semibold mb-2">Tipo de Impuesto</label>
+            <label for="taxRate" class="block text-gray-700 font-semibold mb-2">Tipo de Impuesto:</label>
             <select id="taxRate" name="taxRate" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2
-             focus:ring-blue-500"   required="true" name="taxRate" id="taxRate"
-             [(ngModel)]="taxSetings.taxRate">
-                <option value="Excentos">Excentos</option>
+             focus:ring-blue-500" required="true" name="taxRate" id="taxRate" [(ngModel)]="taxSetings.taxRate">
+                <option value="Exentos">Exentos</option>
                 <option value="Gravado">Gravado</option>
             </select>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['taxRate'].getError('required')">
@@ -18,64 +17,64 @@
             </div>
         </div>
         <div class="mb-4">
-            <label for="type" class="block text-gray-700 font-semibold mb-2">Tipo</label>
+            <label for="type" class="block text-gray-700 font-semibold mb-2">Tipo:</label>
             <select id="type" name="type" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2
-             focus:ring-blue-500" required="true" name="type" id="type"
-             [(ngModel)]="taxSetings.type">
-                <option value="Renta Agrabable Anual">Renta Agrabable Anual</option>
-                <option value="Renta Agrabable Mensual">Renta Agrabable Mensual</option>
+             focus:ring-blue-500" required="true" name="type" id="type" [(ngModel)]="taxSetings.type">
+                <option value="Renta Gravable Anual">Renta Gravable Anual</option>
+                <option value="Renta Gravable Mensual">Renta Gravable Mensual</option>
             </select>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')">
                 <small class="text-xs text-red-900">Tipo es requerido.</small>
             </div>
         </div>
         <div class="mb-4">
-            <label for="fromValue" class="block text-gray-700 font-semibold mb-2">Desde</label>
-            <input type="number" id="fromValue" name="fromValue" step="0.01" class="w-full p-2 border
-             border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-             (keypress)="validateDecimal($event)"
-             min="0"
-             [(ngModel)]="taxSetings.fromValue" required="true" name="fromValue" id="fromValue">
-             <div *ngIf="itemForm.submitted && itemForm.form.controls['fromValue'].getError('required')">
+            <label for="fromValue" class="block text-gray-700 font-semibold mb-2">Desde:</label>
+            <input type="number" id="fromValue" name="fromValue" step="0.01"
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                (keypress)="validateDecimal($event)" min="0" [(ngModel)]="taxSetings.fromValue" required="true">
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['fromValue']?.getError('required')">
                 <small class="text-xs text-red-900">Desde es requerido.</small>
+            </div>
+
+            <div class="mt-3 block text-gray-700 font-semibold mb-2">
+                <input type="checkbox" id="onward" [(ngModel)]="onward" name="onward"
+                    (change)="taxSetings.toValue = null">
+                <label for="onward" class="ml-2 text-sm text-gray-700">En Adelante</label>
             </div>
         </div>
         <div class="mb-4">
-            <label for="toValue" class="block text-gray-700 font-semibold mb-2">Hasta</label>
-            <input type="number" id="toValue" name="toValue" step="0.01"  class="w-full p-2 border border-gray-300 
-            rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-            (keypress)="validateDecimal($event)"
-            min="0.1"
-            [(ngModel)]="taxSetings.toValue" required="true" name="toValue" id="toValue">
-            <div *ngIf="itemForm.submitted && itemForm.form.controls['toValue'].getError('required')">
+            <label for="toValue" class="block text-gray-700 font-semibold mb-2">Hasta:</label>
+            <input type="number" id="toValue" name="toValue" step="0.01"
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                (keypress)="validateDecimal($event)" min="0.1" [(ngModel)]="taxSetings.toValue" [disabled]="onward"
+                required="true">
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['toValue']?.getError('required') && !onward">
                 <small class="text-xs text-red-900">Hasta es requerido.</small>
             </div>
         </div>
         @if(taxSetings.taxRate == 'Gravado'){
-            <div class="mb-4">
-                <label for="percent" class="block text-gray-700 font-semibold mb-2">Porcentaje</label>
-                <input type="number" id="percent" name="percent" step="0.01"
-                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                [(ngModel)]="taxSetings.percent" name="percent" id="percent"
-                min="0.1" max="100"
+        <div class="mb-4">
+            <label for="percent" class="block text-gray-700 font-semibold mb-2">Porcentaje:</label>
+            <input type="number" id="percent" name="percent" step="0.01"
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [(ngModel)]="taxSetings.percent" name="percent" id="percent" min="0.1" max="100"
                 (keypress)="validateDecimal($event)">
-               
-            </div>
+
+        </div>
         }
-        
+
         <div class="justify-end mt-10 absolute right-4 bottom-10">
             <button type="button" (click)="goBack()"
                 class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
                 Cancelar
             </button>
-            <button type="submit"
-            class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600">
-               
-               Guardar
+            <button type="submit" class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600">
+
+                Guardar
             </button>
         </div>
     </form>
 </div>
 <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
     <dxo-position my="top" at="top" of="#taxform"> </dxo-position>
-  </dx-toast>
+</dx-toast>
