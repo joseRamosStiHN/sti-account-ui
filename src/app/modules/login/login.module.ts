@@ -8,9 +8,11 @@ import { LoginRoutingModule } from 'src/app/modules/login/login-routing.module';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginPageComponent } from 'src/app/modules/login/login-page/login-page.component';
+import { PasswordRecoveryComponent } from 'src/app/modules/login/password-recovery/password-recovery.component';
+import { DxToastModule } from 'devextreme-angular';
 
 @NgModule({
-  declarations: [LoginPageComponent],
+  declarations: [LoginPageComponent, PasswordRecoveryComponent],
   exports: [],
   imports: [
     CommonModule,
@@ -20,7 +22,9 @@ import { LoginPageComponent } from 'src/app/modules/login/login-page/login-page.
     ReactiveFormsModule,
     DxDataGridModule,
     DxButtonModule,
+    DxToastModule,
+
     HttpClientModule,
   ],
 })
-export class LoginModule {}
+export class LoginModule { }
