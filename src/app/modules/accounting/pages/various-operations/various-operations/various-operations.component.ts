@@ -301,7 +301,7 @@ export class VariousOperationsComponent {
         this.transactionService.postTransaction(transId).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Transacción publicada con exito';
+            this.messageToast = 'Transacción publicada con éxito.!';
             this.showToast = true;
 
             setTimeout(() => {

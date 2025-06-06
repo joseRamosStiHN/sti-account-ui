@@ -113,4 +113,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+    managePassword() {
+    this.router.navigate(['/dashboard/user/manage-password']);      
+    this.dropdownOpen = false;        
+  }
 }

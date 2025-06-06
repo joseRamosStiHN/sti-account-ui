@@ -9,9 +9,10 @@ import { UserEditComponent } from './pages/user-pages/user-edit/user-edit.compon
 import { UserCreateComponent } from './pages/user-pages/user-create/user-create.component';
 import { FormsModule } from '@angular/forms';
 import { DxDropDownBoxModule, DxListModule, DxTagBoxModule, DxToastModule } from 'devextreme-angular';
+import { ManagePasswordComponent } from 'src/app/modules/users/pages/user-pages/manage-password/manage-password.component';
 
 @NgModule({
-  declarations: [UserPagesComponent, UserEditComponent, UserCreateComponent],
+  declarations: [UserPagesComponent, UserEditComponent, UserCreateComponent, ManagePasswordComponent],
   imports: [
     CommonModule,
     FormsModule,

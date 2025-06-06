@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ManagePasswordComponent } from 'src/app/modules/users/pages/user-pages/manage-password/manage-password.component';
 import { UserCreateComponent } from 'src/app/modules/users/pages/user-pages/user-create/user-create.component';
 import { UserPagesComponent } from 'src/app/modules/users/pages/user-pages/user-pages.component';
 const routers: Routes = [
@@ -26,6 +27,10 @@ const routers: Routes = [
   {
     path: 'edit/:id/userByCompany/:companyId',
     component: UserCreateComponent,
+  },
+    {
+    path: 'manage-password',
+    component: ManagePasswordComponent,
   },
 ];
 

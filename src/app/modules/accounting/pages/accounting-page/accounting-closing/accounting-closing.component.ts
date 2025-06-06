@@ -52,9 +52,10 @@ export class AccountingClosingComponent {
     this.periodService.getInfoClosingPeriod().subscribe({
       next: (info) => {
         this.infoClosing = info;
-        const monthDate= new Date(info.endPeriod) ;
-        const monthName = monthDate.toLocaleString('es-ES', { month: 'long' });
-        this.titleNextPeriod = `Cierre de periodo ${info.typePeriod} ${monthName}`
+        const monthDate = new Date(info.endPeriod);
+        let monthName = monthDate.toLocaleString('es-ES', { month: 'long' });
+        monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1).toLowerCase();
+        this.titleNextPeriod = `Cierre de Período ${info.typePeriod} ${monthName}`;
       },
       error: (err) => {
         console.error('Error al obtener la información del periodo de cierre', err);
@@ -147,7 +148,7 @@ export class AccountingClosingComponent {
         this.periodService.closingPeriod(this.nextPeriod.closureType).subscribe({
           next: () => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Periodo Cerrdado Correctamente';
+            this.messageToast = 'Periodo Cerradado Correctamente';
             this.showToast = true;
 
             setTimeout(() => {

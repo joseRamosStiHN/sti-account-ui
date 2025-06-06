@@ -2,11 +2,21 @@
 <header class="w-[100%] z-auto">
   <nav class="border-b-2 h-14">
     <div class="flex justify-between gap-1 items-center p-2">
-      <a  (click)="goBack()" class="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer">
+      <a (click)="goBack()" class="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer">
 
         @if(nameCompany){
-          <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4">
 
+          <img [src]="'http://localhost:8081/api/v1/company/logo/' + companyId" alt="Logo"
+            class="h-10 w-12 rounded-lg shadow-md mb-3">
+
+          <h1 class="font-medium ml-2 text-xl">
+            {{ nameCompany }}
+          </h1>
+        </div>
+
+
+<<<<<<< HEAD
             <img [src]="apiLogo + companyId"  alt="Logo"
             class="h-10 w-12 rounded-lg shadow-md mb-3" >
             
@@ -19,19 +29,17 @@
           </div>
           
           
+=======
+>>>>>>> main
         }@else{
-          <img [src]="'assets/logoSti.jpeg'" class="h-8" alt="Logo" />
+        <img [src]="'assets/logoSti.jpeg'" class="h-8" alt="Logo" />
         }
 
-        <span
-          class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
-        ></span>
+        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"></span>
       </a>
 
       <div class="h-12" id="navbar-sticky">
-        <ul
-          class="flex gap-1 p-1 border-gray-700 xl:gap-5 md:gap-2 rounded-md text-sm z-[999]"
-        >
+        <ul class="flex gap-1 p-1 border-gray-700 xl:gap-5 md:gap-2 rounded-md text-sm z-[999]">
           @for (n of nav; track $index) {
           <li>
             @if(n.child) {
@@ -39,12 +47,9 @@
             <app-dropdown label="{{ n.label }}" [children]="n.child" />
 
             }@else {
-            <a
-              [routerLink]="n.path"
+            <a [routerLink]="n.path"
               class="block py-2 px-3 font-bold p-1.5 rounded hover:bg-blue-900 hover:text-slate-50"
-              aria-current="page"
-              >{{ n.label }}</a
-            >
+              aria-current="page">{{ n.label }}</a>
             }
           </li>
           }
@@ -53,43 +58,33 @@
 
       <div class="relative inline-block text-left">
         <div class="mb-2">
-          <button
-            type="button"
+          <button type="button"
             class="flex items-center text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-            (click)="toggleDropdown()"
-            id="user-menu-button"
-            aria-expanded="false"
-          >
+            (click)="toggleDropdown()" id="user-menu-button" aria-expanded="false">
             <span class="sr-only">Open user menu</span>
-            <small
-              class="w-8 h-8 rounded-full text-gray-400 flex items-center justify-center bg-gray-700"
-              alt="user photo"
-            >
+            <small class="w-8 h-8 rounded-full text-gray-400 flex items-center justify-center bg-gray-700"
+              alt="user photo">
               U
             </small>
           </button>
         </div>
-      
-        <div
-          *ngIf="dropdownOpen"
+
+        <div *ngIf="dropdownOpen"
           class="cursor-pointer absolute right-0 z-50 mt-2 w-48 origin-top-right bg-gray-200 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          role="menu"
-          aria-orientation="vertical"
-          aria-labelledby="user-menu-button"
-          tabindex="-1"
-        >
+          role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
           <div class="py-1" role="none">
-            <a
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-              (click)="logout()"
-            >
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" (click)="logout()">
               Cerrar Sesión
+            </a>
+          </div>
+          <div class="py-1" role="none">
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" (click)="managePassword()">
+              Gestionar Contraseña
             </a>
           </div>
         </div>
       </div>
-      
+
     </div>
   </nav>
 </header>
