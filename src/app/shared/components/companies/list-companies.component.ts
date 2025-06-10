@@ -247,6 +247,8 @@ export class ListCompaniesComponent implements OnInit {
         this.isAdmind = data.globalRoles.some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
         const { globalRoles, createdAt, ...rest } = data;
         localStorage.setItem('userData', JSON.stringify({ ...rest }));
+        localStorage.setItem('isAdmin', JSON.stringify(this.isAdmind));
+
         this.authService.setLogin(data);
 
       }

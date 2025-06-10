@@ -93,7 +93,4 @@ export class LoginPageComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  passwordRecovery() {
-    this.router.navigate(['/password-recovery']);
-  }
 }
