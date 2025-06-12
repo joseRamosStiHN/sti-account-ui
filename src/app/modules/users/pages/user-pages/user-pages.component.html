@@ -1,8 +1,7 @@
 <div class="container">
   <h2 class="font-medium text-2xl mt-2 mb-5">Usuarios</h2>
 
-  <dx-data-grid id="companiesGrid" [showBorders]="true"
-  [dataSource]="userList$ | async">
+  <dx-data-grid id="companiesGrid" [showBorders]="true" [dataSource]="userList$ | async">
     <dxi-column caption="Nombre Usuario" dataField="userName"></dxi-column>
     <dxi-column caption="Nombres" dataField="firstName"></dxi-column>
     <dxi-column caption="Apellidos" dataField="lastName"></dxi-column>
@@ -12,35 +11,31 @@
 
     <!-- <dxi-column caption="Roles" dataField="roles"></dxi-column> -->
 
-    <dxi-column
-      caption="Fecha de Creación"
-      dataField="createdAt"
-      dataType="date"
-    ></dxi-column>
+    <dxi-column caption="Fecha de Creación" dataField="createdAt" alignment="center" dataType="date"></dxi-column>
     <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
     <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
       <div *dxTemplate="let user of 'cellButtonTemplate'">
-          <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditUser(user.data)"></button>
+        <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditUser(user.data)"></button>
       </div>
-  </dxi-column>
-  <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
-  <div *dxTemplate="let user of 'detail'">
-    <div>
-      <div class="max-w-full p-4 bg-white shadow-sm rounded-lg mx-2 ">
-        <h1 class="text-xl font-semibold text-gray-800 mb-3">{{user.data.firstName}} {{user.data.lastName}}</h1>
+    </dxi-column>
+    <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
+    <div *dxTemplate="let user of 'detail'">
+      <div>
+        <div class="max-w-full p-4 bg-white shadow-sm rounded-lg mx-2 ">
+          <h1 class="text-xl font-semibold text-gray-800 mb-3">{{user.data.firstName}} {{user.data.lastName}}</h1>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
-          <div><span class="font-medium">Nombre Usuario:</span> {{user.data.userName}}</div>
-          <div><span class="font-medium">Dirección:</span> {{user.data.userAddress}}</div>
-          <div><span class="font-medium">Teléfono:</span> {{user.data.userPhone}}</div>
-          <div><span class="font-medium">Correo Electrónico:</span> <a class="text-blue-600 hover:underline">
-              {{user.data.email}}</a></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
+            <div><span class="font-medium">Nombre Usuario:</span> {{user.data.userName}}</div>
+            <div><span class="font-medium">Dirección:</span> {{user.data.userAddress}}</div>
+            <div><span class="font-medium">Teléfono:</span> {{user.data.userPhone}}</div>
+            <div><span class="font-medium">Correo Electrónico:</span> <a class="text-blue-600 hover:underline">
+                {{user.data.email}}</a></div>
+          </div>
         </div>
+
       </div>
 
     </div>
-
-  </div>
     <!--Toolbar-->
     <dxo-toolbar>
       <dxi-item location="before" name="groupPanel"></dxi-item>

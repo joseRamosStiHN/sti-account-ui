@@ -14,11 +14,11 @@ export class CompaniesService {
   private iscompanyLoging = new BehaviorSubject<CompanieResponse | null>(null);
   private companies = new BehaviorSubject<CompanieResponse[]>([]);
 
-  private companysMap = new BehaviorSubject< Map<number, CompanieResponse[]> >(new Map());
+  private companysMap = new BehaviorSubject<Map<number, CompanieResponse[]>>(new Map());
 
- 
-  companysMap$= this.companysMap.asObservable();
- 
+
+  companysMap$ = this.companysMap.asObservable();
+
   companies$ = this.companies.asObservable();
   companyLogin$ = this.iscompanyLoging.asObservable();
 
@@ -49,7 +49,7 @@ export class CompaniesService {
     *
     * @return response()
     */
-  getCompanysByUser(page:number,size:number): Observable<companyByUser> {    
+  getCompanysByUser(page: number, size: number): Observable<companyByUser> {
     return this.httpClient.get<companyByUser>(
       this.apiURL + `/api/v1/company/company-user?page=${page}&size=${size}`
     );
@@ -61,12 +61,12 @@ export class CompaniesService {
     *
     * @return response()
     */
-  getCompanyByUser(companieId:number): Observable<CompanieResponse> {
+  getCompanyByUser(companieId: number): Observable<CompanieResponse> {
     return this.httpClient.get<CompanieResponse>(
       this.apiURL + `/api/v1/company/user/${companieId}`
     );
   }
-  
+
 
 
   /**
@@ -140,17 +140,45 @@ export class CompaniesService {
   setCompanys(company: CompanieResponse[]) {
     this.companies.next(company);
   }
-  
-  getCompanies(){
+
+  getCompanies() {
     return this.companies.getValue();
   }
 
-  setLoadCompanysMap(company:  Map<number, CompanieResponse[]>) {
+  setLoadCompanysMap(company: Map<number, CompanieResponse[]>) {
     this.companysMap.next(company);
   }
-  
-  getLoadCompanysMap(){
+
+  getLoadCompanysMap() {
     return this.companysMap.getValue();
   }
 
+  deleteCompany(id: number, actionByUser: number): Observable<any> {
+    return this.httpClient
+      .delete<any>(
+        this.apiURL + `/api/v1/company/${id}/${actionByUser}`,
+        this.httpOptions
+      )
+      .pipe(catchError(this.errorHandler));
+  }
+
+  removeCompany(companyId: number) {
+    const currentMap = this.companysMap.getValue().get(0);
+    const filterCompany = currentMap?.filter((company, index) => {
+      if(company.id === companyId) {
+        return index;
+      }
+    });
+  
+  }
+
+  addCompany(company: CompanieResponse) {
+    const currentMap = this.companysMap.getValue();
+    const newMap = new Map(currentMap);
+    const listCompanies = newMap.get(company.id) ?? [];
+    listCompanies.push(company);
+    newMap.set(company.id, listCompanies);
+    this.companysMap.next(newMap);
+
+  }
 }

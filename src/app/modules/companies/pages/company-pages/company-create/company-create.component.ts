@@ -178,7 +178,7 @@ export class CompanyCreateComponent implements OnInit {
 
         this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
         this.toastType = typeToast.Success;
-        this.messageToast = 'Empresa registrada exitosamente';
+        this.messageToast = 'Empresa actualizada exitosamente';
         this.showToast = true;
         setTimeout(() => {
           this.goBack();

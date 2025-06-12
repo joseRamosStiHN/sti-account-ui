@@ -2,7 +2,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
-import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { CompanieResponse, CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { typeToast } from 'src/app/modules/accounting/models/models';
+import { ToastType } from 'devextreme/ui/toast';
+import { confirm } from 'devextreme/ui/dialog';
+import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 
 @Component({
   selector: 'app-company-pages',
@@ -10,14 +14,27 @@ import { CompanyResponse } from 'src/app/modules/companies/models/ApiModelsCompa
   styleUrl: './company-pages.component.css',
 })
 export class CompanyPagesComponent implements OnInit {
-  
-  
+
+  messageToast: string = '';
+  showToast: boolean = false;
+  toastType: ToastType = typeToast.Info;
+  userId?: number;
+  userList$: UsersResponse[] = [];
+  imageBase64: string = '';
+
   companyList$: Observable<CompanyResponse[]> | undefined;
   private readonly router = inject(Router);
   private readonly companyService = inject(CompaniesService);
 
   ngOnInit(): void {
-   this.companyList$ = this.companyService.getAllCompanies();
+    const savedUser = localStorage.getItem('userData');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      this.userId = user.id
+    }
+
+
+    this.companyList$ = this.companyService.getAllCompanies();
   }
 
   addCompany(): void {
@@ -25,11 +42,83 @@ export class CompanyPagesComponent implements OnInit {
   }
 
   goBack() {
-    window.history.back();
+    window.location.reload();
   }
 
   onEditCompany(e: any) {
     this.router.navigate(['/dashboard/companies/edit', e.id]);
+  }
+
+
+  async onToggleCompany(event: Event, data: any) {
+    const inputElement = event.target as HTMLInputElement;
+    const newState = inputElement.checked;
+    const originalState = data.data.active;
+
+    inputElement.checked = originalState;
+
+    const action = newState ? 'activar' : 'desactivar';
+    const message = `¿Está seguro de que desea ${action} la empresa ${data.data.name}?`;
+
+    const result = await confirm(message, 'Advertencia');
+
+    if (!result) {
+      return;
+    }
+
+
+    data.data.active = newState;
+
+    const users = this.userList$
+      .filter(users => users.roles && users.roles.length > 0)
+      .map(user => ({
+        id: user.id,
+        roles: user.roles.map((role: any) => ({ id: role }))
+      }));
+
+    const companyRequest = {
+      ...data.data,
+      users: users,
+      companyLogo: this.imageBase64,
+      isActive: newState
+    };
+
+    this.companyService.updateCompany(companyRequest, companyRequest.id, Number(this.userId)).subscribe({
+      next: () => {
+        this.toastType = typeToast.Success;
+        this.messageToast = `Empresa ${action === 'activar' ? 'activada' : 'desactivada'} correctamente`;
+        this.showToast = true;
+      },
+      error: (err) => {
+        console.error('Error updating company:', err);
+        data.data.active = originalState;
+        this.toastType = typeToast.Error;
+        this.messageToast = `Error al ${action} la empresa`;
+        this.showToast = true;
+      },
+    });
+
+    if (action === 'activar') {
+      const companyResponse: CompanieResponse = {
+        id: 3,
+        name: 'Bac',
+        description: 'descripcion',
+        address: 'asdasd',
+        rtn: '14123123',
+        type: '1',
+        email: 'asdasd',
+        phone: '12a312',
+        website: 'asdasd',
+        tenantId: 'asdasd',
+        createdAt: 'asdasd',
+        roles: [],
+        active: true
+      };
+      this.companyService.addCompany(companyResponse);
+    } else {
+      this.companyService.removeCompany(data.data.id)
+
+    }
   }
 
 }

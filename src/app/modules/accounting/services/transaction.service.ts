@@ -56,7 +56,7 @@ export class TransactionService {
   getAllTransactionByDocumentType(
     documentId: number
   ): Observable<TransactionResponse[]> {
-    const url = this.apiURL +`/api/v1/transaction/by-document/${documentId}`;
+    const url = this.apiURL + `/api/v1/transaction/by-document/${documentId}`;
     return this.httpClient.get<TransactionResponse[]>(url).pipe(
       catchError(() => {
         console.error('catch error in service');
@@ -70,7 +70,7 @@ export class TransactionService {
   getTransactionByDate(dateInit: Date, dateEnd: Date): Observable<TransactionResponse[]> {
     let dateInitFormat: string = this.formateDate(dateInit);
     let dateEndFormat: string = this.formateDate(dateEnd);
-    
+
     const url = `${this.apiURL}/api/v1/transaction/date-range?start=${dateInitFormat}&end=${dateEndFormat}`;
     return this.httpClient.get<TransactionResponse[]>(url).pipe(
       catchError(() => {
@@ -107,19 +107,19 @@ export class TransactionService {
     return this.httpClient.put(url, transaccion, this.httpOptions);
   }
 
-  putAllTransaction(transacctions: number []): Observable<any> {
+  putAllTransaction(transacctions: number[]): Observable<any> {
     const url = `${this.apiURL}/api/v1/transaction/confirm-transactions`;
-    return this.httpClient.put(url,transacctions, this.httpOptions);
+    return this.httpClient.put(url, transacctions, this.httpOptions);
   }
 
-  putAllDebitNotes(debitNotes: number []): Observable<any> {
+  putAllDebitNotes(debitNotes: number[]): Observable<any> {
     const url = `${this.apiURL}/api/v1/debit-notes/confirm-debit-notes`;
-    return this.httpClient.put(url,debitNotes, this.httpOptions);
+    return this.httpClient.put(url, debitNotes, this.httpOptions);
   }
 
-  putAllCreditNotes(creditNotes: number []): Observable<any> {
+  putAllCreditNotes(creditNotes: number[]): Observable<any> {
     const url = `${this.apiURL}/api/v1/credit-notes/confirm-credit-notes`;
-    return this.httpClient.put(url,creditNotes, this.httpOptions);
+    return this.httpClient.put(url, creditNotes, this.httpOptions);
   }
 
 
@@ -135,12 +135,12 @@ export class TransactionService {
   }
 
 
-   /**
- * Method that brings a list with all seniorsAccounts
- *
- * @return response()
- */
-   getAllSeniorAccounts(): Observable<any[]> {
+  /**
+* Method that brings a list with all seniorsAccounts
+*
+* @return response()
+*/
+  getAllSeniorAccounts(): Observable<any[]> {
     return this.httpClient.get<any[]>(
       this.apiURL + '/api/v1/senior-accountants'
     );
@@ -218,18 +218,18 @@ export class TransactionService {
   }
 
 
-    /**
-  * Method that brings a list adjusjentment
-  *
-  * @return response()
-  */
-    getAllNotasDebits(): Observable<any> {
-      return this.httpClient
-        .get(this.apiURL + '/api/v1/debit-notes')
-  
-        .pipe(catchError(this.errorHandler));
-    }
-  
+  /**
+* Method that brings a list adjusjentment
+*
+* @return response()
+*/
+  getAllNotasDebits(): Observable<any> {
+    return this.httpClient
+      .get(this.apiURL + '/api/v1/debit-notes')
+
+      .pipe(catchError(this.errorHandler));
+  }
+
 
   getNoteCreditById(id: number): Observable<any> {
     const url = `${this.apiURL}/api/v1/credit-notes/${id}`;
@@ -244,9 +244,9 @@ export class TransactionService {
 
 
   putStatusCreditNotes(id: number): Observable<any> {
-    
+
     const transaccion = [id];
-    
+
     const url = `${this.apiURL}/api/v1/credit-notes/confirm-credit-notes`;
 
     return this.httpClient.put(url, transaccion, this.httpOptions);
@@ -278,5 +278,50 @@ export class TransactionService {
 
   formateDate(date: any): string {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  getAllTransactionByDocumentTypeDeleteCompany(
+    documentId: number,
+    tenantId?: string
+  ): Observable<TransactionResponse[]> {
+    let headers = this.httpOptions.headers;
+
+    if (tenantId) {
+      headers = headers.set('tenantId', tenantId);
+    }
+
+    const options = {
+      ...this.httpOptions,
+      headers: headers
+    };
+
+    const url = this.apiURL + `/api/v1/transaction/by-document/${documentId}`;
+    return this.httpClient.get<TransactionResponse[]>(url, options).pipe(
+      catchError(() => {
+        console.error('catch error in service');
+        return throwError(() => {
+          return new Error('No se puedo obtener la data.');
+        });
+      })
+    );
+  }
+
+  checkCompanyTransactions(tenantId?: string): Observable<any> {
+
+    let headers = this.httpOptions.headers;
+
+    if (tenantId) {
+      headers = headers.set('tenantId', tenantId);
+    }
+
+    const options = {
+      ...this.httpOptions,
+      headers: headers
+    };
+
+    return this.httpClient
+      .get(this.apiURL + '/api/v1/transaction', options)
+
+      .pipe(catchError(this.errorHandler));
   }
 }
