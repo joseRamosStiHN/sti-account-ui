@@ -44,7 +44,6 @@ export const routes: Routes = [
       },
       {
         path: 'user',
-        canActivate: [AdminGuard],
         loadChildren: () =>
           import('./modules/users/users.module').then((m) => m.UsersModule),
       },

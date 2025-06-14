@@ -100,19 +100,19 @@ export class CompanyPagesComponent implements OnInit {
 
     if (action === 'activar') {
       const companyResponse: CompanieResponse = {
-        id: 3,
-        name: 'Bac',
-        description: 'descripcion',
-        address: 'asdasd',
-        rtn: '14123123',
-        type: '1',
-        email: 'asdasd',
-        phone: '12a312',
-        website: 'asdasd',
-        tenantId: 'asdasd',
-        createdAt: 'asdasd',
-        roles: [],
-        active: true
+        id: data.data.id,
+        name: data.data.name,
+        description: data.data.description,
+        address: data.data.address,
+        rtn: data.data.rtn,
+        type: data.data.type,
+        email: data.data.email,
+        phone: data.data.phone,
+        website: data.data.website,
+        tenantId: data.data.tenantId,
+        createdAt: data.data.createdAt,
+        roles: data.data.roles,
+        active: data.data.active
       };
       this.companyService.addCompany(companyResponse);
     } else {
