@@ -35,6 +35,7 @@ export class CompanyCreateComponent implements OnInit {
   imagePreview: string | ArrayBuffer | null = null;
   imageBase64: string = '';
   imageChanged = false;
+  rtnExists: boolean = false;
 
   @Input('id') id?: number;
 
@@ -130,6 +131,24 @@ export class CompanyCreateComponent implements OnInit {
     console.log(this.accountsFromSystem);
   }
 
+  fullName(data: any): string {
+    return `${data.firstName} ${data.lastName}`;
+  }
+
+
+  async checkRtnExists(rtn: string): Promise<boolean> {
+    if (!rtn) return false;
+
+    try {
+      const companies = await lastValueFrom(this.companyService.getAllCompanies());
+      return companies.some(company => company.rtn === rtn && (!this.id || company.tenantId !== this.companyForm.tenantId));
+    } catch (error) {
+      console.error('Error checking RTN:', error);
+      return false;
+    }
+  }
+
+
 
   async onSubmit(e: NgForm) {
 
@@ -139,6 +158,22 @@ export class CompanyCreateComponent implements OnInit {
       this.showToast = true;
       return;
     }
+
+    if (!this.imagePreview && !this.imageChanged && !this.id) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Por favor seleccione una imagen.';
+      this.showToast = true;
+      return;
+    }
+
+    this.rtnExists = await this.checkRtnExists(this.companyForm.rtn);
+    if (this.rtnExists) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'El RTN ingresado ya está registrado.';
+      this.showToast = true;
+      return;
+    }
+
 
     if (e.valid) {
       if (this.id) {
@@ -164,10 +199,13 @@ export class CompanyCreateComponent implements OnInit {
 
     if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
-      this.messageToast = 'Seleccione al menos un Usuario';
+      this.messageToast = 'Seleccione al menos un rol para el usuario.';
       this.showToast = true;
       return
     }
+
+    this.imageChanged = true;
+    this.imagePreview = `data:image/png;base64,${this.imageBase64}`;
 
     this.companyService.updateCompany(this.companyForm, Number(this.id), Number(this.userId)).subscribe({
       next: (data) => {
@@ -178,9 +216,11 @@ export class CompanyCreateComponent implements OnInit {
 
         this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
         this.toastType = typeToast.Success;
-        this.messageToast = 'Empresa registrada exitosamente';
+        this.messageToast = 'Empresa actualizada exitosamente';
         this.showToast = true;
         setTimeout(() => {
+          this.imageChanged = false;
+
           this.goBack();
         }, 1000);
 
@@ -190,6 +230,8 @@ export class CompanyCreateComponent implements OnInit {
         this.toastType = typeToast.Error;
         this.messageToast = 'Error al crear el Empresa';
         this.showToast = true;
+        this.imageChanged = false;
+
       },
     });
 
@@ -211,7 +253,7 @@ export class CompanyCreateComponent implements OnInit {
 
     if (this.companyForm.users.length == 0) {
       this.toastType = typeToast.Error;
-      this.messageToast = 'Seleccione al menos un usuario';
+      this.messageToast = 'Seleccione al menos un rol para el usuario.';
       this.showToast = true;
       return
     }

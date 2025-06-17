@@ -5,12 +5,8 @@
       <div class="form w-full">
         <label for="firstName" class="block mb-2 text-sm text-gray-900">Nombres:</label>
         <input placeholder="Luis" required="true" name="firstName" id="firstName" type="text"
-          [(ngModel)]="userForm.firstName"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500
-           focus:outline-none "
-          required 
-          
-          />
+          [(ngModel)]="userForm.firstName" class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500
+           focus:outline-none " required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['firstName'].getError('required')">
           <small class="text-xs text-red-900">Nombre es requerido.</small>
         </div>
@@ -18,10 +14,8 @@
       <div class="form w-full">
         <label for="lastName" class="block mb-2 text-sm text-gray-900">Apellidos:</label>
         <input placeholder="Martinez" required="true" name="lastName" id="lastName" type="text"
-          [(ngModel)]="userForm.lastName"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
-           focus:border-blue-500 focus:outline-none"
-          required />
+          [(ngModel)]="userForm.lastName" class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
+           focus:border-blue-500 focus:outline-none" required />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['lastName'].getError('required')">
           <small class="text-xs text-red-900">Apellido es requerido.</small>
         </div>
@@ -54,14 +48,12 @@
         </div>
       </div>
 
-      <div class="form" *ngIf="id == null">
+ <!--      <div class="form" *ngIf="id == null">
         <label for="password" class="block mb-2 text-sm text-gray-900">Contraseña:</label>
         <div class="relative">
           <input [(ngModel)]="txtPassword" type="password" maxlength="20" name="password" id="password"
-          autocomplete="new-password"
-            class="block w-full p-1.5 text-sm text-gray-900 border border-gray-300 rounded-lg
-             focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            [required]="id != null ? false : true"/>
+            autocomplete="new-password" class="block w-full p-1.5 text-sm text-gray-900 border border-gray-300 rounded-lg
+             focus:ring-blue-500 focus:border-blue-500 focus:outline-none" [required]="id != null ? false : true" />
           <div *ngIf="itemForm.submitted && itemForm.form.controls['password'].getError('required')">
             <small class="text-xs text-red-900">Contraseña es requerida.</small>
           </div>
@@ -81,60 +73,59 @@
       <div class="form" *ngIf="id == null">
         <label for="txtRepeatPassword" class="block mb-2 text-sm text-gray-900">Repetir Contraseña:</label>
         <input [(ngModel)]="txtConfirmPassword" required="true" name="txtRepeatPassword" id="txtRepeatPassword"
-          type="password"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
-           focus:border-blue-500 focus:outline-none"
-          [required]="id != null ? false : true"/>
+          type="password" class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500
+           focus:border-blue-500 focus:outline-none" [required]="id != null ? false : true" />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['txtRepeatPassword'].getError('required')">
           <small class="text-xs text-red-900">Repetir Contraseña es requerida.</small>
         </div>
-      </div>
+      </div> -->
 
       <div class="form">
         <label for="email" class="block mb-2 text-sm text-gray-900">Correo Electrónico:</label>
         <input required="true" name="email" id="email" type="email" [(ngModel)]="userForm.email"
           class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          required email required />
+          email required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
         <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
           <small class="text-xs text-red-900">Correo Electrónico es requerido.</small>
         </div>
-        <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
+        <div
+          *ngIf="itemForm.submitted && (itemForm.form.controls['email'].getError('email') || itemForm.form.controls['email'].getError('pattern'))">
           <small class="text-xs text-red-900">Formato de correo invalido.</small>
         </div>
       </div>
-      <div class="form col-span-2">
-        <label for="txtAddress" class="block mb-2 text-sm text-gray-900">Dirección:</label>
-        <input required="true" name="txtAddress" id="txtAddress" type="text"
-        [(ngModel)]="userForm.userAddress"
-          class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg
-           focus:ring-blue-500 focus:border-blue-500 focus:outline-none" />
-
+     <div class="form">
+        <label for="userAddress" class="block mb-2 text-sm text-gray-900">Dirección:</label>
+        <input required="true" name="userAddress" id="userAddress" type="text" [(ngModel)]="userForm.userAddress" class="border block w-full p-1.5 border-gray-300 text-sm rounded-lg
+           focus:ring-blue-500 focus:border-blue-500 focus:outline-none" required />
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['userAddress'].getError('required')">
+          <small class="text-xs text-red-900">Dirección es requerida.</small>
+        </div>
       </div>
 
       <br>
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
         <legend class="font-medium ml-2">Empresas</legend>
-        <dx-data-grid id="companyUser Grid" [showBorders]="true" [dataSource]="companyList$" 
-                       [selection]="{ mode: 'single' }" (onSelectionChanged)="onCompanySelectionChanged($event)">
+        <dx-data-grid id="companyUser Grid" [showBorders]="true" [dataSource]="companyList$"
+          [selection]="{ mode: 'single' }" (onSelectionChanged)="onCompanySelectionChanged($event)">
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-group-panel [visible]="false"></dxo-group-panel>
           <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
-          
+
           <dxi-column caption="Nombre" dataField="name" [allowEditing]="false"></dxi-column>
-          
-          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false"
-                      editCellTemplate="tagBoxEditor" [cellTemplate]="cellTemplate">
+
+          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false" editCellTemplate="tagBoxEditor"
+            [cellTemplate]="cellTemplate">
             <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
             </dxo-lookup>
           </dxi-column>
-          
+
           <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
             <dx-tag-box [dataSource]="rolesCompanys$" [value]="cellInfo.value" valueExpr="id" displayExpr="name"
-                        [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
-                        [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
-                        (onValueChanged)="cellInfo.setValue($event.value)"
-                        (onSelectionChanged)="cellInfo.component.updateDimensions()">
+              [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
+              [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
+              (onValueChanged)="cellInfo.setValue($event.value)"
+              (onSelectionChanged)="cellInfo.component.updateDimensions()">
             </dx-tag-box>
           </div>
         </dx-data-grid>
