@@ -17,6 +17,7 @@ export class LoginPageComponent implements OnInit {
   messageToast: string = '';
   showToast: boolean = false;
   loginForm: LoginRequest;
+  loading: boolean = false;
 
   backgroundStyle = {
     'background-image': 'url("/assets/accounting-bg.jpg")',
@@ -63,31 +64,37 @@ export class LoginPageComponent implements OnInit {
   }
 
   onSubmit(e: NgForm) {
-
     this.trimUsername();
+    this.loading = true;
+    this.errorLogin = false;
 
     if (!e.valid) {
       this.toastType = typeToast.Error;
       this.messageToast = 'Por favor, complete todos los campos requeridos.';
       this.showToast = true;
+      this.loading = false;
       return;
     }
 
-    if (e.valid) {
-      this.authService.login(this.loginForm).subscribe({
-        next: (n: any) => {
-          if (n.active) {
-            this.authService.setLogin(n);
-            this.router.navigate(['/dashboard']);
-          }
-        },
-        error: (err: any) => {
-          this.errorLogin = true;
+    this.authService.login(this.loginForm).subscribe({
+      next: (response: any) => {
+        if (response.active) {
+          this.authService.setLogin(response);
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.toastType = typeToast.Warning;
+          this.messageToast = 'Usuario inactivo. Por favor, contacte al administrador.';
+          this.showToast = true;
         }
-      });
-
-    }
+        this.loading = false;
+      },
+      error: (err: any) => {
+        this.errorLogin = true;
+        this.loading = false;
+      }
+    });
   }
+
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;

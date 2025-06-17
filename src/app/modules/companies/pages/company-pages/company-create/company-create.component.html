@@ -24,7 +24,9 @@
             <span class="text-gray-500 text-xs">Selecciona una imagen</span>
             <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
           </label>
-
+          <div *ngIf="itemForm.submitted && !imagePreview && !imageChanged && !id" class="text-xs text-red-900 mt-1">
+            <small>Por favor seleccione una imagen.</small>
+          </div>
 
 
         </div>
@@ -54,14 +56,16 @@
             <label for="rtn" class="block mb-2 text-sm text-gray-900">RTN:</label>
             <input id="rtn" name="rtn" type="text" [(ngModel)]="companyForm.rtn"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder="" required pattern="[0-9]*" />
+              placeholder="" required pattern="[0-9]{14}" minlength="14" maxlength="14" />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].getError('required')">
               <small class="text-xs text-red-900">RTN es requerido.</small>
             </div>
             <div *ngIf="itemForm.submitted && itemForm.form.controls['rtn'].hasError('pattern')">
-
               <small class="text-xs text-red-900">Solo se permiten números.</small>
-
+            </div>
+            <div
+              *ngIf="(itemForm.form.controls['rtn'].hasError('minlength') || itemForm.form.controls['rtn'].hasError('maxlength'))">
+              <small class="text-xs text-red-900">El RTN es inválido debe tener 14 caracteres.</small>
             </div>
           </div>
 
@@ -81,12 +85,13 @@
             <label for="email" class="block mb-2 text-sm text-gray-900">Correo Electrónico:</label>
             <input id="email" name="email" type="email" [(ngModel)]="companyForm.email"
               class="border block w-full p-2 border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-              placeholder="" email required />
+              placeholder="" email required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('required')">
               <small class="text-xs text-red-900">Correo Electrónico es requerido.</small>
             </div>
-            <div *ngIf="itemForm.submitted && itemForm.form.controls['email'].getError('email')">
-              <small class="text-xs text-red-900">Formato de correo invalido.</small>
+            <div
+              *ngIf="itemForm.submitted && (itemForm.form.controls['email'].getError('email') || itemForm.form.controls['email'].getError('pattern'))">
+              <small class="text-xs text-red-900">Formato de correo inválido.</small>
             </div>
           </div>
           <div class="form">
@@ -162,8 +167,8 @@
           <dxo-paging [enabled]="false"></dxo-paging>
           <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
           </dxo-editing>
-          <dxi-column caption="Nombre" dataField="firstName" [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false" editCellTemplate="tagBoxEditor"
+          <dxi-column caption="Nombre" [calculateCellValue]="fullName" [allowEditing]="false"></dxi-column> <dxi-column
+            dataField="roles" caption="Roles" [allowSorting]="false" editCellTemplate="tagBoxEditor"
             [cellTemplate]="cellTemplate">
             <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
             </dxo-lookup>

@@ -66,11 +66,19 @@ export class CompanyPagesComponent implements OnInit {
       return;
     }
 
-
     data.data.active = newState;
 
+    const companyRoles = data.data.users.flatMap((userCompany: any) =>
+      userCompany.roles.map((role: any) => ({
+        id: role.id,
+        name: role.name,
+        description: role.description,
+        global: role.global
+      }))
+    );
+
     const users = this.userList$
-      .filter(users => users.roles && users.roles.length > 0)
+      .filter(user => user.roles && user.roles.length > 0)
       .map(user => ({
         id: user.id,
         roles: user.roles.map((role: any) => ({ id: role }))
@@ -88,37 +96,37 @@ export class CompanyPagesComponent implements OnInit {
         this.toastType = typeToast.Success;
         this.messageToast = `Empresa ${action === 'activar' ? 'activada' : 'desactivada'} correctamente`;
         this.showToast = true;
+
+        if (action === 'activar') {
+          const companyResponse: CompanieResponse = {
+            id: data.data.id,
+            name: data.data.name,
+            description: data.data.description,
+            address: data.data.address,
+            rtn: data.data.rtn,
+            type: data.data.type,
+            email: data.data.email,
+            phone: data.data.phone,
+            website: data.data.website,
+            tenantId: data.data.tenantId,
+            createdAt: data.data.createdAt,
+            roles: companyRoles,
+            active: data.data.active
+          };
+          this.companyService.addCompany(companyResponse);
+        } else {
+          this.companyService.removeCompany(data.data.id);
+        }
       },
       error: (err) => {
         console.error('Error updating company:', err);
         data.data.active = originalState;
+        inputElement.checked = originalState;
         this.toastType = typeToast.Error;
         this.messageToast = `Error al ${action} la empresa`;
         this.showToast = true;
       },
     });
-
-    if (action === 'activar') {
-      const companyResponse: CompanieResponse = {
-        id: data.data.id,
-        name: data.data.name,
-        description: data.data.description,
-        address: data.data.address,
-        rtn: data.data.rtn,
-        type: data.data.type,
-        email: data.data.email,
-        phone: data.data.phone,
-        website: data.data.website,
-        tenantId: data.data.tenantId,
-        createdAt: data.data.createdAt,
-        roles: data.data.roles,
-        active: data.data.active
-      };
-      this.companyService.addCompany(companyResponse);
-    } else {
-      this.companyService.removeCompany(data.data.id)
-
-    }
   }
 
 }

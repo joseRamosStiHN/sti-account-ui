@@ -7,8 +7,8 @@
     <dxi-column caption="Apellidos" dataField="lastName"></dxi-column>
 
     <dxi-column caption="Correo" dataField="email"></dxi-column>
-    <dxi-column caption="Estado" dataField="active"></dxi-column>
-
+    <dxi-column caption="Estado" dataField="active" alignment="center" width="150"
+      cellTemplate="cellTemplate"></dxi-column>
     <!-- <dxi-column caption="Roles" dataField="roles"></dxi-column> -->
 
     <dxi-column caption="Fecha de Creación" dataField="createdAt" alignment="center" dataType="date"></dxi-column>
@@ -18,6 +18,23 @@
         <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditUser(user.data)"></button>
       </div>
     </dxi-column>
+
+    <div *dxTemplate="let data of 'cellTemplate'">
+      <label class="inline-flex items-center cursor-pointer">
+        <input type="checkbox" [checked]="data.data.active" (change)="onToggleUser($event, data)"
+          class="sr-only peer">
+
+        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
+                 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
+                 peer dark:bg-gray-700 peer-checked:after:translate-x-full 
+                 rtl:peer-checked:after:-translate-x-full
+                  peer-checked:after:border-white after:content-[''] 
+                  after:absolute after:top-[2px] after:start-[2px] after:bg-white
+                   after:border-gray-300 after:border after:rounded-full after:h-5 
+                   after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+        </div>
+      </label>
+    </div>
     <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
     <div *dxTemplate="let user of 'detail'">
       <div>
@@ -51,3 +68,7 @@
     <dxo-group-panel [visible]="true"></dxo-group-panel>
   </dx-data-grid>
 </div>
+
+<dx-toast [(visible)]="showToast" [message]="messageToast" [type]="toastType" [displayTime]="4000"
+  [position]="{ my: { x: 'center', y: 'top' }, at: { x: 'center', y: 'top' }, offset: '0 60' }">
+</dx-toast>

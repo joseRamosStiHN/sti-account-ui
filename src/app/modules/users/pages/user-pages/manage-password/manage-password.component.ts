@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { AbstractControl, NgForm, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastType } from 'devextreme/ui/toast';
 import { typeToast } from 'src/app/modules/accounting/models/models';
@@ -11,6 +11,38 @@ interface PasswordData {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
+}
+
+// Agrega esta función dentro de tu componente (antes de @Component)
+function validatePasswordStrength(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+  if (!value) {
+    return null;
+  }
+
+  const hasUpperCase = /[A-Z]/.test(value);
+  const hasLowerCase = /[a-z]/.test(value);
+  const hasNumber = /[0-9]/.test(value);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+  const isLengthValid = value.length >= 8;
+
+  if (!hasUpperCase) {
+    return { noUpperCase: true };
+  }
+  if (!hasLowerCase) {
+    return { noLowerCase: true };
+  }
+  if (!hasNumber) {
+    return { noNumber: true };
+  }
+  if (!hasSpecialChar) {
+    return { noSpecialChar: true };
+  }
+  if (!isLengthValid) {
+    return { minlength: { requiredLength: 8, actualLength: value.length } };
+  }
+
+  return null;
 }
 
 @Component({
@@ -60,7 +92,7 @@ export class ManagePasswordComponent {
     }
   }
 
-onSubmit(form: NgForm) {
+  onSubmit(form: NgForm) {
     if (form.valid && this.passwordData.newPassword === this.passwordData.confirmPassword) {
       this.isLoading = true;
 
@@ -86,7 +118,7 @@ onSubmit(form: NgForm) {
     this.showToastMessage('Contraseña cambiada exitosamente. Serás redirigido para iniciar sesión.', typeToast.Success);
     form.resetForm();
     this.passwordData = { currentPassword: '', newPassword: '', confirmPassword: '' };
-    
+
     setTimeout(() => {
       this.authService.logout().subscribe({
         next: () => this.router.navigate(['/login']),
@@ -100,7 +132,7 @@ onSubmit(form: NgForm) {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ocurrió un error inesperado. Por favor intente nuevamente.';
-    
+
     if (error.status === 400) {
       if (Array.isArray(error.error)) {
         errorMessage = error.error[0]?.message || 'Error de validación';
@@ -120,6 +152,45 @@ onSubmit(form: NgForm) {
     this.toastType = type;
     this.showToast = true;
     setTimeout(() => this.showToast = false, 5000);
+  }
+
+  validatePasswordStrength(control: AbstractControl): void {
+    const value = control.value;
+    if (!value) {
+      control.setErrors(null);
+      return;
+    }
+
+    const errors: ValidationErrors = {};
+
+    if (!/[A-Z]/.test(value)) {
+      errors['noUpperCase'] = true;
+    }
+    if (!/[a-z]/.test(value)) {
+      errors['noLowerCase'] = true;
+    }
+    if (!/[0-9]/.test(value)) {
+      errors['noNumber'] = true;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+      errors['noSpecialChar'] = true;
+    }
+    if (value.length < 8) {
+      errors['minlength'] = { requiredLength: 8, actualLength: value.length };
+    }
+
+    const currentErrors = control.errors || {};
+    const otherErrors = Object.keys(currentErrors)
+      .filter(key => !['required','noUpperCase', 'noLowerCase', 'noNumber', 'noSpecialChar', 'minlength'].includes(key))
+      .reduce((obj, key) => {
+        obj[key] = currentErrors[key];
+        return obj;
+      }, {} as ValidationErrors);
+
+    const newErrors = Object.keys(errors).length > 0 ? { ...otherErrors, ...errors } :
+      Object.keys(otherErrors).length > 0 ? otherErrors : null;
+
+    control.setErrors(newErrors);
   }
 
 }

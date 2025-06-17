@@ -78,3 +78,7 @@
     </form>
   </div>
 </div>
+
+<dx-toast [(visible)]="showToast" [message]="messageToast" [type]="toastType" [displayTime]="4000"
+  [position]="{ my: { x: 'center', y: 'top' }, at: { x: 'center', y: 'top' }, offset: '0 60' }">
+</dx-toast>
