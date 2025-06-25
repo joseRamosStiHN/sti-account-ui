@@ -50,8 +50,8 @@ export class AccountComponent implements OnInit {
   toastType: ToastType = typeToast.Info;
   accountFatherIsRequired: boolean = false;
 
-  hasTransaction:boolean= false;
-  hasChildAccounts:boolean= false;
+  hasTransaction: boolean = false;
+  hasChildAccounts: boolean = false;
 
 
   private readonly router = inject(Router);
@@ -111,6 +111,7 @@ export class AccountComponent implements OnInit {
   }
 
   onSubmit(e: NgForm) {
+
     if (e.valid) {
       if (!this.id) {
         this.createAccount();
@@ -176,7 +177,7 @@ export class AccountComponent implements OnInit {
       code = this.accountPrefix + '-' + this.accountForm.code;
       this.accountForm.code = code;
     }
-    this.accountForm.status = this.accountForm.isActive ? "ACTIVO": "INACTIVO";
+    this.accountForm.status = this.accountForm.isActive ? "ACTIVO" : "INACTIVO";
     this.accountService
       .updateAccount(Number(this.id), this.accountForm)
       .subscribe({
@@ -239,7 +240,7 @@ export class AccountComponent implements OnInit {
 
     this.accountForm.accountType = data.accountType;
     this.accountFatherIsRequired = data.supportEntry;
-    this.accountForm.asTransaction= data.asTransaction;
+    this.accountForm.asTransaction = data.asTransaction;
 
     this.hasTransaction = data.asTransaction;
     this.hasChildAccounts = data.hasChildAccounts;

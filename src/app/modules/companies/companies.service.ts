@@ -33,7 +33,7 @@ export class CompaniesService {
     }),
   };
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
   /**
    * Method that brings a list with all the companies
@@ -193,5 +193,12 @@ export class CompaniesService {
 
     // Publicar el nuevo Map
     this.companysMap.next(newMap);
+  }
+
+  getCompanyLogo(companyId: number): Observable<Blob> {
+    return this.httpClient.get(
+      this.apiURL + `/api/v1/company/logo/${companyId}`,
+      { responseType: 'blob' }
+    );
   }
 }

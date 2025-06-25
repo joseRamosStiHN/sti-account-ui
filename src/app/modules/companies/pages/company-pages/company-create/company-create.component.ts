@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { filter, from, lastValueFrom, map, mergeMap, Observable, pipe, toArray } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
@@ -12,6 +12,7 @@ import { PeriodService } from 'src/app/modules/accounting/services/period.servic
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { error } from 'console';
 import { environment } from '@environment/environment';
+import { DxDataGridComponent } from 'devextreme-angular';
 
 @Component({
   selector: 'app-company-create',
@@ -19,6 +20,10 @@ import { environment } from '@environment/environment';
   styleUrl: './company-create.component.css',
 })
 export class CompanyCreateComponent implements OnInit {
+
+  @ViewChild(DxDataGridComponent) dataGrid!: DxDataGridComponent;
+  @Input('id') id?: number;
+
   accountsFromSystem: number = 1;
 
   companyList$: Observable<CompanyResponse[]> | undefined;
@@ -37,7 +42,7 @@ export class CompanyCreateComponent implements OnInit {
   imageChanged = false;
   rtnExists: boolean = false;
 
-  @Input('id') id?: number;
+
 
   tenantId: string = '';
   userId?: number;
@@ -46,6 +51,10 @@ export class CompanyCreateComponent implements OnInit {
 
   apiLogo = environment.SECURITY_API_URL + '/api/v1/company/logo/'
 
+  searchTerm: string = '';
+  filteredUsers: UsersResponse[] = [];
+  originalUsers: UsersResponse[] = [];
+  private searchTextBox: any;
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -85,6 +94,8 @@ export class CompanyCreateComponent implements OnInit {
 
     const users = await lastValueFrom(this.userService.getAllUsers());
     this.userList$ = users;
+    this.originalUsers = [...users];
+    this.filteredUsers = [...users];
 
     const roles = await lastValueFrom(this.userService.getAllRoles());
     this.rolesCompanys$ = roles.filter(roles => !roles.global).map(roles => {
@@ -384,6 +395,50 @@ export class CompanyCreateComponent implements OnInit {
     }
   }
 
+  searchHandler = (e: any) => {
+    this.searchTerm = e.value;
+    this.filterUsers();
+
+    setTimeout(() => {
+      if (this.searchTextBox) {
+        this.searchTextBox.focus();
+      }
+    }, 100);
+  };
+
+  onToolbarPreparing(e: any) {
+    e.toolbarOptions.items.forEach((item: any) => {
+      if (item.widget === 'dxTextBox') {
+        item.options = {
+          ...item.options,
+          onInitialized: (e: any) => {
+            this.searchTextBox = e.component;
+          }
+        };
+      }
+    });
+  }
+  
+  refreshData = () => {
+    this.searchTerm = '';
+    this.filteredUsers = [...this.originalUsers];
+  };
+
+  filterUsers(): void {
+    if (!this.searchTerm) {
+      this.filteredUsers = [...this.originalUsers];
+      return;
+    }
+
+    setTimeout(() => {
+      const searchTermLower = this.searchTerm.toLowerCase();
+      this.filteredUsers = this.originalUsers.filter(user =>
+        user.firstName.toLowerCase().includes(searchTermLower) ||
+        user.lastName.toLowerCase().includes(searchTermLower) ||
+        user.email.toLowerCase().includes(searchTermLower)
+      );
+    });
+  }
 
   onSelectionChanged(event: { selectedRowsData: any; }) {
     const selectedRows = event.selectedRowsData;

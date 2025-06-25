@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { NavigationService, NavStiLink } from '../navigation.service';
 import { DropdownComponent } from '../components/dropdown/dropdown.component';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
+import { CompaniesService } from 'src/app/modules/companies/companies.service';
 
 
 @Component({
@@ -28,29 +29,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   nav: NavStiLink[] = [];
   dropdownOpen = false;
-    private readonly navigationService = inject(NavigationService);
-    private authService = inject(AuthServiceService);
+  private readonly navigationService = inject(NavigationService);
+  private authService = inject(AuthServiceService);
 
-    companyId?: number
+  companyId?: number;
 
-  // nombreUsuario: string = 'Josue Rodriguez';
+  nameCompany?: string;
 
-  // tieneFotoPerfil: boolean = false;
+  companyLogoUrl?: string;
 
-  // iniciales?: string;
+  logoLoaded = false;
 
-  nameCompany?:string
-
-  constructor(private navigate: NavigationService, private router: Router) {}
+  constructor(private navigate: NavigationService, private router: Router, private companiesService: CompaniesService) { }
 
   ngOnInit(): void {
-    /*     // Calcular iniciales
-    const nombreDividido = this.nombreUsuario.split(' ');
-    const primerNombre = nombreDividido[0][0];
-    const apellido = nombreDividido[nombreDividido.length - 1];
-    const primerApellido = apellido ? apellido[0] : ''; // Verificar si hay apellido
-    this.iniciales = (primerNombre + primerApellido).toUpperCase(); */
-
     this.subscription.add(
       this.navigate.navLinks$.subscribe((links) => {
         this.nav = links;
@@ -58,13 +50,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
     );
 
     // To Do cargar imagen en header
-
     this.subscription.add(
-      this.navigate.companyNavigation.subscribe((company)=>{
+      this.navigate.companyNavigation.subscribe((company) => {
         this.nameCompany = company.name
         this.companyId = company.id
+        if (company.id && !this.logoLoaded) {
+          this.loadCompanyLogo(company.id);
+          this.logoLoaded = true;
+        }
       })
     )
+
+
+
   }
 
   ngOnDestroy(): void {
@@ -76,15 +74,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    localStorage.removeItem('company'); 
-    this.router.navigate(['/dashboard']);      
-    this.dropdownOpen = false;        
+    localStorage.removeItem('company');
+    this.router.navigate(['/dashboard']);
+    this.dropdownOpen = false;
   }
 
   logout() {
     this.authService.logout().subscribe({
-      next: (data) => {      
-        localStorage.removeItem('userData'); 
+      next: (data) => {
+        localStorage.removeItem('userData');
         localStorage.removeItem('company');
         this.authService.setLogin({
           userName: '',
@@ -97,21 +95,43 @@ export class HeaderComponent implements OnInit, OnDestroy {
           lastName: '',
           globalRoles: []
         });
-    
-        this.dropdownOpen = false;        
-        this.router.navigate(['/login']);    
+
+        this.dropdownOpen = false;
+        this.router.navigate(['/login']);
       },
       error: (err) => {
 
         console.log(err.error);
-        
+
         console.log(err);
       }
     });
   }
 
-    managePassword() {
-    this.router.navigate(['/dashboard/user/manage-password']);      
-    this.dropdownOpen = false;        
+  managePassword() {
+    this.router.navigate(['/dashboard/user/manage-password']);
+    this.dropdownOpen = false;
+  }
+
+  loadCompanyLogo(companyId: number) {
+    this.companiesService.getCompanyLogo(companyId).subscribe({
+      next: (logoBlob) => {
+        this.createImageFromBlob(logoBlob);
+      },
+      error: (err) => {
+        console.error('Error loading company logo:', err);
+      }
+    });
+  }
+
+  createImageFromBlob(image: Blob) {
+    let reader = new FileReader();
+    reader.addEventListener('load', () => {
+      this.companyLogoUrl = reader.result as string;
+    }, false);
+
+    if (image) {
+      reader.readAsDataURL(image);
+    }
   }
 }

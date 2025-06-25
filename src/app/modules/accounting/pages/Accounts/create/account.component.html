@@ -1,4 +1,4 @@
-<div class="w-100"> 
+<div class="w-100">
   <form id="account-form" class="w-100 mx-2 mt-5" (ngSubmit)="onSubmit(itemForm)" #itemForm="ngForm">
     <div class="w-100 flex justify-between mb-5">
       <h2 class="text-2xl font-semibold">
@@ -8,13 +8,27 @@
 
     <div class="grid grid-cols-2 gap-3">
       <div>
-        <Label for="txt-description" class="block mb-2 text-sm text-gray-900">Nombre de Cuenta:</Label>
+        <Label for="txt-description" class="block mb-2 text-sm text-gray-900">Nombre de Cuenta:
+          <span class="text-xs text-gray-500 float-right">
+            {{accountForm.description?.length || 0}}/150
+          </span>
+        </Label>
+
         <input id="txt-description" [(ngModel)]="accountForm.description" name="description" type="text" required
+          pattern="^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ% ]{1,150}$" maxlength="150"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
           style="outline: none; box-shadow: none;" />
+
         <div *ngIf=" itemForm.submitted && itemForm.form.controls['description'].getError('required')">
           <small class="text-xs text-red-900">Nombre de Cuenta es requerido.</small>
         </div>
+        <div *ngIf="itemForm.submitted && accountForm.description && accountForm.description.length > 150">
+          <small class="text-xs text-red-900">El nombre no puede exceder los 150 caracteres.</small>
+        </div>
+        <div *ngIf="itemForm.submitted && itemForm.form.controls['description']?.errors?.['pattern']">
+          <small class="text-xs text-red-900">Solo se permiten letras, números y espacios.</small>
+        </div>
+
       </div>
       <div>
         <Label for="select-category" class="block mb-2 text-sm text-gray-900">Categoría:</Label>
@@ -53,11 +67,15 @@
           <div class="w-3/4">
             <Label for="account-code" class="block mb-2 text-sm w-full text-gray-900">
               Código de Cuenta:</Label>
-            <input [(ngModel)]="accountForm.code" name="code" required id="account-code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+            <input [(ngModel)]="accountForm.code" name="code" required pattern="^[0-9\-]+$" id="account-code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                focus:ring-blue-500 focus:border-blue-500 block w-full p-2" style="outline: none; box-shadow: none;" />
             <div *ngIf="itemForm.submitted && itemForm.form.controls['code'].getError('required')">
               <small class="text-xs text-red-900">Código es requerido.</small>
             </div>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['code']?.errors?.['pattern']">
+              <small class="text-xs text-red-900">Solo se permiten números y guiones en el código.</small>
+            </div>
+
           </div>
         </div>
       </div>

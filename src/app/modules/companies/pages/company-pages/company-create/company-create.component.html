@@ -162,16 +162,33 @@
 
       <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-2">
         <legend class="font-medium ml-2"><strong>Usuarios</strong></legend>
-        <dx-data-grid id="companyUser Grid" [dataSource]="userList$" [showBorders]="true"
-          [selection]="{ mode: 'single' }" (onSelectionChanged)="onSelectionChanged($event)">
-          <dxo-paging [enabled]="false"></dxo-paging>
-          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
-          </dxo-editing>
-          <dxi-column caption="Nombre" [calculateCellValue]="fullName" [allowEditing]="false"></dxi-column> <dxi-column
-            dataField="roles" caption="Roles" [allowSorting]="false" editCellTemplate="tagBoxEditor"
+
+        <dx-data-grid (onToolbarPreparing)="onToolbarPreparing($event)" id="companyUserGrid"
+          [dataSource]="filteredUsers" [showBorders]="true" [selection]="{ mode: 'single' }"
+          (onSelectionChanged)="onSelectionChanged($event)">
+          <dxo-toolbar>
+            <dxi-item location="before" widget="dxTextBox" [options]="{
+        placeholder: 'Buscar usuarios...',
+        showClearButton: true,
+        value: searchTerm,
+        valueChangeEvent: 'input',
+        onValueChanged: searchHandler
+      }"></dxi-item>
+            <dxi-item location="after" widget="dxButton" [options]="{
+        icon: 'refresh',
+        onClick: refreshData
+      }"></dxi-item>
+          </dxo-toolbar>
+
+          <dxo-paging [enabled]="true" [pageSize]="5"></dxo-paging>
+          <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[5, 10, 20]" [showInfo]="true"
+            infoText="Página {0} de {1} ({2} usuarios)"></dxo-pager>
+
+          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false"></dxo-editing>
+          <dxi-column caption="Nombre" [calculateCellValue]="fullName" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="roles" caption="Roles" [allowSorting]="false" editCellTemplate="tagBoxEditor"
             [cellTemplate]="cellTemplate">
-            <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name">
-            </dxo-lookup>
+            <dxo-lookup [dataSource]="rolesCompanys$" valueExpr="id" displayExpr="name"></dxo-lookup>
           </dxi-column>
 
           <div *dxTemplate="let cellInfo of 'tagBoxEditor'">
@@ -179,12 +196,10 @@
               [showSelectionControls]="true" [maxDisplayedTags]="3" [showMultiTagOnly]="false"
               [inputAttr]="{ 'aria-label': 'Name' }" applyValueMode="useButtons" [searchEnabled]="true"
               (onValueChanged)="cellInfo.setValue($event.value)"
-              (onSelectionChanged)="cellInfo.component.updateDimensions()">
-            </dx-tag-box>
+              (onSelectionChanged)="cellInfo.component.updateDimensions()"></dx-tag-box>
           </div>
         </dx-data-grid>
       </fieldset>
-
       <!-- <fieldset class="flex border rounded-sm w-full gap-2 gap-x-3 p-2 col-span-3">
         <legend class="text-sm font-thin mb-2">Roles</legend>
         <dx-data-grid id="companyUserGrid" [showBorders]="true" [dataSource]="rolesList$">
