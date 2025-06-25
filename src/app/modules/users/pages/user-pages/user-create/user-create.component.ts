@@ -14,6 +14,10 @@ import { UsersService } from 'src/app/modules/users/users.service';
   styleUrl: './user-create.component.css',
 })
 export class UserCreateComponent implements OnInit {
+
+  @Input('id') id?: number;
+  @Input('companyId') companyId?: number;
+
   txtPassword!: string;
   txtConfirmPassword!: string;
   companyList$: CompanyResponse[] = [];
@@ -31,8 +35,10 @@ export class UserCreateComponent implements OnInit {
   userExists: boolean = false;
   emailExists: boolean = false;
 
-  @Input('id') id?: number;
-  @Input('companyId') companyId?: number;
+  searchCompanyTerm: string = '';
+  filteredCompanies$: CompanyResponse[] = [];
+  originalCompanies: CompanyResponse[] = [];
+  private searchCompanyTextBox: any;
 
   private readonly companyService = inject(CompaniesService);
   private readonly userService = inject(UsersService);
@@ -87,6 +93,9 @@ export class UserCreateComponent implements OnInit {
         company.active = false;
         return company;
       });
+
+      this.originalCompanies = [...this.companyList$];
+      this.filteredCompanies$ = [...this.companyList$];
 
       if (this.id) {
         const user = await lastValueFrom(this.userService.getUSerById(Number(this.id)));
@@ -329,10 +338,50 @@ export class UserCreateComponent implements OnInit {
     window.history.back();
   }
 
+  searchCompanyHandler = (e: any) => {
+    this.searchCompanyTerm = e.value;
+    this.filterCompanies();
+
+    setTimeout(() => {
+      if (this.searchCompanyTextBox) {
+        this.searchCompanyTextBox.focus();
+      }
+    }, 100);
+  };
+
+  onToolbarPreparing(e: any) {
+    e.toolbarOptions.items.forEach((item: any) => {
+      if (item.widget === 'dxTextBox') {
+        item.options = {
+          ...item.options,
+          onInitialized: (e: any) => {
+            this.searchCompanyTextBox = e.component;
+          }
+        };
+      }
+    });
+  }
+
+  refreshCompanyData = () => {
+    this.searchCompanyTerm = '';
+    this.filteredCompanies$ = [...this.originalCompanies];
+  };
+
+  filterCompanies(): void {
+    if (!this.searchCompanyTerm) {
+      this.filteredCompanies$ = [...this.originalCompanies];
+      return;
+    }
+
+    const searchTermLower = this.searchCompanyTerm.toLowerCase();
+    this.filteredCompanies$ = this.originalCompanies.filter(company =>
+      company.name.toLowerCase().includes(searchTermLower)
+    );
+  }
+
   onCompanySelectionChanged(event: { selectedRowsData: any; }) {
     const selectedRows = event.selectedRowsData;
     console.log('Filas seleccionadas en Empresas:', selectedRows);
-    // Aquí puedes agregar lógica adicional si es necesario
   }
 
 }
