@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { environment } from '@environment/environment';
 import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
   debounceTime,
   distinctUntilChanged,
   first,
@@ -13,6 +16,7 @@ import {
   startWith,
   Subject,
   switchMap,
+  tap,
 } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
 import {
@@ -32,7 +36,6 @@ import { ToastType } from 'devextreme/ui/toast';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 import { DxToastModule } from 'devextreme-angular';
 import { confirm } from 'devextreme/ui/dialog';
-import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-companies',
@@ -44,19 +47,20 @@ import { HttpHeaders } from '@angular/common/http';
 export class ListCompaniesComponent implements OnInit {
   user$: Observable<UsersResponse | null> | undefined;
 
-  companyList$?: Observable<CompanieResponse[]>;
-  isAdmind: boolean = false;
-
-  paginatorArray: number[] = [];
-  numberPages = 10;
-
-  private companiasMap = new Map<number, CompanieResponse[]>();
-
   apiLogo = environment.SECURITY_API_URL + '/api/v1/company/logo/';
 
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
+
+  searchQuery: string = '';
+  currentPage: number = 0;
+  numberPages: number = 10;
+  totalPages: number = 0;
+  companyList$: Observable<CompanieResponse[]> = of([]);
+  isAdmind: boolean = false;
+  paginatorArray: number[] = [];
+  private companiasMap = new Map<number, CompanieResponse[]>();
 
   private readonly router = inject(Router);
   private readonly navigationService = inject(NavigationService);
@@ -65,11 +69,10 @@ export class ListCompaniesComponent implements OnInit {
   private readonly companyService = inject(CompaniesService);
   private readonly transactionService = inject(TransactionService);
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.companiasMap = this.companyService.getLoadCompanysMap();
-
     this.navigationService.setNavLinks([]);
     this.navigationService.setCompany('');
 
@@ -78,45 +81,72 @@ export class ListCompaniesComponent implements OnInit {
 
     if (savedUser) {
       const usuario = JSON.parse(savedUser);
+      this.isAdmind = this.authService
+        .getRolesUser()
+        .some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
 
       if ((userId == 0 && usuario.id != null) || this.companiasMap.size == 0) {
         this.saveUserInMemory(usuario.id);
-        this.saveCompanysInMemory(0, this.numberPages);
+        this.loadCompanies(0, this.numberPages);
       } else {
-        this.isAdmind = this.authService
-          .getRolesUser()
-          .some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
-
-        // this.companyList$ = of(this.companyService());
-        //this.companyList$ = of(this.companiasMap.get(0) ?? []);
-        this.companyList$ = this.companyService.companysMap$.pipe(
-          map((map) => map.get(0) ?? [])
-        );
-        this.paginator(Number(localStorage.getItem('totalPages')));
+        this.setupSearch();
       }
     } else {
       this.saveUserInMemory(userId);
-      this.saveCompanysInMemory(0, this.numberPages);
+      this.loadCompanies(0, this.numberPages);
     }
   }
+
 
   getValue(event: Event): string {
     return (event.target as HTMLInputElement).value;
   }
 
-  search(packageName: string) {
-    this.debounceSearch(packageName);
+  private setupSearch(): void {
+    this.companyList$ = this.companyService.companies$.pipe(
+      switchMap(companies => {
+        if (this.searchQuery.trim() === '') {
+          return this.companyService.companysMap$.pipe(
+            map(companysMap => companysMap.get(this.currentPage) ?? [])
+          );
+        } else {
+          return of(
+            companies.filter(company =>
+              company.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+            )
+          );
+        }
+      })
+    );
   }
 
-  private debounceSearch = (() => {
-    let timeoutId: any;
-    return (packageName: string) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        this.searchCompany(packageName);
-      }, 1000);
-    };
-  })();
+  search(): void {
+    if (this.searchQuery.trim() === '') {
+      this.loadCompanies(this.currentPage, this.numberPages);
+    } else {
+      this.setupSearch();
+    }
+  }
+
+  private loadCompanies(page: number, size: number): void {
+    this.companyService.getCompanysByUser(page, size).subscribe({
+      next: (data) => {
+        this.companiasMap.set(page, data.response);
+        this.companyService.setCompanys(data.response);
+        this.companyService.setLoadCompanysMap(this.companiasMap);
+
+        this.totalPages = data.totalPages;
+        localStorage.setItem('totalPages', data.totalPages.toString());
+        this.paginator(data.totalPages);
+
+        this.companyList$ = of(data.response);
+      },
+      error: (error) => {
+        console.error('Error loading companies:', error);
+      }
+    });
+  }
+
 
   goTo(cmp: CompanieResponse) {
     const { roles, ...company } = cmp;
@@ -137,78 +167,37 @@ export class ListCompaniesComponent implements OnInit {
     this.router.navigate(['/dashboard/user/company/', companie.id]);
   };
 
-  searchCompany(search: string) {
-    const savedUser = localStorage.getItem('userData');
-    if (savedUser) {
-      if (search === '') {
-        // Cuando se borra el texto de búsqueda, restablece el mapa de empresas
-        this.companiasMap = new Map<number, CompanieResponse[]>();
-        this.saveCompanysInMemory(0, this.numberPages);
-        //this.companyList$ = of(this.companiasMap.get(0) ?? []);
-        this.companyList$ = this.companyService.companysMap$.pipe(
-          map((map) => map.get(0) ?? [])
-        );
-        this.paginator(Number(localStorage.getItem('totalPages')));
-        this.deactivePaginator();
-        return;
-      }
-
-      // Filtrar las empresas basadas en el nombre
-      const filteredCompanies = this.companyService
-        .getCompanies()
-        .filter((companie: CompanieResponse) => {
-          return companie.name.toUpperCase().includes(search.toUpperCase());
-        });
-
-      // Actualizar la lista de empresas sin duplicados
-      this.updateCompanyList(filteredCompanies);
-    }
-  }
-
-  private updateCompanyList(companies: CompanieResponse[]) {
-    // Eliminar duplicados
-    const uniqueCompanies = Array.from(
-      new Set(companies.map((company) => company.id))
-    ).map((id) => companies.find((company) => company.id === id));
-
-    this.paginatorArray = Array.from(
-      { length: Math.ceil(uniqueCompanies.length / this.numberPages) },
-      (_, i) => i
-    );
-    this.companiasMap = new Map<number, CompanieResponse[]>();
-    const companiesByMap = this.dividirBusquedad(
-      uniqueCompanies,
-      this.numberPages
-    );
-
-    for (let index = 0; index < this.paginatorArray.length; index++) {
-      const currentArray = companiesByMap[index];
-      this.companiasMap.set(index, currentArray);
-    }
-    //this.companyList$ = of(this.companiasMap.get(0) ?? []);
-    this.companyList$ = this.companyService.companysMap$.pipe(
-      map((map) => map.get(0) ?? [])
-    );
-    this.deactivePaginator();
-    this.activePaginator(0);
-  }
 
   paginator(totalPages: number) {
     this.paginatorArray = Array.from({ length: totalPages }, (_, i) => i);
   }
 
-  page(page: number) {
-    if (!this.companiasMap.has(page - 1)) {
-      this.saveCompanysInMemory(page - 1, this.numberPages);
-    } else {
-      //this.companyList$ = of(this.companiasMap.get(page - 1) ?? []);
-      this.companyList$ = this.companyService.companysMap$.pipe(
-        map((map) => map.get(page - 1) ?? [])
-      );
+  private paginateArray(array: any[], itemsPerPage: number): {
+    map: Map<number, any[]>,
+    totalPages: number
+  } {
+    const result = new Map<number, any[]>();
+    const totalPages = Math.ceil(array.length / itemsPerPage);
+
+    for (let i = 0; i < totalPages; i++) {
+      const start = i * itemsPerPage;
+      const end = start + itemsPerPage;
+      result.set(i, array.slice(start, end));
     }
 
+    return { map: result, totalPages };
+  }
+
+  page(page: number) {
+    this.currentPage = page - 1;
     this.deactivePaginator();
     this.activePaginator(page - 1);
+
+    if (!this.companiasMap.has(this.currentPage)) {
+      this.saveCompanysInMemory(this.currentPage, this.numberPages);
+    } else {
+      this.companyList$ = of(this.companiasMap.get(this.currentPage) ?? []);
+    }
   }
 
   pageBack() {
@@ -221,7 +210,6 @@ export class ListCompaniesComponent implements OnInit {
         if (!this.companiasMap.has(i)) {
           this.saveCompanysInMemory(i, this.numberPages);
         } else {
-          //this.companyList$ = of(this.companiasMap.get(i) ?? []);
           this.companyList$ = this.companyService.companysMap$.pipe(
             map((map) => map.get(i) ?? [])
           );
@@ -240,7 +228,6 @@ export class ListCompaniesComponent implements OnInit {
         if (!this.companiasMap.has(i)) {
           this.saveCompanysInMemory(i, this.numberPages);
         } else {
-          //this.companyList$ = of(this.companiasMap.get(i) ?? []);
           this.companyList$ = this.companyService.companysMap$.pipe(
             map((map) => map.get(i) ?? [])
           );
@@ -295,7 +282,6 @@ export class ListCompaniesComponent implements OnInit {
 
       this.companyService.setCompanys(companias.flat());
 
-      //this.companyList$ = of(this.companiasMap.get(page) ?? []);
       this.companyList$ = this.companyService.companysMap$.pipe(
         map((map) => map.get(page) ?? [])
       );
@@ -318,17 +304,9 @@ export class ListCompaniesComponent implements OnInit {
 
   onPageChange(newValue: number) {
     this.numberPages = newValue;
-
-    this.companiasMap = new Map<number, CompanieResponse[]>();
+    this.currentPage = 0;
+    this.searchQuery = '';
     this.saveCompanysInMemory(0, this.numberPages);
-
-    //this.companyList$ = of(this.companiasMap.get(0) ?? []);
-    this.companyList$ = this.companyService.companysMap$.pipe(
-      map((map) => map.get(0) ?? [])
-    );
-    this.paginator(Number(localStorage.getItem('totalPages')));
-    this.deactivePaginator();
-    this.activePaginator(0);
   }
 
   async deleteCompany(company: CompanieResponse) {
