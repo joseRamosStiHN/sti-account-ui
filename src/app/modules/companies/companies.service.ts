@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
-import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, throwError } from 'rxjs';
 import {
   CompanieResponse,
   companyByUser,
@@ -199,6 +199,16 @@ export class CompaniesService {
     return this.httpClient.get(
       this.apiURL + `/api/v1/company/logo/${companyId}`,
       { responseType: 'blob' }
+    );
+  }
+
+  getFilteredCompanies(searchTerm: string): Observable<CompanieResponse[]> {
+    return this.companies$.pipe(
+      map(companies =>
+        companies.filter(company =>
+          company.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      )
     );
   }
 }

@@ -37,11 +37,14 @@ import { UploadBulkFileComponent } from 'src/app/modules/accounting/pages/upload
 import { VariousOperationsListComponent } from 'src/app/modules/accounting/pages/various-operations/various-operations-list/various-operations-list.component';
 import { VariousOperationsComponent } from 'src/app/modules/accounting/pages/various-operations/various-operations/various-operations.component';
 import { RoleGuard } from 'src/app/shared/handlers/Guards/RoleGuard';
+import { AccountigGuard } from 'src/app/shared/handlers/Guards/AccountingGuard';
+import { AuthGuard } from 'src/app/shared/handlers/Guards/AuthGuard';
 
 const routes: Routes = [
   {
     path: '',
     component: AccountingPageComponent,
+    canActivate: [AuthGuard, AccountigGuard],
     children: [
       { path: '', component: DashboardComponent },
       { path: 'client-invoicing', component: ClientComponent },
