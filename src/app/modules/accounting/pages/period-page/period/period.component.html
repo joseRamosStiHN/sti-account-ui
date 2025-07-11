@@ -1,132 +1,120 @@
 <div class="mt-2 px-1">
-    <div class="flex flex-row justify-between">
-        <div class="w-100 flex justify-between mb-5">
-            <h2 class="text-2xl font-semibold">Periodo Contable</h2>
-          </div>
+  <div class="flex flex-row justify-between">
+    <div class="w-100 flex justify-between mb-5">
+      <h2 class="text-2xl font-semibold">Periodo Contable</h2>
     </div>
-    <form id="periodForm" class="w-100" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
-        <div class="container mx-auto">
+  </div>
+  <form id="periodForm" class="w-100" #itemForm="ngForm" (ngSubmit)="save(itemForm)">
+    <div class="container mx-auto">
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="flex flex-col gap-2">
-                    <div class="form-group">
-                        <label for="closureType" class="block mb-2 text-sm text-gray-900">Tipo de Período:</label>
-                        <select [(ngModel)]="periodForm.closureType"
-                        required="true" name="closureType" id="closureType"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-2">
+          <div class="form-group">
+            <label for="closureType" class="block mb-2 text-sm text-gray-900">Tipo de Período:</label>
+            <select [(ngModel)]="periodForm.closureType" required="true" name="closureType" id="closureType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
                                             focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                            <option *ngFor="let type of typePeriodList" [value]="type" [disabled]="type === 'Anual'">
-                                {{ type }}
-                            </option>
-                        </select>
-                        <div *ngIf="itemForm.submitted && itemForm.form.controls['closureType'].getError('required')">
-                            <small class="text-xs text-red-900">Tipo de Período es requerido.</small>
-                        </div>
-                    </div>
-    
-                    <div class="form-group">
-                        <label for="date" class="block mb-2 text-sm text-gray-900" >Fecha Inicio Periodo:</label>
-                        <input
-                          type="date"
-                          [ngModel]="periodForm.startPeriod | date:'yyyy-MM-dd' : 'UTC'"
-                          id="startPeriod"
-                          name="startPeriod"
-                          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+              <option *ngFor="let type of typePeriodList" [value]="type" [disabled]="type === 'Anual'">
+                {{ type }}
+              </option>
+            </select>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['closureType'].getError('required')">
+              <small class="text-xs text-red-900">Tipo de Período es requerido.</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="date" class="block mb-2 text-sm text-gray-900">Fecha Inicio Periodo:</label>
+            <input type="date" [ngModel]="periodForm.startPeriod | date:'yyyy-MM-dd' : 'UTC'" id="startPeriod"
+              name="startPeriod" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
                           focus:ring-blue-500 focus:border-blue-500 block w-full p-2" placeholder="" required />
-                        <div
-                          *ngIf="
+            <div *ngIf="
                             itemForm.submitted &&
                             itemForm.form.controls['startPeriod'].getError('required')
-                          "
-                        >
-                          <small class="text-xs text-red-900">La fecha de inicio es requerida.</small>
-                        </div>
-                      </div>
-                </div>
-                <div class="flex flex-col gap-2">
-               
+                          ">
+              <small class="text-xs text-red-900">La fecha de inicio es requerida.</small>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
 
-                   <div class="form-group">
-                          <label for="periodName" class="block mb-2 text-sm text-gray-900">Nombre Periodo:</label>
-                          <input [(ngModel)]="periodForm.periodName" id="periodName" name="periodName" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block 
-                                  w-full p-2" placeholder="" required />
-                          <div *ngIf="
-                                  itemForm.submitted &&
-                                  itemForm.form.controls['periodName'].getError('required')
-                                ">
-                              <small class="text-xs text-red-900">Nombre de Periodo es requerido.</small>
-                          </div>
-                      </div>
-                    @if(periodForm.closureType==='Personalizado'){
-  
-                     
-  
-                        <div class="form-group">
-                          <label for="endPeriod" class="block mb-2 text-sm text-gray-900"
-                            >Fecha Fin periodo </label
-                          >
-                          <input
-                            type="date"
-                            [ngModel]="periodForm.endPeriod | date:'yyyy-MM-dd' : 'UTC'"
-                            id="endPeriod"
-                            name="endPeriod"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                            focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-                            placeholder=""
-                            required
-                          />
-                          <div
-                            *ngIf="
+
+          <div class="form-group">
+            <label for="periodName" class="block mb-2 text-sm text-gray-900">Nombre Periodo:</label>
+            <input [(ngModel)]="periodForm.periodName" id="periodName" name="periodName" type="text" maxlength="50"
+              #periodNameInput="ngModel" pattern="^[a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ ]+$"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+              placeholder="" required />
+
+            <div *ngIf="itemForm.submitted && periodNameInput.errors?.['required']">
+              <small class="text-xs text-red-900">Nombre de Periodo es requerido.</small>
+            </div>
+
+            <div *ngIf="itemForm.submitted && periodNameInput.value?.trim() === ''">
+              <small class="text-xs text-red-900">El nombre del período no puede contener solo espacios en
+                blanco.</small>
+            </div>
+            <div *ngIf="itemForm.submitted && periodNameInput.errors?.['pattern']">
+              <small class="text-xs text-red-900">Solo se permiten letras y números, sin caracteres especiales.</small>
+            </div>
+
+            <div *ngIf="itemForm.submitted && periodNameInput.errors?.['maxlength']">
+              <small class="text-xs text-red-900">No puede exceder los 50 caracteres.</small>
+            </div>
+          </div>
+
+          @if(periodForm.closureType==='Personalizado'){
+
+
+
+          <div class="form-group">
+            <label for="endPeriod" class="block mb-2 text-sm text-gray-900">Fecha Fin periodo </label>
+            <input type="date" [ngModel]="periodForm.endPeriod | date:'yyyy-MM-dd' : 'UTC'" id="endPeriod"
+              name="endPeriod" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                            focus:ring-blue-500 focus:border-blue-500 block w-full p-2" placeholder="" required />
+            <div *ngIf="
                               itemForm.submitted &&
                               itemForm.form.controls['endPeriod'].getError('required')
-                            "
-                          >
-                            <small class="text-xs text-red-900">La fecha fin es requerida.</small>
-                          </div>
-                        </div>
-                    }
-                 
-                 
-              </div>
+                            ">
+              <small class="text-xs text-red-900">La fecha fin es requerida.</small>
             </div>
-
-            @if(!activatePeriodo){
-              <div class="flex items-center border border-gray-200 rounded w-6/12 mt-4">
-                <label class="inline-flex items-center p-2 cursor-pointer w-full">
-                    <span class="mr-2.5 ms-3 text-sm font-medium text-gray-900 w-5/6" >Activar Periodo </span>
-                        <input
-                        type="checkbox"
-                        name="isActive"
-                        [(ngModel)]="periodForm.status"
-                        [checked]="periodForm.status"
-                        [disabled]="periodForm.status"
-                        class="sr-only peer absolute right-0"
-                      />
-
-                  <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-blue-600">
-                  </div>
-                </label>       
-              </div>
+          </div>
           }
-          
 
-            <div class="justify-end mt-10 absolute right-4 bottom-10">
-                <button type="button" (click)="goBack()"
-                    class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
-                    Cancelar
-                </button>
-                <button type="submit"
-                [disabled]="periodForm.closureType =='Anual'"    
-                [ngClass]="{ 'opacity-50 cursor-not-allowed': periodForm.closureType == 'Anual' }"
-                class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600">
-                   
-                   Guardar
-                </button>
-            </div>
 
         </div>
-    </form>
+      </div>
+
+      @if(!activatePeriodo){
+      <div class="flex items-center border border-gray-200 rounded w-6/12 mt-4">
+        <label class="inline-flex items-center p-2 cursor-pointer w-full">
+          <span class="mr-2.5 ms-3 text-sm font-medium text-gray-900 w-5/6">Activar Periodo </span>
+          <input type="checkbox" name="isActive" [(ngModel)]="periodForm.status" [checked]="periodForm.status"
+            [disabled]="periodForm.status" class="sr-only peer absolute right-0" />
+
+          <div
+            class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-blue-600">
+          </div>
+        </label>
+      </div>
+      }
+
+
+      <div class="justify-end mt-10 absolute right-4 bottom-10">
+        <button type="button" (click)="goBack()"
+          class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 border border-gray-600 text-gray-600 bg-white-600">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="periodForm.closureType =='Anual'"
+          [ngClass]="{ 'opacity-50 cursor-not-allowed': periodForm.closureType == 'Anual' }"
+          class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600">
+
+          Guardar
+        </button>
+      </div>
+
+    </div>
+  </form>
 </div>
 <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
-    <dxo-position my="top" at="top" of="#periodForm"> </dxo-position>
-  </dx-toast>
+  <dxo-position my="top" at="top" of="#periodForm"> </dxo-position>
+</dx-toast>

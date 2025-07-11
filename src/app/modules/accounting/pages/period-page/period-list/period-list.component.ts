@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
 import { confirm } from 'devextreme/ui/dialog';
@@ -33,15 +33,16 @@ export class PeriodListComponent {
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
+  hasData: boolean = true;
 
 
 
   periodList$: Observable<PeriodModel[]> | undefined;
 
-  typePeriods= [
-    {id:0, name:"Mensual"},
-    {id:1, name:"Trimestral"},
-    {id:2, name:"Semestral"}
+  typePeriods = [
+    { id: 0, name: "Mensual" },
+    { id: 1, name: "Trimestral" },
+    { id: 2, name: "Semestral" }
   ]
 
   private readonly router = inject(Router);
@@ -58,13 +59,46 @@ export class PeriodListComponent {
 
   }
 
-  onSearch(): void {
 
+
+  private transformPeriodData(data: any[]): any[] {
+    const transformedData = data.map(nuevo => {
+      const status = nuevo.closureType?.toUpperCase() === "ANUAL" || nuevo.periodStatus.toUpperCase() == "ACTIVE" ? true : false;
+      const isClosed = nuevo.periodStatus == "CLOSED" ? true : false;
+      return { ...nuevo, status, isClosed };
+    });
+
+    const groupedByClosureType = transformedData.reduce((acc, period) => {
+      const closureType = period.closureType || 'Otros';
+      if (!acc[closureType]) {
+        acc[closureType] = [];
+      }
+      acc[closureType].push(period);
+      return acc;
+    }, {} as { [key: string]: any[] });
+
+    return Object.entries(groupedByClosureType).map(([key, periods], index) => ({
+      id: index + 1,
+      name: key,
+      periods
+    }));
+  }
+
+  getListPeriods(): Observable<any[]> {
+    return this.periodoService.getAllPeriods().pipe(
+      map(data => this.transformPeriodData(data))
+    );
+  }
+
+  onSearch(): void {
     let [dateInitStr, dateEndStr] = this.currentValue;
     const dateInit = new Date(dateInitStr);
     const dateEnd = new Date(dateEndStr);
 
     if (dateEnd < dateInit) {
+      this.toastType = typeToast.Warning;
+      this.messageToast = 'La fecha final no puede ser menor a la fecha inicial';
+      this.showToast = true;
       return;
     }
 
@@ -75,12 +109,33 @@ export class PeriodListComponent {
 
     const formattedDateInit = formatDate(dateInit);
     const formattedDateEnd = formatDate(dateEnd);
-    this.periodList$ = this.periodoService.getPeridoBydate(formattedDateInit, formattedDateEnd)
 
+    this.periodoService.getPeridoBydate(formattedDateInit, formattedDateEnd).pipe(
+      map(data => {
+        if (data.length === 0) {
+          this.hasData = false;
+          this.toastType = typeToast.Warning;
+          this.messageToast = 'No se encontraron períodos para el rango de fechas seleccionado.';
+          this.showToast = true;
+          return [];
+        }
+        this.hasData = true;
+        this.toastType = typeToast.Success;
+        this.messageToast = 'Consulta realizada correctamente.';
+        this.showToast = true;
+        return this.transformPeriodData(data);
+      }),
+      catchError(error => {
+        console.error('Error fetching periods:', error);
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Error al obtener los períodos';
+        this.showToast = true;
+        return of([]);
+      })
+    ).subscribe(result => {
+      this.periodList$ = of(result);
+    });
   }
-
-
-
 
   onEditPeriod(e: any) {
 
@@ -144,58 +199,4 @@ export class PeriodListComponent {
 
   }
 
-  getListPeriods(): Observable<any[]> {
-
-    // return this.periodoService.getAllPeriods().pipe(
-    //   map(data => {
-    //     data.map(nuevo => {
-        
-    //     const status = nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status;
-    //      const isClosed=  nuevo.isClosed == null ? false : true;
-
-    //      return { ...nuevo,status, isClosed}
-
-        
-    //     })
-        
-    //     return data
-    //   })
-      
-    // );
-
-    return this.periodoService.getAllPeriods().pipe(
-      map(data => {
-
-        const transformedData = data.map(nuevo => {
-          const status = nuevo.closureType?.toUpperCase() === "ANUAL" || nuevo.periodStatus.toUpperCase() == "ACTIVE" ? true :false;
-          const isClosed = nuevo.periodStatus == "CLOSED" ? true : false;
-          return { ...nuevo, status, isClosed };
-        });
-    
-
-        const groupedByClosureType = transformedData.reduce((acc, period) => {
-          const closureType = period.closureType || 'Otros';
-          if (!acc[closureType]) {
-            acc[closureType] = [];
-          }
-          acc[closureType].push(period);
-          return acc;
-        }, {} as { [key: string]: any[] });
-    
-
-        const result = Object.entries(groupedByClosureType).map(([key, periods], index) => ({
-          id: index + 1,
-          name: key,   
-          periods  
-        }));
-
-
-        console.log(result);
-        
-    
-        return result;
-      })
-    );
-    
-  }
 }
