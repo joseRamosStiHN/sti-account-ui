@@ -1,6 +1,6 @@
 <div class="w-100 mt-5">
     <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-        Periodo Contable
+        Período Contable
     </h2>
     <div class="w-100 bg-white p-2 flex gap-2 items-center border-b-2" id="periodAccount">
         <dx-date-range-box [(value)]="currentValue" (onValueChanged)="currentValueChanged($event)"></dx-date-range-box>
@@ -10,84 +10,6 @@
             Consultar
         </button>
     </div>
-    <!-- 
-    <dx-data-grid id="account-list-grid" [dataSource]="periodList$ | async" [repaintChangesOnly]="true"
-        [loadPanel]="{ enabled: true }" [width]="'100%'" [allowColumnReordering]="true" [allowColumnResizing]="true"
-        [remoteOperations]="false" [rowAlternationEnabled]="true" [showBorders]="true">
-        <dxo-sorting mode="multiple"></dxo-sorting>
-        <dxo-header-filter [visible]="true"></dxo-header-filter>
-        <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
-        <dxo-group-panel [visible]="true"></dxo-group-panel>
-
-        <dxo-paging [pageSize]="15"> </dxo-paging>
-        <dxo-pager [visible]="true"> </dxo-pager>
-        <dxi-column
-        caption="#"
-        [width]="50"
-        [minWidth]="20"
-        alignment="center"
-        cellTemplate="indexTemplate"
-        [showEditorAlways]="false"
-        [formItem]="{ visible: false }"
-        [allowEditing]="false"
-      >
-        </dxi-column>
-        <dxi-column caption="Tipo de Período" dataField="closureType" alignment="center"></dxi-column>
-        <dxi-column caption="Fecha Inicio" width="200" [calculateDisplayValue]="formatDateInit"
-            alignment="center"></dxi-column>
-        <dxi-column caption="Fecha Fin" width="200" [calculateDisplayValue]="formatDateEnd"
-            alignment="center"></dxi-column>
-
-
-            <dxi-column
-            caption="Cerrado"dataField="isClosed"[width]="100"></dxi-column>
-  
-            <dxi-column
-            caption="Estado"
-            dataField="status"
-            [width]="100"
-            cellTemplate="cellTemplate"
-          ></dxi-column>
-
-         
-
-        <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
-            <div *dxTemplate="let account of 'cellButtonTemplate'">
-                <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditPeriod(account.data)"></button>
-            </div>
-        </dxi-column>
-        <div *dxTemplate="let d of 'indexTemplate'">
-            <span>{{ d.rowIndex + 1 }}</span>
-          </div>
-        <div *dxTemplate="let data of 'cellTemplate'">
-
-            <label class="inline-flex items-center cursor-pointer">
-                <input type="checkbox" value="" class="sr-only peer" 
-                [disabled]="data.value || data.data.isClosed"
-                [(ngModel)]="data.data.status" 
-                (change)="updatePeriod(data)">
-                <div
-                    class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
-                     peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full 
-                     peer dark:bg-gray-700 peer-checked:after:translate-x-full 
-                     rtl:peer-checked:after:-translate-x-full
-                      peer-checked:after:border-white after:content-[''] 
-                      after:absolute after:top-[2px] after:start-[2px] after:bg-white
-                       after:border-gray-300 after:border after:rounded-full after:h-5 
-                       after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-                </div>
-            </label>
-          </div>
-        <dxo-toolbar>
-            <dxi-item name="groupPanel"></dxi-item>
-            <dxi-item name="searchPanel"></dxi-item>
-            <dxi-item location="after">
-                <dx-button icon="add" hint="Agregar Periodo" aria-placeholder="Agregar Periodo"
-                    (onClick)="goToNewJournal()">
-                </dx-button>
-            </dxi-item>
-        </dxo-toolbar>
-    </dx-data-grid> -->
 
     <dx-data-grid id="gridJournalEntry" [dataSource]="periodList$ | async" class="mt-5 shadow-lg overflow-hidden mb-10"
         [allowColumnReordering]="true" [rowAlternationEnabled]="true" [allowColumnResizing]="true"
@@ -97,7 +19,7 @@
         <dxo-header-filter [visible]="true"></dxo-header-filter>
         <dxo-paging [pageSize]="10"></dxo-paging>
         <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
-        <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
+      <!--   <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel> -->
         <dxo-group-panel [visible]="true"></dxo-group-panel>
         <dxi-column alignment="left" caption="Periodo" dataField="name" class="p-2 text-center bg-gray-100">
 
@@ -112,9 +34,10 @@
 
                 <dxo-paging [pageSize]="5"></dxo-paging>
                 <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
-        
 
-        
+
+
+                <dxi-column caption="Nombre Período" dataField="periodName" alignment="center"></dxi-column>
                 <dxi-column caption="Tipo de Período" dataField="closureType" alignment="center"></dxi-column>
                 <dxi-column caption="Fecha Inicio" width="200" [calculateDisplayValue]="formatDateInit"
                     alignment="center"></dxi-column>

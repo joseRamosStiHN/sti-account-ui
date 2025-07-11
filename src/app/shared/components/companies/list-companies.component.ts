@@ -3,35 +3,14 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { environment } from '@environment/environment';
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  first,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { Observable, of, first } from 'rxjs';
 import { CompaniesService } from 'src/app/modules/companies/companies.service';
-import {
-  CompanieResponse,
-  companyByUser,
-  CompanyResponse,
-} from 'src/app/modules/companies/models/ApiModelsCompanies';
+import { CompanieResponse } from 'src/app/modules/companies/models/ApiModelsCompanies';
 import { AuthServiceService } from 'src/app/modules/login/auth-service.service';
 import { UsersResponse } from 'src/app/modules/users/models/ApiModelUsers';
 import { UsersService } from 'src/app/modules/users/users.service';
 import { NavigationService } from 'src/app/shared/navigation.service';
-import {
-  typeToast,
-  DocumentType,
-} from 'src/app/modules/accounting/models/models';
+import { typeToast } from 'src/app/modules/accounting/models/models';
 import { ToastType } from 'devextreme/ui/toast';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 import { DxToastModule } from 'devextreme-angular';
@@ -42,26 +21,27 @@ import { confirm } from 'devextreme/ui/dialog';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, DxToastModule],
   templateUrl: './list-companies.component.html',
-  styleUrl: './list-companies.component.css',
+  styleUrls: ['./list-companies.component.css']
 })
 export class ListCompaniesComponent implements OnInit {
-  user$: Observable<UsersResponse | null> | undefined;
-
   apiLogo = environment.SECURITY_API_URL + '/api/v1/company/logo/';
 
+  // Variables de estado
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-
   searchQuery: string = '';
   currentPage: number = 0;
-  numberPages: number = 10;
+  pageSize: number = 10;
+  totalElements: number = 0;
   totalPages: number = 0;
-  companyList$: Observable<CompanieResponse[]> = of([]);
-  isAdmind: boolean = false;
-  paginatorArray: number[] = [];
-  private companiasMap = new Map<number, CompanieResponse[]>();
+  companyList: CompanieResponse[] = [];
+  loading: boolean = false;
+  isAdmin: boolean = false;
+  allCompanies: CompanieResponse[] = [];
+  user$: Observable<UsersResponse | null> | undefined;
 
+  // Servicios
   private readonly router = inject(Router);
   private readonly navigationService = inject(NavigationService);
   private readonly userService = inject(UsersService);
@@ -69,327 +49,173 @@ export class ListCompaniesComponent implements OnInit {
   private readonly companyService = inject(CompaniesService);
   private readonly transactionService = inject(TransactionService);
 
-  constructor() { }
-
   ngOnInit(): void {
-    this.companiasMap = this.companyService.getLoadCompanysMap();
-    this.navigationService.setNavLinks([]);
-    this.navigationService.setCompany('');
-
     const savedUser = localStorage.getItem('userData');
-    const userId: number = this.authService.getUserId();
+    const userId = this.authService.getUserId();
 
     if (savedUser) {
-      const usuario = JSON.parse(savedUser);
-      this.isAdmind = this.authService
-        .getRolesUser()
-        .some((role: any) => role.name === 'ADMINISTRADOR' && role.global);
-
-      if ((userId == 0 && usuario.id != null) || this.companiasMap.size == 0) {
-        this.saveUserInMemory(usuario.id);
-        this.loadCompanies(0, this.numberPages);
-      } else {
-        this.setupSearch();
-      }
-    } else {
+      const user = JSON.parse(savedUser);
+      this.saveUserInMemory(user.id);
+    } else if (userId) {
       this.saveUserInMemory(userId);
-      this.loadCompanies(0, this.numberPages);
     }
+
+    this.loadCompanies();
+    this.navigationService.setNavLinks([]);
+    this.navigationService.setCompany('');
   }
 
-
-  getValue(event: Event): string {
-    return (event.target as HTMLInputElement).value;
-  }
-
-  private setupSearch(): void {
-    this.companyList$ = this.companyService.companies$.pipe(
-      switchMap(companies => {
-        if (this.searchQuery.trim() === '') {
-          return this.companyService.companysMap$.pipe(
-            map(companysMap => companysMap.get(this.currentPage) ?? [])
+  saveUserInMemory(userId: number): void {
+    this.user$ = this.userService.getUSerById(userId);
+    this.user$.subscribe({
+      next: (data) => {
+        if (data) {
+          this.isAdmin = data.globalRoles.some(
+            (role: any) => role.name === 'ADMINISTRADOR' && role.global
           );
-        } else {
-          return of(
-            companies.filter(company =>
-              company.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-            )
-          );
+          const { globalRoles, createdAt, ...rest } = data;
+          localStorage.setItem('userData', JSON.stringify({ ...rest }));
+          localStorage.setItem('isAdmin', JSON.stringify(this.isAdmin));
+          this.authService.setLogin(data);
         }
-      })
-    );
+      },
+      error: (error) => {
+        console.error('Error loading user data:', error);
+      }
+    });
+  }
+
+  private loadCompanies(): void {
+    this.loading = true;
+    this.companyService.getCompanysByUser(this.currentPage, this.pageSize)
+      .subscribe({
+        next: (response) => {
+          this.companyList = response.content;
+          this.allCompanies = [...this.allCompanies, ...response.content];
+          this.totalElements = response.totalElements;
+          this.totalPages = response.totalPages;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading companies:', error);
+          this.showErrorToast('Error al cargar empresas');
+          this.loading = false;
+        }
+      });
   }
 
   search(): void {
     if (this.searchQuery.trim() === '') {
-      this.loadCompanies(this.currentPage, this.numberPages);
+      this.loadCompanies();
     } else {
-      this.setupSearch();
+      // Filtrar las compañías almacenadas
+      this.companyList = this.allCompanies.filter(company =>
+        company.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
     }
   }
 
-  private loadCompanies(page: number, size: number): void {
-    this.companyService.getCompanysByUser(page, size).subscribe({
-      next: (data) => {
-        this.companiasMap.set(page, data.response);
-        this.companyService.setCompanys(data.response);
-        this.companyService.setLoadCompanysMap(this.companiasMap);
 
-        this.totalPages = data.totalPages;
-        localStorage.setItem('totalPages', data.totalPages.toString());
-        this.paginator(data.totalPages);
-
-        this.companyList$ = of(data.response);
-      },
-      error: (error) => {
-        console.error('Error loading companies:', error);
-      }
-    });
-  }
-
-
-  goTo(cmp: CompanieResponse) {
-    const { roles, ...company } = cmp;
-    localStorage.setItem('company', JSON.stringify(company));
-    this.companyService.setCompany(cmp);
+  goTo(company: CompanieResponse): void {
+    const { roles, ...companyData } = company;
+    localStorage.setItem('company', JSON.stringify(companyData));
+    this.companyService.setCompany(company);
     this.router.navigate(['/accounting']);
   }
 
-  goToCompany() {
+  goToCompany(): void {
     this.router.navigate(['/dashboard/companies']);
   }
 
-  goToUser = () => {
+  goToUser(): void {
     this.router.navigate(['/dashboard/user']);
-  };
-
-  addUserCompany = (companie: any) => {
-    this.router.navigate(['/dashboard/user/company/', companie.id]);
-  };
-
-
-  paginator(totalPages: number) {
-    this.paginatorArray = Array.from({ length: totalPages }, (_, i) => i);
   }
 
-  private paginateArray(array: any[], itemsPerPage: number): {
-    map: Map<number, any[]>,
-    totalPages: number
-  } {
-    const result = new Map<number, any[]>();
-    const totalPages = Math.ceil(array.length / itemsPerPage);
-
-    for (let i = 0; i < totalPages; i++) {
-      const start = i * itemsPerPage;
-      const end = start + itemsPerPage;
-      result.set(i, array.slice(start, end));
-    }
-
-    return { map: result, totalPages };
+  addUserCompany(company: CompanieResponse): void {
+    this.router.navigate(['/dashboard/user/company/', company.id]);
   }
 
-  page(page: number) {
-    this.currentPage = page - 1;
-    this.deactivePaginator();
-    this.activePaginator(page - 1);
-
-    if (!this.companiasMap.has(this.currentPage)) {
-      this.saveCompanysInMemory(this.currentPage, this.numberPages);
-    } else {
-      this.companyList$ = of(this.companiasMap.get(this.currentPage) ?? []);
+  onPageChange(newPage: number): void {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.currentPage = newPage;
+      this.loadCompanies();
     }
   }
 
-  pageBack() {
-    const pages = document.querySelectorAll('#page');
-    for (let i = 0; i < pages.length; i++) {
-      if (pages[i].className.includes('active') && i > 0) {
-        pages[i].classList.remove('active');
-        pages[--i].classList.add('active');
-
-        if (!this.companiasMap.has(i)) {
-          this.saveCompanysInMemory(i, this.numberPages);
-        } else {
-          this.companyList$ = this.companyService.companysMap$.pipe(
-            map((map) => map.get(i) ?? [])
-          );
-        }
-      }
-    }
-  }
-
-  pageNext() {
-    const pages = document.querySelectorAll('#page');
-    for (let i = 0; i < pages.length; i++) {
-      if (pages[i].className.includes('active') && i < pages.length - 1) {
-        pages[i].classList.remove('active');
-        pages[++i].classList.add('active');
-
-        if (!this.companiasMap.has(i)) {
-          this.saveCompanysInMemory(i, this.numberPages);
-        } else {
-          this.companyList$ = this.companyService.companysMap$.pipe(
-            map((map) => map.get(i) ?? [])
-          );
-        }
-      }
-    }
-  }
-
-  ngAfterViewInit() {
-    const pages = document.querySelectorAll('#page');
-    if (pages.length > 0) {
-      this.activePaginator(0);
-    }
-  }
-
-  activePaginator(id: number) {
-    const pages = document.querySelectorAll('#page');
-    pages[id].classList.add('active');
-  }
-
-  deactivePaginator() {
-    const pages = document.querySelectorAll('#page');
-    pages.forEach((page) => {
-      if (page.className.includes('active')) {
-        page.classList.remove('active');
-      }
-    });
-  }
-
-  saveUserInMemory(userId: number) {
-    this.user$ = this.userService.getUSerById(userId);
-    this.user$.subscribe((data) => {
-      if (data) {
-        this.isAdmind = data.globalRoles.some(
-          (role: any) => role.name === 'ADMINISTRADOR' && role.global
-        );
-        const { globalRoles, createdAt, ...rest } = data;
-        localStorage.setItem('userData', JSON.stringify({ ...rest }));
-        localStorage.setItem('isAdmin', JSON.stringify(this.isAdmind));
-
-        this.authService.setLogin(data);
-      }
-    });
-  }
-
-  saveCompanysInMemory(page: number, size: number) {
-    this.companyService.getCompanysByUser(page, size).subscribe((data) => {
-      let companias: any = this.companyService.getCompanies();
-      companias = [...companias, data.response];
-
-      this.companiasMap.set(page, data.response);
-
-      this.companyService.setCompanys(companias.flat());
-
-      this.companyList$ = this.companyService.companysMap$.pipe(
-        map((map) => map.get(page) ?? [])
-      );
-
-      this.companyService.setLoadCompanysMap(this.companiasMap);
-
-      localStorage.setItem('totalPages', data.totalPages.toString());
-      this.paginator(data.totalPages);
-    });
-  }
-
-  dividirBusquedad(array: any, length: number) {
-    const result = [];
-    for (let i = 0; i < array.length; i += length) {
-      result.push(array.slice(i, i + length));
-    }
-
-    return result;
-  }
-
-  onPageChange(newValue: number) {
-    this.numberPages = newValue;
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
-    this.searchQuery = '';
-    this.saveCompanysInMemory(0, this.numberPages);
+    this.loadCompanies();
   }
 
-  async deleteCompany(company: CompanieResponse) {
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  async deleteCompany(company: CompanieResponse): Promise<void> {
     if (!company.tenantId) {
-      this.toastType = typeToast.Error;
-      this.messageToast = 'La compañía no tiene TenantId configurado';
-      this.showToast = true;
+      this.showErrorToast('La compañía no tiene TenantId configurado');
       return;
     }
 
     const actionByUser = this.authService.getUserId();
+    const confirmMessage = `¿Está seguro de que desea eliminar la empresa ${company.name}? Esta acción no se puede deshacer.`;
+
+    const result = await confirm(confirmMessage, 'Confirmar eliminación');
+    if (!result) return;
 
     try {
-      const hasTransactions = await this.checkCompanyTransactions(
-        company.id,
-        company.tenantId
-      );
+      const hasTransactions = await this.checkCompanyTransactions(company.id, company.tenantId);
       if (hasTransactions) {
-        this.toastType = typeToast.Error;
-        this.messageToast =
-          'No se puede eliminar la empresa porque existen transacciones asociadas';
-        this.showToast = true;
+        this.showErrorToast('No se puede eliminar la empresa porque existen transacciones asociadas');
         return;
       }
-    } catch (error) {
-      this.toastType = typeToast.Error;
-      this.messageToast = 'Error al verificar transacciones';
-      this.showToast = true;
-      console.error('Error checking transactions:', error);
-      return;
-    }
 
-    const result = await confirm(
-      `¿Está seguro de que desea eliminar la empresa ${company.name}? Esta acción no se puede deshacer.`,
-      'Confirmar eliminación'
-    );
+      this.companyService.deleteCompany(company.id, actionByUser).subscribe({
+        next: () => {
+          this.showSuccessToast('Empresa eliminada correctamente');
+          this.loadCompanies();
+        },
+        error: (err) => {
+          const errorMsg = err.error?.error?.includes('TenantId')
+            ? 'Error: No se pudo identificar la organización. Por favor, seleccione una compañía nuevamente.'
+            : 'Error al eliminar la empresa';
 
-    if (!result) {
-      return;
-    }
+          this.showErrorToast(errorMsg);
 
-    this.companyService.deleteCompany(company.id, actionByUser).subscribe({
-      next: () => {
-        this.companiasMap = new Map<number, CompanieResponse[]>();
-        this.saveCompanysInMemory(0, this.numberPages);
-
-        this.toastType = typeToast.Success;
-        this.messageToast = 'Empresa eliminada correctamente';
-        this.showToast = true;
-      },
-      error: (err) => {
-        this.toastType = typeToast.Error;
-        if (err.error?.error?.includes('TenantId')) {
-          this.messageToast =
-            'Error: No se pudo identificar la organización. Por favor, seleccione una compañía nuevamente.';
-          setTimeout(() => this.router.navigate(['/select-company']), 3000);
-        } else {
-          this.messageToast = 'Error al eliminar la empresa';
+          if (err.error?.error?.includes('TenantId')) {
+            setTimeout(() => this.router.navigate(['/select-company']), 3000);
+          }
         }
-        this.showToast = true;
-        console.error('Error deleting company:', err);
-      },
-    });
+      });
+    } catch (error) {
+      this.showErrorToast('Error al verificar transacciones');
+      console.error('Error:', error);
+    }
   }
 
-  private async checkCompanyTransactions(
-    companyId: number,
-    tenantId: string
-  ): Promise<boolean> {
+  private async checkCompanyTransactions(companyId: number, tenantId: string): Promise<boolean> {
     try {
       const transactions = await this.transactionService
         .checkCompanyTransactions(tenantId)
         .pipe(first())
         .toPromise();
-
-      if (transactions && transactions.length > 0) {
-        return true;
-      }
-
-      return false;
+      return !!transactions && transactions.length > 0;
     } catch (error) {
       console.error('Error checking transactions:', error);
       return true;
     }
+  }
+
+  private showSuccessToast(message: string): void {
+    this.toastType = typeToast.Success;
+    this.messageToast = message;
+    this.showToast = true;
+  }
+
+  private showErrorToast(message: string): void {
+    this.toastType = typeToast.Error;
+    this.messageToast = message;
+    this.showToast = true;
   }
 }

@@ -7,6 +7,7 @@ import {
   companyByUser,
   CompanyRequest,
   CompanyResponse,
+  PaginatedResponse,
 } from 'src/app/modules/companies/models/ApiModelsCompanies';
 
 @Injectable({
@@ -51,9 +52,11 @@ export class CompaniesService {
    *
    * @return response()
    */
-  getCompanysByUser(page: number, size: number): Observable<companyByUser> {
-    return this.httpClient.get<companyByUser>(
-      this.apiURL + `/api/v1/company/company-user?page=${page}&size=${size}`
+  getCompanysByUser(page: number, size: number): Observable<PaginatedResponse<CompanieResponse>> {
+    return this.httpClient.get<PaginatedResponse<CompanieResponse>>(
+      `${this.apiURL}/api/v1/company/company-user?page=${page}&size=${size}`
+    ).pipe(
+      catchError(this.errorHandler)
     );
   }
 
