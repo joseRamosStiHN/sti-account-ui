@@ -37,9 +37,8 @@ export class TaxSettingsListComponent {
   onEditTax(e: any) {
 
     console.log(e);
-    
 
-    this.router.navigate(['/accounting/configuration/period/update', e.id]);
+    this.router.navigate(['/accounting/configuration/tax-settings/update', e.id]);
   }
 
   goToNewTax = () => {

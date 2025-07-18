@@ -72,7 +72,7 @@ export class PeriodComponent {
 
   async save(e: NgForm) {
 
-    if (!e.valid) {
+    if (!e.valid || this.periodForm.periodName?.trim() === '') {
       this.toastType = typeToast.Error;
       this.messageToast = 'Por favor, complete todos los campos requeridos.';
       this.showToast = true;

@@ -55,39 +55,39 @@ const routes: Routes = [
       { path: 'provider-list', component: ProviderListComponent },
       {
         path: 'configuration', component: ConfigurationComponent, canActivate: [RoleGuard],
-        data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        data: { roles: ['REGISTRO CONTABLE'] }
       },
-      { path: 'configuration/new-account', component: AccountComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
+      { path: 'configuration/new-account', component: AccountComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       {
         path: 'configuration/update-account/:id',
-        component: AccountComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        component: AccountComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] }
       },
       {
         path: 'configuration/accounts',
-        component: ConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        component: ConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] }
       },
       { path: 'report/general-balance', component: GeneralBalanceComponent, canActivate: [RoleGuard], data: { roles: ['CONSULTA', 'APROBADOR'] } },
       { path: 'report/incomes', component: IncomeStatementComponent, canActivate: [RoleGuard], data: { roles: ['CONSULTA', 'APROBADOR'] } },
       { path: 'report/trialbalance', component: TrialBalanceComponent, canActivate: [RoleGuard], data: { roles: ['CONSULTA', 'APROBADOR'] } },
-      { path: 'configuration/journal-list', component: JournalListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
+      { path: 'configuration/journal-list', component: JournalListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       {
         path: 'configuration/journal/new-journal',
-        component: JournalPageComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        component: JournalPageComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] }
       },
       {
         path: 'configuration/journal/update-journal/:id',
-        component: JournalPageComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        component: JournalPageComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] }
       },
-      { path: 'configuration/period', component: PeriodListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
-      { path: 'configuration/period/create', component: PeriodComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
-      { path: 'configuration/period/update/:id', component: PeriodComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
+      { path: 'configuration/period', component: PeriodListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
+      { path: 'configuration/period/create', component: PeriodComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
+      { path: 'configuration/period/update/:id', component: PeriodComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       {
         path: 'configuration/balance/accounts',
-        component: BalanceListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        component: BalanceListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] }
       },
       {
         path: 'configuration/balance/accounts/inital/:id',
-        component: BalanceAccountsComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] }
+        component: BalanceAccountsComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] }
       },
       {
         path: 'report/senior-accountants',
@@ -107,13 +107,13 @@ const routes: Routes = [
       { path: 'debit-notes', component: DebitNotesComponent },
       { path: 'debit-notes/:id', component: DebitNotesComponent },
 
-      { path: 'configuration/tax-settings', component: TaxSettingsListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
-      { path: 'configuration/tax-settings/create', component: TaxSettingsComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
-      { path: 'configuration/tax-settings/:id', component: TaxSettingsComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
+      { path: 'configuration/tax-settings', component: TaxSettingsListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
+      { path: 'configuration/tax-settings/create', component: TaxSettingsComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
+      { path: 'configuration/tax-settings/update/:id', component: TaxSettingsComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
 
-      { path: 'configuration/bulk-configuration', component: BulkConfigurationListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
-      { path: 'configuration/bulk-configuration/create', component: BulkConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
-      { path: 'configuration/bulk-configuration/:id', component: BulkConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE', 'APROBADOR'] } },
+      { path: 'configuration/bulk-configuration', component: BulkConfigurationListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
+      { path: 'configuration/bulk-configuration/create', component: BulkConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
+      { path: 'configuration/bulk-configuration/:id', component: BulkConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       { path: 'bulk-upload-file', component: UploadBulkFileComponent },
       { path: 'various-operations', component: VariousOperationsComponent },
       { path: 'various-operations/:id', component: VariousOperationsComponent },

@@ -2,7 +2,7 @@
     <h2 class="text-4xl mb-6 font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
         Impuestos
     </h2>
-    
+
 
     <dx-data-grid id="account-list-grid" [dataSource]="taxList$ | async" [repaintChangesOnly]="true"
         [loadPanel]="{ enabled: true }" [width]="'100%'" [allowColumnReordering]="true" [allowColumnResizing]="true"
@@ -14,57 +14,42 @@
 
         <dxo-paging [pageSize]="15"> </dxo-paging>
         <dxo-pager [visible]="true"> </dxo-pager>
-        <dxi-column
-        caption="#"
-        [width]="50"
-        [minWidth]="20"
-        alignment="left"
-        cellTemplate="indexTemplate"
-        [showEditorAlways]="false"
-        [formItem]="{ visible: false }"
-        [allowEditing]="false"
-      >
+        <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="left" cellTemplate="indexTemplate"
+            [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
         </dxi-column>
-        <dxi-column caption="Tipo" width="400" dataField="type"
-        alignment="left"></dxi-column>
-       <!--  <dxi-column caption="Tipo de Impuesto" dataField="taxRate" alignment="left"></dxi-column> -->
-        <dxi-column caption="Desde" width="300" dataField="fromValue"
-            alignment="right" [format]="{ 
+        <dxi-column caption="Tipo" width="400" dataField="type" alignment="left"></dxi-column>
+        <dxi-column caption="Desde" width="300" dataField="fromValue" alignment="right" [format]="{ 
                 style: 'currency', 
                 currency: 'HNL', 
                 minimumFractionDigits: 2, 
                 useGrouping: true 
               }"></dxi-column>
 
-            <dxi-column
-            caption="Hasta"
-            width="300"
-            dataField="toValue"
-            [format]="{ 
+        <dxi-column caption="Hasta" width="300" dataField="toValue" [format]="{ 
                 style: 'currency', 
                 currency: 'HNL', 
                 minimumFractionDigits: 2, 
                 useGrouping: true 
-              }"
+              }"></dxi-column>
+        <dxi-column caption="Porcentaje" width="200" dataField="percent" cellTemplate="cellTemplatePercent">
+        </dxi-column>
 
-          ></dxi-column>
-          <dxi-column
-            caption="Porcentaje"
-            width="200"
-            dataField="percent"
-          ></dxi-column>
+        <div *dxTemplate="let data of 'cellTemplatePercent'">
+            {{ data.data.percent | number:'1.0-2' }}%
+        </div>
 
-          <dxi-column caption="Fecha Creación" width="200" [calculateDisplayValue]="formatDateInit"
-            alignment="left"></dxi-column>
+        <dxi-column caption="Fecha de Creación" dataField="creationDate" alignment="center"
+            dataType="date"></dxi-column>
+
 
 
         <div *dxTemplate="let d of 'indexTemplate'">
             <span>{{ d.rowIndex + 1 }}</span>
-          </div>
+        </div>
 
-          <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
+        <dxi-column type="buttons" cellTemplate="cellButtonTemplate" width="50">
             <div *dxTemplate="let data of 'cellButtonTemplate'">
-            
+
                 <button class="dx-link dx-icon-edit dx-link-icon" (click)="onEditTax(data.data)"></button>
             </div>
         </dxi-column>
