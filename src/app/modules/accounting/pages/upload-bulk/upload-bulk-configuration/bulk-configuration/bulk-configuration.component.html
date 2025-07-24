@@ -7,12 +7,17 @@
         <div class="container">
             <div class="grid grid-cols-3 gap-2">
                 <div class="form-group">
-                    <label for="nameSettings" class="block mb-2 text-sm text-gray-900">Nombre Configuracion</label>
-                    <input [(ngModel)]="BulkConfiguration.name" id="nameSettings" name="nameSettings" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                    <label for="nameSettings" class="block mb-2 text-sm text-gray-900">Nombre Configuración</label>
+                    <input [(ngModel)]="BulkConfiguration.name" id="nameSettings" name="nameSettings" type="text"
+                        maxlength="50" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
              focus:ring-blue-500 focus:border-blue-500 block w-full p-2" required />
                     <div *ngIf="itemForm.submitted && itemForm.form.controls['nameSettings'].getError('required')
             ">
-                        <small class="text-xs text-red-900">Nombre de Configuracion es requerido.</small>
+                        <small class="text-xs text-red-900">Nombre de Configuración es requerido.</small>
+                    </div>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['nameSettings'].errors?.['maxlength']">
+
+                        <small class="text-xs text-red-900">No puede exceder los 50 caracteres.</small>
                     </div>
                 </div>
                 <div>
@@ -30,13 +35,19 @@
                 </div>
                 <div class="form-group">
                     <label for="rowInit" class="block mb-2 text-sm text-gray-900">Fila Inicio</label>
-                    <input [(ngModel)]="BulkConfiguration.rowInit" id="rowInit" name="rowInit" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-             focus:ring-blue-500 focus:border-blue-500 block w-full p-2" required />
-                    <div *ngIf="itemForm.submitted && itemForm.form.controls['rowInit'].getError('required')
-            ">
+                    <input [(ngModel)]="BulkConfiguration.rowInit" #rowInit="ngModel" id="rowInit" name="rowInit"
+                        type="number" min="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+           focus:ring-blue-500 focus:border-blue-500 block w-full p-2" required />
+
+                    <div *ngIf="itemForm.submitted && rowInit.errors?.['required']">
                         <small class="text-xs text-red-900">Fila de inicio es requerida.</small>
                     </div>
+
+                    <div *ngIf="itemForm.submitted && rowInit.errors?.['min']">
+                        <small class="text-xs text-red-900">Fila de inicio debe ser un número mayor a 0.</small>
+                    </div>
                 </div>
+
 
 
 
@@ -46,7 +57,7 @@
 
             <div class="grid grid-cols-3 gap-2">
                 <div>
-                    <label for="credito" class="block mb-2 text-sm text-gray-900">Credito</label>
+                    <label for="credito" class="block mb-2 text-sm text-gray-900">Crédito</label>
                     <select required name="credito" id="credito" (ngModelChange)="onChange($event)"
                         [(ngModel)]="configDefault[0].colum" class="bg-gray-50 border border-gray-300 text-gray-900 
                         text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
@@ -57,11 +68,11 @@
                     </select>
                     <div *ngIf="itemForm.submitted && itemForm.form.controls['credito'].getError('required')
                   ">
-                        <small class="text-xs text-red-900">Credito es requerido.</small>
+                        <small class="text-xs text-red-900">Crédito es requerido.</small>
                     </div>
                 </div>
                 <div>
-                    <label for="cuenta-credito" class="block mb-2 text-sm text-gray-900">Cuenta Credito</label>
+                    <label for="cuenta-credito" class="block mb-2 text-sm text-gray-900">Cuenta Crédito</label>
                     <select required name="cuenta-credito" id="cuenta-credito" [(ngModel)]="configDefault[0].account"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                         <option *ngFor="let colum of accountList" [ngValue]="colum.id">
@@ -70,11 +81,11 @@
                     </select>
                     <div *ngIf="itemForm.submitted && itemForm.form.controls['cuenta-credito'].getError('required')
                   ">
-                        <small class="text-xs text-red-900">Cuenta Credito es requerido.</small>
+                        <small class="text-xs text-red-900">Cuenta Crédito es requerido.</small>
                     </div>
                 </div>
                 <div>
-                    <label for="movimiento-credito" class="block mb-2 text-sm text-gray-900">Movimiento Credito</label>
+                    <label for="movimiento-credito" class="block mb-2 text-sm text-gray-900">Movimiento Crédito</label>
                     <select required name="movimiento-credito" id="movimiento-credito"
                         [(ngModel)]="configDefault[0].operation"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
@@ -84,10 +95,11 @@
                     </select>
                     <div *ngIf="itemForm.submitted && itemForm.form.controls['movimiento-credito'].getError('required')
                   ">
-                        <small class="text-xs text-red-900">Movimiento Credito es requerido.</small>
+                        <small class="text-xs text-red-900">Movimiento Crédito es requerido.</small>
                     </div>
                 </div>
             </div>
+            <div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
             <div class="grid grid-cols-3 gap-2">
                 <div>
                     <label for="contado" class="block mb-2 text-sm text-gray-900">Contado</label>
@@ -235,12 +247,12 @@
                 </dxo-lookup>
                 <dxi-validation-rule type="required"></dxi-validation-rule>
             </dxi-column>
-            <dxi-column caption="Titulo" dataField="title" alignment="left" [width]="350"></dxi-column>
+            <dxi-column caption="Título" dataField="title" alignment="left" [width]="350"></dxi-column>
             <dxi-column caption="Cuenta" dataField="account" alignment="left">
                 <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">
                 </dxo-lookup>
             </dxi-column>
-            <dxi-column caption="Operacion" dataField="operation" alignment="left" [width]="100">
+            <dxi-column caption="Operación" dataField="operation" alignment="left" [width]="100">
                 <dxo-lookup [dataSource]="listMovement" valueExpr="code" displayExpr="name">
                 </dxo-lookup>
             </dxi-column>

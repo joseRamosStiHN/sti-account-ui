@@ -29,11 +29,11 @@ export class BulkConfigurationListComponent {
 
 
   ngOnInit(): void {
- this.bulkSettingList$ = this.periodoService.getAllBulkSettings().pipe(
-      map(data=> {
-       return data.map(bulk=>{
-          const typeSale = bulk.type == 1 ? "Venta": "Compra";          
-          return { typeSale, ...bulk}
+    this.bulkSettingList$ = this.periodoService.getAllBulkSettings().pipe(
+      map(data => {
+        return data.map(bulk => {
+          const typeSale = bulk.type == 1 ? "Ingresos" : "Compras";
+          return { typeSale, ...bulk }
 
         })
       })
