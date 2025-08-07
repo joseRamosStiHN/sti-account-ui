@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { confirm } from 'devextreme/ui/dialog';
 import config from 'devextreme/core/config';
@@ -8,7 +8,7 @@ import {
   Transaction,
   typeToast,
 } from '../../../models/models';
-import { NgForm } from '@angular/forms';
+import { NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TransactionService } from '../../../services/transaction.service';
 import { TransactionModel } from '../../../models/TransactionModel';
@@ -85,6 +85,8 @@ export class ProviderComponent {
 
   accountList: AccountModel[] = [];
 
+  @ViewChild('itemForm') itemForm!: NgForm;
+
   private readonly router = inject(Router);
   private readonly transactionService = inject(TransactionService);
   private accountService = inject(AccountService);
@@ -110,14 +112,14 @@ export class ProviderComponent {
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item => (item.accountTypeName	=== "Gastos" || item.accountTypeName	=== "Compras") && item.status == true);
+          .filter(item => (item.accountTypeName === "Gastos" || item.accountTypeName === "Compras") && item.status == true);
 
         if (this.journalList.length > 0) {
           this.providerBilling.diaryType = this.journalList[0].id;
           this.loadAccounts();
         } else {
           this.toastType = typeToast.Error;
-          this.messageToast = 'Debe de crear o activar un diario de compras para poder continuar';
+          this.messageToast = 'Debe de crear o activar un diario de compras para poder continuar.';
           this.showToast = true;
         }
 
@@ -196,9 +198,6 @@ export class ProviderComponent {
         return;
       }
 
-
-
-
       if (this.id) {
         //Cuando Actualiza la Factura de proveedores
 
@@ -208,7 +207,7 @@ export class ProviderComponent {
             next: (data) => {
               this.fillBilling(data);
               this.toastType = typeToast.Success;
-              this.messageToast = 'Actualizados Exitosamente';
+              this.messageToast = 'Registro Actualizado Exitosamente.';
               this.showToast = true;
 
               setTimeout(() => {
@@ -218,9 +217,9 @@ export class ProviderComponent {
             },
             error: (err) => {
               this.toastType = typeToast.Error;
-              this.messageToast = 'No se pudo Actualizar los datos';
+              this.messageToast = err.message || 'Error al actualizar la transacción.'
               this.showToast = true;
-              console.error('erro al actualizar transacción ', err);
+              console.error('Error al actualizar transacción ', err);
             },
           });
         return;
@@ -232,53 +231,20 @@ export class ProviderComponent {
           this.providerBilling.id = data.id;
           this.providerBilling.status = 'Draft';
           this.toastType = typeToast.Success;
-          this.messageToast = 'Registros insertados exitosamente';
+          this.messageToast = 'Registro insertado exitosamente.';
           this.showToast = true;
 
           setTimeout(() => {
             this.router.navigate(['/accounting/provider-list']);
           }, 2000);
         },
-        error: (err) => console.error('error', err),
-      });
-
-
-
-
-      //TODO: Laurent aqui hace la integración
-      //el servicio deberia retornar el id de la transaccion y su estado
-      //set id
-      /*  const transactionData: TransactionModel = {
-        createAtDate: this.providerBilling.date,
-        reference: this.providerBilling.billingNumber,
-        documentType: 1,
-        exchangeRate: this.providerBilling.exchangeRate,
-        descriptionPda: this.providerBilling.description,
-        currency: this.providerBilling.currency,
-        detail: this.dataSource.map((detail) => {
-          return {
-            accountId: detail.accountId,
-            amount: detail.amount,
-            motion: detail.movement,
-          };
-        }),
-      };
-
-      this.transactionService.createTransaction(transactionData).subscribe(
-        (response: any) => {
-          this.providerBilling.id = 1;
-          this.providerBilling.status = 'Draft';
-          this.toastType = typeToast.Success;
-          this.messageToast = 'Registros insertados exitosamente';
+        error: (err) => {
+          console.error('Error creating transaction:', err);
+          this.toastType = typeToast.Error;
+          this.messageToast = err.message || 'Error al crear la transacción.'
           this.showToast = true;
         },
-        (error: any) => {
-          console.error('Error creating transaction:', error);
-          this.toastType = typeToast.Error;
-          this.messageToast = 'Error al crear la transacción';
-          this.showToast = true;
-        }
-      ); */
+      });
     }
   }
 
@@ -291,14 +257,14 @@ export class ProviderComponent {
     dialogo.then(async (d) => {
       if (d) {
 
-        this.buttonTextPosting = 'confirmando...';
+        this.buttonTextPosting = 'Confirmando...';
         this.disablePosting = true;
 
         const transId = Number(this.id);
         this.transactionService.postTransaction(transId).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Transacción publicada con éxito.!';
+            this.messageToast = 'Transacción confirmada con éxito.!';
             this.showToast = true;
             setTimeout(() => {
               this.router.navigate(['/accounting/provider-list']);
@@ -307,7 +273,7 @@ export class ProviderComponent {
           },
           error: (err) => {
             this.toastType = typeToast.Error;
-            this.messageToast = 'Error al intentar publicar la transacción';
+            this.messageToast = 'Error al intentar publicar la transacción.';
             this.showToast = true;
 
             this.buttonTextPosting = 'Confirmar';
@@ -347,74 +313,45 @@ export class ProviderComponent {
   }
 
   onContentReady(e: DxDataGridTypes.ContentReadyEvent) {
-    e.component.option('loadPanel.enabled', false); // elimina el loading cuando agregas una nueva fila
+    e.component.option('loadPanel.enabled', false);
     const gridComponent = e.component;
 
-    // Obtén los totales del summary. por medio de los nombres del calculateSummary.
     const totalDebit = gridComponent.getTotalSummaryValue('totalDebit');
     const totalCredit = gridComponent.getTotalSummaryValue('totalCredit');
 
-    // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
-    // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
-
-
-    // const rows = document.querySelectorAll('.dx-data-row');
-    // rows.forEach(row => {
-    //   const tds = row.querySelectorAll("td");
-    //   tds.forEach(td => {
-    //     const codeAccount = td.textContent
-    //     if (codeAccount == 'Debe') {
-    //       const editButtons = row.querySelectorAll(".dx-link-edit");
-    //       const deleteButtons = row.querySelectorAll(".dx-link-delete");
-    //       editButtons.forEach(button => {
-    //         (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-    //       });
-
-    //       deleteButtons.forEach(button => {
-    //         (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-    //       });
-    //     }
-    //   })
-    // });
+    const rows = document.querySelectorAll('.dx-data-row');
   }
 
   private validate(): boolean {
-    this.messageToast = ''; // limpia el balance
+    this.messageToast = '';
     this.showToast = false;
     if (this.dataSource.length < 2) {
-      // si el array contiene menos de 2 registros
-      this.messageToast = 'Debe agregar al menos 2 transacciones';
+      this.messageToast = 'Debe agregar al menos 2 transacciones para continuar.';
       this.showToast = true;
       this.toastType = typeToast.Error;
       return false;
     }
-    // operar sobre el total y verificar que lleve a cero la operación
     const total = this.totalCredit - this.totalDebit;
-    // console.log(total);
-
     if (total !== 0) {
       this.messageToast =
-        'El balance no es correcto, por favor ingrese los valores correctos';
+        'El balance no es correcto, por favor ingrese los valores correctos.';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida balance');
       return false;
     }
-
     const hasDuplicateAccountId = this.dataSource.some((item, index) => {
       return this.dataSource.filter(obj => obj.accountId === item.accountId).length > 1;
     });
 
     if (hasDuplicateAccountId) {
       this.messageToast =
-        'No se puede registrar la misma cuenta en la transaccion';
+        'No se puede registrar la misma cuenta en la transacción en el debe y en el haber.';
       this.showToast = true;
       this.toastType = typeToast.Error;
 
       return false;
     }
 
-    // si todo `OK` retorna true
     return true;
   }
 
@@ -442,11 +379,25 @@ export class ProviderComponent {
     this.providerBilling.rtn = data.rtn
     this.providerBilling.supplierName = data.supplierName
 
-    this.loadAccounts();
+    //this.loadAccounts();
     const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
     const haber = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
     this.totalCredit = debe;
     this.totalDebit = haber;
+
+    setTimeout(() => {
+      this.onCurrencyChange();
+      this.onRtnChange();
+    });
+  }
+
+  onChangeJournal(e: any) {
+
+    if (e.target.value) {
+      this.dataSource = [];
+
+      this.loadAccounts();
+    }
   }
 
   async react() {
@@ -458,14 +409,6 @@ export class ProviderComponent {
     this.router.navigate(['/accounting/configuration/period']);
   }
 
-  onChangeJournal(e: any) {
-
-    if (e.target.value) {
-      this.dataSource = [];
-
-      this.loadAccounts();
-    }
-  }
 
   loadAccounts() {
     this.accountService.getAllAccount().subscribe({
@@ -481,259 +424,35 @@ export class ProviderComponent {
     });
   }
 
-/*   save(e: any) {
 
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    // console.log("credit", credit);
-    // console.log("debit", debit);
-
-    if (e.data.movement === 'C' && debit.length <= 1) {
-      if (debit.length === 1) {
-        debit.forEach((item) => {
-          // Sumar el monto de los movimientos 'C'
-          const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-
-          // Redondear la suma a dos decimales para asegurar precisión
-          const roundedSum = parseFloat(sum.toFixed(2));
-
-          // Asignar el valor redondeado
-          // console.log('Suma calculada para movimiento C (redondeada):', roundedSum);
-          item.amount = roundedSum;  // Redondear a dos decimales
-        });
-      } else {
-        // Si no hay debit, agregarlo automáticamente
-        this.dataSource.push({
-          id: this.selectedJournal?.id ?? 0,
-          accountId: this.selectedJournal?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),  // Aseguramos precisión al agregar el valor
-          movement: 'D',
-        });
-      }
-    }
-
-    if (e.data.movement === 'D' && credit.length <= 1) {
-      if (credit.length === 1) {
-        credit.forEach((item) => {
-          // Sumar el monto de los movimientos 'D'
-          const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-
-          // Redondear la suma a dos decimales para asegurar precisión
-          const roundedSum = parseFloat(sum.toFixed(2));
-
-          // Asignar el valor redondeado
-          // console.log('Suma calculada para movimiento D (redondeada):', roundedSum);
-          item.amount = roundedSum;  // Redondear a dos decimales
-        });
-      } else {
-        // Si no hay credit, agregarlo automáticamente
-        this.dataSource.push({
-          id: this.selectedJournal?.id ?? 0,
-          accountId: this.selectedJournal?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),  // Aseguramos precisión al agregar el valor
-          movement: 'C',
-        });
-      }
-    }
-
+  save(e: any) {
     this.updateAmounts();
-
-
-
-
-
-    // e.data.movement = "C";
-    // let foundItems = this.dataSource.filter((data) => data.movement === 'D');
-    // if (foundItems.length > 0) {
-
-    //   foundItems.forEach((item) => {
-    //     const sum = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
-
-    //     this.totalCredit = sum;
-    //     this.totalDebit = sum;
-
-    //     item.amount = sum
-    //   });
-    // } else {
-
-    //   this.totalCredit = e.data.amount;
-    //   this.totalDebit = e.data.amount;
-
-    //   this.dataSource.push({
-    //     id: this.selectedJournal?.id ?? 0,
-    //     accountId: this.selectedJournal?.defaultAccount ?? 0,
-    //     amount: e.data.amount,
-    //     movement: 'D',
-
-    //   });
-
-
-    // setTimeout(() => {
-    //   const rows = document.querySelectorAll('.dx-data-row');
-
-    //   rows.forEach(row => {
-    //     const tds = row.querySelectorAll("td");
-    //     tds.forEach(td => {
-    //       const codeAccount = td.textContent
-    //       if (codeAccount == 'Debe') {
-    //         const editButtons = row.querySelectorAll(".dx-link-edit");
-    //         const deleteButtons = row.querySelectorAll(".dx-link-delete");
-    //         editButtons.forEach(button => {
-    //           (button as HTMLElement).style.display = 'none';
-    //         });
-
-    //         deleteButtons.forEach(button => {
-    //           (button as HTMLElement).style.display = 'none'; 
-    //         });
-    //       }
-    //     })
-    //   });
-    // }, 2);
-  } */
-
-
-    save(e: any) {
-      const credit = this.dataSource.filter((data) => data.movement === 'C');
-      const debit = this.dataSource.filter((data) => data.movement === 'D');
-  
-      // Si el movimiento es 'C' (Haber)
-      if (e.data.movement == 'C') {
-        // Si ya hay un movimiento de 'D' (Debe), actualiza el monto
-        if (debit.length === 1) {
-          debit.forEach((item) => {
-            const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-            const roundedSum = parseFloat(sum.toFixed(2));
-            item.amount = roundedSum;
-          });
-        }
-      }
-  
-      // Si el movimiento es 'D' (Debe)
-      if (e.data.movement == 'D') {
-        // Si ya hay un movimiento de 'C' (Haber), actualiza el monto
-        if (credit.length === 1) {
-          credit.forEach((item) => {
-            const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-            const roundedSum = parseFloat(sum.toFixed(2));
-            item.amount = roundedSum;
-          });
-        }
-      }
-  
-      // Actualiza los montos totales
-      this.updateAmounts();
-    }
-  
-
-  private updateAmounts(): void {
-
-
-    if (this.dataSource.length > 0) {
-      // Calcular el total de los movimientos 'D' (debe)
-      const debe = this.dataSource
-        .filter((data) => data.movement === 'D')
-        .reduce((sum, item) => sum + item.amount, 0);
-
-      // Calcular el total de los movimientos 'C' (haber)
-      const haber = this.dataSource
-        .filter((data) => data.movement === 'C')
-        .reduce((sum, item) => sum + item.amount, 0);
-
-      // Redondear los totales a dos decimales
-      this.totalCredit = parseFloat(haber.toFixed(2));
-      this.totalDebit = parseFloat(debe.toFixed(2));
-
-      // Mostrar en la consola para verificar
-      // console.log('Total Debit:', this.totalDebit);
-      // console.log('Total Credit:', this.totalCredit);
-    }
   }
 
   update(e: any) {
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement === 'D' && credit.length === 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); // Redondear a dos decimales
-        // console.log('Nuevo monto para crédito:', item.amount); // Mostrar en consola
-      });
-    }
-
-    if (e.data.movement === 'C' && debit.length === 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); // Redondear a dos decimales
-        // console.log('Nuevo monto para débito:', item.amount); // Mostrar en consola
-      });
-    }
-
-
-
-
     this.updateAmounts();
-    // let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    // if (foundItems.length > 0) {
-    //   foundItems.forEach((item) => {
-    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-    //     this.totalCredit = sum;
-    //     this.totalDebit = sum;
-    //     item.amount = sum
-    //   });
-    // }
+  }
+
+  private updateAmounts(): void {
+    if (this.dataSource.length > 0) {
+      const totalDebit = this.dataSource
+        .filter(item => item.movement === 'D')
+        .reduce((sum, item) => sum + item.amount, 0);
+
+      const totalCredit = this.dataSource
+        .filter(item => item.movement === 'C')
+        .reduce((sum, item) => sum + item.amount, 0);
+
+      this.totalDebit = parseFloat(totalDebit.toFixed(2));
+      this.totalCredit = parseFloat(totalCredit.toFixed(2));
+    } else {
+      this.totalDebit = 0;
+      this.totalCredit = 0;
+    }
   }
 
   removed(e: any) {
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    // Eliminar todos los registros si hay uno de cada tipo y ninguno más
-    if (e.data.movement === 'D' && credit.length === 1 && debit.length === 0) {
-      this.dataSource = [];
-      return;
-    }
-    if (e.data.movement === 'C' && debit.length === 1 && credit.length === 0) {
-      this.dataSource = [];
-      return;
-    }
-
-    // Actualizar el monto del movimiento de crédito
-    if (e.data.movement === 'D' && credit.length === 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); // Redondear a dos decimales
-      });
-    }
-
-    // Actualizar el monto del movimiento de débito
-    if (e.data.movement === 'C' && debit.length === 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); // Redondear a dos decimales
-      });
-    }
-
-
     this.updateAmounts();
-
-    // let debitos = this.dataSource.filter((data) => data.movement === 'D');
-    // if (debitos.length > 0) {
-    //   let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    //   foundItems.forEach((item) => {
-    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-    //     this.totalCredit = sum;
-    //     this.totalDebit = sum;
-    //     item.amount = sum
-    //   });
-    // } else {
-    //   this.dataSource = [];
-    //   this.totalCredit = 0;
-    //   this.totalDebit = 0;
-
-
-    // }
   }
 
   combineCodeAndDescription = (item: any) => {
@@ -744,6 +463,7 @@ export class ProviderComponent {
   goBack() {
     window.history.back();
   }
+
   getCredit(dataRow: any) {
 
     if (dataRow.movement === "C") {
@@ -760,5 +480,45 @@ export class ProviderComponent {
 
     return 0;
 
+  }
+
+  onCurrencyChange() {
+    if (!this.itemForm || !this.itemForm.form) {
+      return;
+    }
+    const exchangeRateControl = this.itemForm.form.get('exchangeRate');
+
+    if (!exchangeRateControl) {
+      return;
+    }
+
+    if (this.providerBilling.currency === 'USD') {
+      exchangeRateControl.setValidators([Validators.required]);
+    } else {
+      exchangeRateControl.clearValidators();
+      exchangeRateControl.setValue(null);
+    }
+    exchangeRateControl.updateValueAndValidity();
+    exchangeRateControl.markAsTouched();
+  }
+
+  onRtnChange() {
+    if (!this.itemForm || !this.itemForm.form) {
+      return;
+    }
+    const supplierNameControl = this.itemForm.form.get('supplierName');
+
+    if (!supplierNameControl) {
+      return;
+    }
+
+    if (this.providerBilling.rtn === 'SI') {
+      supplierNameControl.setValidators([Validators.required]);
+    } else {
+      supplierNameControl.clearValidators();
+      supplierNameControl.setValue(null);
+    }
+    supplierNameControl.updateValueAndValidity();
+    supplierNameControl.markAsTouched();
   }
 }
