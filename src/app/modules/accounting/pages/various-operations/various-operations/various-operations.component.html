@@ -24,16 +24,21 @@
                 <div class="form-group">
                     <label for="billingNumber" class="block mb-2 text-sm text-gray-900">Referencia:</label>
                     <input [(ngModel)]="variousOperations.billingNumber" id="billingNumber" name="billingNumber"
-                        type="text"
+                        type="text" maxlength="50" pattern="^[a-zA-Z0-9\- ]*$"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
                         placeholder="FACT00001" required />
-                    <div *ngIf="
-                  itemForm.submitted &&
-                  itemForm.form.controls['billingNumber'].getError('required')
-                ">
+                    <div *ngIf="itemForm.submitted &&itemForm.form.controls['billingNumber'].getError('required')">
                         <small class="text-xs text-red-900">Referencia es requerida.</small>
                     </div>
+                    <div *ngIf="itemForm.submitted && itemForm.form.controls['billingNumber'].getError('maxlength')">
+                        <small class="text-xs text-red-900">Máximo 50 caracteres.</small>
+                    </div>
+
+                    <div *ngIf="itemForm.submitted &&itemForm.form.controls['billingNumber'].getError('pattern')">
+                        <small class="text-xs text-red-900">Solo se permiten letras, números y guiones.</small>
+                    </div>
                 </div>
+
                 <div>
                     <label for="date" class="block mb-2 text-sm text-gray-900">Fecha:</label>
                     <input type="date" [(ngModel)]="variousOperations.date" id="date" name="date"

@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, ElementRef, inject, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { NgForm, Validators } from '@angular/forms';
-import { DxDataGridComponent, DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { Component,  inject, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import config from 'devextreme/core/config';
 import { confirm } from 'devextreme/ui/dialog';
 import {
@@ -17,7 +17,7 @@ import { AccountService } from '../../../services/account.service';
 import { AccountModel } from '../../../models/AccountModel';
 import { AccountAPIResponse, AccountTypeResponse, TransactionResponse } from '../../../models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
-import { JournalModel, JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalModel } from 'src/app/modules/accounting/models/JournalModel';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
 import { Observable, BehaviorSubject, map } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
@@ -94,7 +94,7 @@ export class VariousOperationsComponent {
   accountList: AccountModel[] = [];
 
   @ViewChild('itemForm') itemForm!: NgForm;
-  //
+
   private readonly router = inject(Router);
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly transactionService = inject(TransactionService);
@@ -128,44 +128,43 @@ export class VariousOperationsComponent {
 
   ngOnInit(): void {
     this.activeRouter.paramMap.subscribe((params) => {
-        this.id = params.get('id');
-        this.variousOperations.id = Number(this.id);
-        const findId = Number(this.id);
-        if (findId) {
-            this.transactionService.getTransactionById(findId).subscribe({
-                next: (data) => this.fillBilling(data),
-            });
-        } else {
-            this.periodService.getStatusPeriod().subscribe({
-                next: (status) => {
-                    if (!status) {
-                        this.react();
-                    }
-                },
-                error: (err) => this.router.navigate(['/accounting/various-operations-list']),
-            });
-        }
+      this.id = params.get('id');
+      this.variousOperations.id = Number(this.id);
+      const findId = Number(this.id);
+      if (findId) {
+        this.transactionService.getTransactionById(findId).subscribe({
+          next: (data) => this.fillBilling(data),
+        });
+      } else {
+        this.periodService.getStatusPeriod().subscribe({
+          next: (status) => {
+            if (!status) {
+              this.react();
+            }
+          },
+          error: (err) => this.router.navigate(['/accounting/various-operations-list']),
+        });
+      }
     });
 
     const excludedTypes = ['Ingresos', 'Gastos'];
 
     this.journalTypes = this.journalService.getAllAccountType().pipe(
-        map((results: AccountTypeResponse[]): LocalAccountType[] =>
-            results
-                .filter(result => !excludedTypes.includes(result.name))
-                .map((result: AccountTypeResponse) => {
-                    return {
-                        id: result.id,
-                        isActive: false,
-                        name: result.name,
-                    };
-                })
-        )
+      map((results: AccountTypeResponse[]): LocalAccountType[] =>
+        results
+          .filter(result => !excludedTypes.includes(result.name))
+          .map((result: AccountTypeResponse) => {
+            return {
+              id: result.id,
+              isActive: false,
+              name: result.name,
+            };
+          })
+      )
     );
-}
+  }
 
   async onSubmit(e: NgForm) {
-    console.log(this.dataSource);
 
     if (!e.valid) {
       this.toastType = typeToast.Error;
@@ -186,13 +185,12 @@ export class VariousOperationsComponent {
 
       if (accountTypeId === undefined || accountTypeId === null) {
         this.toastType = typeToast.Error;
-        this.messageToast = 'Tipo de diario no definido';
+        this.messageToast = 'Tipo de diario no definido.';
         this.showToast = true;
         return;
       }
 
       try {
-        // Use firstValueFrom to convert observable to Promise
         const journal = await firstValueFrom(this.journalService.getJournalByAccountType(accountTypeId));
 
         if (!journal || !journal.id) {
@@ -224,7 +222,6 @@ export class VariousOperationsComponent {
           })),
         };
 
-        console.log(transactionData);
 
         const dialogo = await confirm(
           `¿Está seguro de que desea realizar esta acción?`,
@@ -242,7 +239,7 @@ export class VariousOperationsComponent {
               next: (data) => {
                 this.fillBilling(data);
                 this.toastType = typeToast.Success;
-                this.messageToast = 'Actualizados Exitosamente';
+                this.messageToast = 'Registro actualizado exitosamente.';
                 this.showToast = true;
                 setTimeout(() => {
                   this.router.navigate(['/accounting/various-operations-list']);
@@ -250,7 +247,7 @@ export class VariousOperationsComponent {
               },
               error: (err) => {
                 this.toastType = typeToast.Error;
-                this.messageToast = 'No se pudo Actualizar los datos';
+                this.messageToast = err.message || 'Error al actualizar la transacción.'
                 this.showToast = true;
                 console.error('Error al actualizar transacción ', err);
               }
@@ -263,7 +260,7 @@ export class VariousOperationsComponent {
             next: (data) => {
               this.fillBilling(data);
               this.toastType = typeToast.Success;
-              this.messageToast = 'Registros insertados exitosamente';
+              this.messageToast = 'Registro insertado exitosamente.';
               this.showToast = true;
               setTimeout(() => {
                 this.router.navigate(['/accounting/various-operations-list']);
@@ -272,7 +269,7 @@ export class VariousOperationsComponent {
             error: (err) => {
               console.error('Error creating transaction:', err);
               this.toastType = typeToast.Error;
-              this.messageToast = 'Error al crear la transacción';
+              this.messageToast = err.message || 'Error al crear la transacción.'
               this.showToast = true;
             },
           });
@@ -280,7 +277,7 @@ export class VariousOperationsComponent {
       } catch (error) {
         console.error('Error fetching journal by account type:', error);
         this.toastType = typeToast.Error;
-        this.messageToast = 'Error al obtener el diario por tipo de cuenta';
+        this.messageToast = 'Error al obtener el diario por tipo de cuenta.';
         this.showToast = true;
       }
     }
@@ -294,14 +291,13 @@ export class VariousOperationsComponent {
 
     dialogo.then(async (d) => {
       if (d) {
-        // si el usuario dio OK
-        this.buttonTextPosting = 'confirmando...';
+        this.buttonTextPosting = 'Confirmando...';
         this.disablePosting = true;
         const transId = Number(this.id);
         this.transactionService.postTransaction(transId).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Transacción publicada con éxito.!';
+            this.messageToast = 'Transacción confirmada con éxito.!';
             this.showToast = true;
 
             setTimeout(() => {
@@ -312,7 +308,7 @@ export class VariousOperationsComponent {
           },
           error: (err) => {
             this.toastType = typeToast.Error;
-            this.messageToast = 'Error al intentar publicar la transacción';
+            this.messageToast = 'Error al intentar publicar la transacción.';
             this.showToast = true;
 
             this.buttonTextPosting = 'Confirmar';
@@ -357,7 +353,7 @@ export class VariousOperationsComponent {
   }
 
   onContentReady(e: DxDataGridTypes.ContentReadyEvent) {
-    e.component.option('loadPanel.enabled', false); // elimina el loading cuando agregas una nueva fila
+    e.component.option('loadPanel.enabled', false);
     const gridComponent = e.component;
 
     const totalDebit = gridComponent.getTotalSummaryValue('totalDebit');
@@ -367,10 +363,10 @@ export class VariousOperationsComponent {
   }
 
   private validate(): boolean {
-    this.messageToast = ''; // limpia el balance
+    this.messageToast = '';
     this.showToast = false;
     if (this.dataSource.length < 2) {
-      this.messageToast = 'Debe agregar al menos 2 transacciones para continuar';
+      this.messageToast = 'Debe agregar al menos 2 transacciones para continuar.';
       this.showToast = true;
       this.toastType = typeToast.Error;
       return false;
@@ -378,7 +374,7 @@ export class VariousOperationsComponent {
     const total = this.totalCredit - this.totalDebit;
     if (total !== 0) {
       this.messageToast =
-        'El balance no es correcto, por favor ingrese los valores correctos';
+        'El balance no es correcto, por favor ingrese los valores correctos.';
       this.showToast = true;
       this.toastType = typeToast.Error;
       return false;
@@ -389,7 +385,7 @@ export class VariousOperationsComponent {
 
     if (hasDuplicateAccountId) {
       this.messageToast =
-        'No se puede registrar la misma cuenta en la transaccion';
+        'No se puede registrar la misma cuenta en la transacción en el debe y en el haber.';
       this.showToast = true;
       this.toastType = typeToast.Error;
 
@@ -400,18 +396,17 @@ export class VariousOperationsComponent {
   }
 
   private fillBilling(data: TransactionResponse): void {
-    // Aquí se llama al servicio para obtener el journal por ID
-  if (data.diaryType) {
-    this.journalService.getJournalById(data.diaryType).subscribe({
-      next: (journal: JournalModel) => {
-        this.variousOperations.diaryType = journal.accountType;
-        this.loadAccounts(this.variousOperations.diaryType);
-      },
-      error: (err) => {
-        console.error('Error loading journal:', err);
-      }
-    });
-  }
+    if (data.diaryType) {
+      this.journalService.getJournalById(data.diaryType).subscribe({
+        next: (journal: JournalModel) => {
+          this.variousOperations.diaryType = journal.accountType;
+          this.loadAccounts(this.variousOperations.diaryType);
+        },
+        error: (err) => {
+          console.error('Error loading journal:', err);
+        }
+      });
+    }
 
     this.dataSource = data.transactionDetails.map((item) => {
       return {
@@ -421,7 +416,7 @@ export class VariousOperationsComponent {
         movement: item.shortEntryType,
       } as Transaction;
     });
-    
+
     this.variousOperations.id = data.id;
     this.variousOperations.currency = data.currency;
     this.variousOperations.status =
@@ -456,7 +451,7 @@ export class VariousOperationsComponent {
   }
 
   async react() {
-    let dialogo = await confirm(`¿No existe un periodo Activo desea activarlo?`, 'Advertencia');
+    let dialogo = await confirm(`¿No existe un periodo activo desea activarlo?`, 'Advertencia');
     if (!dialogo) {
       window.history.back()
       return;
@@ -500,31 +495,31 @@ export class VariousOperationsComponent {
 
   loadAccounts(selectedTypeId?: number) {
     this.accountService.getAllAccount().subscribe({
-        next: (data) => {
-            this.accounts = data.filter(item => item.supportEntry);
-            if (selectedTypeId !== undefined) {
-                // Filtrar cuentas por tipo de cuenta que coincide con selectedTypeId
-                this.accountList = this.accounts.filter(account => account.accountType === selectedTypeId)
-                    .map(item => ({
-                        id: item.id,
-                        description: item.name,
-                        code: item.accountCode
-                    } as AccountModel));
-            } else {
-                this.accountList = this.accounts.map(item => ({
-                    id: item.id,
-                    description: item.name,
-                    code: item.accountCode
-                } as AccountModel));
-            }
-            if (this.accountList.length === 0) {
-                this.toastType = typeToast.Warning;
-                this.messageToast = 'No se encontraron cuentas para el tipo seleccionado';
-                this.showToast = true;
-            }
-        },
+      next: (data) => {
+        this.accounts = data.filter(item => item.supportEntry);
+        if (selectedTypeId !== undefined) {
+          // Filtrar cuentas por tipo de cuenta que coincide con selectedTypeId
+          this.accountList = this.accounts.filter(account => account.accountType === selectedTypeId)
+            .map(item => ({
+              id: item.id,
+              description: item.name,
+              code: item.accountCode
+            } as AccountModel));
+        } else {
+          this.accountList = this.accounts.map(item => ({
+            id: item.id,
+            description: item.name,
+            code: item.accountCode
+          } as AccountModel));
+        }
+        if (this.accountList.length === 0) {
+          this.toastType = typeToast.Warning;
+          this.messageToast = 'No se encontraron cuentas para el tipo seleccionado.';
+          this.showToast = true;
+        }
+      },
     });
-}
+  }
 
   combineCodeAndDescription = (item: any) => {
     return item ? `${item.description} ${item.code}` : '';
@@ -540,6 +535,7 @@ export class VariousOperationsComponent {
     }
     return 0;
   }
+
   getDebit(dataRow: any) {
     if (dataRow.movement === "D") {
       return dataRow.amount;
@@ -550,7 +546,7 @@ export class VariousOperationsComponent {
   onChangeType(e: any) {
     const selectedTypeId = Number(e.target.value);
     this.previousDiaryType = this.variousOperations.diaryType;
-  
+
     // Verificar si el tipo de cuenta seleccionado tiene un diario creado
     this.journalService.getJournalByAccountType(selectedTypeId).subscribe({
       next: (journal) => {
@@ -558,7 +554,6 @@ export class VariousOperationsComponent {
         if (journal && journal.id) {
           // Si hay diario asociado, proceder con el cambio
           if (this.dataSource.length > 0) {
-            // Confirmación antes de limpiar registros existentes
             confirm(
               '¿Está seguro de que desea cambiar el tipo de operación? Esto eliminará todos los registros ingresados.',
               'Advertencia'
@@ -571,13 +566,11 @@ export class VariousOperationsComponent {
                 this.variousOperations.diaryType = selectedTypeId;
                 this.loadAccounts(selectedTypeId);
               } else {
-                // Restaurar valor anterior en el select y en el estado interno
-                e.target.value = this.previousDiaryType; 
+                e.target.value = this.previousDiaryType;
                 this.variousOperations.diaryType = this.previousDiaryType;
               }
             });
           } else {
-            // No hay registros previos, se procede directamente
             this.variousOperations.diaryType = selectedTypeId;
             this.variousOperations.description = '';
             this.totalDebit = 0;
@@ -585,7 +578,6 @@ export class VariousOperationsComponent {
             this.loadAccounts(selectedTypeId);
           }
         } else {
-          // No hay diario creado para el tipo seleccionado
           this.handleNoJournalAssociated(e);
         }
       },
@@ -595,7 +587,7 @@ export class VariousOperationsComponent {
       }
     });
   }
-  
+
   private handleNoJournalAssociated(e: any) {
     if (this.dataSource.length > 0) {
       confirm(
@@ -615,7 +607,7 @@ export class VariousOperationsComponent {
       this.clearData(e);
     }
   }
-  
+
   private handleApiError(e: any) {
     if (this.dataSource.length > 0) {
       confirm(
@@ -635,20 +627,20 @@ export class VariousOperationsComponent {
       this.clearData(e);
     }
   }
-  
+
   private showToastMessage(type: ToastType, message: string) {
     this.toastType = type;
     this.messageToast = message;
     this.showToast = true;
   }
-  
+
   private clearData(e: any) {
     this.accountList = [];
     this.dataSource = [];
     this.totalDebit = 0;
     this.totalCredit = 0;
     this.variousOperations.description = '';
-   this.variousOperations.diaryType = this.previousDiaryType;
+    this.variousOperations.diaryType = this.previousDiaryType;
     e.target.value = this.previousDiaryType;
   }
 }
