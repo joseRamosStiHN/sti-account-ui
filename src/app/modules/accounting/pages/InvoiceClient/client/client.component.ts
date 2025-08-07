@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, ElementRef, inject, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
-import { DxDataGridComponent, DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
+import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import config from 'devextreme/core/config';
 import { confirm } from 'devextreme/ui/dialog';
 import {
@@ -17,9 +17,9 @@ import { AccountService } from '../../../services/account.service';
 import { AccountModel } from '../../../models/AccountModel';
 import { TransactionResponse } from '../../../models/APIModels';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
-import { JournalModel, JournalTypes } from 'src/app/modules/accounting/models/JournalModel';
+import { JournalModel } from 'src/app/modules/accounting/models/JournalModel';
 import { JournalService } from 'src/app/modules/accounting/services/journal.service';
-import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-client',
@@ -78,7 +78,7 @@ export class ClientComponent {
   accountList: AccountModel[] = [];
 
   @ViewChild('itemForm') itemForm!: NgForm;
-  //
+
   private readonly router = inject(Router);
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly transactionService = inject(TransactionService);
@@ -122,7 +122,7 @@ export class ClientComponent {
           this.loadAccounts();
         } else {
           this.toastType = typeToast.Error;
-          this.messageToast = 'Debe de crear o activar un diario de ingresos para poder continuar';
+          this.messageToast = 'Debe de crear o activar un diario de ingresos para poder continuar.';
           this.showToast = true;
         }
       },
@@ -150,7 +150,7 @@ export class ClientComponent {
       }
     });
   }
-  
+
 
   async onSubmit(e: NgForm) {
     console.log(this.dataSource);
@@ -192,9 +192,6 @@ export class ClientComponent {
         }),
       };
 
-
-      console.log(transactionData);
-
       let dialogo = await confirm(
         `¿Está seguro de que desea realizar esta acción?`,
         'Advertencia'
@@ -203,9 +200,6 @@ export class ClientComponent {
       if (!dialogo) {
         return;
       }
-
-
-
 
       //is an update
       if (this.id) {
@@ -216,7 +210,7 @@ export class ClientComponent {
             next: (data) => {
               this.fillBilling(data);
               this.toastType = typeToast.Success;
-              this.messageToast = 'Actualizados Exitosamente';
+              this.messageToast = 'Registro Actualizado Exitosamente.';
               this.showToast = true;
               setTimeout(() => {
                 this.router.navigate(['/accounting/client-list']);
@@ -224,9 +218,9 @@ export class ClientComponent {
             },
             error: (err) => {
               this.toastType = typeToast.Error;
-              this.messageToast = 'No se pudo Actualizar los datos';
+              this.messageToast = err.message || 'Error al actualizar la transacción.'
               this.showToast = true;
-              console.error('erro al actualizar transacción ', err);
+              console.error('Error al actualizar transacción ', err);
             },
           });
         return;
@@ -236,7 +230,7 @@ export class ClientComponent {
         next: (data) => {
           this.fillBilling(data);
           this.toastType = typeToast.Success;
-          this.messageToast = 'Registros insertados exitosamente';
+          this.messageToast = 'Registro insertado exitosamente.';
           this.showToast = true;
           setTimeout(() => {
             this.router.navigate(['/accounting/client-list']);
@@ -245,7 +239,7 @@ export class ClientComponent {
         error: (err) => {
           console.error('Error creating transaction:', err);
           this.toastType = typeToast.Error;
-          this.messageToast = 'Error al crear la transacción';
+          this.messageToast = err.message || 'Error al crear la transacción.'
           this.showToast = true;
         },
       });
@@ -260,14 +254,13 @@ export class ClientComponent {
 
     dialogo.then(async (d) => {
       if (d) {
-        // si el usuario dio OK
-        this.buttonTextPosting = 'confirmando...';
+        this.buttonTextPosting = 'Confirmando...';
         this.disablePosting = true;
         const transId = Number(this.id);
         this.transactionService.postTransaction(transId).subscribe({
           next: (data) => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Transacción publicada con éxito.!';
+            this.messageToast = 'Transacción confirmada con éxito.!';
             this.showToast = true;
 
             setTimeout(() => {
@@ -278,30 +271,13 @@ export class ClientComponent {
           },
           error: (err) => {
             this.toastType = typeToast.Error;
-            this.messageToast = 'Error al intentar publicar la transacción';
+            this.messageToast = 'Error al intentar publicar la transacción.';
             this.showToast = true;
 
             this.buttonTextPosting = 'Confirmar';
             this.disablePosting = false;
           },
         });
-        //TODO: Laurent
-        /*
-          aqui cuando el usuario le dio confirma debe de llamar al api
-          debe de enviar el estado al que va a cambiar que seria POST(o el que ponga Edwin)
-          y el id de la transacción
-          si todo va bien lo vamos a enviar a otra sección
-          en caso de error usar:
-               this.toastType = typeToast.Error;
-               this.messageToast = '<Aqui va el mensaje de error>'; 
-               this.showToast = true;
-
-                this.buttonTextPosting = 'Confirmar';
-                this.disablePosting = false;
-    
-        */
-        //si todo fue OK redirigir al usuario
-        //this.router.navigate(['/accounting/client-list']);
       }
     });
   }
@@ -339,69 +315,39 @@ export class ClientComponent {
   }
 
   onContentReady(e: DxDataGridTypes.ContentReadyEvent) {
-    e.component.option('loadPanel.enabled', false); // elimina el loading cuando agregas una nueva fila
+    e.component.option('loadPanel.enabled', false);
     const gridComponent = e.component;
 
-    // Obtén los totales del summary. por medio de los nombres del calculateSummary.
     const totalDebit = gridComponent.getTotalSummaryValue('totalDebit');
     const totalCredit = gridComponent.getTotalSummaryValue('totalCredit');
 
-    // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
-    // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
-    // this.totalDebit = totalDebit; // actualiza en la vista
-    // this.totalCredit = totalCredit;
-
     const rows = document.querySelectorAll('.dx-data-row');
-    // rows.forEach(row => {
-    //   const tds = row.querySelectorAll("td");
-    //   tds.forEach(td => {
-    //     const codeAccount = td.textContent
-    //     if (codeAccount == 'Haber') {
-    //       const editButtons = row.querySelectorAll(".dx-link-edit");
-    //       const deleteButtons = row.querySelectorAll(".dx-link-delete");
-    //       editButtons.forEach(button => {
-    //         (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-    //       });
-
-    //       deleteButtons.forEach(button => {
-    //         (button as HTMLElement).style.display = 'none'; // Type assertion para HTMLElement
-    //       });
-    //     }
-    //   })
-    // });
-
   }
 
   private validate(): boolean {
-    this.messageToast = ''; // limpia el balance
+    this.messageToast = '';
     this.showToast = false;
     if (this.dataSource.length < 2) {
-      // si el array contiene menos de 2 registros
-      this.messageToast = 'Debe agregar al menos 2 transacciones para continuar';
+      this.messageToast = 'Debe agregar al menos 2 transacciones para continuar.';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida number of tnx');
       return false;
     }
-    // operar sobre el total y verificar que lleve a cero la operación
     const total = this.totalCredit - this.totalDebit;
     if (total !== 0) {
       this.messageToast =
-        'El balance no es correcto, por favor ingrese los valores correctos';
+        'El balance no es correcto, por favor ingrese los valores correctos.';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida balance');
       return false;
     }
-    // si todo `OK` retorna true
-
     const hasDuplicateAccountId = this.dataSource.some((item, index) => {
       return this.dataSource.filter(obj => obj.accountId === item.accountId).length > 1;
     });
 
     if (hasDuplicateAccountId) {
       this.messageToast =
-        'No se puede registrar la misma cuenta en la transaccion';
+        'No se puede registrar la misma cuenta en la transacción en el debe y en el haber.';
       this.showToast = true;
       this.toastType = typeToast.Error;
 
@@ -434,10 +380,10 @@ export class ClientComponent {
     this.clientBilling.methodPayment = data.typePayment
     this.clientBilling.rtn = data.rtn
     this.clientBilling.supplierName = data.supplierName
-    //
+    
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
 
-    this.loadAccounts();
+    //this.loadAccounts();
 
     const debe = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
     const haber = this.dataSource.filter((data) => data.movement === 'C').reduce((sum, item) => sum + item.amount, 0);
@@ -456,7 +402,7 @@ export class ClientComponent {
   }
 
   async react() {
-    let dialogo = await confirm(`¿No existe un periodo Activo desea activarlo?`, 'Advertencia');
+    let dialogo = await confirm(`¿No existe un periodo activo desea activarlo?`, 'Advertencia');
     if (!dialogo) {
       window.history.back()
       return;
@@ -468,231 +414,34 @@ export class ClientComponent {
     window.history.back();
   }
 
-
-  /*   save(e: any) {
-  
-  
-      const credit = this.dataSource.filter((data) => data.movement === 'C');
-      const debit = this.dataSource.filter((data) => data.movement === 'D');
-  
-      if (e.data.movement == 'C' && debit.length <= 1) {
-        if (debit.length == 1) {
-          debit.forEach((item) => {
-            const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-  
-            const roundedSum = parseFloat(sum.toFixed(2));
-  
-            item.amount = roundedSum;
-          });
-  
-        } else {
-  
-          this.dataSource.push({
-            id: this.selectedJournal?.id ?? 0,
-            accountId: this.selectedJournal?.defaultAccount ?? 0,
-            amount: parseFloat(e.data.amount.toFixed(2)),
-            movement: 'D',
-  
-          });
-        }
-  
-      }
-  
-      if (e.data.movement == 'D' && credit.length <= 1) {
-  
-        console.log("entro en el debe");
-  
-  
-        if (credit.length == 1) {
-          credit.forEach((item) => {
-            const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-            const roundedSum = parseFloat(sum.toFixed(2));
-  
-            item.amount = roundedSum
-          });
-  
-        } else {
-  
-          console.log(this.selectedJournal);
-  
-  
-          this.dataSource.push({
-            id: this.selectedJournal?.id ?? 0,
-            accountId: this.selectedJournal?.defaultAccount ?? 0,
-            amount: parseFloat(e.data.amount.toFixed(2)),
-            movement: 'C',
-  
-          });
-        }
-  
-      }
-  
-      this.updateAmounts();
-  
-  
-  
-  
-  
-      // let foundItems = this.dataSource.filter((data) => data.movement === 'D');
-      // console.log(foundItems.length);
-  
-      // console.log("afuera");
-      // if (foundItems.length = 0) {
-      //   console.log("aqui entro");
-  
-      //   foundItems.forEach((item) => {
-      //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-      //     item.amount = sum
-      //   });
-      // } else {
-  
-      //   this.totalCredit = e.data.amount;
-      //   this.totalDebit = e.data.amount;
-  
-      //   this.dataSource.push({
-      //     id: this.selectedJournal?.id ?? 0,
-      //     accountId: this.selectedJournal?.defaultAccount ?? 0,
-      //     amount: e.data.amount,
-      //     movement: 'C',
-  
-      //   });
-      // }
-    } */
-
   save(e: any) {
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
+    this.updateAmounts();
+  }
 
-    // Si el movimiento es 'C' (Haber)
-    if (e.data.movement == 'C') {
-      // Si ya hay un movimiento de 'D' (Debe), actualiza el monto
-      if (debit.length === 1) {
-        debit.forEach((item) => {
-          const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-          const roundedSum = parseFloat(sum.toFixed(2));
-          item.amount = roundedSum;
-        });
-      }
-    }
-
-    // Si el movimiento es 'D' (Debe)
-    if (e.data.movement == 'D') {
-      // Si ya hay un movimiento de 'C' (Haber), actualiza el monto
-      if (credit.length === 1) {
-        credit.forEach((item) => {
-          const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-          const roundedSum = parseFloat(sum.toFixed(2));
-          item.amount = roundedSum;
-        });
-      }
-    }
-
-    // Actualiza los montos totales
+  update(e: any) {
     this.updateAmounts();
   }
 
   private updateAmounts(): void {
-
-
     if (this.dataSource.length > 0) {
-      // Calcular el total de los movimientos 'D' (debe)
-      const debe = this.dataSource
-        .filter((data) => data.movement === 'D')
+      const totalDebit = this.dataSource
+        .filter(item => item.movement === 'D')
         .reduce((sum, item) => sum + item.amount, 0);
 
-      // Calcular el total de los movimientos 'C' (haber)
-      const haber = this.dataSource
-        .filter((data) => data.movement === 'C')
+      const totalCredit = this.dataSource
+        .filter(item => item.movement === 'C')
         .reduce((sum, item) => sum + item.amount, 0);
 
-      // Redondear los totales a dos decimales
-      this.totalCredit = parseFloat(haber.toFixed(2));
-      this.totalDebit = parseFloat(debe.toFixed(2));
-
-      // Mostrar en la consola para verificar
-      // console.log('Total Debit:', this.totalDebit);
-      // console.log('Total Credit:', this.totalCredit);
+      this.totalDebit = parseFloat(totalDebit.toFixed(2));
+      this.totalCredit = parseFloat(totalCredit.toFixed(2));
+    } else {
+      this.totalDebit = 0;
+      this.totalCredit = 0;
     }
-  }
-
-  update(e: any) {
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'D' && credit.length == 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-    if (e.data.movement == 'C' && debit.length == 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-
-
-
-    this.updateAmounts();
-
-    // let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    // if (foundItems.length > 0) {
-    //   foundItems.forEach((item) => {
-    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-    //     this.totalCredit = sum;
-    //     this.totalDebit = sum;
-    //     item.amount = sum
-    //   });
-    // }
-
-
   }
 
   removed(e: any) {
-
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'D' && credit.length == 1 && debit.length == 0) {
-      this.dataSource = [];
-      return;
-    }
-    if (e.data.movement == 'C' && debit.length == 1 && credit.length == 0) {
-      this.dataSource = [];
-      return
-    }
-
-    if (e.data.movement == 'D' && credit.length == 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-    if (e.data.movement == 'C' && debit.length == 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-
     this.updateAmounts();
-
-
-    // let debitos = this.dataSource.filter((data) => data.movement === 'D');
-    // if (debitos.length > 0) {
-    //   let foundItems = this.dataSource.filter((data) => data.movement === 'C');
-    //   foundItems.forEach((item) => {
-    //     const sum = this.dataSource.filter((data) => data.movement === 'D').reduce((sum, item) => sum + item.amount, 0);
-    //     this.totalCredit = sum;
-    //     this.totalDebit = sum;
-    //     item.amount = sum
-    //   });
-    // } else {
-    //   this.dataSource = [];
-    //   this.totalCredit = 0;
-    //   this.totalDebit = 0;
-    // }
   }
 
   loadAccounts() {
@@ -729,6 +478,7 @@ export class ClientComponent {
     return 0;
 
   }
+
   getDebit(dataRow: any) {
     if (dataRow.movement === "D") {
       return dataRow.amount;
