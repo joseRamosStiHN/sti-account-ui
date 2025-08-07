@@ -1,4 +1,4 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AdjustmentResponseById, SeniorAccounts, TransactionResponse } from '../models/APIModels';
@@ -43,14 +43,13 @@ export class TransactionService {
    * @return response()
    */
   createTransaction(data: any): Observable<TransactionResponse> {
-    return this.httpClient
-      .post<TransactionResponse>(
-        this.apiURL + '/api/v1/transaction',
-        JSON.stringify(data),
-        this.httpOptions
-      )
-
-      .pipe(catchError(this.errorHandler));
+    return this.httpClient.post<TransactionResponse>(
+      this.apiURL + '/api/v1/transaction',
+      JSON.stringify(data),
+      this.httpOptions
+    ).pipe(
+      catchError(this.handleError)
+    );
   }
 
   getAllTransactionByDocumentType(
@@ -87,17 +86,18 @@ export class TransactionService {
     return this.httpClient.get<TransactionResponse>(url);
   }
 
-  updateTransaction(
-    id: number,
-    data: TransactionModel
-  ): Observable<TransactionResponse> {
+
+  updateTransaction(id: number, data: TransactionModel): Observable<TransactionResponse> {
     const url = `${this.apiURL}/api/v1/transaction/${id}`;
     return this.httpClient.put<TransactionResponse>(
       url,
       JSON.stringify(data),
       this.httpOptions
+    ).pipe(
+      catchError(this.handleError)
     );
   }
+
 
   postTransaction(id: number): Observable<any> {
 
@@ -323,5 +323,38 @@ export class TransactionService {
       .get(this.apiURL + '/api/v1/transaction', options)
 
       .pipe(catchError(this.errorHandler));
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'Ocurrió un error desconocido';
+
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      if (error.status === 400) {
+        try {
+          const errorObj = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
+
+          if (Array.isArray(errorObj)) { 
+            errorMessage = errorObj[0]?.message || 'Error de validación';
+          } else if (errorObj.message) {
+            errorMessage = errorObj.message;
+          } else {
+            errorMessage = `Error ${error.status}: ${error.statusText}`;
+          }
+        } catch (e) {
+          errorMessage = error.error || `Error ${error.status}: ${error.statusText}`;
+        }
+      } else {
+        errorMessage = `Error ${error.status}: ${error.statusText}`;
+      }
+    }
+
+    console.error(errorMessage);
+    return throwError(() => ({
+      status: error.status,
+      message: errorMessage,
+      originalError: error
+    }));
   }
 }

@@ -423,48 +423,36 @@ export class AccountingAdjustmentComponent {
     return true;
   }
 
-  fillDataSource(data: any[]): LocalData[] {
-
-
+fillDataSource(data: any[]): LocalData[] {
     return data.filter((item: any) => item.status == "SUCCESS")
-      .map((item: any) => {
-        const totalDetail = item.transactionDetails.find((element: any) => {
-          if (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") {
-            return true;
-          } else if (item.documentType === JournalTypes.Compras && element.entryType === "Debito") {
-            return true;
-          }
-          return false;
-        });
+        .map((item: any) => {
+            const totalDetail = item.transactionDetails.find((element: any) => {
+                return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
+                       (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
+            }) || { amount: 0 }; // Manejo de caso donde no se encuentra el detalle
 
-        return {
-          id: item.id,
-          date: item.date,
-          referenceNumber: item.reference,
-          documentType: item.documentType,
-          numberPda: item.numberPda,
-          diaryType: item.diaryType,
-          reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras
-            ? "" : item.description,
-          journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
-          total: totalDetail.amount,
-          status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
-          details: item.transactionDetails.map((item: any) => {
             return {
-              accountId: item.accountId,
-              amount: item.amount,
-              id: item.id,
-              movement: item.shortEntryType == "C" ? "C" : "D",
-              accountName: item.accountName
-            } as Transaction;
-          })
-        } as LocalData;
+                id: item.id,
+                date: item.date,
+                referenceNumber: item.reference,
+                documentType: item.documentType,
+                numberPda: item.numberPda,
+                diaryType: item.diaryType,
+                reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras ? "" : item.description,
+                journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
+                total: totalDetail.amount,
+                status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
+                details: item.transactionDetails.map((item: any) => ({
+                    accountId: item.accountId,
+                    amount: item.amount,
+                    id: item.id,
+                    movement: item.shortEntryType == "C" ? "C" : "D",
+                    accountName: item.accountName
+                }))
+            } as LocalData;
+        });
+}
 
-
-      })
-
-
-  }
 
   showDetails: boolean = false;
 

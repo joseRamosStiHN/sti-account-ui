@@ -114,7 +114,7 @@ const routes: Routes = [
       { path: 'configuration/bulk-configuration', component: BulkConfigurationListComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       { path: 'configuration/bulk-configuration/create', component: BulkConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       { path: 'configuration/bulk-configuration/:id', component: BulkConfigurationComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
-      { path: 'bulk-upload-file', component: UploadBulkFileComponent },
+      { path: 'bulk-upload-file', component: UploadBulkFileComponent, canActivate: [RoleGuard], data: { roles: ['REGISTRO CONTABLE'] } },
       { path: 'various-operations', component: VariousOperationsComponent },
       { path: 'various-operations/:id', component: VariousOperationsComponent },
       { path: 'various-operations-list', component: VariousOperationsListComponent },

@@ -312,7 +312,7 @@ export interface ConfigDetail {
 
 
 export interface TransactionUpload {
-  typetransaction:number
+  typeTransaction:number
   data: Daum[]
   errors: any[]
 }
