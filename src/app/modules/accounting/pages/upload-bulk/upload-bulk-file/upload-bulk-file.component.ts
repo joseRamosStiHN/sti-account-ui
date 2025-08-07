@@ -12,18 +12,15 @@ import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-upload-bulk-file',
   templateUrl: './upload-bulk-file.component.html',
-  styleUrl: './upload-bulk-file.component.css'
+  styleUrls: ['./upload-bulk-file.component.css']
 })
 export class UploadBulkFileComponent {
-
-
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-
-
   isDragging = false;
   selectedFile: File | undefined;
+  fileUploaded = false;
 
   BulkConfiguration: UploadBulkSettingsModel;
   accountList: AccountModel[] = [];
@@ -31,12 +28,12 @@ export class UploadBulkFileComponent {
   bulkSettingList$: Observable<UploadBulkSettings[]> | undefined;
   TransactionUpload$: any = [];
   TransactionErrors$: any = [];
-  newBulk:boolean = false;
-
+  newBulk: boolean = false;
   typeTransaction: number = 0;
 
   private readonly accountService = inject(AccountService);
   private readonly bulkSettingsService = inject(UploadBulkService);
+
   constructor() {
     this.BulkConfiguration = {
       name: "",
@@ -51,9 +48,7 @@ export class UploadBulkFileComponent {
     this.accountService.getAllAccount().subscribe({
       next: (data) => {
         this.accountList = data
-          .filter(item => {
-            return item.supportEntry && item.balances.length > 0
-          })
+          .filter(item => item.supportEntry && item.balances.length > 0)
           .map(item => ({
             id: item.id,
             description: item.name,
@@ -61,13 +56,11 @@ export class UploadBulkFileComponent {
           } as AccountModel));
       },
     });
-
   }
 
   combineCodeAndDescription = (item: any) => {
     return item ? `${item.description} ${item.code}` : '';
   };
-
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -83,29 +76,36 @@ export class UploadBulkFileComponent {
     event.preventDefault();
     this.isDragging = false;
     if (event.dataTransfer?.files.length) {
-      this.selectedFile = event.dataTransfer.files[0];
-      console.log('Archivo seleccionado:', this.selectedFile);
+      this.handleFileSelection(event.dataTransfer.files[0]);
     }
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
-      this.selectedFile = input.files[0];
-      console.log('Archivo seleccionado:', this.selectedFile);
+      this.handleFileSelection(input.files[0]);
     }
   }
 
+  private handleFileSelection(file: File): void {
+    this.selectedFile = file;
+    this.fileUploaded = false;
+    
+    // Mostrar mensaje de archivo seleccionado
+    this.toastType = typeToast.Success;
+    this.messageToast = `Archivo seleccionado: ${file.name}`;
+    this.showToast = true;
+    
+  }
+
   async onSubmit(e: NgForm) {
-
     if (e.valid && this.selectedFile) {
-
       const formData = new FormData();
       formData.append('file', this.selectedFile);
 
       this.bulkSettingsService.UploadBulkSettings(formData, e.form.value.type, 1).subscribe({
         next: (data) => {
-          this.typeTransaction = data.typetransaction;
+          this.typeTransaction = data.typeTransaction;
           const merged = [...data.data, ...data.errors];
           const dataFilter: any = merged.flatMap(item => {
             return item.accounts.map((account: any) => {
@@ -115,34 +115,41 @@ export class UploadBulkFileComponent {
           });
 
           this.TransactionUpload$ = dataFilter;
-
           this.TransactionErrors$ = this.extractTransactionErrors(merged);
-        
+          this.fileUploaded = true;
 
+          // Mostrar mensaje de éxito
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Archivo procesado correctamente.';
+          this.showToast = true;
         },
         error: (err) => {
           console.error('Error al subir el archivo:', err);
           this.toastType = typeToast.Error;
-          this.messageToast = 'Error al subir el archivo';
+          this.messageToast = 'Error al procesar el archivo.';
           this.showToast = true;
         },
       });
-
     }
-
   }
 
   async saveTransactions() {
-
+    // Verificar si hay errores antes de proceder
+    if (this.TransactionErrors$.length > 0) {
+      this.toastType = typeToast.Warning;
+      this.messageToast = 'No se pueden subir las transacciones. Corrija los errores.';
+      this.showToast = true;
+      return;
+    }
 
     let dialogo = await confirm(
-      `¿Está seguro de que desea realizar esta acción, revise los errores de las partidas?`,
-      'Advertencia'
+      `¿Está seguro de que desea realizar esta acción?`,
+      'Confirmación'
     );
 
-
-    console.log(this.TransactionUpload$);
-    
+    if (!dialogo) {
+      return;
+    }
 
     const groupedById = this.TransactionUpload$.reduce((acc: Map<string, Daum[]>, item: Daum) => {
       if (!acc.has(item.reference)) {
@@ -153,7 +160,7 @@ export class UploadBulkFileComponent {
     }, new Map<string, Daum[]>());
 
     const transactionsToSave: TransactionUpload = {
-      typetransaction: this.typeTransaction,
+      typeTransaction: this.typeTransaction,
       data: [],
       errors: [],
     };
@@ -198,26 +205,29 @@ export class UploadBulkFileComponent {
         transactionsToSave.data.push(transactionData);
       }
     }
-    
 
     this.bulkSettingsService.saveTransacionsBulk(transactionsToSave).subscribe({
       next: (data) => {
-
         const merged = [...data.data, ...data.errors];
         this.TransactionErrors$ = this.extractTransactionErrors(merged);
-        this.newBulk = true
+        this.newBulk = true;
 
+        if (this.TransactionErrors$.length === 0) {
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Transacciones guardadas correctamente';
+        } else {
+          this.toastType = typeToast.Warning;
+          this.messageToast = 'Transacciones guardadas con algunos errores';
+        }
+        this.showToast = true;
       },
       error: (err) => {
-        console.error('Error al subir el archivo:', err);
+        console.error('Error al guardar transacciones:', err);
         this.toastType = typeToast.Error;
-        this.messageToast = 'Error al subir el archivo';
+        this.messageToast = 'Error al guardar las transacciones';
         this.showToast = true;
       },
     });
-
-
-
   }
 
   private extractTransactionErrors(merged: any[]): any[] {
@@ -231,16 +241,12 @@ export class UploadBulkFileComponent {
       );
   }
 
-   resetAll(){
+  resetAll() {
     this.TransactionUpload$ = [];
     this.TransactionErrors$ = [];
     this.newBulk = false;
     this.selectedFile = undefined;
+    this.fileUploaded = false;
   }
-  
-
-
-
-
 
 }

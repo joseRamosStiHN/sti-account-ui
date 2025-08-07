@@ -4,201 +4,213 @@
             Subida Excel
         </h2>
         @if(TransactionUpload$.length > 0 && !newBulk ){
-            <div class="mt-4 flex justify-center">
+        <div class="mt-4 flex justify-center">
 
-                <button (click)="saveTransactions()"
-                    class="h-8 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-orange-600 disabled:bg-orange-300
+            <button (click)="saveTransactions()" class="h-8 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-orange-600 disabled:bg-orange-300
                      disabled:opacity-50">
-                    Subir Transaciones
-                </button>
-    
-            </div>
-            }
+                Subir Transaciones
+            </button>
 
-            @if(selectedFile != undefined && TransactionUpload$.length < 1 && !newBulk &&  itemForm.valid){
-                <div class="mt-4 flex justify-center">
+        </div>
+        }
 
-                    <button (click)="onSubmit(itemForm)"
-                        class="h-8 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-green-600 disabled:bg-green-300
+        @if(selectedFile != undefined && TransactionUpload$.length < 1 && !newBulk && itemForm.valid){ <div
+            class="mt-4 flex justify-center">
+
+            <button (click)="onSubmit(itemForm)" class="h-8 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-green-600 disabled:bg-green-300
                          disabled:opacity-50">
-                        Crear Transaciones
-                    </button>
-        
-                </div>
-            }
+                Crear Transaciones
+            </button>
 
-            @if(newBulk){
-                <div class="mt-4 flex justify-center">
-
-                    <button (click)="resetAll()"
-                        class="h-8 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300
-                         disabled:opacity-50">
-                        Cargar otro Documento
-                    </button>
-        
-                </div>
-            }
     </div>
-    
-
-    <form id="bulkConfiguration" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
-        <div class="grid grid-cols-1 gap-4 items-center justify-items-center w-full">
-            <div class="w-3/12">
-                <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
-                <select required name="type" id="type" [(ngModel)]="BulkConfiguration.name"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
-                    <option value="" disabled selected></option>
-                    <option *ngFor="let configuration of bulkSettingList$ | async" [ngValue]="configuration.id">
-                        {{ configuration.name }}
-                    </option>
-                </select>
-                <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')
-            ">
-                    <small class="text-xs text-red-900">Tipo es requerido.</small>
-                </div>
-            </div>
-
-            <div class="flex justify-center w-3/5">
-                <div 
-                  class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50 w-4/5"
-                  [class.bg-blue-50]="isDragging" 
-                  (dragover)="onDragOver($event)" 
-                  (dragleave)="onDragLeave($event)"
-                  (drop)="onDrop($event)"
-                >
-                  <p class="mb-2 text-sm text-gray-600">Arrastra y suelta el archivo aquí</p>
-                  <label
-                    class="inline-block mt-2 cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                  >
-                    Subir Archivo
-                    <input type="file" id="file" name="file" class="hidden" (change)="onFileSelected($event)">
-                  </label>
-                </div>
-              </div>      
-
-        </div>
-        
-
-    </form>
-
-    <div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
-
-    <dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full" [dataSource]="TransactionUpload$"
-        [showBorders]="true" [height]="500" [repaintChangesOnly]="true" [allowColumnReordering]="true"
-        [rowAlternationEnabled]="true" [allowColumnResizing]="true" [allowColumnReordering]="true" [showRowLines]="true"
-        [allowColumnResizing]="true" noDataText="" [width]="'90%'">
-
-        <dxo-load-panel [enabled]="true"></dxo-load-panel>
-        <dxo-scrolling mode="virtual"></dxo-scrolling>
-
-        <dxo-editing mode="cell" [useIcons]="true" [allowAdding]="true" [allowDeleting]="true" [allowUpdating]="true">
-        </dxo-editing>
-
- 
-        <dxo-group-panel [visible]="true"></dxo-group-panel>
-
-        <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
-            [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
-        </dxi-column>
-
-
-        <dxi-column caption="Fecha" dataField="date" alignment="left" [width]="170" ></dxi-column>
-
-
-        <dxi-column caption="Factura" dataField="reference" alignment="left" [width]="170" [groupIndex]="0"></dxi-column>
-        <dxi-column caption="Detalle" dataField="description" alignment="left" [width]="250"></dxi-column>
-        <dxi-column caption="Cuenta" dataField="account" alignment="left">
-            <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">
-            </dxo-lookup>
-        </dxi-column>
-        <dxi-column caption="Debe" dataField="debit" alignment="left" [width]="170"></dxi-column>
-        <dxi-column caption="Haber" dataField="credit" alignment="left" [width]="170"></dxi-column>
-
-        <div *dxTemplate="let d of 'indexTemplate'">
-            <span>{{ d.rowIndex + 1 }}</span>
-        </div>
-
- 
-        <dxi-column type="buttons" [width]="110">
-            <dxi-button name="edit"></dxi-button>
-            <dxi-button name="delete"></dxi-button>
-        </dxi-column>
-
-
-        <dxo-summary>
-            <dxi-group-item column="debit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
-          style: 'currency', 
-          currency: 'HNL', 
-          minimumFractionDigits: 2, 
-          useGrouping: true 
-        }" displayFormat="Total {0}"></dxi-group-item>
-            <dxi-group-item column="credit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
-          style: 'currency', 
-          currency: 'HNL', 
-          minimumFractionDigits: 2, 
-          useGrouping: true 
-        }" displayFormat="Total {0}"></dxi-group-item>
-        </dxo-summary>
-
-    </dx-data-grid>
-
-    @if(TransactionErrors$.length > 0){
-
-        <h1 class="text-red-700 text-2xl font-bold">Errores</h1>
-
-
-        <dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full" [dataSource]="TransactionErrors$"
-        [showBorders]="true" [height]="500" [repaintChangesOnly]="true" [allowColumnReordering]="true"
-        [rowAlternationEnabled]="true" [allowColumnResizing]="true" [allowColumnReordering]="true" [showRowLines]="true"
-        [allowColumnResizing]="true" noDataText="" [width]="'90%'">
-    
-        <dxo-load-panel [enabled]="true"></dxo-load-panel>
-        <dxo-scrolling mode="virtual"></dxo-scrolling>
-    
-        <dxo-editing mode="cell" [useIcons]="true" [allowAdding]="false" [allowDeleting]="false" [allowUpdating]="false">
-        </dxo-editing>
-    
-    
-        <dxo-group-panel [visible]="true"></dxo-group-panel>
-    
-        <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
-            [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
-        </dxi-column>
-    
-    
-    
-        <dxi-column caption="Fila" dataField="row" alignment="left" [width]="170"></dxi-column>
-        <dxi-column caption="Descripcion Error" dataField="mensaje" alignment="left"></dxi-column>
-        <div *dxTemplate="let d of 'indexTemplate'">
-            <span>{{ d.rowIndex + 1 }}</span>
-        </div>
-    
-    
-        <dxi-column type="buttons" [width]="110">
-            <dxi-button name="edit"></dxi-button>
-            <dxi-button name="delete"></dxi-button>
-        </dxi-column>
-    
-    
-        <dxo-summary>
-            <dxi-group-item column="debit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
-          style: 'currency', 
-          currency: 'HNL', 
-          minimumFractionDigits: 2, 
-          useGrouping: true 
-        }" displayFormat="Total {0}"></dxi-group-item>
-            <dxi-group-item column="credit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
-          style: 'currency', 
-          currency: 'HNL', 
-          minimumFractionDigits: 2, 
-          useGrouping: true 
-        }" displayFormat="Total {0}"></dxi-group-item>
-        </dxo-summary>
-    
-    </dx-data-grid>
     }
 
-  
+    @if(newBulk){
+    <div class="mt-4 flex justify-center">
+
+        <button (click)="resetAll()" class="h-8 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300
+                         disabled:opacity-50">
+            Cargar otro Documento
+        </button>
+
+    </div>
+    }
+</div>
+
+
+<form id="bulkConfiguration" class="w-100" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+    <div class="grid grid-cols-1 gap-4 items-center justify-items-center w-full">
+        <div class="w-3/12">
+            <label for="type" class="block mb-2 text-sm text-gray-900">Tipo</label>
+            <select required name="type" id="type" [(ngModel)]="BulkConfiguration.name"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                <option value="" disabled selected></option>
+                <option *ngFor="let configuration of bulkSettingList$ | async" [ngValue]="configuration.id">
+                    {{ configuration.name }}
+                </option>
+            </select>
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['type'].getError('required')
+            ">
+                <small class="text-xs text-red-900">Tipo es requerido.</small>
+            </div>
+        </div>
+        <div class="flex justify-center w-3/5">
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50 w-4/5"
+                [class.bg-blue-50]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)">
+
+                @if(selectedFile) {
+                <div class="flex flex-col items-center">
+                    <i class="fas fa-file-excel text-4xl text-green-600 mb-2"></i>
+                    <p class="text-sm font-medium text-gray-700">{{selectedFile.name}}</p>
+                    <label
+                        class="inline-block mt-2 cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        Cambiar Archivo
+                        <input type="file" id="file" name="file" class="hidden" (change)="onFileSelected($event)"
+                            accept=".xlsx,.xls">
+                    </label>
+                </div>
+                } @else {
+                <div>
+                    <p class="mb-2 text-sm text-gray-600">Arrastra y suelta el archivo aquí</p>
+                    <label
+                        class="inline-block mt-2 cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        Subir Archivo
+                        <input type="file" id="file" name="file" class="hidden" (change)="onFileSelected($event)"
+                            accept=".xlsx,.xls">
+                    </label>
+                </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+
+</form>
+
+<div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
+
+<dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full" [dataSource]="TransactionUpload$"
+    [showBorders]="true" [height]="500" [repaintChangesOnly]="true" [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true" [allowColumnResizing]="true" [allowColumnReordering]="true" [showRowLines]="true"
+    [allowColumnResizing]="true" noDataText="" [width]="'90%'">
+
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+    <dxo-editing mode="cell" [useIcons]="true" [allowAdding]="true" [allowDeleting]="true" [allowUpdating]="true">
+    </dxo-editing>
+
+
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+    <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
+        [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
+    </dxi-column>
+
+
+    <dxi-column caption="Fecha" dataField="date" alignment="left" [width]="170"></dxi-column>
+
+
+    <dxi-column caption="Factura" dataField="reference" alignment="left" [width]="170" [groupIndex]="0"></dxi-column>
+    <dxi-column caption="Detalle" dataField="description" alignment="left" [width]="250"></dxi-column>
+    <dxi-column caption="Cuenta" dataField="account" alignment="left">
+        <dxo-lookup [dataSource]="accountList" valueExpr="id" [displayExpr]="combineCodeAndDescription">
+        </dxo-lookup>
+    </dxi-column>
+    <dxi-column caption="Debe" dataField="debit" alignment="left" [width]="170"
+        [format]="{ type: 'currency', currency: 'HNL' }">
+    </dxi-column>
+
+    <dxi-column caption="Haber" dataField="credit" alignment="left" [width]="170"
+        [format]="{ type: 'currency', currency: 'HNL'}">
+    </dxi-column>
+
+    <div *dxTemplate="let d of 'indexTemplate'">
+        <span>{{ d.rowIndex + 1 }}</span>
+    </div>
+
+
+    <dxi-column type="buttons" [width]="110">
+        <dxi-button name="edit"></dxi-button>
+        <dxi-button name="delete"></dxi-button>
+    </dxi-column>
+
+
+    <dxo-summary>
+        <dxi-group-item column="debit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }" displayFormat="Total {0}"></dxi-group-item>
+        <dxi-group-item column="credit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }" displayFormat="Total {0}"></dxi-group-item>
+    </dxo-summary>
+
+</dx-data-grid>
+
+@if(TransactionErrors$.length > 0){
+
+<h1 class="text-red-700 text-2xl font-bold pt-4"  style="padding-inline-start: 5rem;">Errores</h1>
+
+<dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full" [dataSource]="TransactionErrors$"
+    [showBorders]="true" [height]="500" [repaintChangesOnly]="true" [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true" [allowColumnResizing]="true" [allowColumnReordering]="true" [showRowLines]="true"
+    [allowColumnResizing]="true" noDataText="" [width]="'90%'">
+
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+    <dxo-editing mode="cell" [useIcons]="true" [allowAdding]="false" [allowDeleting]="false" [allowUpdating]="false">
+    </dxo-editing>
+
+
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+    <dxi-column caption="#" [width]="50" [minWidth]="20" alignment="center" cellTemplate="indexTemplate"
+        [showEditorAlways]="false" [formItem]="{ visible: false }" [allowEditing]="false">
+    </dxi-column>
+
+
+
+    <dxi-column caption="Fila" dataField="row" alignment="left" [width]="170"></dxi-column>
+    <dxi-column caption="Descripción Error" dataField="mensaje" alignment="left"></dxi-column>
+    <div *dxTemplate="let d of 'indexTemplate'">
+        <span>{{ d.rowIndex + 1 }}</span>
+    </div>
+
+
+    <dxi-column type="buttons" [width]="110">
+        <dxi-button name="edit"></dxi-button>
+        <dxi-button name="delete"></dxi-button>
+    </dxi-column>
+
+
+    <dxo-summary>
+        <dxi-group-item column="debit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }" displayFormat="Total {0}"></dxi-group-item>
+        <dxi-group-item column="credit" summaryType="sum" [showInGroupFooter]="true" [valueFormat]="{ 
+          style: 'currency', 
+          currency: 'HNL', 
+          minimumFractionDigits: 2, 
+          useGrouping: true 
+        }" displayFormat="Total {0}"></dxi-group-item>
+    </dxo-summary>
+
+</dx-data-grid>
+}
+
+
 
 </div>
 <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">

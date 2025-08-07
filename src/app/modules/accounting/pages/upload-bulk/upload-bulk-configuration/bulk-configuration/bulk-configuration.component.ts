@@ -110,7 +110,14 @@ export class BulkConfigurationComponent {
       operation: null,
 
     },
+    {
+      colum: null,
+      title: "TIPO-VENTA",
+      bulkTypeData: BulkDetailType.S,
+      account: null,
+      operation: null,
 
+    },
 
   ]
 
@@ -120,7 +127,7 @@ export class BulkConfigurationComponent {
     },
     showClearButton: true
     , setCellValue: (rowData: any, value: any) => {
-      rowData.colum = value; 
+      rowData.colum = value;
 
     }
   };
@@ -156,11 +163,11 @@ export class BulkConfigurationComponent {
 
     if (this.id) {
       this.bulkSettingsService.getBulkConfigurationById(this.id).subscribe(data => {
-        this.configDefault = data.configDetails.slice(0, 7);
+        this.configDefault = data.configDetails.slice(0, 8);
 
         this.BulkConfiguration = {
           ...data,
-          configDetails: data.configDetails.slice(7)
+          configDetails: data.configDetails.slice(8)
         };
       }
 
@@ -171,7 +178,7 @@ export class BulkConfigurationComponent {
       next: (data) => {
         this.accountList = data
           .filter(item => {
-            return item.supportEntry 
+            return item.supportEntry
           })
           .map(item => ({
             id: item.id,
@@ -193,6 +200,9 @@ export class BulkConfigurationComponent {
   async onSubmit(e: NgForm) {
 
     if (e.valid) {
+      console.log('Before submit - configDefault:', JSON.stringify(this.configDefault));
+      console.log('Before submit - BulkConfiguration:', JSON.stringify(this.BulkConfiguration));
+
       this.BulkConfiguration.configDetails.forEach((data) => {
         if (data.account != null || data.account != undefined) {
           data.bulkTypeData = BulkDetailType.ACC
@@ -236,9 +246,9 @@ export class BulkConfigurationComponent {
               }, 2000);
             },
             error: (err) => {
-              console.error('Error al acutailizar configuracion:', err);
+              console.error('Error al actualizar la configuración:', err);
               this.toastType = typeToast.Error;
-              this.messageToast = 'Error al acutailizar la configuracion';
+              this.messageToast = 'Error al actualizar la configuración';
               this.showToast = true;
             },
           });
@@ -257,7 +267,7 @@ export class BulkConfigurationComponent {
             error: (err) => {
               console.error('Error creating transaction:', err);
               this.toastType = typeToast.Error;
-              this.messageToast = 'Error al crear la transacción';
+              this.messageToast = 'Error al crear la configuración';
               this.showToast = true;
             },
           });
@@ -385,7 +395,7 @@ export class BulkConfigurationComponent {
   }
 
 
- 
+
 
 }
 
