@@ -45,8 +45,14 @@ export class TaxSettingsComponent {
     if (findId) {
       this.periodService.getTaxById(findId).subscribe({
         next: (tax) => {
-          tax.percent = tax.taxRate == "Excentos" ? null : Number(tax.taxRate);
-          tax.taxRate = tax.taxRate != "Excentos" ? "Gravado" : tax.taxRate;
+          if (tax.taxRate?.toLowerCase() === 'exentos' || tax.taxRate?.toLowerCase() === 'excentos') {
+            tax.taxRate = 'Exentos';
+            tax.percent = null;
+          } else {
+            tax.taxRate = 'Gravado';
+            tax.percent = Number(tax.taxRate);
+          }
+
           this.taxSetings = tax;
         },
         error: (err) => {
@@ -115,9 +121,10 @@ export class TaxSettingsComponent {
 
       const { taxRate, percent, ...otherSettings } = this.taxSetings;
       const request = {
-        taxRate: taxRate === "Excentos" ? "Excentos" : percent?.toString() || "",
+        taxRate: taxRate === 'Exentos' ? 'Exentos' : (percent?.toString() || ''),
         ...otherSettings
       };
+
 
       if (this.id) {
         this.updateTax(request);
@@ -229,5 +236,28 @@ export class TaxSettingsComponent {
     const input = document.getElementById(field) as HTMLInputElement;
     input.value = this.formatNumber(this.taxSetings[field]);
   }
+
+  blockInvalidKeys(event: KeyboardEvent) {
+    const invalid = ['-', 'e', 'E', '+'];
+    if (invalid.includes(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  // Fuerza no-negativo y máximo 2 decimales
+  enforceNonNegativeTwoDecimals(field: 'fromValue' | 'toValue') {
+    let v: any = this.taxSetings[field];
+    if (v === null || v === undefined || v === '') return;
+
+    let num = typeof v === 'number' ? v : parseFloat(v);
+    if (isNaN(num)) { this.taxSetings[field] = null as any; return; }
+
+    if (num < 0) num = 0;
+
+    num = Math.floor(num * 100) / 100;
+
+    this.taxSetings[field] = num;
+  }
+
 
 }

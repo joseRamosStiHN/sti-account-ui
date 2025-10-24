@@ -153,8 +153,6 @@ export class ClientComponent {
 
 
   async onSubmit(e: NgForm) {
-    console.log(this.dataSource);
-
     if (!e.valid) {
       this.toastType = typeToast.Error;
       this.messageToast = 'Por favor, complete todos los campos requeridos.';
@@ -380,7 +378,7 @@ export class ClientComponent {
     this.clientBilling.methodPayment = data.typePayment
     this.clientBilling.rtn = data.rtn
     this.clientBilling.supplierName = data.supplierName
-    
+
     this.allowAddEntry = data.status.toUpperCase() !== 'SUCCESS';
 
     //this.loadAccounts();

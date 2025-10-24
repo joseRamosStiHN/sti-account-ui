@@ -27,44 +27,50 @@ export class DebitNoteListComponent {
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-  
+
 
   // seleccion por paginacion
   allMode: string;
-  checkBoxesMode: string;  
+  checkBoxesMode: string;
   selectOptions: { id: string, name: string }[] = [
     { id: 'allPages', name: 'Todos' },
     { id: 'page', name: 'Página' }
   ];
 
-  selectRows:number[]=[];
+  selectRows: number[] = [];
 
-   
+
   user?: UsersResponse;
   private readonly userService = inject(UsersService);
- 
-   isRegistreAccounting:boolean = false;
-  isApprove:boolean= false;
+
+  isRegistreAccounting: boolean = false;
+  isApprove: boolean = false;
 
   private readonly transactionService = inject(TransactionService);
   private readonly navigate = inject(NavigationService);
 
 
-  constructor() { 
+  constructor() {
 
     this.allMode = 'allPages';
     this.checkBoxesMode = themes.current().startsWith('material') ? 'always' : 'onClick';
   }
 
 
- 
-  ngOnInit():void {
+
+  ngOnInit(): void {
+
     this.subscription.add(
-      this.navigate.companyNavigation.subscribe((company)=>{
+      this.navigate.companyNavigation.subscribe((company) => {
         this.validPermisition(company);
       })
     )
-    
+
+    this.loadData();
+
+  }
+
+  private loadData() {
     this.dataSource$ = this.transactionService.getAllNotasDebits()
       .pipe(
         map((data) => this.fillDataSource(data)),
@@ -80,39 +86,43 @@ export class DebitNoteListComponent {
       );
   }
 
-
   private fillDataSource(data: any): any[] {
+    return data.map((item: any) => {
+      const rawStatus = (item.status || '').toUpperCase();
+      const isDraft = rawStatus === 'DRAFT';
 
-
-    return data.map((item:any) => {
       return {
         id: item.id,
         transactionId: item.transactionId,
-        invoiceNo:item.invoiceNo,
+        invoiceNo: item.invoiceNo,
         reference: item.reference,
-        description:item.descriptionNote,
-        status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
-        creationDate: item.creationDate,
-
-      } as any;
+        description: item.descriptionNote,
+        creationDate: new Date(item.creationDate),
+        rawStatus,
+        statusLabel: isDraft ? 'Borrador' : 'Confirmado',
+        isDraft
+      };
     });
-
-
   }
+
 
   goToAdjustment = () => {
     this.router.navigate(['accounting/debit-notes']);
   };
 
-  onButtonClick(data: any) {
-    this.router.navigate(['/accounting/debit-notes', data.id]);
+  onButtonClick(row: any) {
+    const mode = row.isDraft ? 'edit' : 'view';
+    this.router.navigate(['/accounting/debit-notes', row.id], {
+      queryParams: { mode },
+    });
   }
+
 
   onRowSelected(event: any): void {
-
-    this.selectRows =  event.selectedRowsData.filter( (data:any)=> data.status =="Borrador")
-                    .map((data:any)=> data.id);                  
+    const rows = event.selectedRowsData || [];
+    this.selectRows = rows.filter((r: any) => r.isDraft).map((r: any) => r.id);
   }
+
 
   posting() {
     let dialogo = confirm(
@@ -121,7 +131,7 @@ export class DebitNoteListComponent {
     );
 
     dialogo.then(async (d) => {
-    
+
       if (d) {
         this.transactionService.putAllDebitNotes(this.selectRows).subscribe({
           next: (data) => {
@@ -129,9 +139,8 @@ export class DebitNoteListComponent {
             this.messageToast = 'Notas de Débito confirmadas con exito';
             this.showToast = true;
 
-            setTimeout(() => {
-              this.router.navigate(['/accounting']); 
-            }, 3000);
+            this.loadData();
+            this.selectRows = [];
           },
           error: (err) => {
             this.toastType = typeToast.Error;
@@ -140,32 +149,32 @@ export class DebitNoteListComponent {
           },
         });
       }
-      
-      }
+
+    }
     );
   }
 
-  async validPermisition(company:any) {
-  
+  async validPermisition(company: any) {
+
     if (company == '') {
       console.error('Datos de usuario o compañía no encontrados.');
       return;
     }
 
 
-   await company.roles.forEach((role: any) => { 
+    await company.roles.forEach((role: any) => {
 
-      if (role.name == 'REGISTRO CONTABLE') {       
+      if (role.name == 'REGISTRO CONTABLE') {
         this.isRegistreAccounting = true;
       }
 
       if (role.name == 'APROBADOR') {
         this.isApprove = true;
       }
-      
+
     })
 
   }
-  
+
 
 }

@@ -1,8 +1,7 @@
-
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { AccountModel } from 'src/app/modules/accounting/models/AccountModel';
-import {  IMovement, Notes, Transaction, typeToast } from 'src/app/modules/accounting/models/models';
+import { IMovement, Notes, Transaction, typeToast } from 'src/app/modules/accounting/models/models';
 import { AccountService } from 'src/app/modules/accounting/services/account.service';
 import { confirm } from 'devextreme/ui/dialog';
 import { ToastType } from 'devextreme/ui/toast';
@@ -13,27 +12,26 @@ import { JournalService } from 'src/app/modules/accounting/services/journal.serv
 import { ActivatedRoute, Router } from '@angular/router';
 import config from 'devextreme/core/config';
 
-
 interface LocalData {
   id: number;
-  referenceNumber?: string; // este es el numero de factura de cliente o proveedor o banco etc,
+  referenceNumber?: string;
   reference?: string;
   journalEntry?: string;
   journalEntryId?: number;
   total?: number;
   status?: string;
   date?: Date;
-  numberPda?: string
-  documentType?: number
-  diaryType?: number
-  details?: Transaction[]
+  numberPda?: string;
+  documentType?: number;
+  diaryType?: number;
+  details?: Transaction[];
 }
 
 interface TransactionPda {
-  numberPda: number,
-  totalDebit: number,
-  totalCredit: number,
-  details: DetailsPda[]
+  numberPda: number;
+  totalDebit: number;
+  totalCredit: number;
+  details: DetailsPda[];
 }
 
 export interface DetailsPda {
@@ -43,7 +41,6 @@ export interface DetailsPda {
   haber: number;
 }
 
-
 @Component({
   selector: 'app-credit-notes',
   templateUrl: './credit-notes.component.html',
@@ -51,68 +48,84 @@ export interface DetailsPda {
 })
 export class CreditNotesComponent {
 
+  // cabecera form
   creditNotes: Notes = {
     reference: 0,
     date: new Date(),
-    dayri: 0,
+    dayri: null as any,
     applyPorcent: 'no',
     percent: 0,
     description: '',
   };
-  listCredtiNotesByTransaction:any[]=[];
 
+  description: string = '';
   journalList: JournalModel[] = [];
 
-  totalCredit: number = 0;
-  totalDebit: number = 0;
-  allowAddEntry: boolean = true;
-
-  listMovement: IMovement[] = [
-    {
-      code: 'D',
-      name: 'Debe',
-    },
-    {
-      code: 'C',
-      name: 'Haber',
-    },
-  ];
-
-  documentType!: number;
-  messageToast: string = '';
-  showToast: boolean = false;
-  toastType: ToastType = typeToast.Info;
-
-  accountList: AccountModel[] = [];
+  // detalle grid
   dataSource: Transaction[] = [];
+
+  // bloque "Partida # ... / Mostrar detalles"
   transactionOriginal: TransactionPda = {
     numberPda: 0,
     totalDebit: 0,
     totalCredit: 0,
     details: []
-  }
+  };
 
-  creditTransaction: LocalData[] = [];
+  // historial de notas de crédito anteriores
+  listCredtiNotesByTransaction: any[] = [];
+  showDetailsAdjustment: boolean[] = [];
+
+  // totales dinámicos del grid actual
+  totalCredit: number = 0;
+  totalDebit: number = 0;
+
+  // control UI
+  allowAddEntry: boolean = true; // para el botón Add Row del grid
+  isViewOnly = false;            // modo lectura (bloqueado)
+  status: string = "";           // DRAFT | SUCCESS | etc
+
+  // para saber si es nueva, edición o vista
+  id: string | null = null;
+
+  // selects auxiliares
+  listMovement: IMovement[] = [
+    { code: 'D', name: 'Debe' },
+    { code: 'C', name: 'Haber' },
+  ];
+
+  documentType!: number;
+
+  messageToast: string = '';
+  showToast: boolean = false;
+  toastType: ToastType = typeToast.Info;
+
+  accountList: AccountModel[] = [];
+  creditTransaction: LocalData[] = []; // lista de transacciones base (ventas confirmadas)
   journalForm?: JournalModel;
 
   // modal
   popupVisible = false;
-  id: string | null = null;
 
-  description: string = '';
-  status:string="";
+  // referencia contable seleccionada
+  selectRow: LocalData = {
+    id: 0,
+    referenceNumber: ""
+  };
 
+  // UI detalle partida
+  showDetails: boolean = false;
+
+  private lastBuiltKey: string | null = null;
+  private buildingDataSource = false;
+
+  // services / router
   private readonly accountService = inject(AccountService);
   private readonly transService = inject(TransactionService);
   private readonly journalService = inject(JournalService);
   private readonly activeRouter = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  selectRow: LocalData = {
-    id: 0,
-    referenceNumber: ""
-  }
-
+  private readonly cdRef = inject(ChangeDetectorRef);
 
   editorOptions = {
     itemTemplate: 'accounts',
@@ -140,214 +153,167 @@ export class CreditNotesComponent {
       defaultUseCurrencyAccountingStyle: true,
       serverDecimalSeparator: '.',
     });
-
   }
 
-
-
   ngOnInit() {
+    // 0. detectar si venimos en modo vista (?mode=view) / edición (?mode=edit)
+    this.activeRouter.queryParamMap.subscribe((qp) => {
+      const mode = qp.get('mode');
+      this.isViewOnly = (mode === 'view');
 
-    this.transService.getAll().subscribe({
-      next: (data) => {
-        this.creditTransaction = this.fillDataSource(data);
-      },
+      // si estoy solo viendo, no puedo agregar filas
+      this.allowAddEntry = !this.isViewOnly;
     });
 
+    // 1. cargar cuentas (cacheadas) - igual que débito
+    this.loadAccountsOnce();
+
+    // 2. cargar diarios (para crédito usamos los de "Ingresos")
     this.journalService.getAllAccountingJournal().subscribe({
       next: (data) => {
         this.journalList = data
-          .filter(item =>  item.accountTypeName	 === "Ingresos"  && item.status);
+          .filter((item: any) => item.accountTypeName === "Ingresos" && item.status);
       },
-    })
+    });
 
+    // 3. cargar todas las transacciones base (las partidas SUCCESS de Ventas)
+    this.transService.getAll().subscribe({
+      next: (data) => {
+        this.creditTransaction = this.fillDataSource(data);
+
+        // si ya conocemos el transactionId (por edición), init original
+        this.initOriginalTransactionSection();
+      },
+    });
+
+    // 4. leer :id (si existe -> estamos editando / viendo una nota existente)
     this.activeRouter.paramMap.subscribe((params) => {
-      this.id = params.get('id');   
+      this.id = params.get('id');
       const findId = Number(this.id);
-      if (findId) {
 
-        this.allowAddEntry= false;
-        
+      if (findId) {
         this.transService.getNoteCreditById(findId).subscribe({
           next: (data) => {
-          
-            this.selectRow.referenceNumber= data.invoiceNo;
+            this.selectRow.referenceNumber = data.invoiceNo;
+            this.selectRow.id = data.transactionId;
             this.description = data.descriptionNote;
             this.creditNotes.date = data.date;
             this.creditNotes.dayri = data.diaryType;
-
             this.status = data.status;
-    
-            const transaccion =  data.detailNote.map((item: any) => {
-              return {
-                accountId: item.accountId,
-                amount: item.amount,
-                id: item.id,
-                movement: item.shortEntryType,
-                accountName: item.accountName,
-                debit:  item.debit,
-                credit: item.credit
-              } as Transaction;
-            })
-            this.accountService.getAllAccount().subscribe({
-              next: (data) => {
-                this.accountList = data
-                  .filter(item => item.supportEntry )
-                  .map(item => ({
-                    id: item.id,
-                    description: item.name,
-                    code: item.accountCode
-                  } as AccountModel));
-              }
-            });
-             this.dataSource = transaccion;
-             this.updateAmounts();
+
+            // si la nota NO está en DRAFT => bloqueamos edición total
+            if (this.status !== 'DRAFT') {
+              this.isViewOnly = true;
+            }
+
+            this.allowAddEntry = !this.isViewOnly;
+
+            // detalle ya existente de la nota
+            this.dataSource = data.detailNote.map((item: any) => ({
+              accountId: item.accountId,
+              amount: item.amount,
+              id: item.id,
+              movement: item.shortEntryType,
+              accountName: item.accountName,
+              debit: item.debit,
+              credit: item.credit
+            }) as Transaction);
+
+            // reconstruir sección "Partida #" + histórico
+            this.updateAmounts();
+            this.initOriginalTransactionSection();
           }
         });
       }
     });
-
-
   }
+
+  // ===================== helpers init =====================
+
+  private loadAccountsOnce(): void {
+    // alineado a DebitNotesComponent: usamos getAllAccountCached y filtramos supportEntry + defaultAccount
+    this.accountService.getAllAccountCached().subscribe({
+      next: (data) => {
+        this.accountList = data
+          .filter((item: any) => item.supportEntry || item.id == this.journalForm?.defaultAccount)
+          .map((item: any) => ({
+            id: item.id,
+            description: item.name,
+            code: item.accountCode
+          } as AccountModel));
+
+        this.allowAddEntry = !this.isViewOnly;
+      },
+      error: (err) => {
+        console.error('Error cargando cuentas', err);
+      }
+    });
+  }
+
+  private initOriginalTransactionSection(): void {
+    if (!this.selectRow?.id || this.creditTransaction.length === 0) return;
+
+    const base = this.creditTransaction.find(d => d.id === this.selectRow.id);
+    if (!base) return;
+
+    this.transactionOriginal = {
+      numberPda: base.numberPda ? parseInt(base.numberPda, 10) : 0,
+      totalDebit: (base.details ?? [])
+        .filter(d => d.movement === 'D')
+        .reduce((t, i) => t + i.amount, 0),
+      totalCredit: (base.details ?? [])
+        .filter(d => d.movement === 'C')
+        .reduce((t, i) => t + i.amount, 0),
+      details: (base.details ?? []).map(item => ({
+        id: item.id,
+        nameAccount: item.accountName,
+        debe: item.movement === 'D' ? item.amount : 0,
+        haber: item.movement === 'C' ? item.amount : 0,
+      })) as DetailsPda[]
+    };
+
+    this.showDetails = true;
+
+    if (base.id) {
+      this.getAllCreditByTransaction(base.id);
+    } else {
+      this.listCredtiNotesByTransaction = [];
+      this.showDetailsAdjustment = [];
+    }
+  }
+
+  // ================= GRID handlers (idéntico a débito) =================
 
   async saveRow(e: any): Promise<void> {
-
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'C' && debit.length <= 1) {
-      if (debit.length == 1) {
-        debit.forEach((item) => {
-          const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-
-          const roundedSum = parseFloat(sum.toFixed(2));
-
-         item.amount = roundedSum;
-        });
-
-      } else {
-
-        this.dataSource.push({
-          id: this.journalForm?.id ?? 0,
-          accountId: this.journalForm?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),
-          movement: 'D',
-
-        });
-      }
-
-    }
-
-    if (e.data.movement == 'D' && credit.length <= 1) {
-
-      if (credit.length == 1) {
-        credit.forEach((item) => {
-          const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-  
-          // Redondear la suma a dos decimales para asegurar precisión
-          const roundedSum = parseFloat(sum.toFixed(2));
-
-          item.amount = roundedSum
-        });
-
-      } else {
-
-        this.dataSource.push({
-          id:  this.journalForm?.id ?? 0,
-          accountId: this.journalForm?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),
-          movement: 'C',
-
-        });
-      }
-
-    }
-
     this.updateAmounts();
   }
 
-
-  removedRow(e:any): void {
-
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'D' && credit.length == 1 && debit.length == 0) {
-      this.dataSource = [];
-      return;
-    }
-    if (e.data.movement == 'C' && debit.length == 1 && credit.length == 0) {
-      this.dataSource = [];
-      return
-    }
-
-    if (e.data.movement == 'D' && credit.length == 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); 
-      });
-    }
-    if (e.data.movement == 'C' && debit.length == 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2)); 
-      });
-    }
-
+  removedRow(e: any): void {
     this.updateAmounts();
-
   }
-
 
   updateRow(e: any): void {
-
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'D' && credit.length == 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-    if (e.data.movement == 'C' && debit.length == 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-
-
     this.updateAmounts();
-
   }
-
 
   private updateAmounts(): void {
     if (this.dataSource.length > 0) {
-      // Calcular el total de los movimientos 'D' (debe)
       const debe = this.dataSource
         .filter((data) => data.movement === 'D')
         .reduce((sum, item) => sum + item.amount, 0);
-    
-      // Calcular el total de los movimientos 'C' (haber)
+
       const haber = this.dataSource
         .filter((data) => data.movement === 'C')
         .reduce((sum, item) => sum + item.amount, 0);
-    
-      // Redondear los totales a dos decimales
+
       this.totalCredit = parseFloat(haber.toFixed(2));
       this.totalDebit = parseFloat(debe.toFixed(2));
-    
-      // Mostrar en la consola para verificar
-      // console.log('Total Debit:', this.totalDebit);
-      // console.log('Total Credit:', this.totalCredit);
+    } else {
+      this.totalCredit = 0;
+      this.totalDebit = 0;
     }
   }
 
-
-
-
-  // calcula el total en el componente del summary
   calculateSummary(options: any) {
     if (options.name === 'totalDebit' || options.name === 'totalCredit') {
       switch (options.summaryProcess) {
@@ -356,14 +322,9 @@ export class CreditNotesComponent {
           break;
         case 'calculate':
           if (options.name === 'totalDebit' && options.value.movement === 'D') {
-            // si es el item de debito y el movimiento el `DEBE`
             options.totalValue += options.value.amount;
           }
-          if (
-            options.name === 'totalCredit' &&
-            options.value.movement === 'C'
-          ) {
-            // si es el item de credito y movimiento es el `HABER`
+          if (options.name === 'totalCredit' && options.value.movement === 'C') {
             options.totalValue += options.value.amount;
           }
           break;
@@ -372,64 +333,326 @@ export class CreditNotesComponent {
   }
 
   onContentReady(e: DxDataGridTypes.ContentReadyEvent) {
-    e.component.option('loadPanel.enabled', false); // elimina el loading cuando agregas una nueva fila
-    const gridComponent = e.component;
-
-    // Obtén los totales del summary. por medio de los nombres del calculateSummary.
-    const totalDebit = gridComponent.getTotalSummaryValue('totalDebit');
-    const totalCredit = gridComponent.getTotalSummaryValue('totalCredit');
-
-    // Aquí se maneja los totales obtenidos, como actualizar propiedades del componente o llamar a métodos.
-    // console.log(`Total Debit: ${totalDebit}, Total Credit: ${totalCredit}`);
-    // this.totalDebit = totalDebit; // actualiza en la vista
-    // this.totalCredit = totalCredit;
-
-
-
+    e.component.option('loadPanel.enabled', false);
   }
 
+  // ================= VALIDACIONES GRID (copiadas de débito) =================
+
+  amountGreaterThanZero = (e: { value: any }) => {
+    const n = typeof e.value === 'number' ? e.value : parseFloat((e.value || '').toString().replace(/,/g, ''));
+    return !isNaN(n) && n > 0;
+  };
+
+  onRowValidating(e: DxDataGridTypes.RowValidatingEvent) {
+    const data = { ...(e.oldData || {}), ...(e.newData || {}) };
+    const missingAccount = !data.accountId;
+    const missingMovement = !data.movement;
+    const invalidAmount = !(typeof data.amount === 'number' && data.amount > 0);
+
+    if (missingAccount || missingMovement || invalidAmount) {
+      e.isValid = false;
+      const msg =
+        (missingAccount ? '• Seleccione una cuenta.\n' : '') +
+        (missingMovement ? '• Seleccione el movimiento (Debe/Haber).\n' : '') +
+        (invalidAmount ? '• El monto debe ser mayor que 0.\n' : '');
+      this.toastType = typeToast.Error;
+      this.messageToast = 'No se pudo guardar la fila:\n' + msg;
+      this.showToast = true;
+    }
+  }
+
+  onSaving(e: DxDataGridTypes.SavingEvent) {
+    if (!e.changes || e.changes.length === 0) return;
+
+    for (const ch of e.changes) {
+      const currentRow =
+        e.component.getVisibleRows().find(r => r.key === ch.key)?.data || {};
+
+      const data = { ...currentRow, ...(ch.data || {}) };
+
+      const missingAccount = !data.accountId;
+      const missingMovement = !data.movement;
+      const invalidAmount = !(typeof data.amount === 'number' && data.amount > 0);
+
+      if (missingAccount || missingMovement || invalidAmount) {
+        e.cancel = true;
+        const msg =
+          (missingAccount ? '• Seleccione una cuenta.\n' : '') +
+          (missingMovement ? '• Seleccione el movimiento (Debe/Haber).\n' : '') +
+          (invalidAmount ? '• El monto debe ser mayor que 0.\n' : '');
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Complete los campos requeridos antes de guardar:\n' + msg;
+        this.showToast = true;
+        return;
+      }
+    }
+  }
+
+  // ================= VALIDACIÓN FORM COMPLETO =================
+
   private validate(): boolean {
-    this.messageToast = ''; // limpia el balance
+    this.messageToast = '';
     this.showToast = false;
+
     if (this.dataSource.length < 2) {
-      // si el array contiene menos de 2 registros
       this.messageToast = 'Debe agregar al menos 2 transacciones';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida number of tnx');
       return false;
     }
-    // operar sobre el total y verificar que lleve a cero la operación
+
     const total = this.totalCredit - this.totalDebit;
     if (total !== 0) {
-      this.messageToast =
-        'El balance no es correcto, por favor ingrese los valores correctos';
+      this.messageToast = 'El balance no es correcto, por favor ingrese los valores correctos';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida balance');
       return false;
     }
-    // si todo `OK` retorna true
 
-    const hasDuplicateAccountId = this.dataSource.some((item, index) => {
+    const hasDuplicateAccountId = this.dataSource.some((item) => {
       return this.dataSource.filter(obj => obj.accountId === item.accountId).length > 1;
     });
 
     if (hasDuplicateAccountId) {
-      this.messageToast =
-        'No se puede registrar la misma cuenta en la transaccion';
+      this.messageToast = 'No se puede registrar la misma cuenta en la transaccion';
       this.showToast = true;
       this.toastType = typeToast.Error;
-
       return false;
     }
 
     return true;
   }
 
+  // ================= UI HELPERS =================
+
+  toggleDetails() {
+    this.showDetails = !this.showDetails;
+  }
+
+  toggleDetailsAdjustment(index: number) {
+    this.showDetailsAdjustment[index] = !this.showDetailsAdjustment[index];
+  }
+
+  trackByFn(index: number, item: any) {
+    return item.numberPda;
+  }
+
+  showModal() {
+    // si está en modo solo lectura, que no abra el popup
+    if (this.isViewOnly) return;
+    this.popupVisible = !this.popupVisible;
+  }
+
+  goBack() {
+    window.history.back();
+  }
+
+  getCredit(dataRow: any) {
+    return dataRow.movement === "C" ? dataRow.amount : 0;
+  }
+  getDebit(dataRow: any) {
+    return dataRow.movement === "D" ? dataRow.amount : 0;
+  }
+
+  enableEdit = () => {
+    if (this.isViewOnly) return false;
+    return this.status !== 'SUCCESS';
+  };
+
+  // ================= eventos selección referencia =================
+
+  onRowSelected(event: any): void {
+    if (this.isViewOnly) return;
+
+    const reference = event.selectedRowsData[0];
+    if (reference && reference.referenceNumber) {
+      this.handleTransaction(reference.referenceNumber);
+    }
+  }
+
+  onValueChange(reference: string): void {
+    if (this.isViewOnly) return;
+
+    if (reference) {
+      this.handleTransaction(reference);
+    }
+  }
+
+  onChangeJournal(e: any) {
+    if (this.isViewOnly) return;
+
+    if (e.target.value) {
+      this.handleDocumentType(this.selectRow);
+    }
+  }
+
+  // ================= lógica al seleccionar partida base =================
+
+  private handleTransaction(referenceNumber: string): void {
+    const transaccionEncontrada = this.creditTransaction.find(data => data.referenceNumber === referenceNumber);
+    const transaccion: LocalData = transaccionEncontrada
+      ? { ...transaccionEncontrada }
+      : { id: 0, referenceNumber: '' };
+
+    if (!transaccion) return;
+    this.documentType = transaccion.documentType!;
+
+    // cabecera
+    this.selectRow = transaccion;
+
+    // partida original resumida
+    this.transactionOriginal = {
+      numberPda: transaccion.numberPda ? parseInt(transaccion.numberPda, 10) : 0,
+      totalDebit: transaccion.details?.filter(d => d.movement === "D").reduce((t, i) => t + i.amount, 0) ?? 0,
+      totalCredit: transaccion.details?.filter(d => d.movement === "C").reduce((t, i) => t + i.amount, 0) ?? 0,
+      details: (transaccion.details ?? []).map(item => ({
+        id: item.id,
+        nameAccount: item.accountName,
+        debe: item.movement == 'D' ? item.amount : 0,
+        haber: item.movement == 'C' ? item.amount : 0,
+      })) as DetailsPda[]
+    };
+
+    // historial notas de crédito ya hechas sobre esa transacción
+    if (transaccion.id) {
+      this.getAllCreditByTransaction(transaccion.id);
+    } else {
+      this.listCredtiNotesByTransaction = [];
+      this.showDetailsAdjustment = [];
+    }
+
+    // armar grid inicial para nueva nota
+    this.handleDocumentType(transaccion);
+
+    // asegurar que ya se muestre la tarjeta Partida #
+    this.showDetails = true;
+
+    this.updateAmounts();
+  }
+
+  private handleDocumentType(transaccion: LocalData): void {
+    if (!transaccion || transaccion.id == null) return;
+    if (!this.creditNotes.dayri || this.creditNotes.dayri === 0) return;
+    if (transaccion.documentType == null) return;
+
+    const buildKey = `${transaccion.id}-${this.creditNotes.dayri}`;
+    if (this.buildingDataSource) return;
+    if (this.lastBuiltKey === buildKey) return;
+
+    this.buildingDataSource = true;
+
+    // diario elegido actualmente en pantalla (para contrapartida nueva)
+    this.journalForm = this.journalList.find(
+      (item) => item.id == this.creditNotes.dayri
+    );
+
+    // necesitamos conocer el diario original de la transacción base
+    this.journalService.getJournalById(transaccion.diaryType!).subscribe({
+      next: (journalDefault) => {
+        // refrescar accountList en base al diario seleccionado actual
+        this.accountService.getAllAccountCached().subscribe({
+          next: (accountsData) => {
+            this.accountList = accountsData
+              .filter(
+                (item: any) =>
+                  item.supportEntry ||
+                  item.id == this.journalForm?.defaultAccount
+              )
+              .map((item: any) => ({
+                id: item.id,
+                description: item.name,
+                code: item.accountCode,
+              } as AccountModel));
+
+            // clonar detalles base
+            const copiaDetails = (transaccion.details || []).map(d => ({ ...d }));
+
+            // quitar la cuenta default ORIGINAL (journalDefault.defaultAccount)
+            const filteredDetails = copiaDetails.filter(
+              line => line.accountId !== journalDefault.defaultAccount
+            );
+
+            // En nota de CRÉDITO, las líneas restantes pasan a movimiento "C"
+            filteredDetails.forEach(d => d.movement = "C");
+
+            // calcular total de esas líneas
+            const total = filteredDetails.reduce(
+              (sum, d) => sum + (d.amount || 0),
+              0
+            );
+
+            // armamos contrapartida "D" usando el diario actualmente seleccionado
+            const finalRows = [...filteredDetails];
+
+            if (
+              this.journalForm?.defaultAccount != null &&
+              this.journalForm?.defaultAccountName != null &&
+              this.journalForm.defaultAccountName.trim() !== ''
+            ) {
+              finalRows.push({
+                id: 0,
+                accountId: this.journalForm.defaultAccount,
+                amount: total ?? 0,
+                movement: "D",
+                accountName: this.journalForm.defaultAccountName,
+              } as Transaction);
+            }
+
+            // solo regeneramos si estamos creando NUEVA nota,
+            // si estamos editando una existente (this.id), ya cargamos this.dataSource del backend
+            if (!this.id) {
+              this.dataSource = finalRows;
+            }
+
+            this.updateAmounts();
+
+            this.lastBuiltKey = buildKey;
+            this.buildingDataSource = false;
+          },
+          error: (err) => {
+            console.error('Error cargando cuentas filtradas:', err);
+            this.buildingDataSource = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error getJournalById:', err);
+        this.buildingDataSource = false;
+      }
+    });
+  }
+
+  // ================= historial notas crédito =================
+
+  getAllCreditByTransaction(id: number) {
+    this.transService.getAllCreditNoteByTrasactionId(id).subscribe({
+      next: (data: any) => {
+        this.listCredtiNotesByTransaction = data.map((transaction: any) => ({
+          numberPda: transaction.descriptionNote,
+          totalDebit: transaction.detailNote?.filter((i: any) => i.shortEntryType === "D")
+            .reduce((acc: number, i: any) => acc + i.amount, 0),
+          totalCredit: transaction.detailNote?.filter((i: any) => i.shortEntryType === "C")
+            .reduce((acc: number, i: any) => acc + i.amount, 0),
+          date: transaction.date,
+          user: transaction.user,
+          details: transaction.detailNote?.map((i: any) => ({
+            id: i.id,
+            nameAccount: i.accountName,
+            debe: i.shortEntryType === 'D' ? i.amount : 0,
+            haber: i.shortEntryType === 'C' ? i.amount : 0,
+          })) as DetailsPda[]
+        }));
+
+        this.showDetailsAdjustment = Array(this.listCredtiNotesByTransaction.length).fill(false);
+      }
+    });
+  }
+
+  combineCodeAndDescription = (item: any) => {
+    return item ? `${item.description} ${item.code}` : '';
+  };
+
   fillDataSource(data: any[]): LocalData[] {
-
-
     return data.filter((item: any) => item.status == "SUCCESS" && item.documentType === JournalTypes.Ventas)
       .map((item: any) => {
 
@@ -462,44 +685,51 @@ export class CreditNotesComponent {
 
 
   }
+  // ================= submit =================
 
   async onSubmit(e: NgForm) {
+    // si estoy en modo view, no debería ni intentar guardar
+    if (this.isViewOnly) return;
 
-    if (this.selectRow.referenceNumber != '' && this.validate() && e.valid) {
+    if (this.selectRow.referenceNumber === '' || !e.valid) {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Complete todos los campos requeridos correctamente.';
+      this.showToast = true;
+      this.cdRef.detectChanges();
+      return;
+    }
 
+    if (!this.validate()) return;
 
+    const request: any = {
+      transactionId: this.selectRow.id,
+      descriptionNote: e.form.value.description,
+      diaryType: e.form.value.dayri,
+      createAtDate: e.form.value.date,
+      detailNote: this.dataSource.map((detail) => ({
+        id: detail.id,
+        accountId: detail.accountId,
+        amount: detail.amount,
+        motion: detail.movement,
+      })),
+    };
 
-      const request: any = {
+    const dialogo = await confirm(
+      this.id
+        ? '¿Está seguro de que desea guardar los cambios?'
+        : '¿Está seguro de que desea crear la nota de crédito?',
+      'Advertencia'
+    );
+    if (!dialogo) return;
 
-        transactionId: this.selectRow.id,
-        reference: "Nota Credito",
-        descriptionNote: e.form.value.description,
-        diaryType: e.form.value.dayri,
-        createAtDate: e.form.value.date,
-        detailNote: this.dataSource.map((detail) => {
-          return {
-            accountId: detail.accountId,
-            amount: detail.amount,
-            motion: detail.movement
+    const currentId = Number(this.id);
 
-          };
-        }),
-      };
-
-      let dialogo = await confirm(
-        `¿Está seguro de que desea realizar esta acción?`,
-        'Advertencia'
-      );
-
-      if (!dialogo) {
-        return;
-      }
-
-      this.transService.createTransactionCreditNotes(request).subscribe({
-        next: (data) => {
-
+    if (currentId) {
+      // UPDATE
+      this.transService.updateCreditNote(currentId, request).subscribe({
+        next: () => {
           this.toastType = typeToast.Success;
-          this.messageToast = 'Registros insertados exitosamente';
+          this.messageToast = 'Nota de Crédito actualizada correctamente.';
           this.showToast = true;
 
           setTimeout(() => {
@@ -507,281 +737,65 @@ export class CreditNotesComponent {
           }, 2000);
         },
         error: (err) => {
-          console.error('Error creating transaction:', err);
           this.toastType = typeToast.Error;
-          this.messageToast = 'Error al crear la transacción';
+          this.messageToast = err.message || 'Error al actualizar la Nota de Crédito.';
           this.showToast = true;
+          console.error('Error actualizando nota de crédito:', err);
         },
       });
+    } else {
+      // CREATE
+      this.transService.createTransactionCreditNotes(request).subscribe({
+        next: () => {
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Nota de Crédito creada correctamente.';
+          this.showToast = true;
 
-    }
-
-
-  }
-
-  showModal() {
-    this.popupVisible = this.popupVisible ? false : true;
-  }
-
-
-  customCurrencyText(cellInfo: any): string {
-    return cellInfo.valueText.replace('USD', '$').replace('HNL', 'L');
-  }
-
-  combineCodeAndDescription = (item: any) => {
-    return item ? `${item.description} ${item.code}` : '';
-  };
-
-  goBack() {
-    window.history.back();
-  }
-
-  onRowSelected(event: any): void {
-    const reference = event.selectedRowsData[0];
-    if (reference && reference.referenceNumber) {
-
-
-      this.handleTransaction(reference.referenceNumber);
-    }
-  }
-
-
-  onValueChange(reference: string): void {
-    if (reference) {
-      this.handleTransaction(reference);
-    }
-  }
-
-  onChangeJournal(e: any) {
-
-    if (e.target.value) {
-      this.handleDocumentType(this.selectRow);
-    }
-  }
-
-  onChangePercent(e: any) {
-
-    this.handleDocumentType(this.selectRow);
-
-  }
-
-
-  private handleTransaction(referenceNumber: string): void {
-
-    const transaccionEncontrada = this.creditTransaction.find(data => data.referenceNumber === referenceNumber);
-
-    const transaccion: LocalData = transaccionEncontrada
-      ? { ...transaccionEncontrada }
-      : { id: 0, referenceNumber: '' };
-
-    if (!transaccion) return;
-    this.documentType = transaccion.documentType!;
-
-    const copiaTransaction = { ...transaccion };
-
-    this.transactionOriginal = {
-      numberPda: copiaTransaction.numberPda ? parseInt(copiaTransaction.numberPda, 10) : 0,
-      totalDebit: copiaTransaction.details?.filter(data => data.movement === "D")
-        .reduce((total, item) => total + item.amount, 0),
-      totalCredit: copiaTransaction.details?.filter(data => data.movement === "C")
-        .reduce((total, item) => total + item.amount, 0),
-      details: copiaTransaction.details?.map(item => ({
-        id: item.id,
-        nameAccount: item.accountName,
-        debe: item.movement == 'D' ? item.amount : 0,
-        haber: item.movement == 'C' ? item.amount : 0,
-      })) as DetailsPda[]
-    } as TransactionPda;
-
-    this.getAllCreditByTransaction(transaccion.id);
-
-
-    this.selectRow = transaccion;
-
-    this.handleDocumentType(transaccion);
-
-  }
-
-
-  private handleDocumentType(transaccion: LocalData): void {
-
-
-    if (this.creditNotes.dayri != 0 && transaccion.documentType != null) {
-      this.journalForm = this.journalList.find((item) => item.id == this.creditNotes.dayri);
-
-
-      this.accountService.getAllAccount().subscribe({
-        next: (data) => {
-          this.accountList = data
-            .filter(item => item.supportEntry 
-              || item.id == this.journalForm?.defaultAccount
-            )
-            .map(item => ({
-              id: item.id,
-              description: item.name,
-              code: item.accountCode
-            } as AccountModel));
-        }
+          setTimeout(() => {
+            this.router.navigate(['/accounting/creditnotes-list']);
+          }, 2000);
+        },
+        error: (err) => {
+          this.toastType = typeToast.Error;
+          this.messageToast = err.message || 'Error al crear la Nota de Crédito.';
+          this.showToast = true;
+          console.error('Error creando nota de crédito:', err);
+        },
       });
-
-      let JournalDefault: JournalModel;
-
-      this.journalService.getJournalById(transaccion.diaryType!).subscribe(data => {
-        JournalDefault = data;
-
-        const itemToRemove = transaccion.details?.find(item => item.accountId === JournalDefault.defaultAccount);
-
-        if (itemToRemove) {
-          const index = transaccion.details?.indexOf(itemToRemove);
-
-          if (index !== undefined && index >= 0) {
-            transaccion.details?.splice(index, 1);
-          }
-        }
-
-        const accountToCheck = "Debe";
-
-        transaccion.details?.forEach(details => details.movement = "C")
-
-        const total = transaccion.details?.reduce((sum, details) => ((details.movement = "C"), sum + (details.amount || 0)), 0) || 0;
-
-        transaccion.details?.push({
-          "id": 0,
-          "accountId":total ?? 0,
-          "amount": total?? 0,
-          "movement": "D",
-          "accountName": this.journalForm?.defaultAccountName ?? ''
-        });
-
-  
-        
-
-        this.dataSource = transaccion?.details ?? [];
-        // setTimeout(() => this.hideEditDeleteButtons(accountToCheck), 100);
-
-        this.updateAmounts();
-
-
-      });
-
     }
-
-
   }
 
-  // private hideEditDeleteButtons(accountToCheck: string): void {
-  //   const rows = document.querySelectorAll('.dx-data-row');
-  //   rows.forEach(row => {
-  //     const tds = row.querySelectorAll("td");
-  //     tds.forEach(td => {
-  //       const codeAccount = td.textContent;
-  //       if (codeAccount === accountToCheck) {
-  //         const editButtons = row.querySelectorAll(".dx-link-edit");
-  //         const deleteButtons = row.querySelectorAll(".dx-link-delete");
-
-  //         editButtons.forEach(button => {
-  //           (button as HTMLElement).style.display = 'none';
-  //         });
-
-  //         deleteButtons.forEach(button => {
-  //           (button as HTMLElement).style.display = 'none';
-  //         });
-  //       }
-  //     });
-  //   });
-  // }
-
-  showDetails: boolean = false;
-
-  toggleDetails() {
-    this.showDetails = !this.showDetails;
-  }
-
-
-  getAllCreditByTransaction(id:number){
-    this.transService.getAllCreditNoteByTrasactionId(id).subscribe({
-      next: (data:any) => {
-        this.listCredtiNotesByTransaction = data.map((transaction:any) => (
-          {
-          numberPda: transaction.descriptionNote ,
-          totalDebit: transaction.detailNote?.filter((item:any) => item.shortEntryType === "D")
-            .reduce((total:any, item:any) => total + item.amount, 0),
-          totalCredit: transaction.detailNote?.filter((item:any) => item.shortEntryType === "C")
-            .reduce((total:any, item:any) => total + item.amount, 0),
-          date:transaction.date,
-          user:transaction.user,
-          details: transaction.detailNote?.map((item:any) => ({
-            id: item.id,
-            nameAccount: item.accountName,
-            debe: item.shortEntryType === 'D' ? item.amount : 0,
-            haber: item.shortEntryType === 'C' ? item.amount : 0,
-          })) as DetailsPda[]
-        })) as any [];
-    
-      }
-    });
-  }
-
-  showDetailsAdjustment: boolean[] = [];
-  initializeShowDetails() {
-    this.showDetailsAdjustment = this.listCredtiNotesByTransaction.map(() => false);
-  }
-
-  toggleDetailsAdjustment(index: number) {
-    this.showDetailsAdjustment[index] = !this.showDetailsAdjustment[index];
-  }
-
-  trackByFn(index: number, item: any) {
-    return item.numberPda;  // Asumiendo que numberPda es único
-  }
+  // ================= confirmar / "postear" =================
 
   posting() {
-    let dialogo = confirm(
+    confirm(
       `¿Está seguro de que desea realizar esta acción?`,
       'Advertencia'
-    );
-
-    dialogo.then(async (d) => {
+    ).then(async (d) => {
       if (d) {
         const transId = Number(this.id);
+
         this.transService.putStatusCreditNotes(transId).subscribe({
-          next: (data) => {
+          next: () => {
+            this.toastType = typeToast.Success;
+            this.messageToast = 'Nota de Crédito confirmada correctamente.';
+            this.showToast = true;
+
             setTimeout(() => {
               this.router.navigate(['/accounting/creditnotes-list']);
             }, 2000);
           },
           error: (err) => {
+            console.error('Error al confirmar la Nota de Crédito:', err);
             this.toastType = typeToast.Error;
             this.messageToast = 'Error al intentar publicar la transacción';
             this.showToast = true;
-
           },
         });
       }
     });
   }
 
-  getCredit(dataRow: any) {
-    
 
-    if (dataRow.movement === "C") {
-      return dataRow.amount;
-    }
-
-    return 0;
-
-  }
-  getDebit(dataRow: any) {
-
-
-    
-    if (dataRow.movement === "D") {
-      return dataRow.amount;
-    }
-
-    return 0;
-
-  }
 
 }
-

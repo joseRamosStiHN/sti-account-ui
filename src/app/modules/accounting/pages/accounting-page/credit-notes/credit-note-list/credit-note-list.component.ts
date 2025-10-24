@@ -1,10 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastType } from 'devextreme/ui/toast';
-import { catchError, firstValueFrom, map, Observable, of, Subscription, tap } from 'rxjs';
+import { catchError, map, Observable, of, Subscription, tap } from 'rxjs';
 import { AdjustmentResponse } from 'src/app/modules/accounting/models/APIModels';
 import { typeToast } from 'src/app/modules/accounting/models/models';
-import { AdjusmentService } from 'src/app/modules/accounting/services/adjusment.service';
 import { TransactionService } from 'src/app/modules/accounting/services/transaction.service';
 import themes from 'devextreme/ui/themes';
 import { confirm } from 'devextreme/ui/dialog';
@@ -18,53 +17,54 @@ import { NavigationService } from 'src/app/shared/navigation.service';
   styleUrl: './credit-note-list.component.css'
 })
 export class CreditNoteListComponent {
+
   private subscription: Subscription = new Subscription();
   error: Error | null = null;
-  private readonly router = inject(Router);
-  dataSource$: Observable<AdjustmentResponse[]> | undefined;
 
+  private readonly router = inject(Router);
+  private readonly transactionService = inject(TransactionService);
+  private readonly userService = inject(UsersService);
+  private readonly navigate = inject(NavigationService);
+
+  dataSource$: Observable<AdjustmentResponse[]> | undefined;
 
   messageToast: string = '';
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
-  
 
-  // seleccion por paginacion
+  // selección masiva
   allMode: string;
-  checkBoxesMode: string;  
+  checkBoxesMode: string;
   selectOptions: { id: string, name: string }[] = [
     { id: 'allPages', name: 'Todos' },
     { id: 'page', name: 'Página' }
   ];
 
-  selectRows:number[]=[];
-
+  // IDs seleccionados que SÍ son borrador
+  selectRows: number[] = [];
 
   user?: UsersResponse;
-  private readonly userService = inject(UsersService);
-  private readonly navigate = inject(NavigationService);
- 
-   isRegistreAccounting:boolean = false;
-  isApprove:boolean= false;
- 
 
-  private readonly transactionService = inject(TransactionService);
+  isRegistreAccounting: boolean = false;
+  isApprove: boolean = false;
 
-  constructor() { 
-
+  constructor() {
     this.allMode = 'allPages';
     this.checkBoxesMode = themes.current().startsWith('material') ? 'always' : 'onClick';
   }
 
-
- 
- 
-  ngOnInit() {
+  ngOnInit(): void {
+    // escuchar empresa/roles para permisos
     this.subscription.add(
-      this.navigate.companyNavigation.subscribe((company)=>{
+      this.navigate.companyNavigation.subscribe((company) => {
         this.validPermisition(company);
       })
-    )
+    );
+
+    this.loadData();
+  }
+
+  private loadData() {
     this.dataSource$ = this.transactionService.getAllNotasCredits()
       .pipe(
         map((data) => this.fillDataSource(data)),
@@ -80,90 +80,114 @@ export class CreditNoteListComponent {
       );
   }
 
-
+  /**
+   * - rawStatus: el status real (DRAFT / SUCCESS / etc.)
+   * - isDraft: boolean para saber si se puede editar/confirmar
+   * - statusLabel: 'Borrador' o 'Confirmado'
+   * - creationDate: pasamos a Date para que el grid lo formatee como fecha
+   */
   private fillDataSource(data: any): any[] {
+    return data.map((item: any) => {
+      const rawStatus = (item.status || '').toUpperCase();
+      const isDraft = rawStatus === 'DRAFT';
 
-
-    return data.map((item:any) => {
       return {
         id: item.id,
         transactionId: item.transactionId,
-        invoiceNo:item.invoiceNo,
+        invoiceNo: item.invoiceNo,
         reference: item.reference,
-        description:item.descriptionNote,
-        status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
-        creationDate: item.creationDate,
-
-      } as any;
+        description: item.descriptionNote,
+        creationDate: new Date(item.creationDate),
+        rawStatus,
+        statusLabel: isDraft ? 'Borrador' : 'Confirmado',
+        isDraft
+      };
     });
-
-
   }
 
+  // navegar para crear nueva nota de crédito
   goToAdjustment = () => {
     this.router.navigate(['accounting/credit-notes']);
   };
 
-  onButtonClick(data: any) {
-    this.router.navigate(['/accounting/credit-notes', data.id]);
+  /**
+   * Igual que en DebitNoteList:
+   * si es borrador -> modo edición
+   * si está confirmada -> modo vista
+   */
+  onButtonClick(row: any) {
+    const mode = row.isDraft ? 'edit' : 'view';
+    this.router.navigate(['/accounting/credit-notes', row.id], {
+      queryParams: { mode },
+    });
   }
 
-
+  /**
+   * Cuando el usuario selecciona filas en el grid:
+   * guardamos SOLO las que están en borrador (isDraft === true)
+   * y nos quedamos solo con los IDs
+   */
   onRowSelected(event: any): void {
-
-    this.selectRows =  event.selectedRowsData.filter( (data:any)=> data.status =="Borrador")
-                    .map((data:any)=> data.id);                  
+    const rows = event.selectedRowsData || [];
+    this.selectRows = rows
+      .filter((r: any) => r.isDraft)
+      .map((r: any) => r.id);
   }
 
+  /**
+   * Confirmar todas las notas seleccionadas:
+   * - pide confirmación al usuario
+   * - llama putAllCreditNotes(selectRows)
+   * - muestra toast
+   * - recarga data y limpia selección
+   */
   posting() {
     let dialogo = confirm(
       `¿Está seguro de que desea realizar esta acción?`,
       'Advertencia'
     );
 
-    dialogo.then(async (d) => {    
+    dialogo.then(async (d) => {
       if (d) {
         this.transactionService.putAllCreditNotes(this.selectRows).subscribe({
-          next: (data) => {
+          next: () => {
             this.toastType = typeToast.Success;
-            this.messageToast = 'Notas de Créditos confirmadas con exito';
+            this.messageToast = 'Notas de Crédito confirmadas con éxito';
             this.showToast = true;
 
-            setTimeout(() => {
-              this.router.navigate(['/accounting']); 
-            }, 3000);
+            // recargamos data para que el grid ya muestre "Confirmado"
+            this.loadData();
+            this.selectRows = [];
           },
           error: (err) => {
             this.toastType = typeToast.Error;
-            this.messageToast = 'Error al intentar confirmar Notas de Créditos';
+            this.messageToast = 'Error al intentar confirmar Notas de Crédito';
             this.showToast = true;
           },
         });
       }
-       
-      }
-    );
+    });
   }
 
-  async validPermisition(company:any) {
-  
+  /**
+   * Roles de la empresa seleccionada determinan:
+   * - puede crear (REGISTRO CONTABLE)
+   * - puede confirmar (APROBADOR)
+   */
+  async validPermisition(company: any) {
     if (company == '') {
       console.error('Datos de usuario o compañía no encontrados.');
       return;
     }
 
-
-   await company.roles.forEach((role: any) => { 
-
-      if (role.name == 'REGISTRO CONTABLE') {       
+    company.roles.forEach((role: any) => {
+      if (role.name == 'REGISTRO CONTABLE') {
         this.isRegistreAccounting = true;
       }
 
       if (role.name == 'APROBADOR') {
         this.isApprove = true;
       }
-      
-    })
-
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { AccountModel } from 'src/app/modules/accounting/models/AccountModel';
 import { IMovement, Transaction, typeToast } from 'src/app/modules/accounting/models/models';
@@ -18,7 +18,7 @@ import config from 'devextreme/core/config';
 
 interface LocalData {
   id: number;
-  referenceNumber?: string; // este es el numero de factura de cliente o proveedor o banco etc,
+  referenceNumber?: string;
   reference?: string;
   journalEntry?: string;
   journalEntryId?: number;
@@ -77,7 +77,6 @@ export class AccountingAdjustmentComponent {
   showToast: boolean = false;
   toastType: ToastType = typeToast.Info;
 
-  accountList: AccountModel[] = [];
   dataSource: Transaction[] = [];
   transactionOriginal: TransactionPda = {
     numberPda: '',
@@ -96,6 +95,11 @@ export class AccountingAdjustmentComponent {
 
   description: string = '';
 
+  isViewOnly = false;
+
+  accountList: AccountModel[] = [];
+  showDetails: boolean = false;
+
   //
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
@@ -103,6 +107,7 @@ export class AccountingAdjustmentComponent {
   private readonly adjustemntService = inject(AdjusmentService);
   private readonly journalService = inject(JournalService);
   private readonly activeRouter = inject(ActivatedRoute);
+  private readonly cdRef = inject(ChangeDetectorRef);
 
   selectRow: LocalData = {
     id: 0,
@@ -143,155 +148,131 @@ export class AccountingAdjustmentComponent {
 
 
   ngOnInit() {
+    // 1. Detectar si estamos en modo view (para bloquear edición)
+    this.activeRouter.queryParamMap.subscribe(qp => {
+      const mode = qp.get('mode');
+      this.isViewOnly = (mode === 'view');
+      if (this.isViewOnly) {
+        this.allowAddEntry = false;
+      }
+    });
 
+    // 2. Cargar cuentas (una sola vez, con cache)
+    this.loadAccountsOnce();
 
+    // 3. Cargar TODAS las transacciones base (para armar dataTable e info de la partida original)
     this.transService.getAll().subscribe({
       next: (data) => {
         this.dataTable = this.fillDataSource(data);
+
+        // <- intenta inicializar el bloque "Partida # ..." si ya sabemos qué transacción corresponde
+        this.initOriginalTransactionFromDataTable();
       },
     });
+
+    // 4. Leer el :id del ajuste (si existe, es edición / view)
     this.activeRouter.paramMap.subscribe((params) => {
       this.id = params.get('id');
       const findId = Number(this.id);
-      if (findId) {
 
+      if (findId) {
+        // si estoy editando / viendo un ajuste existente,
+        // no permito agregar nuevas filas inicialmente
         this.allowAddEntry = false;
 
         this.adjustemntService.getAdjustmentById(findId).subscribe({
           next: (data) => {
+            // info cabecera del ajuste
             this.selectRow.referenceNumber = data.invoiceNo;
             this.description = data.descriptionAdjustment;
             this.status = data.status;
 
-            const transaccion = data.adjustmentDetails.map((item: any) => {
-              return {
-                accountId: item.accountId,
-                amount: item.amount,
-                id: item.id,
-                movement: item.shortEntryType,
-                accountName: item.accountName,
-                debit: item.debit,
-                credit: item.credit
-              } as Transaction;
-            })
-            this.accountService.getAllAccount().subscribe({
-              next: (data) => {
-                this.accountList = data
-                  .filter(item => item.supportEntry)
-                  .map(item => ({
-                    id: item.id,
-                    description: item.name,
-                    code: item.accountCode
-                  } as AccountModel));
-              }
-            });
+            // guarda el transactionId real al que pertenece este ajuste
+            this.selectRow.id = data.transactionId;
 
-            this.dataSource = transaccion
+            // líneas del ajuste que se van a editar en el grid
+            this.dataSource = data.adjustmentDetails.map((item: any) => ({
+              accountId: item.accountId,
+              amount: item.amount,
+              id: item.id,
+              movement: item.shortEntryType,
+              accountName: item.accountName,
+              debit: item.debit,
+              credit: item.credit
+            } as Transaction));
 
             this.updateAmounts();
 
-            // setTimeout(() => {
-            //   this.hideEditDeleteButtons("Haber");
-            // }, 10000);
-
-
-
+            // <- intenta inicializar el bloque "Partida # ..." ahora que ya tenemos transactionId
+            this.initOriginalTransactionFromDataTable();
           }
         });
       }
     });
-
-
-
   }
 
+  private loadAccountsOnce(): void {
+    this.allowAddEntry = false;
 
+    this.accountService.getAllAccountCached().subscribe({
+      next: (data) => {
+        this.accountList = data
+          .filter(item => item.supportEntry)
+          .map(item => ({
+            id: item.id,
+            description: item.name,
+            code: item.accountCode
+          } as AccountModel));
+
+        this.allowAddEntry = !this.isViewOnly;
+      },
+      error: (err) => {
+        console.error('Error cargando cuentas', err);
+      }
+    });
+  }
+
+  private initOriginalTransactionFromDataTable(): void {
+    if (!this.selectRow?.id || !this.dataTable || this.dataTable.length === 0) {
+      return;
+    }
+
+    const transaccionBase = this.dataTable.find(
+      d => d.id === this.selectRow.id
+    );
+
+    if (!transaccionBase) {
+      return;
+    }
+
+    this.transactionOriginal = {
+      numberPda: transaccionBase.numberPda ?? '',
+      totalDebit: (transaccionBase.details ?? [])
+        .filter(d => d.movement === 'D')
+        .reduce((t, i) => t + i.amount, 0),
+      totalCredit: (transaccionBase.details ?? [])
+        .filter(d => d.movement === 'C')
+        .reduce((t, i) => t + i.amount, 0),
+      details: (transaccionBase.details ?? []).map(item => ({
+        id: item.id,
+        nameAccount: item.accountName ?? '',
+        debe: item.movement === 'D' ? item.amount : 0,
+        haber: item.movement === 'C' ? item.amount : 0,
+      } as DetailsPda)),
+
+    };
+
+    this.showDetails = true;
+
+    this.getAllAdjustmentByTransaction(transaccionBase.id);
+  }
 
 
   async saveRow(e: any): Promise<void> {
-
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'C' && debit.length <= 1) {
-      if (debit.length == 1) {
-        debit.forEach((item) => {
-          const sum = credit.reduce((total, currentItem) => total + currentItem.amount, 0);
-
-          const roundedSum = parseFloat(sum.toFixed(2));
-
-          item.amount = roundedSum;
-        });
-
-      } else {
-
-        this.dataSource.push({
-          id: this.journalForm?.id ?? 0,
-          accountId: this.journalForm?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),
-          movement: 'D',
-
-        });
-      }
-
-    }
-
-    if (e.data.movement == 'D' && credit.length <= 1) {
-
-      if (credit.length == 1) {
-        credit.forEach((item) => {
-          const sum = debit.reduce((total, currentItem) => total + currentItem.amount, 0);
-
-          // Redondear la suma a dos decimales para asegurar precisión
-          const roundedSum = parseFloat(sum.toFixed(2));
-
-          item.amount = roundedSum
-        });
-
-      } else {
-
-        this.dataSource.push({
-          id: this.journalForm?.id ?? 0,
-          accountId: this.journalForm?.defaultAccount ?? 0,
-          amount: parseFloat(e.data.amount.toFixed(2)),
-          movement: 'C',
-
-        });
-      }
-
-    }
-
-
     this.updateAmounts();
-
   }
 
-  removedRow(e:any): void {
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'D' && credit.length == 1 && debit.length == 0) {
-      this.dataSource = [];
-      return;
-    }
-    if (e.data.movement == 'C' && debit.length == 1 && credit.length == 0) {
-      this.dataSource = [];
-      return
-    }
-
-    if (e.data.movement == 'D' && credit.length == 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-    if (e.data.movement == 'C' && debit.length == 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, item) => sum + item.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-
+  removedRow(e: any): void {
     this.updateAmounts();
 
   }
@@ -299,47 +280,28 @@ export class AccountingAdjustmentComponent {
 
   updateRow(e: any): void {
 
-    const credit = this.dataSource.filter((data) => data.movement === 'C');
-    const debit = this.dataSource.filter((data) => data.movement === 'D');
-
-    if (e.data.movement == 'D' && credit.length == 1) {
-      credit.forEach((item) => {
-        const sum = debit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-    if (e.data.movement == 'C' && debit.length == 1) {
-      debit.forEach((item) => {
-        const sum = credit.reduce((sum, currentItem) => sum + currentItem.amount, 0);
-        item.amount = parseFloat(sum.toFixed(2));
-      });
-    }
-
-
     this.updateAmounts();
   }
 
 
   private updateAmounts(): void {
-
-   
     if (this.dataSource.length > 0) {
-
-      const debe = this.dataSource
-        .filter((data) => data.movement === 'D')
+      const totalDebit = this.dataSource
+        .filter(item => item.movement === 'D')
         .reduce((sum, item) => sum + item.amount, 0);
-    
-      const haber = this.dataSource
-        .filter((data) => data.movement === 'C')
+
+      const totalCredit = this.dataSource
+        .filter(item => item.movement === 'C')
         .reduce((sum, item) => sum + item.amount, 0);
-    
 
-      this.totalCredit = parseFloat(haber.toFixed(2));
-      this.totalDebit = parseFloat(debe.toFixed(2));
-    
-
+      this.totalDebit = parseFloat(totalDebit.toFixed(2));
+      this.totalCredit = parseFloat(totalCredit.toFixed(2));
+    } else {
+      this.totalDebit = 0;
+      this.totalCredit = 0;
     }
   }
+
 
 
 
@@ -392,6 +354,7 @@ export class AccountingAdjustmentComponent {
       this.messageToast = 'Debe agregar al menos 2 transacciones';
       this.showToast = true;
       this.toastType = typeToast.Error;
+      this.cdRef.detectChanges();
       //console.log('invalida number of tnx');
       return false;
     }
@@ -399,10 +362,9 @@ export class AccountingAdjustmentComponent {
     const total = this.totalCredit - this.totalDebit;
     if (total !== 0) {
       this.messageToast =
-        'El balance no es correcto, por favor ingrese los valores correctos';
+        'El balance no es correcto, por favor ingrese los valores correctos.';
       this.showToast = true;
       this.toastType = typeToast.Error;
-      //console.log('invalida balance');
       return false;
     }
     // si todo `OK` retorna true
@@ -423,96 +385,108 @@ export class AccountingAdjustmentComponent {
     return true;
   }
 
-fillDataSource(data: any[]): LocalData[] {
+  fillDataSource(data: any[]): LocalData[] {
     return data.filter((item: any) => item.status == "SUCCESS")
-        .map((item: any) => {
-            const totalDetail = item.transactionDetails.find((element: any) => {
-                return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
-                       (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
-            }) || { amount: 0 }; // Manejo de caso donde no se encuentra el detalle
+      .map((item: any) => {
+        const totalDetail = item.transactionDetails.find((element: any) => {
+          return (item.documentType === JournalTypes.Ventas && element.entryType === "Credito") ||
+            (item.documentType === JournalTypes.Compras && element.entryType === "Debito");
+        }) || { amount: 0 }; // Manejo de caso donde no se encuentra el detalle
 
-            return {
-                id: item.id,
-                date: item.date,
-                referenceNumber: item.reference,
-                documentType: item.documentType,
-                numberPda: item.numberPda,
-                diaryType: item.diaryType,
-                reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras ? "" : item.description,
-                journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
-                total: totalDetail.amount,
-                status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
-                details: item.transactionDetails.map((item: any) => ({
-                    accountId: item.accountId,
-                    amount: item.amount,
-                    id: item.id,
-                    movement: item.shortEntryType == "C" ? "C" : "D",
-                    accountName: item.accountName
-                }))
-            } as LocalData;
-        });
-}
-
-
-  showDetails: boolean = false;
+        return {
+          id: item.id,
+          date: item.date,
+          referenceNumber: item.reference,
+          documentType: item.documentType,
+          numberPda: item.numberPda,
+          diaryType: item.diaryType,
+          reference: item.documentType == JournalTypes.Ventas || item.documentType == JournalTypes.Compras ? "" : item.description,
+          journalEntry: item.documentType == JournalTypes.Ventas ? "Ventas" : "Compras",
+          total: totalDetail.amount,
+          status: item.status.toUpperCase() === 'DRAFT' ? 'Borrador' : 'Confirmado',
+          details: item.transactionDetails.map((item: any) => ({
+            accountId: item.accountId,
+            amount: item.amount,
+            id: item.id,
+            movement: item.shortEntryType == "C" ? "C" : "D",
+            accountName: item.accountName
+          }))
+        } as LocalData;
+      });
+  }
 
   toggleDetails() {
     this.showDetails = !this.showDetails;
   }
 
   async onSubmit(e: NgForm) {
+    if (!e.valid || this.selectRow.referenceNumber === '') {
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Complete todos los campos requeridos correctamente.';
+      this.showToast = true;
+      this.cdRef.detectChanges();
+      return;
+    }
 
-    if (e.valid && this.selectRow.referenceNumber != '' && this.validate()) {
+    if (!this.validate()) return;
 
-      const request: AdjustmentRequest = {
 
-        transactionId: this.selectRow.id,
-        reference: "Ajuste",
-        descriptionAdjustment: e.form.value.description,
-        detailAdjustment: this.dataSource.map((detail) => {
-          return {
-            id: detail.id,
-            accountId: detail.accountId,
-            amount: detail.amount,
-            motion: detail.movement
+    const request: AdjustmentRequest = {
+      transactionId: this.selectRow.id,
+      reference: 'Ajuste',
+      descriptionAdjustment: e.form.value.description,
+      detailAdjustment: this.dataSource.map((detail) => ({
+        id: detail.id,
+        accountId: detail.accountId,
+        amount: detail.amount,
+        motion: detail.movement,
+      })),
+    };
 
-          };
-        }),
-      };
+    let dialogo = await confirm('¿Está seguro de que desea guardar los cambios?', 'Advertencia');
+    if (!dialogo) return;
 
-      let dialogo = await confirm(
-        `¿Está seguro de que desea realizar esta acción?`,
-        'Advertencia'
-      );
+    const id = Number(this.id);
 
-      if (!dialogo) {
-        return;
-      }
-
-      this.adjustemntService.createAdjusment(request).subscribe({
+    if (id) {
+      this.adjustemntService.updateAdjustment(id, request).subscribe({
         next: (data) => {
-          // this.fillBilling(data);
           this.toastType = typeToast.Success;
-          this.messageToast = 'Registros insertados exitosamente';
+          this.messageToast = 'Ajuste actualizado correctamente.';
           this.showToast = true;
 
           setTimeout(() => {
-            this.router.navigate(['/accounting/adjustment-list']);    
-          }, 3000);
-
+            this.router.navigate(['/accounting/adjustment-list']);
+          }, 2000);
         },
         error: (err) => {
-          console.error('Error creating transaction:', err);
           this.toastType = typeToast.Error;
-          this.messageToast = 'Error al crear la transacción';
+          this.messageToast = err.message || 'Error al actualizar el ajuste.';
           this.showToast = true;
+          console.error('Error actualizando ajuste:', err);
         },
       });
+    } else {
+      this.adjustemntService.createAdjusment(request).subscribe({
+        next: (data) => {
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Ajuste creado correctamente.';
+          this.showToast = true;
 
+          setTimeout(() => {
+            this.router.navigate(['/accounting/adjustment-list']);
+          }, 2000);
+        },
+        error: (err) => {
+          this.toastType = typeToast.Error;
+          this.messageToast = err.message || 'Error al crear el ajuste.';
+          this.showToast = true;
+          console.error('Error creando ajuste:', err);
+        },
+      });
     }
-
-
   }
+
 
   showModal() {
     this.popupVisible = this.popupVisible ? false : true;
@@ -549,72 +523,65 @@ fillDataSource(data: any[]): LocalData[] {
 
 
   private handleTransaction(referenceNumber: string): void {
-    const transaccionEncontrada = this.dataTable.find(data => data.referenceNumber === referenceNumber);
-
-    const transaccion: LocalData = transaccionEncontrada
-      ? { ...transaccionEncontrada }
-      : { id: 0, referenceNumber: '' };
-
+    const transaccionEncontrada = this.dataTable.find(d => d.referenceNumber === referenceNumber);
+    const transaccion: LocalData = transaccionEncontrada ? { ...transaccionEncontrada } : { id: 0, referenceNumber: '' };
     if (!transaccion) return;
+
+    // Reset de UI vinculada
+    this.showDetails = false;
+
+    // *** LIMPIA AJUSTES ANTERIORES ***
+    this.listAdjustmentByTransaction = [];
+    this.showDetailsAdjustment = [];
+
     this.documentType = transaccion.documentType!;
-
-    this.journalService.getJournalById(transaccion.diaryType!).subscribe(data => {
-      this.journalForm = data;
-    });
-
-
+    this.journalService.getJournalById(transaccion.diaryType!).subscribe(data => this.journalForm = data);
 
     this.transactionOriginal = {
-      numberPda: transaccion.numberPda,
-      totalDebit: transaccion.details?.filter(data => data.movement === "D")
-        .reduce((total, item) => total + item.amount, 0),
-      totalCredit: transaccion.details?.filter(data => data.movement === "C")
-        .reduce((total, item) => total + item.amount, 0),
-      details: transaccion.details?.map(item => ({
+      numberPda: transaccion.numberPda ?? '',
+      totalDebit: (transaccion.details ?? [])
+        .filter(d => d.movement === 'D')
+        .reduce((t, i) => t + i.amount, 0),
+      totalCredit: (transaccion.details ?? [])
+        .filter(d => d.movement === 'C')
+        .reduce((t, i) => t + i.amount, 0),
+      details: (transaccion.details ?? []).map(item => ({
         id: item.id,
         nameAccount: item.accountName,
-        debe: item.movement == 'D' ? item.amount : 0,
-        haber: item.movement == 'C' ? item.amount : 0,
-      })) as DetailsPda[]
+        debe: item.movement === 'D' ? item.amount : 0,
+        haber: item.movement === 'C' ? item.amount : 0,
+      })),
     } as TransactionPda;
-
-
 
 
     const copiaTransaccion = { ...transaccion };
 
-    this.getAllAdjustmentByTransaction(copiaTransaccion.id);
+    // Pide ajustes (si no hay id válido, asegura arrays vacías)
+    if (copiaTransaccion.id) {
+      this.getAllAdjustmentByTransaction(copiaTransaccion.id);
+    } else {
+      this.listAdjustmentByTransaction = [];
+      this.showDetailsAdjustment = [];
+    }
 
-    copiaTransaccion.details?.forEach((detail) => {
+    // voltea movimientos para el grid de edición
+    copiaTransaccion.details?.forEach(detail => {
       if (detail.movement === "D" || detail.movement === "C") {
-        const isDebit = detail.movement === "D";
-        detail.movement = isDebit ? "C" : "D";
+        detail.movement = detail.movement === "D" ? "C" : "D";
       }
     });
 
-    this.dataSource = copiaTransaccion.details!;
-
+    this.dataSource = copiaTransaccion.details || [];
     this.selectRow = transaccion;
     this.handleDocumentType(transaccion.documentType);
-
     this.updateAmounts();
   }
+
 
 
   private handleDocumentType(documentType: number | undefined): void {
     if (documentType === JournalTypes.Ventas || documentType === JournalTypes.Compras) {
       const accountType = documentType === JournalTypes.Ventas ? JournalTypes.Ventas : JournalTypes.Compras;
-      this.accountService.getAllAccount().subscribe({
-        next: (data) => {
-          this.accountList = data
-            .filter(item => item.supportEntry)
-            .map(item => ({
-              id: item.id,
-              description: item.name,
-              code: item.accountCode
-            } as AccountModel));
-        }
-      });
       const accountToCheck = documentType === JournalTypes.Ventas ? 'Debe' : 'Haber';
 
     }
@@ -646,26 +613,40 @@ fillDataSource(data: any[]): LocalData[] {
 
 
   getAllAdjustmentByTransaction(id: number) {
+    this.listAdjustmentByTransaction = [];
+    this.showDetailsAdjustment = [];
+
     this.adjustemntService.getAllAdjustmentByTrasactionId(id).subscribe({
       next: (data) => {
-        this.listAdjustmentByTransaction = data.map((transaction: any) => (
+        if (!data || data.length === 0) {
+          this.listAdjustmentByTransaction = [];
+          this.showDetailsAdjustment = [];
+          return;
+        }
 
-          {
-            numberPda: transaction.descriptionAdjustment,
-            totalDebit: transaction.adjustmentDetails?.filter((item: any) => item.shortEntryType === "D")
-              .reduce((total: any, item: any) => total + item.amount, 0),
-            totalCredit: transaction.adjustmentDetails?.filter((item: any) => item.shortEntryType === "C")
-              .reduce((total: any, item: any) => total + item.amount, 0),
-            date: transaction.creationDate.substring(0, 10),
-            user: transaction.user,
-            details: transaction.adjustmentDetails?.map((item: any) => ({
-              id: item.id,
-              nameAccount: item.accountName,
-              debe: item.shortEntryType === 'D' ? item.amount : 0,
-              haber: item.shortEntryType === 'C' ? item.amount : 0,
-            })) as DetailsPda[]
-          })) as TransactionPda[];
+        this.listAdjustmentByTransaction = data.map((t: any) => ({
+          numberPda: t.descriptionAdjustment,
+          totalDebit: (t.adjustmentDetails || [])
+            .filter((i: any) => i.shortEntryType === 'D')
+            .reduce((acc: number, i: any) => acc + i.amount, 0),
+          totalCredit: (t.adjustmentDetails || [])
+            .filter((i: any) => i.shortEntryType === 'C')
+            .reduce((acc: number, i: any) => acc + i.amount, 0),
+          date: t.creationDate ? t.creationDate.substring(0, 10) : '',
+          user: t.user ?? '',
+          details: (t.adjustmentDetails || []).map((i: any) => ({
+            id: i.id,
+            nameAccount: i.accountName,
+            debe: i.shortEntryType === 'D' ? i.amount : 0,
+            haber: i.shortEntryType === 'C' ? i.amount : 0,
+          }))
+        }));
 
+        this.showDetailsAdjustment = Array(this.listAdjustmentByTransaction.length).fill(false);
+      },
+      error: () => {
+        this.listAdjustmentByTransaction = [];
+        this.showDetailsAdjustment = [];
       }
     });
   }
@@ -700,5 +681,63 @@ fillDataSource(data: any[]): LocalData[] {
     return 0;
 
   }
+
+  enableEdit = () => {
+    if (this.isViewOnly) return false;
+    return this.status !== 'SUCCESS';
+  };
+
+
+  amountGreaterThanZero = (e: { value: any }) => {
+    const n = typeof e.value === 'number' ? e.value : parseFloat((e.value || '').toString().replace(/,/g, ''));
+    return !isNaN(n) && n > 0;
+  };
+
+
+  onRowValidating(e: DxDataGridTypes.RowValidatingEvent) {
+    const data = { ...(e.oldData || {}), ...(e.newData || {}) };
+    const missingAccount = !data.accountId;
+    const missingMovement = !data.movement;
+    const invalidAmount = !(typeof data.amount === 'number' && data.amount > 0);
+
+    if (missingAccount || missingMovement || invalidAmount) {
+      e.isValid = false;
+      const msg =
+        (missingAccount ? '• Seleccione una cuenta.\n' : '') +
+        (missingMovement ? '• Seleccione el movimiento (Debe/Haber).\n' : '') +
+        (invalidAmount ? '• El monto debe ser mayor que 0.\n' : '');
+      this.toastType = typeToast.Error;
+      this.messageToast = 'No se pudo guardar la fila:\n' + msg;
+      this.showToast = true;
+    }
+  }
+
+  onSaving(e: DxDataGridTypes.SavingEvent) {
+    if (!e.changes || e.changes.length === 0) return;
+
+    for (const ch of e.changes) {
+      const currentRow =
+        e.component.getVisibleRows().find(r => r.key === ch.key)?.data || {};
+
+      const data = { ...currentRow, ...(ch.data || {}) };
+
+      const missingAccount = !data.accountId;
+      const missingMovement = !data.movement;
+      const invalidAmount = !(typeof data.amount === 'number' && data.amount > 0);
+
+      if (missingAccount || missingMovement || invalidAmount) {
+        e.cancel = true;
+        const msg =
+          (missingAccount ? '• Seleccione una cuenta.\n' : '') +
+          (missingMovement ? '• Seleccione el movimiento (Debe/Haber).\n' : '') +
+          (invalidAmount ? '• El monto debe ser mayor que 0.\n' : '');
+        this.toastType = typeToast.Error;
+        this.messageToast = 'Complete los campos requeridos antes de guardar:\n' + msg;
+        this.showToast = true;
+        return;
+      }
+    }
+  }
+
 
 }

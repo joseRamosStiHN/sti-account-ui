@@ -82,7 +82,7 @@ export interface Notes {
   id?: number;
   reference: number;
   date: Date;
-  dayri: number;
+ dayri: number | null;
   applyPorcent: string;
   percent: number;
   description: string;

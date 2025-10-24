@@ -120,6 +120,7 @@ export interface AdjustmentResponse {
   status: string
   creationDate: any
   invoiceNo:string
+  descriptionAdjustment:string
   adjustmentDetails: AdjustmentDetail[]
 }
 

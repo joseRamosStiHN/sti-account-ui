@@ -27,43 +27,42 @@
                 <small class="text-xs text-red-900">Tipo es requerido.</small>
             </div>
         </div>
+
         <div class="mb-4">
             <label for="fromValue" class="block text-gray-700 font-semibold mb-2">Desde:</label>
             <div class="relative">
-
-                <input type="text" id="fromValue" name="fromValue" [(ngModel)]="taxSetings.fromValue"
-                    (blur)="formatFromInput('fromValue')"
+                <input type="number" id="fromValue" name="fromValue" [(ngModel)]="taxSetings.fromValue" min="0"
+                    step="0.01" (keydown)="blockInvalidKeys($event)"
+                    (input)="enforceNonNegativeTwoDecimals('fromValue')"
                     class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
-                    required>
-
-
-
-            </div>
-            <div *ngIf="itemForm.submitted && itemForm.form.controls['fromValue']?.getError('required')">
-                <small class="text-xs text-red-900">Desde es requerido.</small>
+                    required />
             </div>
 
             <div class="mt-3 block text-gray-700 font-semibold mb-2">
                 <input type="checkbox" id="onward" [(ngModel)]="onward" name="onward"
-                    (change)="taxSetings.toValue = null">
+                    (change)="taxSetings.toValue = null" />
                 <label for="onward" class="ml-2 text-sm text-gray-700">En Adelante</label>
             </div>
+
+            <div *ngIf="itemForm.submitted && itemForm.form.controls['fromValue']?.getError('required')">
+                <small class="text-xs text-red-900">Desde es requerido.</small>
+            </div>
         </div>
+
         <div class="mb-4">
             <label for="toValue" class="block text-gray-700 font-semibold mb-2">Hasta:</label>
             <div class="relative">
-
-                <input type="text" id="toValue" name="toValue" [(ngModel)]="taxSetings.toValue"
-                    (blur)="formatFromInput('toValue')"
+                <input type="number" id="toValue" name="toValue" [(ngModel)]="taxSetings.toValue" min="0" step="0.01"
+                    (keydown)="blockInvalidKeys($event)" (input)="enforceNonNegativeTwoDecimals('toValue')"
                     class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
-                    required>
-
-
+                    [disabled]="onward" [required]="!onward" />
             </div>
+
             <div *ngIf="itemForm.submitted && itemForm.form.controls['toValue']?.getError('required') && !onward">
                 <small class="text-xs text-red-900">Hasta es requerido.</small>
             </div>
         </div>
+
         @if(taxSetings.taxRate == 'Gravado'){
         <div class="mb-4">
             <label for="percent" class="block text-gray-700 font-semibold mb-2">Porcentaje (%):</label>

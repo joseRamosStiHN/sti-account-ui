@@ -176,6 +176,17 @@ export class TransactionService {
   }
 
 
+  updateCreditNote(id: number, data: any): Observable<any> {
+    const url = `${this.apiURL}/api/v1/credit-notes/${id}`;
+    return this.httpClient.put<any>(
+      url,
+      JSON.stringify(data),
+      this.httpOptions
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
   /**
    * Method to create a transaction
@@ -191,6 +202,18 @@ export class TransactionService {
       )
 
       .pipe(catchError(this.errorHandler));
+  }
+
+
+  updateDebitNote(id: number, data: any): Observable<any> {
+    const url = `${this.apiURL}/api/v1/debit-notes/${id}`;
+    return this.httpClient.put<any>(
+      url,
+      JSON.stringify(data),
+      this.httpOptions
+    ).pipe(
+      catchError(this.handleError)
+    );
   }
 
 
@@ -335,7 +358,7 @@ export class TransactionService {
         try {
           const errorObj = typeof error.error === 'string' ? JSON.parse(error.error) : error.error;
 
-          if (Array.isArray(errorObj)) { 
+          if (Array.isArray(errorObj)) {
             errorMessage = errorObj[0]?.message || 'Error de validación';
           } else if (errorObj.message) {
             errorMessage = errorObj.message;

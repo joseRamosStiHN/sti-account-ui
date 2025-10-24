@@ -21,70 +21,81 @@ export class AdjusmentService {
     }),
   };
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
- /**
-   * Method that brings a list adjusjentment
-   *
-   * @return response()
-   */
- getAll(): Observable<any> {
-  return this.httpClient
-    .get(this.apiURL + '/api/v1/adjustment')
+  /**
+    * Method that brings a list adjusjentment
+    *
+    * @return response()
+    */
+  getAll(): Observable<any> {
+    return this.httpClient
+      .get(this.apiURL + '/api/v1/adjustment')
 
-    .pipe(catchError(this.errorHandler));
-}
-
-
-  
-
-    /**
-   * Method to create a adjusment
-   *
-   * @return response()
-   */
-    createAdjusment(data: AdjustmentRequest): Observable<AdjustmentResponse> {
-      return this.httpClient
-        .post<AdjustmentResponse>(
-          this.apiURL + '/api/v1/adjustment',
-          JSON.stringify(data),
-          this.httpOptions
-        )
-  
-        .pipe(catchError(this.errorHandler));
-    }
-  
-    getAdjustmentById(id: number): Observable<AdjustmentResponseById> {
-      const url = `${this.apiURL}/api/v1/adjustment/${id}`;
-      return this.httpClient.get<AdjustmentResponseById>(url);
-    }
-
-    putStatusAdjusment(id: number): Observable<any> {
-
-      const transaccion = [id]
-
-      const url = `${this.apiURL}/api/v1/adjustment/confirm-adjustments`;
-      return this.httpClient.put(url, transaccion, this.httpOptions);
-    }
-
-    getAllAdjustmentByTrasactionId(id: number): Observable<AdjustmentResponseById[]> {
-      const url = `${this.apiURL}/api/v1/adjustment/by-transaction/${id}`;
-      return this.httpClient.get<AdjustmentResponseById[]>(url);
-    }
-
-    putAllAdjustment(transacctions: number []): Observable<any> {
-      const url = `${this.apiURL}/api/v1/adjustment/confirm-adjustments`;
-      return this.httpClient.put(url,transacctions, this.httpOptions);
-    }
-  
-  
+      .pipe(catchError(this.errorHandler));
+  }
 
 
-     /**
-   * Error Handler Method
-   *
-   * @return response()
-   */
+
+
+  /**
+ * Method to create a adjusment
+ *
+ * @return response()
+ */
+  createAdjusment(data: AdjustmentRequest): Observable<AdjustmentResponse> {
+    return this.httpClient
+      .post<AdjustmentResponse>(
+        this.apiURL + '/api/v1/adjustment',
+        JSON.stringify(data),
+        this.httpOptions
+      )
+
+      .pipe(catchError(this.errorHandler));
+  }
+
+  updateAdjustment(id: number, data: AdjustmentRequest): Observable<AdjustmentResponse> {
+    return this.httpClient
+      .put<AdjustmentResponse>(
+        `${this.apiURL}/api/v1/adjustment/${id}`,
+        JSON.stringify(data),
+        this.httpOptions
+      )
+      .pipe(catchError(this.errorHandler));
+  }
+
+
+  getAdjustmentById(id: number): Observable<AdjustmentResponseById> {
+    const url = `${this.apiURL}/api/v1/adjustment/${id}`;
+    return this.httpClient.get<AdjustmentResponseById>(url);
+  }
+
+  putStatusAdjusment(id: number): Observable<any> {
+
+    const transaccion = [id]
+
+    const url = `${this.apiURL}/api/v1/adjustment/confirm-adjustments`;
+    return this.httpClient.put(url, transaccion, this.httpOptions);
+  }
+
+  getAllAdjustmentByTrasactionId(id: number): Observable<AdjustmentResponseById[]> {
+    const url = `${this.apiURL}/api/v1/adjustment/by-transaction/${id}`;
+    return this.httpClient.get<AdjustmentResponseById[]>(url);
+  }
+
+  putAllAdjustment(transacctions: number[]): Observable<any> {
+    const url = `${this.apiURL}/api/v1/adjustment/confirm-adjustments`;
+    return this.httpClient.put(url, transacctions, this.httpOptions);
+  }
+
+
+
+
+  /**
+* Error Handler Method
+*
+* @return response()
+*/
   errorHandler(error: any) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {
