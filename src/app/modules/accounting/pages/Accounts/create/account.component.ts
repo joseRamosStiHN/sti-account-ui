@@ -74,7 +74,7 @@ export class AccountComponent implements OnInit {
       },
     });
 
-    this.accountService.getAllAccount().subscribe({
+    this.accountService.getAllAccountCached().subscribe({
       next: (data) => {
         data = data.filter(account => account.supportEntry == false);
         this.fillAccounts(data)

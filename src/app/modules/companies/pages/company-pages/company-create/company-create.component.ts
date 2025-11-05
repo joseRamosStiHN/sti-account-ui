@@ -198,105 +198,146 @@ export class CompanyCreateComponent implements OnInit {
   }
 
   async update() {
-    const users = this.userList$
-      .filter(users => users.roles && users.roles.length > 0)
-      .map(user => ({
-        id: user.id,
-        roles: user.roles.map((role: any) => ({ id: role }))
-      }));
+    try {
+      // 1) Asegura que el grid guarde la edición actual del TagBox
+      if (this.dataGrid?.instance) {
+        await this.dataGrid.instance.saveEditData();
+      }
 
-    this.companyForm.users = users;
-    this.companyForm.companyLogo = this.imageBase64;
+      // 2) Toma la misma fuente de datos que usa el grid
+      const source = (this.filteredUsers && this.filteredUsers.length > 0)
+        ? this.filteredUsers
+        : this.userList$;
 
-    if (this.companyForm.users.length == 0) {
-      this.toastType = typeToast.Error;
-      this.messageToast = 'Seleccione al menos un rol para el usuario.';
-      this.showToast = true;
-      return
-    }
+      // 3) Normaliza roles y arma el payload de usuarios
+      const users = (source || [])
+        .map(u => ({ ...u, roles: Array.isArray(u.roles) ? u.roles : [] }))
+        .filter(u => u.roles.length > 0)
+        .map(u => ({
+          id: u.id,
+          roles: u.roles.map((roleId: number) => ({ id: Number(roleId) }))
+        }));
 
-    this.imageChanged = true;
-    this.imagePreview = `data:image/png;base64,${this.imageBase64}`;
+      // 4) Asigna users al form (cast puntual para no tocar tus interfaces)
+      (this.companyForm as any).users = users;
 
-    this.companyService.updateCompany(this.companyForm, Number(this.id), Number(this.userId)).subscribe({
-      next: (data) => {
+      // 5) Logo: en update solo si cambió la imagen
+      if (this.imageChanged && this.imageBase64) {
+        this.companyForm.companyLogo = this.imageBase64;
+        this.imagePreview = `data:image/png;base64,${this.imageBase64}`;
+      }
 
-        if (this.tenantId != "" && this.accountsFromSystem !== 0) {
-          this.cloneAccountsToNewCompany(this.tenantId, this.companyForm.tenantId || '');
-        }
-
-        this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
-        this.toastType = typeToast.Success;
-        this.messageToast = 'Empresa actualizada exitosamente';
-        this.showToast = true;
-        setTimeout(() => {
-          this.imageChanged = false;
-
-          this.goBack();
-        }, 1000);
-
-      },
-      error: (err) => {
-        console.error('Error creando Empresa:', err);
+      // 6) Validación de usuarios/roles
+      if (!users.length) {
         this.toastType = typeToast.Error;
-        this.messageToast = 'Error al crear el Empresa';
+        this.messageToast = 'Seleccione al menos un rol para el usuario.';
         this.showToast = true;
-        this.imageChanged = false;
+        return;
+      }
 
-      },
-    });
+      // 7) Llamada al servicio
+      this.companyService.updateCompany(this.companyForm, Number(this.id), Number(this.userId)).subscribe({
+        next: () => {
+          if (this.tenantId !== '' && this.accountsFromSystem !== 0) {
+            this.cloneAccountsToNewCompany(this.tenantId, this.companyForm.tenantId || '');
+          }
 
+          this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Empresa actualizada exitosamente';
+          this.showToast = true;
 
+          setTimeout(() => {
+            this.imageChanged = false;
+            this.goBack();
+          }, 1000);
+        },
+        error: (err) => {
+          console.error('Error actualizando Empresa:', err);
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al actualizar la empresa';
+          this.showToast = true;
+          this.imageChanged = false;
+        },
+      });
+
+    } catch (err) {
+      console.error('Error en update():', err);
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Ocurrió un error al actualizar la empresa.';
+      this.showToast = true;
+    }
   }
 
   async save() {
+    try {
+      // 1) Asegura que el grid guarde la edición actual del TagBox
+      if (this.dataGrid?.instance) {
+        await this.dataGrid.instance.saveEditData();
+      }
 
-    const users = this.userList$
-      .filter(users => users.roles && users.roles.length > 0)
-      .map(user => ({
-        id: user.id,
-        roles: user.roles.map((role: any) => ({ id: role }))
-      }));
+      // 2) Toma la misma fuente de datos que usa el grid
+      const source = (this.filteredUsers && this.filteredUsers.length > 0)
+        ? this.filteredUsers
+        : this.userList$;
 
-    this.companyForm.users = users;
-    this.companyForm.companyLogo = this.imageBase64;
+      // 3) Normaliza roles y arma el payload de usuarios
+      const users = (source || [])
+        .map(u => ({ ...u, roles: Array.isArray(u.roles) ? u.roles : [] }))
+        .filter(u => u.roles.length > 0)
+        .map(u => ({
+          id: u.id,
+          roles: u.roles.map((roleId: number) => ({ id: Number(roleId) }))
+        }));
 
+      // 4) Asigna users al form (cast puntual para no tocar tus interfaces)
+      (this.companyForm as any).users = users;
 
-    if (this.companyForm.users.length == 0) {
-      this.toastType = typeToast.Error;
-      this.messageToast = 'Seleccione al menos un rol para el usuario.';
-      this.showToast = true;
-      return
-    }
+      // 5) Logo en create: usa lo que tengas en base64 (o vacío)
+      this.companyForm.companyLogo = this.imageBase64 || '';
 
-    this.companyService.createCompany(this.companyForm).subscribe({
-      next: (data) => {
-        this.createPeriod(data.tenantId);
-
-        if (this.accountsFromSystem !== 0) {
-          this.cloneAccountsToNewCompany(this.tenantId, data.tenantId);
-        }
-
-        this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
-
-        this.toastType = typeToast.Success;
-        this.messageToast = 'Empresa registrada exitosamente';
-        this.showToast = true;
-        setTimeout(() => {
-          this.goBack();
-        }, 1000);
-
-      },
-      error: (err) => {
-        console.error('Error creando Empresa:', err);
+      // 6) Validación de usuarios/roles
+      if (!users.length) {
         this.toastType = typeToast.Error;
-        this.messageToast = 'Error al crear el Empresa';
+        this.messageToast = 'Seleccione al menos un rol para el usuario.';
         this.showToast = true;
-      },
-    });
+        return;
+      }
 
+      // 7) Llamada al servicio
+      this.companyService.createCompany(this.companyForm).subscribe({
+        next: (data) => {
+          // Crea periodo anual de la nueva empresa
+          this.createPeriod(data.tenantId);
 
+          // Clonado de cuentas si corresponde
+          if (this.accountsFromSystem !== 0) {
+            this.cloneAccountsToNewCompany(this.tenantId, data.tenantId);
+          }
+
+          this.companyService.setLoadCompanysMap(new Map<number, CompanieResponse[]>());
+          this.toastType = typeToast.Success;
+          this.messageToast = 'Empresa registrada exitosamente';
+          this.showToast = true;
+
+          setTimeout(() => this.goBack(), 1000);
+        },
+        error: (err) => {
+          console.error('Error creando Empresa:', err);
+          this.toastType = typeToast.Error;
+          this.messageToast = 'Error al crear la empresa';
+          this.showToast = true;
+        },
+      });
+
+    } catch (err) {
+      console.error('Error en save():', err);
+      this.toastType = typeToast.Error;
+      this.messageToast = 'Ocurrió un error al registrar la empresa.';
+      this.showToast = true;
+    }
   }
+
 
   createPeriod(tenantId: string) {
 
@@ -418,7 +459,7 @@ export class CompanyCreateComponent implements OnInit {
       }
     });
   }
-  
+
   refreshData = () => {
     this.searchTerm = '';
     this.filteredUsers = [...this.originalUsers];

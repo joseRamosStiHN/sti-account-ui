@@ -65,7 +65,7 @@ export class JournalPageComponent {
 
   ngOnInit(): void {
     this.accountService
-      .getAllAccount()
+      .getAllAccountCached()
       .pipe(
         tap((data) => {
           this.accounts = data.filter(

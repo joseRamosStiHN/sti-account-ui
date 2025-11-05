@@ -20,7 +20,7 @@ export class ConfigurationComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.accountList$ = this.accountService.getAllAccount();
+    this.accountList$ = this.accountService.getAllAccountCached();
   }
 
   onEditAccount(e: AccountModel) {

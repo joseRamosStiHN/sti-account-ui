@@ -18,7 +18,7 @@ export class BalanceListComponent {
   constructor() {}
 
   ngOnInit(): void {
-    this.accountList$ = this.accountService.getAllAccount().pipe(
+    this.accountList$ = this.accountService.getAllAccountCached().pipe(
       map(accounts =>
         accounts.filter(account => account.supportEntry ==true)
       )

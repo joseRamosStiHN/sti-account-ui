@@ -55,8 +55,7 @@ export class ConfigurationAccountComponent {
   }
 
   ngOnInit(): void {
-    this.accountService.getAllAccount().subscribe((response: any[]) => {
-      console.log(response);
+    this.accountService.getAllAccountCached().subscribe((response: any[]) => {
 
       if (Array.isArray(response)) {
         this.acountList = response;

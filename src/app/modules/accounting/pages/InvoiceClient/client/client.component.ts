@@ -443,7 +443,7 @@ export class ClientComponent {
   }
 
   loadAccounts() {
-    this.accountService.getAllAccount().subscribe({
+    this.accountService.getAllAccountCached().subscribe({
       next: (data) => {
         this.accountList = data
           .filter(item => {

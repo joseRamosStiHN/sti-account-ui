@@ -494,7 +494,7 @@ export class VariousOperationsComponent {
   }
 
   loadAccounts(selectedTypeId?: number) {
-    this.accountService.getAllAccount().subscribe({
+    this.accountService.getAllAccountCached().subscribe({
       next: (data) => {
         this.accounts = data.filter(item => item.supportEntry);
         if (selectedTypeId !== undefined) {

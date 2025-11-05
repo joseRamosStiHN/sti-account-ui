@@ -45,7 +45,7 @@ export class UploadBulkFileComponent {
 
   ngOnInit(): void {
     this.bulkSettingList$ = this.bulkSettingsService.getAllBulkSettings();
-    this.accountService.getAllAccount().subscribe({
+    this.accountService.getAllAccountCached().subscribe({
       next: (data) => {
         this.accountList = data
           .filter(item => item.supportEntry && item.balances.length > 0)

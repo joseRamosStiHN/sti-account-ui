@@ -174,7 +174,7 @@ export class BulkConfigurationComponent {
       );
     }
 
-    this.accountService.getAllAccount().subscribe({
+    this.accountService.getAllAccountCached().subscribe({
       next: (data) => {
         this.accountList = data
           .filter(item => {
