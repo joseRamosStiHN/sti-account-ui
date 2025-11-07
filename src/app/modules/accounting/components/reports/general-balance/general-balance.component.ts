@@ -4,7 +4,7 @@ import { DxTreeListTypes } from 'devextreme-angular/ui/tree-list';
 import { GeneralBalance, GeneralBalanceResponse } from '../../../models/APIModels';
 import { ReportServiceService } from '../../../services/report-service.service';
 import { PeriodService } from 'src/app/modules/accounting/services/period.service';
-import { map, Observable } from 'rxjs';
+import { finalize, map, Observable } from 'rxjs';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
 import { NgForm } from '@angular/forms';
 // import * as XLSX from 'xlsx';
@@ -332,6 +332,9 @@ export class GeneralBalanceComponent implements OnInit {
 
   periodList$: Observable<PeriodModel[]> | undefined;
 
+  isLoading = false;
+  errorMsg: string | null = null;
+
   private readonly periodoService = inject(PeriodService);
 
   private readonly reportService = inject(ReportServiceService, {
@@ -340,27 +343,22 @@ export class GeneralBalanceComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-
-    this.company = JSON.parse(localStorage.getItem("company") ?? "");
-
-    const periodo = JSON.parse(localStorage.getItem("periodo") ?? "");
+    this.company = JSON.parse(localStorage.getItem('company') ?? '');
+    const periodo = JSON.parse(localStorage.getItem('periodo') ?? '');
 
     this.loadInfoBalance(periodo);
-
     this.setInitValues(0);
 
     this.periodList$ = this.periodoService.getAllPeriods().pipe(
-      map(data => {
-        data.map(nuevo => {
-          const status = nuevo.closureType?.toUpperCase() == "ANUAL" ? nuevo.status = true : nuevo.status;
+      map((data) => {
+        data.map((nuevo) => {
+          const status = nuevo.closureType?.toUpperCase() == 'ANUAL' ? (nuevo.status = true) : nuevo.status;
           const isClosed = nuevo.isClosed == null ? false : true;
-          return { ...nuevo, status, isClosed }
-        })
-        return data
+          return { ...nuevo, status, isClosed };
+        });
+        return data;
       })
     );
-
-
   }
 
   onContentReady(e: any): void {
@@ -484,42 +482,30 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
   private setInitValues(id: number) {
+    this.isLoading = true;
+    this.errorMsg = null;
+
     this.reportService
       ?.getGeneralBalanceReport(id)
-      .subscribe((response: GeneralBalanceResponse[]) => {
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (response: GeneralBalanceResponse[]) => {
+          this.dataSource = [];
+          this.treeData = [];
+          this.values = [];
+          this.summaryTotal = 0;
+          this.totalActivoSumary = 0;
 
-
-        this.dataSource = [];
-        this.treeData = [];
-        this.values = [];
-        this.summaryTotal = 0;
-        this.totalActivoSumary = 0;
-
-
-        // Convertir el JSON a la estructura de GeneralBalance[]
-        const dataBalance: GeneralBalance[] = this.convertToGeneralBalance(response);
-
-
-
-        // const indexActive = data.findIndex(
-        //   (item) => item.accountName.toUpperCase() === 'ACTIVO'
-        // );
-        // const indexPasivo = data.findIndex(
-        //   (item) => item.accountName.toUpperCase() === 'PASIVO'
-        // );
-
-        // const pasivo = data[indexPasivo];
-        // data.splice(indexPasivo, 1);
-        // data.unshift(pasivo);
-        // const active = data[indexActive];
-        // data.splice(indexActive, 1);
-        // data.unshift(active);
-
-        this.dataSource = dataBalance;
-        this.buildTree(dataBalance);
+          const dataBalance: GeneralBalance[] = this.convertToGeneralBalance(response);
+          this.dataSource = dataBalance;
+          this.buildTree(dataBalance);
+        },
+        error: (err) => {
+          console.error(err);
+          this.errorMsg = 'No se pudo cargar el Balance General.';
+        },
       });
   }
-
   convertToGeneralBalance(response: GeneralBalanceResponse[]): GeneralBalance[] {
     return [
       ...response.map((item: any) => ({
@@ -535,23 +521,14 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
   async onSubmit(e: NgForm) {
-    
-
     if (e.valid) {
+      this.setInitValues(e.form.value.period);
 
-      await this.setInitValues(e.form.value.period);
-
-      await this.periodList$?.subscribe(data=>{
-     
-        const periodo =  data.find(periodo=> periodo.id === e.form.value.period);
-
-        this.loadInfoBalance(periodo);
-        
-
-      })
+      this.periodList$?.subscribe((data) => {
+        const periodo = data.find((p) => p.id === e.form.value.period);
+        if (periodo) this.loadInfoBalance(periodo);
+      });
     }
-
-
   }
 
 
@@ -709,7 +686,7 @@ export class GeneralBalanceComponent implements OnInit {
   }
 
 
-  loadInfoBalance(periodo:any){
+  loadInfoBalance(periodo: any) {
 
 
 
@@ -717,7 +694,7 @@ export class GeneralBalanceComponent implements OnInit {
     const startDate = new Date(periodo.startPeriod);
     const endDate = new Date(periodo.endPeriod);
 
-    const formatMonth = (month:any) => {
+    const formatMonth = (month: any) => {
       const months = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"

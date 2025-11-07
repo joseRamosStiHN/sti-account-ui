@@ -167,13 +167,15 @@ export interface FinalBalance {
 }
 
 export interface IncomeStatement {
-  id: number
-  category?: string
-  accountParent?: string
-  account: string
-  amount: number
-  date: Date
+  id: number;
+  category?: string | null;
+  accountParent?: string | null;
+  typicalBalance: 'D' | 'C';
+  account: string;
+  amount: number;
+  date: string;
 }
+
 
 export interface AdjustmentResponseById{
   id: number

@@ -30,6 +30,7 @@ export class UploadBulkFileComponent {
   TransactionErrors$: any = [];
   newBulk: boolean = false;
   typeTransaction: number = 0;
+  showGrid = true;
 
   private readonly accountService = inject(AccountService);
   private readonly bulkSettingsService = inject(UploadBulkService);
@@ -76,26 +77,54 @@ export class UploadBulkFileComponent {
     event.preventDefault();
     this.isDragging = false;
     if (event.dataTransfer?.files.length) {
-      this.handleFileSelection(event.dataTransfer.files[0]);
+      const nextFile = event.dataTransfer.files[0];
+
+      if (this.fileUploaded || (this.TransactionUpload$?.length ?? 0) > 0 || (this.TransactionErrors$?.length ?? 0) > 0) {
+        confirm('Esto reemplazará el archivo y limpiará la información cargada. ¿Desea continuar?', 'Cambiar archivo')
+          .then((ok) => {
+            if (ok) {
+              this.resetParsedData(true);
+              this.handleFileSelection(nextFile);
+            }
+          });
+      } else {
+        this.handleFileSelection(nextFile);
+      }
     }
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length) {
-      this.handleFileSelection(input.files[0]);
+    const nextFile = input.files && input.files.length ? input.files[0] : undefined;
+    if (!nextFile) return;
+
+    // Si hay un archivo/datos ya cargados, confirmamos reemplazo
+    if (this.fileUploaded || (this.TransactionUpload$?.length ?? 0) > 0 || (this.TransactionErrors$?.length ?? 0) > 0) {
+      confirm('Esto reemplazará el archivo y limpiará la información cargada. ¿Desea continuar?', 'Cambiar archivo')
+        .then((ok) => {
+          if (ok) {
+            this.resetParsedData(true);
+            this.handleFileSelection(nextFile);
+          }
+        });
+    } else {
+      this.handleFileSelection(nextFile);
     }
+
+    // Muy importante: limpiar el valor del input para que el mismo archivo dispare "change" de nuevo
+    input.value = '';
   }
 
   private handleFileSelection(file: File): void {
+    // Por si llega aquí directo (drop/selección inicial), aseguramos limpieza previa
+    this.resetParsedData(true);
+
     this.selectedFile = file;
-    this.fileUploaded = false;
-    
-    // Mostrar mensaje de archivo seleccionado
+
+    // Toast
     this.toastType = typeToast.Success;
     this.messageToast = `Archivo seleccionado: ${file.name}`;
     this.showToast = true;
-    
   }
 
   async onSubmit(e: NgForm) {
@@ -242,11 +271,36 @@ export class UploadBulkFileComponent {
   }
 
   resetAll() {
+    this.resetParsedData(true);
+
     this.TransactionUpload$ = [];
     this.TransactionErrors$ = [];
     this.newBulk = false;
     this.selectedFile = undefined;
     this.fileUploaded = false;
+
+    const inputEl = document.getElementById('file') as HTMLInputElement | null;
+    if (inputEl) inputEl.value = '';
+  }
+
+  private resetParsedData(preserveType = true): void {
+    // Limpia tablas y flags
+    this.TransactionUpload$ = [];
+    this.TransactionErrors$ = [];
+    this.newBulk = false;
+    this.fileUploaded = false;
+    this.typeTransaction = 0;
+
+    // Opcional: si quieres limpiar también el select "Tipo"
+    if (!preserveType) {
+      this.BulkConfiguration.name = "";
+      this.BulkConfiguration.type = null as any;
+    }
+  }
+
+  private forceGridReload(): void {
+    this.showGrid = false;
+    setTimeout(() => this.showGrid = true); // destruye y crea el grid
   }
 
 }

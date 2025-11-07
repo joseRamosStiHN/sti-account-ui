@@ -17,6 +17,7 @@ import {
   DxPivotGridModule,
   DxToastModule,
   DxTreeListModule,
+  DxLoadPanelModule,
 } from 'devextreme-angular';
 
 import { HttpClientModule } from '@angular/common/http';
@@ -122,6 +123,7 @@ import { VariousOperationsComponent } from 'src/app/modules/accounting/pages/var
     DxPopupModule,
     DxButtonModule,
     DxTemplateModule,
+    DxLoadPanelModule
   ],
 })
 export class AccountingModule {}

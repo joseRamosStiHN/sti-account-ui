@@ -1,40 +1,81 @@
-<div class="w-100 mt-5">
-  <h1 class="text-2xl font-semibold text-center">{{company.name}}</h1>
-  <h2 class="text-2xl font-semibold text-center">Estado de resultado</h2>
-  <h3 class="font-semibold text-center">{{periodoAnual}}</h3>
-  <br>
-  <form class="flex justify-start items-center m-5 gap-4"  #itemForm="ngForm"
-  (ngSubmit)="onSubmit(itemForm)"
->
-    <select  [(ngModel)]="selectedPeriod"
-      class="border border-gray-300 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      name="period"
-      aria-label="Seleccionar período" required>
-      <option value="" disabled selected>Seleccione un período</option>
-      <option *ngFor="let period of periodList$ | async" [ngValue]="period.id">
-        {{ period.closureType }} {{ period.startPeriod | date: 'dd-MM-yyyy' }}
-      </option>
-    </select>
-    
-    <button type="submit"
-      class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      Buscar
-    </button>
-  </form>
-  <br>
-  <dx-pivot-grid
-  (onExporting)="onExporting($event)"
-    id="incomes"
-    [dataSource]="pivotDataSource"
-    [showBorders]="true"
-    [showColumnGrandTotals]="false"
-    [showColumnTotals]="false"
-    [allowSortingBySummary]="true"
-    [texts]="{ grandTotal: 'Total del Ejercicio' }"
-    height="600"
-    [scrolling]="{ useNative: true }"
-    class="capitalize">
+<!-- Spinner pantalla completa -->
+<dx-load-panel [visible]="isLoading" [showIndicator]="true" [showPane]="true" [shading]="true"
+  shadingColor="rgba(0,0,0,0.25)" message="Cargando..." [closeOnOutsideClick]="false">
+</dx-load-panel>
 
-    <dxo-export [enabled]="true"></dxo-export>
-  </dx-pivot-grid>
+<!-- Mensaje de error -->
+<div *ngIf="errorMsg" class="my-3 rounded-md bg-red-50 px-4 py-2 text-red-700 text-center">
+  {{ errorMsg }}
+</div>
+
+<!-- CONTENIDO -->
+<div class="w-100 items-center mt-5" *ngIf="!isLoading && !errorMsg">
+
+  <h1 class="text-2xl font-semibold text-center">{{ company?.name }}</h1>
+  <h2 class="text-2xl font-semibold text-center">Estado de Resultados</h2>
+  <h3 class="font-semibold text-center">{{ periodoAnual }}</h3>
+
+  <div class="mx-auto w-full max-w-5xl px-2">
+
+    <div class="flex justify-between items-center m-8 gap-4">
+
+      <!-- Formulario de búsqueda -->
+      <form class="flex items-center gap-3" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+        <select [(ngModel)]="selectedPeriod"
+          class="border border-gray-300 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          name="period" aria-label="Seleccionar período" required>
+          <option value="" disabled selected>Seleccione un período</option>
+          <option *ngFor="let period of periodList$ | async" [ngValue]="period.id">
+            {{ period.closureType }} {{ period.startPeriod | date:'dd-MM-yyyy' }}
+          </option>
+        </select>
+
+        <button type="submit"
+          class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+          Buscar
+        </button>
+      </form>
+
+      <button (click)="exportExcel()"
+        class="bg-green-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+        Exportar a Excel
+      </button>
+    </div>
+
+
+    <!-- ======= TABLA (idéntica al estilo del Balance General) ======= -->
+    <table class="w-full border mx-2 text-sm text-gray-500">
+      <thead class="text-sm text-gray-700 uppercase bg-gray-50">
+        <tr>
+          <th scope="col" class="px-4 py-2 border w-[75%]">Descripción</th>
+          <th scope="col" class="px-4 py-2 border w-[25%] text-right">Monto</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Filas visibles según expansión (+/-). Indent por nivel -->
+        <tr *ngFor="let row of visibleRows">
+          <td class="pl-1 py-2 border-b-[1px] border-t-[1px]">
+            <span *ngIf="hasChildren(row.id)" class="cursor-pointer select-none mr-1" (click)="toggle(row.id)">
+              {{ isExpanded(row.id) ? '-' : '+' }}
+            </span>
+
+            <span class="font-semibold" *ngIf="row.bold">{{ row.description }}</span>
+            <span *ngIf="!row.bold" [style.padding-left.px]="row.level ? row.level * 10 : 0">
+              {{ row.description }}
+            </span>
+          </td>
+
+          <td class="px-4 py-2 text-right border-b-[1px] border-t-[1px]">
+            <ng-container *ngIf="row.amount !== null; else emptyCell">
+              {{ calcAbs(row.amount) | currency:'L.' : 'symbol' : '1.2-2' }}
+            </ng-container>
+            <ng-template #emptyCell>—</ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
 </div>

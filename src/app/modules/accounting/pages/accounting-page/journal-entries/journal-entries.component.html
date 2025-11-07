@@ -1,111 +1,50 @@
 <div class="container mx-auto">
-  <h2 class="mt-6 mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">Asientos Contables</h2>
-  <dx-data-grid
-    id="gridJournalEntry"
-    [dataSource]="dataTable"
-    class="mt-5"
-    keyExpr="id"
-    [allowColumnReordering]="true"
-    [rowAlternationEnabled]="true"
-    [allowColumnResizing]="true"
-    [allowColumnReordering]="true"
-    [showBorders]="true"
-    [width]="'100%'"
-  >
+  <h2 class="mt-6 mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
+    Asientos Contables</h2>
+  <dx-data-grid id="gridJournalEntry" [dataSource]="dataTable" class="mt-5" keyExpr="id" [allowColumnReordering]="true"
+    [rowAlternationEnabled]="true" [allowColumnResizing]="true" [allowColumnReordering]="true" [showBorders]="true"
+    [width]="'100%'">
     <dxo-sorting mode="multiple"></dxo-sorting>
     <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-paging [pageSize]="15"></dxo-paging>
-    <dxo-pager
-      [showPageSizeSelector]="true"
-      [allowedPageSizes]="[10, 25, 50, 100]"
-    ></dxo-pager>
-    <dxo-search-panel
-      [visible]="true"
-      [highlightCaseSensitive]="true"
-    ></dxo-search-panel>
+    <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[10, 25, 50, 100]"></dxo-pager>
+    <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
     <dxo-group-panel [visible]="true"></dxo-group-panel>
 
-    <dxi-column
-      caption="Fecha"
-      dataField="date"
-      format="shortDate"
-      dataType="date"
-      alignment="center"
-      format="dd/MM/yyyy"
-      width="90"
-    ></dxi-column>
-    <dxi-column
-      alignment="left"
-      caption="No. Factura"
-      dataField="referenceNumber"
-    ></dxi-column>
-    <dxi-column
-      alignment="left"
-      caption="Referencia"
-      dataField="reference"
-    ></dxi-column>
-    <dxi-column
-      alignment="left"
-      caption="Diario"
-      dataField="journalEntry"
-    ></dxi-column>
-    <dxi-column
-      alignment="right"
-      caption="Total"
-      dataType="currency"
-      dataField="total"
-      [format]="{ 
+    <dxi-column caption="Fecha" dataField="date" format="shortDate" dataType="date" alignment="center"
+      format="dd/MM/yyyy" width="90"></dxi-column>
+    <dxi-column alignment="left" caption="No. Factura" dataField="referenceNumber"></dxi-column>
+    <dxi-column alignment="left" caption="Referencia" dataField="reference"></dxi-column>
+    <dxi-column alignment="left" caption="Diario" dataField="journalEntry"></dxi-column>
+    <dxi-column alignment="right" caption="Total" dataType="currency" dataField="total" [format]="{ 
         style: 'currency', 
         currency: 'HNL', 
         minimumFractionDigits: 2, 
         useGrouping: true 
-      }"
-    ></dxi-column>
-    <dxi-column
-      alignment="center"
-      caption="Estado"
-      dataField="status"
-    ></dxi-column>
+      }"></dxi-column>
+    <dxi-column alignment="center" caption="Estado" dataField="status"></dxi-column>
 
     <dxo-summary>
-      <dxi-total-item
-  column="total"
-  summaryType="sum"
-  [valueFormat]="{ 
+      <dxi-total-item column="total" summaryType="sum" [valueFormat]="{ 
       style: 'currency', 
       currency: 'HNL', 
       minimumFractionDigits: 2, 
       useGrouping: true 
-    }"
-  displayFormat="Total {0}"
-></dxi-total-item>
+    }" displayFormat="Total {0}"></dxi-total-item>
 
-<dxi-group-item
-        column="total"
-        summaryType="sum"
-        displayFormat="total: {0}"
-        [valueFormat]="{ 
+      <dxi-group-item column="total" summaryType="sum" displayFormat="total: {0}" [valueFormat]="{ 
           style: 'currency', 
           currency: 'HNL', 
           minimumFractionDigits: 2, 
           useGrouping: true 
-        }"
-        [showInGroupFooter]="true"
-        [alignByColumn]="true"
-      ></dxi-group-item>
-      <dxi-group-item
-      column="total"
-      summaryType="sum"
-      [showInGroupFooter]="false"
-      [valueFormat]="{ 
+        }" [showInGroupFooter]="true" [alignByColumn]="true"></dxi-group-item>
+      <dxi-group-item column="total" summaryType="sum" [showInGroupFooter]="false" [valueFormat]="{ 
         style: 'currency', 
         currency: 'HNL', 
         minimumFractionDigits: 2, 
         useGrouping: true 
-      }"
-      displayFormat="Total {1}:{0}" 
-    ></dxi-group-item>
-       
+      }" displayFormat="Total {1}:{0}"></dxi-group-item>
+
     </dxo-summary>
   </dx-data-grid>
 </div>

@@ -7,6 +7,7 @@ import { exportDataGrid } from 'devextreme/excel_exporter';
 import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver';
+import { finalize } from 'rxjs';
 
 
 interface Incomes {
@@ -33,6 +34,9 @@ export class TrialBalanceComponent {
 
   periodoAnual: any;
 
+  isLoading = false;
+  errorMsg: string | null = null;
+
   private readonly reportService = inject(ReportServiceService, {
     optional: true,
   });
@@ -40,66 +44,63 @@ export class TrialBalanceComponent {
   constructor() { }
 
   ngOnInit(): void {
-
     this.loadInfoBalance();
 
-    this.reportService?.getTrialBalance().subscribe((data: TrialBalaceResponse) => {
+    this.isLoading = true; 
+    this.reportService?.getTrialBalance()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (data: TrialBalaceResponse) => {
+          data.periods.sort((a, b) => new Date(a.startPeriod).getTime() - new Date(b.startPeriod).getTime());
+          const filteredPeriods = data.periods.filter(period => period.closureType !== "Anual");
 
-      data.periods.sort((a, b) => new Date(a.startPeriod).getTime() - new Date(b.startPeriod).getTime());
-      
+          const initialBalances = filteredPeriods[0].accountBalances.map(diary => ({
+            periodName: filteredPeriods[0].closureType,
+            periodDate: `${this.convertDates(filteredPeriods[0].startPeriod)} - ${this.convertDates(filteredPeriods[0].endPeriod)}`,
+            accountName: diary.name,
+            id: diary.id,
+            debit: diary.initialBalance[0].debit,
+            credit: diary.initialBalance[0].credit
+          }));
 
-      const filteredPeriods = data.periods.filter(period => period.closureType !== "Anual");
-      
-      const initialBalances = filteredPeriods[0].accountBalances.map(diary => ({
-        periodName: filteredPeriods[0].closureType,
-        periodDate: `${this.convertDates(filteredPeriods[0].startPeriod)} - ${this.convertDates(filteredPeriods[0].endPeriod)}`,
-        accountName: diary.name,
-        id:diary.id,
-        debit: diary.initialBalance[0].debit,
-        credit: diary.initialBalance[0].credit
-      }));
-    
-  
-      const lastPeriod = filteredPeriods[filteredPeriods.length - 1].accountBalances.map(diary => ({
-        periodName: filteredPeriods[filteredPeriods.length - 1].closureType,
-        periodDate: `${this.convertDates(filteredPeriods[filteredPeriods.length - 1].startPeriod)} - ${this.convertDates(filteredPeriods[filteredPeriods.length - 1].endPeriod)}`,
-        accountName: diary.name,
-        id:diary.id,
-        debit: diary.finalBalance[0].debit,
-        credit: diary.finalBalance[0].credit
-      }));
-    
-    
-      const lista = initialBalances.map(initialBalance => {
-        const correspondingTransactions = filteredPeriods.map(period => {
-          return period.accountBalances
-            .filter(diary => diary.id === initialBalance.id) 
-            .map(diary => ({
-              periodName: period.closureType,
-              periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
-              accountName: diary.name,
-              debit: diary.balancePeriod[0].debit,
-              credit: diary.balancePeriod[0].credit
-            }));
-        });
-    
-        const correspondingLastPeriod = lastPeriod.find(lp => lp.id === initialBalance.id);
-  
-        return {
-          name: initialBalance.accountName,
-          initialBalance: {
-            debit: initialBalance.debit,
-            credit: initialBalance.credit
-          },
-          transactions: correspondingTransactions, // Las transacciones se mantienen por periodo
-          lastPeriod: correspondingLastPeriod
-        };
+          const lastPeriod = filteredPeriods[filteredPeriods.length - 1].accountBalances.map(diary => ({
+            periodName: filteredPeriods[filteredPeriods.length - 1].closureType,
+            periodDate: `${this.convertDates(filteredPeriods[filteredPeriods.length - 1].startPeriod)} - ${this.convertDates(filteredPeriods[filteredPeriods.length - 1].endPeriod)}`,
+            accountName: diary.name,
+            id: diary.id,
+            debit: diary.finalBalance[0].debit,
+            credit: diary.finalBalance[0].credit
+          }));
+
+          const lista = initialBalances.map(initialBalance => {
+            const correspondingTransactions = filteredPeriods.map(period => {
+              return period.accountBalances
+                .filter(diary => diary.id === initialBalance.id)
+                .map(diary => ({
+                  periodName: period.closureType,
+                  periodDate: `${this.convertDates(period.startPeriod)} - ${this.convertDates(period.endPeriod)}`,
+                  accountName: diary.name,
+                  debit: diary.balancePeriod[0].debit,
+                  credit: diary.balancePeriod[0].credit
+                }));
+            });
+            const correspondingLastPeriod = lastPeriod.find(lp => lp.id === initialBalance.id);
+
+            return {
+              name: initialBalance.accountName,
+              initialBalance: { debit: initialBalance.debit, credit: initialBalance.credit },
+              transactions: correspondingTransactions,
+              lastPeriod: correspondingLastPeriod
+            };
+          });
+
+          this.trialBalanceData = lista;
+        },
+        error: (err) => {
+          this.errorMsg = 'No se pudo cargar la balanza de comprobación.';
+          console.error(err);
+        }
       });
-
-      this.trialBalanceData= lista;
-    
-    });
-    
   }
 
 
@@ -127,9 +128,9 @@ export class TrialBalanceComponent {
       });
     });
   }
- 
 
-  loadInfoBalance(){
+
+  loadInfoBalance() {
 
     this.company = JSON.parse(localStorage.getItem("company") ?? "");
 
@@ -139,7 +140,7 @@ export class TrialBalanceComponent {
     const startDate = new Date(periodo.startPeriod);
     const endDate = new Date(periodo.endPeriod);
 
-    const formatMonth = (month:any) => {
+    const formatMonth = (month: any) => {
       const months = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"

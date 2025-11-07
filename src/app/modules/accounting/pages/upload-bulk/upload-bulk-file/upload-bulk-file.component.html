@@ -91,7 +91,7 @@
 
 <div class="w-4/5 h-px bg-gray-300 my-4 mx-auto"></div>
 
-<dx-data-grid id="grid-billing-client" class="mx-auto mt-2 py-2 w-full" [dataSource]="TransactionUpload$"
+<dx-data-grid *ngIf="showGrid" id="grid-billing-client" class="mx-auto mt-2 py-2 w-full" [dataSource]="TransactionUpload$"
     [showBorders]="true" [height]="500" [repaintChangesOnly]="true" [allowColumnReordering]="true"
     [rowAlternationEnabled]="true" [allowColumnResizing]="true" [allowColumnReordering]="true" [showRowLines]="true"
     [allowColumnResizing]="true" noDataText="" [width]="'90%'">

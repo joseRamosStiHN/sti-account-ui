@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environment/environment';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { PeriodClosing, PeriodsRequest, PeriodsResponse, TaxSettings } from 'src/app/modules/accounting/models/APIModels';
 import { ClosingPeriodsAll, NextPeridModel } from 'src/app/modules/accounting/models/models';
 import { PeriodModel } from 'src/app/modules/accounting/models/PeriodModel';
@@ -300,6 +300,16 @@ export class PeriodService {
   }
 
 
+getUtilityTaxRate(scope: 'Mensual' | 'Anual', uai: number): Observable<number> {
+  const url = `${this.apiURL}/api/v1/tax-settings/rate?scope=${encodeURIComponent(scope)}&uai=${encodeURIComponent(String(uai))}`;
+  return this.httpClient.get<{ rate: number | string }>(url).pipe(
+    map(res => typeof res.rate === 'number' ? res.rate : Number(res.rate)),
+    catchError((e) => {
+      console.error('Fallo consultando tasa ISR, usando fallback 0.25', e);
+      return of(0.25);
+    })
+  );
+}
 
 
 

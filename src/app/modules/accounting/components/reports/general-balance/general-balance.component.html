@@ -1,24 +1,32 @@
-<div class="w-100 items-center mt-5">
+<!-- Spinner overlay -->
+<dx-load-panel [visible]="isLoading" [showIndicator]="true" [showPane]="true" [shading]="true"
+  shadingColor="rgba(0,0,0,0.2)" message="Cargando...">
+</dx-load-panel>
+
+<!-- Mensaje de error (opcional) -->
+<div *ngIf="errorMsg" class="my-3 rounded-md bg-red-50 px-4 py-2 text-red-700 text-center">
+  {{ errorMsg }}
+</div>
+
+<!-- CONTENIDO -->
+<div class="w-100 items-center mt-5" *ngIf="!isLoading && !errorMsg">
 
 
   <h1 class="text-2xl font-semibold text-center">{{company.name}}</h1>
   <h2 class="text-2xl font-semibold text-center">Balance General</h2>
   <h3 class="font-semibold text-center">{{periodoAnual}}</h3>
-  
+
   <br>
-  <form class="flex justify-start items-center m-5 gap-4"  #itemForm="ngForm"
-  (ngSubmit)="onSubmit(itemForm)"
->
-    <select  [(ngModel)]="selectedPeriod"
+  <form class="flex justify-start items-center m-5 gap-4" #itemForm="ngForm" (ngSubmit)="onSubmit(itemForm)">
+    <select [(ngModel)]="selectedPeriod"
       class="border border-gray-300 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      name="period"
-      aria-label="Seleccionar período" required>
+      name="period" aria-label="Seleccionar período" required>
       <option value="" disabled selected>Seleccione un período</option>
       <option *ngFor="let period of periodList$ | async" [ngValue]="period.id">
         {{ period.closureType }} {{ period.startPeriod | date: 'dd-MM-yyyy' }}
       </option>
     </select>
-    
+
     <button type="submit"
       class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
       Buscar
@@ -27,15 +35,14 @@
 
   <br>
   <div class="flex justify-end mb-3">
-    <button
-      (click)="exportToExcel()"
+    <button (click)="exportToExcel()"
       class="bg-green-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
       Exportar a Excel
     </button>
   </div>
-  
+
   <div class="flex flex-wrap">
- 
+
 
     <div class="w-full md:w-1/2 pr-2 mt-4 md:mt-0">
 
@@ -174,5 +181,5 @@
     } }
   </ng-template>
 
- 
+
 </div>

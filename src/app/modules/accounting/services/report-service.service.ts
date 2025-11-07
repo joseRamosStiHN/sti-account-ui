@@ -27,30 +27,14 @@ export class ReportServiceService {
     return this.http.get<TrialBalaceResponse>(url);
   }
 
-  getIncomeStatement(id:number): Observable<IncomeStatement[]> {
-    if (id == 0) {
-       const url = `${this.BASE_URL}/api/v1/income-statement`;
-       return this.http.get<IncomeStatement[]>(url).pipe(
-        // Convertir el campo 'date' en un objeto Date
-        map(data => data.map(statement => ({
-          ...statement,
-          date: new Date(statement.date)
-        })))
-      );
-    }
+getIncomeStatement(id:number): Observable<IncomeStatement[]> {
+  const url = id === 0
+    ? `${this.BASE_URL}/api/v1/income-statement`
+    : `${this.BASE_URL}/api/v1/income-statement?periodId=${id}`;
 
-    const url = `${this.BASE_URL}/api/v1/income-statement?periodId=${id}`;
-    return this.http.get<IncomeStatement[]>(url).pipe(
-     // Convertir el campo 'date' en un objeto Date
-     map(data => data.map(statement => ({
-       ...statement,
-       date: new Date(statement.date)
-     })))
-   );
-   
+  return this.http.get<IncomeStatement[]>(url);
+}
 
-   
-  }
 
   private formatDate(dateString: string): string {
     const date = new Date(dateString);
