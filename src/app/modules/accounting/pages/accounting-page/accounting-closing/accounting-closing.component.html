@@ -1,16 +1,30 @@
-<div class="w-full flex flex-col mt-3 gap-3">
+<!-- SPINNER GLOBAL (arranque y procesos de confirmación) -->
+<dx-load-panel
+  [visible]="isLoading || isProcessing"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  shadingColor="rgba(0,0,0,0.2)"
+  [message]="loadMessage">
+</dx-load-panel>
+
+<!-- CONTENIDO -->
+<div class="w-full flex flex-col mt-3 gap-3" [class.opacity-60]="isProcessing">
+
+  <!-- Título -->
   <h2 *ngIf="!nextYear"
-    class="mt-4 mb-2 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
+      class="mt-4 mb-2 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
     Cierre Contable
   </h2>
   <h2 *ngIf="nextYear"
-    class="mb-2 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
+      class="mb-2 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-3xl lg:text-4xl">
     Cierre Contable Anual
   </h2>
+
   <div id="container" class="container mx-auto p-4 bg-gray-100 rounded-lg shadow-md space-y-4">
+    <!-- Datos del período -->
     <div class="container mx-auto p-4 bg-gray-100 rounded-lg">
       <h2 class="text-xl font-serif text-gray-700 mb-3">Datos del Período</h2>
-
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white p-4 rounded-lg shadow-sm">
           <p class="text-gray-500 text-ms">Fecha de Inicio:</p>
@@ -26,30 +40,39 @@
         </div>
       </div>
     </div>
+
+    <!-- Resumen contable -->
     <div class="container mx-auto p-4 bg-gray-100 rounded-lg">
       <h2 class="text-xl font-serif text-gray-700 mb-3">Resumen Contable</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white p-4 rounded-lg shadow-md">
           <h3 class="text-ms font-semibold text-gray-700 mb-2">Saldos Finales</h3>
-          <p class="text-gray-600 text-ms">Activos Totales: <span class="font-semibold text-gray-800">{{
-              (infoClosing)?.totalAssets }}</span></p>
-          <p class="text-gray-600 text-ms">Pasivos Totales: <span class="font-semibold text-gray-800">{{
-              (infoClosing)?.totalLiabilities }}</span></p>
-          <p class="text-gray-600 text-ms">Capital: <span class="font-semibold text-gray-800">{{
-              (infoClosing)?.totalCapital }}</span></p>
+          <p class="text-gray-600 text-ms">Activos Totales:
+            <span class="font-semibold text-gray-800">{{ (infoClosing)?.totalAssets }}</span>
+          </p>
+          <p class="text-gray-600 text-ms">Pasivos Totales:
+            <span class="font-semibold text-gray-800">{{ (infoClosing)?.totalLiabilities }}</span>
+          </p>
+          <p class="text-gray-600 text-ms">Capital:
+            <span class="font-semibold text-gray-800">{{ (infoClosing)?.totalCapital }}</span>
+          </p>
         </div>
         <div class="bg-white p-4 rounded-lg shadow-md">
           <h3 class="text-ms font-semibold text-gray-700 mb-2">Utilidades</h3>
-          <p class="text-gray-600 text-ms">Ingresos Totales: <span class="font-semibold text-gray-800">{{
-              (infoClosing)?.totalIncome }}</span></p>
-          <p class="text-gray-600 text-ms">Gastos Totales: <span class="font-semibold text-gray-800">{{
-              (infoClosing)?.totalExpenses }}</span></p>
-          <p class="text-gray-600 text-ms">Utilidad Neta: <span class="font-semibold text-gray-800">{{
-              (infoClosing)?.netIncome }}</span></p>
+          <p class="text-gray-600 text-ms">Ingresos Totales:
+            <span class="font-semibold text-gray-800">{{ (infoClosing)?.totalIncome }}</span>
+          </p>
+          <p class="text-gray-600 text-ms">Gastos Totales:
+            <span class="font-semibold text-gray-800">{{ (infoClosing)?.totalExpenses }}</span>
+          </p>
+          <p class="text-gray-600 text-ms">Utilidad Neta:
+            <span class="font-semibold text-gray-800">{{ (infoClosing)?.netIncome }}</span>
+          </p>
         </div>
       </div>
     </div>
 
+    <!-- Periodos cerrados -->
     <div class="container mx-auto p-4 bg-gray-100 rounded-lg">
       <h2 class="text-xl font-serif text-gray-700 mb-3">Periodos Cerrados</h2>
       <div class="overflow-x-auto">
@@ -64,150 +87,174 @@
             </tr>
           </thead>
           <tbody>
-
             @for (item of periodsClosing; track $index) {
-            <tr>
-              <td class="px-3 py-2 text-ms text-gray-800">{{$index + 1}}</td>
-              <td class="px-3 py-2 text-ms text-gray-800">{{item.startPeriod | date: 'dd/MM/yyyy'}}</td>
-              <td class="px-3 py-2 text-ms text-gray-800">{{item.endPeriod | date: 'dd/MM/yyyy'}} </td>
-              <td class="px-3 py-2 text-ms font-semibold text-gray-600">
-
-                <a (click)="dowloadPdf(item)" class="text-blue-600 underline hover:text-blue-800">
-                  Descargar
-                </a>
-
-              </td>
-              <td class="px-3 py-2 text-ms text-gray-800">Cerrado</td>
-            </tr>
+              <tr>
+                <td class="px-3 py-2 text-ms text-gray-800">{{ $index + 1 }}</td>
+                <td class="px-3 py-2 text-ms text-gray-800">{{ item.startPeriod | date: 'dd/MM/yyyy' }}</td>
+                <td class="px-3 py-2 text-ms text-gray-800">{{ item.endPeriod | date: 'dd/MM/yyyy' }}</td>
+                <td class="px-3 py-2 text-ms font-semibold text-gray-600">
+                  <a (click)="dowloadPdf(item)" class="text-blue-600 underline hover:text-blue-800">
+                    Descargar
+                  </a>
+                </td>
+                <td class="px-3 py-2 text-ms text-gray-800">Cerrado</td>
+              </tr>
             }
-
           </tbody>
         </table>
       </div>
     </div>
 
+    <!-- Acciones -->
     <div class="flex justify-end gap-2">
-      <button *ngIf="!nextYear" (click)="openModal()"
-        class="bg-red-500 text-white font-semibold py-1 px-4 rounded-lg hover:bg-red-700 transition ease-in-out duration-150 text-sm">
+      <button *ngIf="!nextYear"
+              (click)="openModal()"
+              [disabled]="isProcessing"
+              class="bg-red-500 text-white font-semibold py-1 px-4 rounded-lg hover:bg-red-700 transition ease-in-out duration-150 text-sm disabled:opacity-50">
         Cerrar Período
       </button>
 
-      <button *ngIf="nextYear" (click)="openModalYear()"
-        class="bg-red-500 text-white font-semibold py-1 px-4 rounded-lg hover:bg-red-700 transition ease-in-out duration-150 text-sm">
+      <button *ngIf="nextYear"
+              (click)="openModalYear()"
+              [disabled]="isProcessing"
+              class="bg-red-500 text-white font-semibold py-1 px-4 rounded-lg hover:bg-red-700 transition ease-in-out duration-150 text-sm disabled:opacity-50">
         Cerrar Período Anual
       </button>
     </div>
-
-
-
-
   </div>
-
 </div>
 
-<dx-popup [visible]="isPopupVisiblePeriod" [width]="600" [height]="400" [title]="titleNextPeriod" [dragEnabled]="true"
-  [closeOnOutsideClick]="true" (onHiding)="onPopupHiding()">
+<!-- POPUP: Cierre de período -->
+<dx-popup
+  [visible]="isPopupVisiblePeriod"
+  [width]="600"
+  [height]="400"
+  [title]="titleNextPeriod"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="!isProcessing"
+  (onHiding)="onPopupHiding()">
   <div *dxTemplate="let data of 'content'">
     <p class="font-bold text-base mb-4">Siguiente Período:</p>
+
     <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="closing()">
       <div *ngIf="!nextYearPeriod" class="grid grid-cols-2 gap-2">
         <div>
           <label for="closureType" class="block mb-2 text-sm text-gray-900">Período:</label>
-          <select [(ngModel)]="nextPeriod.closureType" required="true" name="closureType" id="closureType"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            disabled>
+          <select [(ngModel)]="nextPeriod.closureType"
+                  required="true"
+                  name="closureType"
+                  id="closureType"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                  disabled>
             <option value="Mensual">Mensual</option>
             <option value="Trimestral">Trimestral</option>
             <option value="Semestral">Semestral</option>
           </select>
-
         </div>
 
         <div class="form-group">
           <label for="startPeriod" class="block mb-2 text-sm text-gray-900">Fecha Inicio:</label>
-          <input [(ngModel)]="nextPeriod.startPeriod" id="startPeriod" name="startPeriod" type="text"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            disabled />
-        </div>
-        <div class="form-group">
-          <label for="endPeriod" class="block mb-2 text-sm text-gray-900">Fecha Fin:</label>
-          <input [(ngModel)]="nextPeriod.endPeriod" id="endPeriod" name="endPeriod" type="text"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            disabled />
+          <input [(ngModel)]="nextPeriod.startPeriod"
+                 id="startPeriod"
+                 name="startPeriod"
+                 type="text"
+                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                 disabled />
         </div>
 
+        <div class="form-group">
+          <label for="endPeriod" class="block mb-2 text-sm text-gray-900">Fecha Fin:</label>
+          <input [(ngModel)]="nextPeriod.endPeriod"
+                 id="endPeriod"
+                 name="endPeriod"
+                 type="text"
+                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                 disabled />
+        </div>
       </div>
+
       <div *ngIf="nextYearPeriod"
-        class="grid grid-cols-2 gap-2 p-4 bg-blue-100 border-l-4 border-blue-500 rounded-lg shadow-md">
+           class="grid grid-cols-2 gap-2 p-4 bg-blue-100 border-l-4 border-blue-500 rounded-lg shadow-md">
         <div class="col-span-2 text-center">
           <h2 class="text-lg font-semibold text-blue-700">✨ Último Período del Año ✨</h2>
-          <p class="mt-2 text-gray-600">Este es el mes de <span class="font-medium text-blue-700">diciembre</span>.
-            Estamos por cerrar el último periodo.</p>
+          <p class="mt-2 text-gray-600">
+            Este es el mes de <span class="font-medium text-blue-700">diciembre</span>.
+            Estamos por cerrar el último periodo.
+          </p>
           <p class="text-gray-500 mt-1">La nueva configuración será definida al finalizar el año.</p>
         </div>
       </div>
 
-
       <div class="mt-20 flex justify-end">
         <button type="submit"
-          class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50">
+                [disabled]="isProcessing"
+                class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50">
           Confirmar
         </button>
       </div>
-
-
     </form>
-
   </div>
 </dx-popup>
 
-
-<dx-popup [visible]="isPopupVisibleYear" [width]="600" [height]="400"
-  [title]="'Configuracion Siguiente Período Contable'" [dragEnabled]="true" [closeOnOutsideClick]="true"
+<!-- POPUP: Cierre anual / configuración siguiente período -->
+<dx-popup
+  [visible]="isPopupVisibleYear"
+  [width]="600"
+  [height]="400"
+  [title]="'Configuracion Siguiente Período Contable'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="!isProcessing"
   (onHiding)="onPopupHidingYear()">
   <div *dxTemplate="let data of 'content'">
     <form id="clientForm" class="w-100" #itemForm="ngForm" (ngSubmit)="closingYear()">
       <div class="grid grid-cols-2 gap-2">
         <div>
           <label for="closureType" class="block mb-2 text-sm text-gray-900">Período</label>
-          <select [(ngModel)]="nextPeriod.closureType" required="true" name="closureType" id="closureType"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            (change)="onChange(nextPeriod.closureType)">
+          <select [(ngModel)]="nextPeriod.closureType"
+                  required="true"
+                  name="closureType"
+                  id="closureType"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                  (change)="onChange(nextPeriod.closureType)">
             <option value="Mensual">Mensual</option>
             <option value="Trimestral">Trimestral</option>
             <option value="Semestral">Semestral</option>
           </select>
-
         </div>
 
         <div class="form-group">
           <label for="startPeriod" class="block mb-2 text-sm text-gray-900">Fecha Inicio</label>
-          <input [(ngModel)]="nextPeriod.startPeriod" id="startPeriod" name="startPeriod" type="text"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            disabled />
-        </div>
-        <div class="form-group">
-          <label for="endPeriod" class="block mb-2 text-sm text-gray-900">Fecha Fin</label>
-          <input [(ngModel)]="nextPeriod.endPeriod" id="endPeriod" name="endPeriod" type="text"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-            disabled />
+          <input [(ngModel)]="nextPeriod.startPeriod"
+                 id="startPeriod"
+                 name="startPeriod"
+                 type="text"
+                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                 disabled />
         </div>
 
+        <div class="form-group">
+          <label for="endPeriod" class="block mb-2 text-sm text-gray-900">Fecha Fin</label>
+          <input [(ngModel)]="nextPeriod.endPeriod"
+                 id="endPeriod"
+                 name="endPeriod"
+                 type="text"
+                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                 disabled />
+        </div>
       </div>
 
       <div class="mt-32 flex justify-end">
         <button type="submit"
-          class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50">
+                [disabled]="isProcessing"
+                class="font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 text-white bg-blue-600 disabled:bg-blue-300 disabled:opacity-50">
           Confirmar
         </button>
       </div>
-
-
     </form>
-
   </div>
 </dx-popup>
 
+<!-- TOAST -->
 <dx-toast [(visible)]="showToast" [type]="toastType" [message]="messageToast">
-  <dxo-position my="top" at="top" of="#container"> </dxo-position>
+  <dxo-position my="top" at="top" of="#container"></dxo-position>
 </dx-toast>
